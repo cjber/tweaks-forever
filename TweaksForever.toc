@@ -1,0 +1,17 @@
+## Interface: 16001
+## Title: Tweaks Forever
+## Notes: Small quality-of-life automations and fixes that extend the default UI, stepping aside where another addon already does the job.
+## Author: cjber
+## Version: @project-version@
+## Category: Quality of Life
+## X-License: GPL-3.0-or-later
+## X-Website: https://github.com/cjber/tweaks-forever
+## SavedVariables: TweaksForeverDB
+
+Data\Overlays.lua
+Core.lua
+Automation.lua
+Vendor.lua
+Junk.lua
+Exploration.lua
+Settings.lua
