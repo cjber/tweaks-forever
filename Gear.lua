@@ -81,8 +81,17 @@ end
 
 -- { { item, slot } } in slot order for a group's items, given each item's inventory type.
 function Model.Plan(items, equipLoc)
+	-- Fewest choices first, so a main-hand-only weapon is not crowded out by a one-hander.
+	local ordered = { unpack(items) }
+	table.sort(ordered, function(a, b)
+		local na, nb = #(SLOTS[equipLoc(a)] or {}), #(SLOTS[equipLoc(b)] or {})
+		if na ~= nb then
+			return na < nb
+		end
+		return a < b
+	end)
 	local used, plan = {}, {}
-	for _, item in ipairs(items) do
+	for _, item in ipairs(ordered) do
 		for _, slot in ipairs(SLOTS[equipLoc(item)] or {}) do
 			if not used[slot] then
 				used[slot] = true
@@ -101,8 +110,13 @@ local function Char()
 	return TweaksForeverCharDB
 end
 
--- Saved Equipment Manager sets as { [name] = { [itemID] = true } }, with each set's ID.
+-- Saved Equipment Manager sets as { [name] = { [itemID] = true } }, with each set's ID. Read once per change,
+-- since every bag slot asks.
+local stockSets, stockIDs
 local function StockSets()
+	if stockSets then
+		return stockSets, stockIDs
+	end
 	local sets, ids = {}, {}
 	for _, id in ipairs(C_EquipmentSet.GetEquipmentSetIDs()) do
 		local name = C_EquipmentSet.GetEquipmentSetInfo(id)
@@ -112,6 +126,7 @@ local function StockSets()
 		end
 		sets[name], ids[name] = items, id
 	end
+	stockSets, stockIDs = sets, ids
 	return sets, ids
 end
 
@@ -148,7 +163,6 @@ local function Equip(name)
 		for itemID in pairs(Char().groups[name]) do
 			items[#items + 1] = itemID
 		end
-		table.sort(items)
 		plan = Model.Plan(items, function(itemID)
 			return select(4, C_Item.GetItemInfoInstant(itemID))
 		end)
@@ -328,7 +342,10 @@ ns.Init(function()
 		end
 	end)
 	ns.On("BAG_UPDATE_DELAYED", RefreshBags)
-	ns.On("EQUIPMENT_SETS_CHANGED", RefreshBags)
+	ns.On("EQUIPMENT_SETS_CHANGED", function()
+		stockSets = nil
+		RefreshBags()
+	end)
 	Settings.SetOnValueChangedCallback("TweaksForever_gearGroups", RefreshBags)
 	Settings.SetOnValueChangedCallback("TweaksForever_beforeFishing", RefreshBags)
 	Settle()

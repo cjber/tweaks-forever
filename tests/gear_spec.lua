@@ -39,4 +39,10 @@ for _, step in ipairs(plan) do
 	slots[#slots + 1] = step.item .. "@" .. step.slot
 end
 assert(table.concat(slots, " ") == "6@1 1@11 2@12 4@16 5@17", table.concat(slots, " "))
+
+types[7] = "INVTYPE_WEAPONMAINHAND"
+plan = Model.Plan({ 4, 7 }, function(item)
+	return types[item]
+end)
+assert(plan[1].item == 7 and plan[1].slot == 16 and plan[2].item == 4 and plan[2].slot == 17)
 print("gear: ok")
