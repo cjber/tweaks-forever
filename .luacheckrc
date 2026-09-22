@@ -4,6 +4,7 @@ exclude_files = { "tools/.cache/**", ".release/**" }
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
 	"SLASH_TWEAKSFOREVER1",
+	"SLASH_TWEAKSFOREVER_RELOAD1",
 	"SlashCmdList",
 	"TweaksForeverDB",
 	"UIErrorsFrame",
@@ -24,6 +25,7 @@ read_globals = {
 	"C_Spell",
 	"C_SummonInfo",
 	"C_Timer",
+	"C_UI",
 	"CancelDuel",
 	"CanGuildBankRepair",
 	"CanMerchantRepair",

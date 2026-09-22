@@ -17,4 +17,5 @@ Exploration.lua
 Frames.lua
 Errors.lua
 Fishing.lua
+Reload.lua
 Settings.lua
