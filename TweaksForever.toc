@@ -8,12 +8,14 @@
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
 ## SavedVariables: TweaksForeverDB
+## SavedVariablesPerCharacter: TweaksForeverCharDB
 
 Data\Overlays.lua
 Core.lua
 Automation.lua
 Vendor.lua
 Junk.lua
+Gear.lua
 Exploration.lua
 Frames.lua
 Errors.lua

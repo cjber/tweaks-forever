@@ -75,13 +75,14 @@ function Model.BestLure(count, skill)
 	end
 end
 
-local function HasPole()
-	local item = GetInventoryItemID("player", INVSLOT_MAINHAND)
-	if not item then
-		return false
-	end
+function Model.IsPole(item)
 	local _, _, _, _, _, classID, subclassID = C_Item.GetItemInfoInstant(item)
 	return classID == Enum.ItemClass.Weapon and subclassID == Enum.ItemWeaponSubclass.Fishingpole
+end
+
+local function HasPole()
+	local item = GetInventoryItemID("player", INVSLOT_MAINHAND)
+	return item ~= nil and Model.IsPole(item)
 end
 
 local function HasLure()
