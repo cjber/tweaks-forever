@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <title>Tweaks Forever</title>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0" stop-color="#3a2a1c"/>
+      <stop offset="1" stop-color="#120c08"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fbe7a1"/>
+      <stop offset="0.45" stop-color="#d9a441"/>
+      <stop offset="1" stop-color="#7a4f14"/>
+    </linearGradient>
+    <linearGradient id="cog" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff4c2"/>
+      <stop offset="0.5" stop-color="#f2c14e"/>
+      <stop offset="1" stop-color="#b3741c"/>
+    </linearGradient>
+    <linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="6" y="6" width="244" height="244" rx="28" fill="url(#gold)"/>
+  <rect x="16" y="16" width="224" height="224" rx="20" fill="url(#bg)"/>
+
+  <!-- cog -->
+  <path d="M113.7 53.4 L116.1 32.8 L139.9 32.8 L142.3 53.4 L167.8 64.0 L184.1 51.1 L200.9 67.9 L188.0 84.2 L198.6 109.7 L219.2 112.1 L219.2 135.9 L198.6 138.3 L188.0 163.8 L200.9 180.1 L184.1 196.9 L167.8 184.0 L142.3 194.6 L139.9 215.2 L116.1 215.2 L113.7 194.6 L88.2 184.0 L71.9 196.9 L55.1 180.1 L68.0 163.8 L57.4 138.3 L36.8 135.9 L36.8 112.1 L57.4 109.7 L68.0 84.2 L55.1 67.9 L71.9 51.1 L88.2 64.0 Z" fill="#000" opacity="0.45" transform="translate(4 5)"/>
+  <path d="M113.7 53.4 L116.1 32.8 L139.9 32.8 L142.3 53.4 L167.8 64.0 L184.1 51.1 L200.9 67.9 L188.0 84.2 L198.6 109.7 L219.2 112.1 L219.2 135.9 L198.6 138.3 L188.0 163.8 L200.9 180.1 L184.1 196.9 L167.8 184.0 L142.3 194.6 L139.9 215.2 L116.1 215.2 L113.7 194.6 L88.2 184.0 L71.9 196.9 L55.1 180.1 L68.0 163.8 L57.4 138.3 L36.8 135.9 L36.8 112.1 L57.4 109.7 L68.0 84.2 L55.1 67.9 L71.9 51.1 L88.2 64.0 Z" fill="url(#cog)" stroke="#5a360c" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="128" cy="124" r="46" fill="url(#bg)" stroke="#5a360c" stroke-width="5"/>
+
+  <!-- tick -->
+  <path d="M102 124 L122 146 L160 100" fill="none" stroke="#000" stroke-opacity="0.5" stroke-width="18" stroke-linecap="round" stroke-linejoin="round" transform="translate(3 4)"/>
+  <path d="M102 124 L122 146 L160 100" fill="none" stroke="#40c040" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M102 124 L122 146 L160 100" fill="none" stroke="url(#shine)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
