@@ -16,4 +16,5 @@ Junk.lua
 Exploration.lua
 Frames.lua
 Errors.lua
+Fishing.lua
 Settings.lua
