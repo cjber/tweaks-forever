@@ -180,6 +180,10 @@ ns.Init(function()
 			UpdateSounds()
 		end
 	end)
+	-- Combat started between the press and the release, so PostClick could not clear the binding.
+	ns.On("PLAYER_REGEN_ENABLED", function()
+		ClearOverrideBindings(button)
+	end)
 	-- SavedVariables are written after this, so the restored volumes stay restored if the game closes.
 	ns.On("PLAYER_LOGOUT", RestoreSounds)
 	Settings.SetOnValueChangedCallback("TweaksForever_fishingSounds", UpdateSounds)
