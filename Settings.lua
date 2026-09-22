@@ -1,7 +1,7 @@
 local _, ns = ...
 
--- One stock settings page (Options → AddOns → Tweaks Forever), a section per category. A feature another addon
--- already handles is greyed out, its tooltip naming that addon.
+-- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
+-- tall. A feature another addon already handles is greyed out, its tooltip naming that addon.
 
 local function Tooltip(feature)
 	return function()
@@ -38,7 +38,7 @@ end
 
 ns.Init(function()
 	local category, layout = Settings.RegisterVerticalLayoutCategory("Tweaks Forever")
-	-- Sections in the order their first feature loads; several files add to one section.
+	-- Subpages in the order their first feature loads; several files add to one.
 	local sections, bySection = {}, {}
 	for _, feature in ipairs(ns.features) do
 		if not bySection[feature.category] then
@@ -49,10 +49,14 @@ ns.Init(function()
 	end
 	local initializers = {}
 	for _, section in ipairs(sections) do
-		layout:AddInitializer(CreateSettingsListSectionHeaderInitializer(section))
+		local subcategory = Settings.RegisterVerticalLayoutSubcategory(category, section)
 		for _, feature in ipairs(bySection[section]) do
-			AddCheckbox(category, feature, initializers)
+			AddCheckbox(subcategory, feature, initializers)
 		end
+		-- The index is buttons that open each subpage; search finds the settings themselves instead.
+		layout:AddInitializer(CreateSettingsButtonInitializer(section, "Open", function()
+			Settings.OpenToCategory(subcategory:GetID())
+		end, nil, false))
 	end
 	Settings.RegisterAddOnCategory(category)
 	-- Another addon's settings may have changed since login.
