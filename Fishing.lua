@@ -28,7 +28,7 @@ ns.Feature({
 	key = "lureWarning",
 	category = "Fishing",
 	name = "Warn when your pole has no lure",
-	tooltip = "A message when you equip a fishing pole without a lure, and each time you cast without one.",
+	tooltip = "A message when you log in or equip a fishing pole without a lure, and each time you cast without one.",
 	default = true,
 	conflicts = FISHING_ADDONS,
 })
@@ -151,7 +151,8 @@ ns.Init(function()
 			or not ns.Active("easyCast")
 			or InCombatLockdown()
 			or IsMounted()
-			or GetMouseFoci()[1] ~= WorldFrame
+			-- Over open world the list may be empty rather than WorldFrame; a UI frame keeps its own click.
+			or (GetMouseFoci()[1] or WorldFrame) ~= WorldFrame
 			or not HasPole()
 		then
 			return
@@ -171,6 +172,12 @@ ns.Init(function()
 
 	ns.On("UNIT_SPELLCAST_CHANNEL_START", function(unit, _, spellID)
 		if unit == "player" and C_Spell.GetSpellName(spellID) == fishing then
+			WarnNoLure()
+		end
+	end)
+	-- A pole already in hand at login or after a reload never fires PLAYER_EQUIPMENT_CHANGED.
+	ns.On("PLAYER_ENTERING_WORLD", function(isLogin, isReload)
+		if isLogin or isReload then
 			WarnNoLure()
 		end
 	end)
