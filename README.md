@@ -7,7 +7,7 @@ Small quality-of-life automations for WoW: Forever that feel like part of the de
 <a href="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml"><img src="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 </p>
 
-Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, a revealed world map, movable windows and fishing. Nothing opens a window of its own. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`), with a page for each section.
+Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`), with a page for each section.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight. This is checked again each time the settings open.
 
@@ -26,6 +26,11 @@ When another addon already does one of these jobs, that feature is greyed out an
 - Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat.
 - Sell junk automatically, up to 12 stacks per visit, so everything sold is still in the buyback tab.
 - Mark any bag item as junk with **Alt+Right-click** (off by default). Marked items get the game's junk coin and a tooltip line, and they are sold with your greys, by the merchant's Sell All Junk button too. Marks are account-wide.
+
+**Gear**
+- **Ctrl+Right-click** a bag item to put it in a named group, such as Healing, DPS or Levelling, or to start a new one. The same menu equips a whole group, or an Equipment Manager set the item is in, in one click.
+- Items in a group or an Equipment Manager set get the Equipment Manager's icon in your bags, and a line like "Gear: Healing, DPS" in their tooltip. Groups are kept per character.
+- Equipping a fishing pole remembers the weapons it replaced as a **Before fishing** group, so they stand out in your bags. Ctrl+Right-click one to put them back on.
 
 **Maps**
 - Reveal unexplored areas on zone maps, tinted blue so explored ground still stands out (off by default).
