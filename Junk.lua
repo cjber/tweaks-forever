@@ -139,8 +139,9 @@ ns.Init(function()
 		end
 	end
 
+	-- A bag reports its size before its buttons exist, so a slot can have no button yet.
 	local function HookButton(button)
-		if hooked[button] then
+		if not button or hooked[button] then
 			return
 		end
 		hooked[button] = true
