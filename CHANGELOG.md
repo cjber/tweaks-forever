@@ -17,3 +17,4 @@ First release: quality-of-life automations that sit inside the game's own settin
 - **Mark any item as junk** with Alt+Right-click in your bags. It gets the game's junk coin while a merchant is open, a tooltip line, and Sell All Junk sells it along with your greys.
 - **Automatic junk selling**, twelve stacks per visit so the buyback tab can still undo it.
 - **Unexplored areas on zone maps**, tinted blue so you can see what you haven't found yet.
+- **Move and scale windows in Edit Mode.** A Windows section under the Edit Mode panel shows the character sheet, quest log, vendors, bank, mailbox, trainers, auction house and other Blizzard windows so you can drag, snap and scale them like the rest of the UI. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.

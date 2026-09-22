@@ -25,6 +25,11 @@ that feature is greyed out and its tooltip names the addon, so the two never fig
 **Maps**
 - Reveal unexplored areas on zone maps, tinted so explored ground still stands out.
 
+**Interface**
+- Move and scale Blizzard windows in **Edit Mode**. A Windows section under the Edit Mode panel previews
+  the character sheet, quest log, merchant, bank, mailbox, trainer, auction house and more, so you can drag
+  them into place like any other part of the UI. Positions are saved per Edit Mode layout.
+
 ## Install
 
 Copy the `TweaksForever` folder into `_classic_beta_/Interface/AddOns`, or install from CurseForge or Wago.
