@@ -126,7 +126,7 @@ function Model.NewQueue(blocked)
 end
 
 local records, layoutKeys = {}, {}
-local manager, section, dialog, selected, layoutKey
+local manager, tabs, sheet, faded, dialog, selected, layoutKey
 local editing, installed, scheduled = false, false, false
 local queue = Model.NewQueue(function()
 	return InCombatLockdown()
@@ -223,15 +223,26 @@ local function RefreshPreview(record)
 			width = frame:IsRightPaneCollapsed() and CHARACTER_FRAME_COLLAPSED_WIDTH or CHARACTER_FRAME_WIDTH
 			height = CHARACTER_FRAME_HEIGHT
 		elseif record.name == "WorldMapFrame" then
-			width, height = frame.minimizedWidth, frame.minimizedHeight
+			-- Opened minimized, as the quest log (L) does, with the log beside the map when it is shown.
+			width = frame.minimizedWidth + (frame:ShouldShowQuestLogPanel() and frame.questLogWidth or 0)
+			height = frame.minimizedHeight
 		end
 	end
 	preview:SetSize(width, height)
 	preview:SetScale(scale * (position and position.scale or 1))
 	preview:ClearAllPoints()
+	local panel = UIPanelWindows[record.name]
+	if panel and panel.centerFrameSkipAnchoring then
+		panel = nil -- The game menu centres itself.
+	end
 	if position then
 		Place(preview, position)
-	elseif frame and frame:GetCenter() and not (record.name == "WorldMapFrame" and frame:IsMaximized()) then
+	elseif panel then
+		-- Where the panel manager opens it on its own (UpdateUIPanelPositions), not wherever its XML left it.
+		local x = GetUIPanelLayoutAttribute("LEFT_OFFSET") + (panel.xoffset or 0)
+		local y = GetUIPanelLayoutAttribute("TOP_OFFSET") + (panel.yoffset or 0)
+		preview:SetPoint("TOPLEFT", UIParent, "TOPLEFT", x / preview:GetScale(), y / preview:GetScale())
+	elseif frame and frame:GetCenter() then
 		Place(preview, Serialize(frame, 1))
 	else
 		preview:SetPoint("CENTER", UIParent, "CENTER")
@@ -248,10 +259,51 @@ local function ClearSelection()
 	end
 end
 
+local WINDOWS_TAB = 2
+local SHEET_MIN_HEIGHT = 420
+
+-- Everything the manager draws except the grid and snap lines, which stay useful on the Windows tab.
+local function ManagerArt()
+	local art = { manager:GetRegions() }
+	for _, child in ipairs({ manager:GetChildren() }) do
+		if child ~= manager.Grid and child ~= manager.MagnetismPreviewLinesContainer then
+			art[#art + 1] = child
+		end
+	end
+	return art
+end
+
+local function ShowTab(id)
+	PanelTemplates_SetTab(tabs, id)
+	local onWindows = id == WINDOWS_TAB
+	sheet:SetShown(onWindows)
+	-- The Windows tab covers the manager and fades its own controls. Hiding them or re-running its Layout
+	-- from here would taint Edit Mode's secure layout code; alpha is not Lua state, so it stays clean.
+	if onWindows and not faded then
+		faded = {}
+		for _, region in ipairs(ManagerArt()) do
+			faded[region] = region:GetAlpha()
+			region:SetAlpha(0)
+		end
+	elseif not onWindows and faded then
+		for region, alpha in pairs(faded) do
+			region:SetAlpha(alpha)
+		end
+		faded = nil
+	end
+	tabs.Tabs[1]:ClearAllPoints()
+	tabs.Tabs[1]:SetPoint("TOPLEFT", onWindows and sheet or manager, "BOTTOMLEFT", 11, 2)
+end
+
+local function FitSheet()
+	sheet:SetHeight(math.max(SHEET_MIN_HEIGHT, manager:GetHeight()))
+end
+
 local function HideEditor()
 	ClearSelection()
-	if section then
-		section:Hide()
+	if tabs then
+		ShowTab(1) -- Gives the manager its controls back.
+		tabs:Hide()
 	end
 	for _, record in ipairs(records) do
 		if record.preview then
@@ -470,27 +522,62 @@ local function ShowPreview(record, shown)
 end
 
 local function BuildEditor()
-	-- AccountSettings:LayoutSettings owns its enum-backed checkbox table and reparents its children.
-	-- An independent sibling anchored below the manager avoids injecting insecure data into that path.
-	section = MakePanel(470, 216)
-	section:SetPoint("TOP", manager, "BOTTOM", 0, -4)
-	Label(section, "Windows", "GameFontHighlightLarge", 18, -14)
-	Label(section, "Show previews to arrange. Saved immediately for this layout.", "GameFontHighlightSmall", 18, -36)
-	local scroll = CreateFrame("ScrollFrame", nil, section, "UIPanelScrollFrameTemplate")
-	scroll:SetPoint("TOPLEFT", 16, -58)
-	scroll:SetPoint("BOTTOMRIGHT", -34, 16)
+	-- Parented to UIParent, not the manager: a child would join the manager's ResizeLayoutFrame layout.
+	tabs = CreateFrame("Frame", nil, UIParent)
+	tabs:SetSize(1, 1)
+	tabs:SetFrameStrata("DIALOG")
+	tabs:SetFrameLevel(manager:GetFrameLevel())
+	for id, text in ipairs({ "HUD", "Windows" }) do
+		local tab = CreateFrame("Button", nil, tabs, "PanelTabButtonTemplate")
+		tab:SetID(id)
+		tab:SetText(text)
+		tab:SetScript("OnClick", function()
+			ShowTab(id)
+			PlaySound(SOUNDKIT.IG_CHARACTER_INFO_TAB)
+		end)
+	end
+	PanelTemplates_SetNumTabs(tabs, #tabs.Tabs)
+
+	sheet = CreateFrame("Frame", nil, UIParent)
+	sheet:Hide()
+	sheet:SetFrameStrata("DIALOG")
+	sheet:SetFrameLevel(manager:GetFrameLevel() + 20)
+	sheet:EnableMouse(true)
+	sheet:SetPoint("TOPLEFT", manager)
+	sheet:SetPoint("TOPRIGHT", manager)
+	CreateFrame("Frame", nil, sheet, "DialogBorderTranslucentTemplate")
+	local title = sheet:CreateFontString(nil, "ARTWORK", "GameFontHighlightLarge")
+	title:SetPoint("TOP", 0, -15)
+	title:SetText(manager.Title:GetText())
+	Label(
+		sheet,
+		"Show a window to move and scale it. Changes save at once for this layout.",
+		"GameFontHighlight",
+		25,
+		-48
+	)
+	-- The same inset as Edit Mode's expanded options.
+	local inset = CreateFrame("Frame", nil, sheet)
+	inset:SetPoint("TOPLEFT", 25, -84)
+	inset:SetPoint("BOTTOMRIGHT", -25, 24)
+	NineSliceUtil.ApplyLayoutByName(inset, "UniqueCornersLayout", "OptionsFrame")
+	Label(inset, "Windows", "GameFontNormalLarge", 10, -8)
+	local scroll = CreateFrame("ScrollFrame", nil, inset, "ScrollFrameTemplate")
+	scroll:SetPoint("TOPLEFT", 4, -36)
+	scroll:SetPoint("BOTTOMRIGHT", -24, 6)
 	local child = CreateFrame("Frame", nil, scroll)
-	child:SetSize(420, math.ceil(#records / 2) * 28)
+	child:SetSize(420, math.ceil(#records / 2) * 32)
 	scroll:SetScrollChild(child)
 	for index, record in ipairs(records) do
 		local checkbox = CreateFrame("Frame", nil, child, "EditModeCheckButtonTemplate")
-		checkbox:SetPoint("TOPLEFT", (index - 1) % 2 * 210, -math.floor((index - 1) / 2) * 28)
+		checkbox:SetPoint("TOPLEFT", (index - 1) % 2 * 215, -math.floor((index - 1) / 2) * 32)
 		checkbox:SetLabelText(record.label)
 		checkbox:SetCallback(function(checked)
 			ShowPreview(record, checked)
 		end)
 		record.checkbox = checkbox
 	end
+	manager:HookScript("OnSizeChanged", FitSheet)
 
 	dialog = MakePanel(320, 164)
 	dialog:SetPoint("TOPLEFT", manager, "TOPRIGHT", 8, 0)
@@ -535,10 +622,12 @@ local function Enter()
 	end
 	editing = true
 	SyncLayouts()
-	if not section then
+	if not tabs then
 		BuildEditor()
 	end
-	section:Show()
+	FitSheet()
+	tabs:Show()
+	ShowTab(1)
 	for _, record in ipairs(records) do
 		ShowPreview(record, record.checkbox:IsControlChecked())
 	end
