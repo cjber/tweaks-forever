@@ -1,7 +1,8 @@
 # Tweaks Forever
 
-Small quality-of-life automations for WoW Forever that feel like part of the default UI: one page under
-**Options → AddOns → Tweaks Forever** (or `/tweaks`), native checkboxes, and nothing that needs its own window.
+Small quality-of-life automations for WoW Forever that feel like part of the default UI: settings under
+**Options → AddOns → Tweaks Forever** (or `/tweaks`), one page per section with native checkboxes, and nothing
+that needs its own window.
 
 When another addon already does one of these jobs (Leatrix Plus, Questie, Legacy Here, Mapster and others),
 that feature is greyed out and its tooltip names the addon, so the two never fight.
@@ -25,12 +26,20 @@ that feature is greyed out and its tooltip names the addon, so the two never fig
 **Maps**
 - Reveal unexplored areas on zone maps, tinted so explored ground still stands out.
 
+**Fishing**
+- Double right-click the world with a fishing pole equipped to cast Fishing. Not in combat or while mounted.
+- If the pole has no lure, that double-click puts on the best lure in your bags your fishing skill allows.
+- A warning when you equip a pole, or cast, without a lure.
+- Louder splashes (off by default): full sound effects, no music or ambience while a pole is equipped.
+  Your volumes come back when you unequip it.
+
 **Interface**
-- Move and scale Blizzard windows in **Edit Mode**. A Windows section under the Edit Mode panel previews
+- Move and scale Blizzard windows in **Edit Mode**. A Windows tab on the Edit Mode panel previews
   the character sheet, quest log, merchant, bank, mailbox, trainer, auction house and more, so you can drag
   them into place like any other part of the UI. Positions are saved per Edit Mode layout.
 - Quiet the errors a spammed macro repeats (on by default): no red text or spoken "not ready yet", out of
   range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
+- `/rl` reloads the interface.
 
 ## Install
 
