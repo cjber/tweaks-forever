@@ -4,7 +4,7 @@ ns.Feature({
 	key = "moveWindows",
 	category = "Interface",
 	name = "Move and scale windows in Edit Mode",
-	tooltip = "Use Windows below Edit Mode to preview, move and scale Blizzard windows. "
+	tooltip = "Use the Windows tab in Edit Mode to preview, move and scale Blizzard windows. "
 		.. "Changes save immediately for the current layout. Reset returns a window to Blizzard's placement.",
 	default = true,
 	conflicts = { { addon = "BlizzMove" }, { addon = "MoveAnything" } },
