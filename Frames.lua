@@ -239,9 +239,14 @@ local function RefreshPreview(record)
 		Place(preview, position)
 	elseif panel then
 		-- Where the panel manager opens it on its own (UpdateUIPanelPositions), not wherever its XML left it.
-		local x = GetUIPanelLayoutAttribute("LEFT_OFFSET") + (panel.xoffset or 0)
-		local y = GetUIPanelLayoutAttribute("TOP_OFFSET") + (panel.yoffset or 0)
-		preview:SetPoint("TOPLEFT", UIParent, "TOPLEFT", x / preview:GetScale(), y / preview:GetScale())
+		local y = (GetUIPanelLayoutAttribute("TOP_OFFSET") + (panel.yoffset or 0)) / preview:GetScale()
+		if panel.area == "center" or panel.area == "centerOrLeft" then
+			-- Alone on screen these centre, and ignore xoffset.
+			preview:SetPoint("TOP", UIParent, "TOP", panel.centerXOffset or 0, y)
+		else
+			local x = GetUIPanelLayoutAttribute("LEFT_OFFSET") + (panel.xoffset or 0)
+			preview:SetPoint("TOPLEFT", UIParent, "TOPLEFT", x / preview:GetScale(), y)
+		end
 	elseif frame and frame:GetCenter() then
 		Place(preview, Serialize(frame, 1))
 	else
