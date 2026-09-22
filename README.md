@@ -29,6 +29,8 @@ that feature is greyed out and its tooltip names the addon, so the two never fig
 - Move and scale Blizzard windows in **Edit Mode**. A Windows section under the Edit Mode panel previews
   the character sheet, quest log, merchant, bank, mailbox, trainer, auction house and more, so you can drag
   them into place like any other part of the UI. Positions are saved per Edit Mode layout.
+- Quiet the errors a spammed macro repeats (on by default): no red text or spoken "not ready yet", out of
+  range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
 
 ## Install
 

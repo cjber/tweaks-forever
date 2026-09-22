@@ -6,6 +6,7 @@ globals = {
 	"SLASH_TWEAKSFOREVER1",
 	"SlashCmdList",
 	"TweaksForeverDB",
+	"UIErrorsFrame",
 }
 read_globals = {
 	"AcceptQuest",

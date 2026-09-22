@@ -15,4 +15,5 @@ Vendor.lua
 Junk.lua
 Exploration.lua
 Frames.lua
+Errors.lua
 Settings.lua
