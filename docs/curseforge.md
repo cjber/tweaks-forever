@@ -1,8 +1,16 @@
 Tweaks Forever replaces a handful of single-purpose addons with options in WoW: Forever's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own, and when another addon already does one of these jobs, that option is greyed out with the addon named, so the two never fight.
 
-![Bags with gear groups marked by coloured strips, and a tooltip naming the groups](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/gear.png)
+![The Redridge Mountains map with its unexplored east revealed in a cool blue tint, beside the explored areas in full colour](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/exploration.png)
 
-![The Ctrl+Right-click menu for putting an item in a group and equipping a group](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/menu.png)
+![Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png)
+
+![A backpack with gear groups marked by coloured strips along the bottom of each slot, and a ring's tooltip ending Gear: DPS, Levelling in the groups' colours](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/gear.png)
+
+![The Ctrl+Right-click menu on a ring: group checkboxes, New group, Equip DPS, Equip Levelling and Colour](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/menu.png)
+
+![A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins, and the ring's tooltip ending Marked as junk – Alt+Right-click to unmark](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png)
+
+![A Mana Well tooltip with two green lines: Sitting nearby: Boosted Mana Regeneration, and Active: 48 Min](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png)
 
 ## Features
 

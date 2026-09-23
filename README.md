@@ -13,8 +13,21 @@ Tweaks Forever replaces a handful of single-purpose addons with checkboxes in th
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight. This is checked again each time the settings open.
 
 <p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/exploration.png" width="768" alt="The Redridge Mountains map with its unexplored east revealed in a cool blue tint, beside the explored areas in full colour">
+</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position">
+</p>
+
+<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/gear.png" width="374" alt="A backpack with gear groups marked by coloured strips along the bottom of each slot, and a ring's tooltip ending Gear: DPS, Levelling in the groups' colours">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/menu.png" width="248" alt="The Ctrl+Right-click menu on a ring: group checkboxes, New group, Equip DPS, Equip Levelling and Colour">
+</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins, and the ring's tooltip ending Marked as junk – Alt+Right-click to unmark">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip with two green lines: Sitting nearby: Boosted Mana Regeneration, and Active: 48 Min">
 </p>
 
 ## Features
