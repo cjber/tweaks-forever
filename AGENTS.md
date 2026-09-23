@@ -31,7 +31,7 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
   menus, tooltips, the tracker) is checked in game: list those checks in the PR as `/reload` tests
   for the user. Never drive the game client.
 - LuaLS 3.19.1 checks every TOC-loaded file against pinned Ketho API/FrameXML annotations.
-  `tools/typecheck.sh` fetches them into `.types/` and also checks accidental `select()` expansion.
+  `tools/typecheck.sh` fetches them into an ignored types cache and also checks accidental `select()` expansion.
 - New host globals go in `.luacheckrc`; if upstream lacks their types, declare real types in
   `types/Forever.lua`. Addon contracts live in `types/`. Never add a LuaLS globals allowlist.
 - A final `select(...)` argument, table element or return must be parenthesised, or carry a
