@@ -148,6 +148,7 @@ read_globals = {
 	"unpack",
 	"UpdateContainerFrameAnchors",
 	"UpdateUIPanelPositions",
+	"wipe",
 	"WorldFrame",
 	"WorldMapFrame",
 	"YELLOW_FONT_COLOR",

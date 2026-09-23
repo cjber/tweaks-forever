@@ -18,13 +18,11 @@ ns.Feature({
 	},
 })
 
--- Yards within which you count as inside a quest's area, and how far you move before the list is re-sorted.
-local HERE, RESORT = 10, 25
+-- Yards you move before your position is checked against quest areas again, and before the list is re-sorted.
+local RECHECK, RESORT = 5, 25
 
 local function Format(yards)
-	if yards <= HERE then
-		return "here"
-	elseif yards < 1000 then
+	if yards < 1000 then
 		return ("%d yd"):format(yards)
 	end
 	return ("%.1fk yd"):format(yards / 1000)
@@ -34,6 +32,37 @@ ns.Init(function()
 	local modules = { QuestObjectiveTracker, CampaignQuestObjectiveTracker }
 	-- [block] = { label, glow }; our own regions only, never Blizzard's, so the tracker's secure item buttons stay clean.
 	local decor = {}
+
+	-- The distance API measures to a quest's map marker, not its area, so "here" asks an invisible quest-area frame
+	-- which area is under your map position, the same test the world map uses for its area tooltips.
+	local probe = CreateFrame("QuestPOIFrame", nil, UIParent)
+	probe:SetAllPoints()
+	probe:SetFillAlpha(0)
+	probe:SetBorderAlpha(0)
+	local inside, probeMap = {}, nil
+
+	local function CheckAreas()
+		wipe(inside)
+		local mapID = C_Map.GetBestMapForUnit("player")
+		local position = mapID and C_Map.GetPlayerMapPosition(mapID, "player")
+		if not position then
+			return
+		end
+		if mapID ~= probeMap then
+			probe:SetMapID(mapID)
+			probeMap = mapID
+		end
+		local x, y = position:GetXY()
+		for i = 1, C_QuestLog.GetNumQuestWatches() do
+			local questID = C_QuestLog.GetQuestIDForQuestWatchIndex(i)
+			if questID then
+				probe:DrawNone()
+				probe:DrawBlob(questID, true)
+				inside[questID] = probe:UpdateMouseOverTooltip(x, y) == questID or nil
+			end
+		end
+		probe:DrawNone()
+	end
 
 	local function Decor(block)
 		local d = decor[block]
@@ -66,14 +95,13 @@ ns.Init(function()
 			return Hide(block)
 		end
 		local d = Decor(block)
-		local yards = math.sqrt(distanceSq)
-		local here = yards <= HERE
+		local here = inside[block.id]
 		if relayout then
 			d.label:ClearAllPoints()
 			d.label:SetPoint("TOP", block.HeaderText, "TOP")
 			d.label:SetPoint("RIGHT", block, "RIGHT", block.rightEdgeOffset or 0, 0)
 		end
-		d.label:SetText(Format(yards))
+		d.label:SetText(here and "here" or Format(math.sqrt(distanceSq)))
 		if here then
 			d.label:SetTextColor(GREEN_FONT_COLOR:GetRGB())
 		else
@@ -95,26 +123,39 @@ ns.Init(function()
 
 	for _, module in ipairs(modules) do
 		hooksecurefunc(module, "EndLayout", function()
-			Each(ns.Active("questDistance") and Relayout or Hide)
+			if ns.Active("questDistance") then
+				CheckAreas()
+				Each(Relayout)
+			else
+				Each(Hide)
+			end
 		end)
 		hooksecurefunc(module, "OnFreeBlock", function(_, block)
 			Hide(block)
 		end)
 	end
 
+	local function Moved(last, x, y, yards)
+		return not last.x or (x - last.x) ^ 2 + (y - last.y) ^ 2 > yards * yards
+	end
+
 	-- Re-sort only after real movement and never in combat, when the tracker's item buttons can't be moved.
-	local lastX, lastY
+	local sorted, checked = {}, {}
 	C_Timer.NewTicker(1, function()
 		if not ns.Active("questDistance") then
-			if lastX then
-				lastX, lastY = nil, nil
+			if checked.x then
+				sorted.x, checked.x = nil, nil
 				Each(Hide)
 			end
 			return
 		end
 		local y, x = UnitPosition("player")
-		if x and not InCombatLockdown() and (not lastX or (x - lastX) ^ 2 + (y - lastY) ^ 2 > RESORT * RESORT) then
-			lastX, lastY = x, y
+		if x and Moved(checked, x, y, RECHECK) then
+			checked.x, checked.y = x, y
+			CheckAreas()
+		end
+		if x and not InCombatLockdown() and Moved(sorted, x, y, RESORT) then
+			sorted.x, sorted.y = x, y
 			C_QuestLog.SortQuestWatches()
 		end
 		Each(Update)
