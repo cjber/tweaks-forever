@@ -1,7 +1,8 @@
 local _, ns = ...
 
 -- Features, in declaration order, and by key. Each is { key, category, name, tooltip, default, conflicts }, plus
--- `options` ({ { value, label } }) for a choice rather than an on/off switch.
+-- `options` ({ { value, label } }) for a choice rather than an on/off switch and `parent` (a key) to indent it
+-- under that feature and grey it out while the parent is off.
 ns.features = {}
 local byKey = {}
 -- [key] = title of the addon already doing that feature's job, once addons have loaded.
