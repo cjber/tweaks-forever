@@ -145,6 +145,19 @@ function Model.Migrate(saved, Resolve)
 	end
 end
 
+-- How far down a view our entries may reach: its foot, or the top of the pager where the pager covers it (the stock
+-- pager sits over the foot of the last view). Tops are screen offsets, as GetTop gives them; nil before layout.
+---@param height number the view's height
+---@param top number? the view's top
+---@param pagerTop number? the pager's top
+---@return number
+function Model.Room(height, top, pagerTop)
+	if top and pagerTop then
+		return math.min(height, top - pagerTop)
+	end
+	return height
+end
+
 -- Places a header and count entries after the spellbook's own, with its column-first grid rules: a spacer before a
 -- group on a view already holding one, a header only with room for a row under it, and each view's rows balanced
 -- over the columns. Page 0 is the spellbook's last page; views past it are ours.
@@ -432,7 +445,11 @@ local function Render()
 	local grid = {
 		views = paged.viewsPerPage,
 		width = paged.ViewFrames[1]:GetWidth(),
-		height = paged.ViewFrames[1]:GetHeight(),
+		height = Model.Room(
+			paged.ViewFrames[1]:GetHeight(),
+			paged.ViewFrames[1]:GetTop(),
+			paged.PagingControls:GetTop()
+		),
 		columns = paged.columnsPerRow,
 		gap = paged.xPadding,
 		pad = paged.yPadding,
@@ -498,7 +515,8 @@ end
 local function Arrow(controls, template, step)
 	local arrow = CreateFrame("Button", nil, layer, template)
 	arrow:SetAllPoints(controls)
-	arrow:SetFrameLevel(controls:GetFrameLevel() + 10)
+	-- Above our entries and the blocker, which cover the stock pager's own buttons.
+	arrow:SetFrameLevel(layer:GetFrameLevel() + 10)
 	arrow:SetScript("OnClick", function()
 		Turn(step)
 	end)

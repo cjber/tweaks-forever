@@ -201,4 +201,12 @@ assert(#slots == 30 and last.page == 1, "overflow continues onto our own pages")
 for _, slot in ipairs(slots) do
 	assert(slot.y + grid.item <= grid.height, "every entry fits on its view")
 end
+
+-- The stock pager covers the foot of the last view: entries stop above it.
+assert(Model.Room(590, 700, 160) == 540, "the pager's top ends the room")
+assert(Model.Room(590, 700, 50) == 590 and Model.Room(590, nil, 160) == 590, "else the view's foot")
+grid.height = Model.Room(590, 700, 160)
+for _, slot in ipairs((select(2, Model.Layout(30, 2, 400, grid)))) do
+	assert(slot.y + grid.item <= 540, "no entry reaches the pager")
+end
 print("spellbook: ok")
