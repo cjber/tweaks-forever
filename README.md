@@ -8,7 +8,7 @@ Small quality-of-life automations for WoW: Forever that feel like part of the de
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own, apart from a small panel of camp benefits by a campfire. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`, or the addon compartment on the minimap), with a page for each section.
+Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`, or the addon compartment on the minimap), with a page for each section.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight. This is checked again each time the settings open.
 
@@ -39,7 +39,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/camp.png" width="327" alt="The Camp panel: a hint to sit or craft near a camp feature for a minute, three benefits in green with their time left, such as First Aid Kit (52 Min): Stamina increased by 56, and the seven others in grey with what they would give">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/camp.png" width="327" alt="The Campfire Nearby buff tooltip: the game's description, then Campfire: about 35 yd ahead to your left, and the three benefits you have in green with their time left, such as First Aid Kit (52 Min): Stamina increased by 56">
 </p>
 
 <p align="center">
@@ -81,10 +81,9 @@ When another addon already does one of these jobs, that feature is greyed out an
 - `/rl` reloads the interface.
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Nearest quests first. The quest tracker sorts itself by distance as you move and shows how far away each quest is; the one whose area you're standing in reads "here" with a soft gold highlight.
-- Explain campsite benefits. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows exactly what sitting nearby gives you, such as "Stamina increased by 56 for 1 Hr", and whether you have it now, with the time left. Hovering a campfire lists every benefit a camp can give: the ones you have in green with their time left, the rest in grey. Your Camp Benefits buff adds the ones you haven't gained yet.
-- Coming near a campfire opens a small Camp panel below your buffs with the same list, so you know what each feature would give before you sit down. It closes as you walk away or with its close button, until the next campfire, and stays hidden in combat.
-- Show spells left to train. The top of the spellbook says how many spells you can learn now and the level of the next ones; hover it for the list, ready spells in green and later ones by level. The server leaves unlearned spells out of the spellbook, so the list comes from your class trainer, remembered per character each time you visit.
-- Retail-style tooltips: a thin grey border with rounded corners in place of the beige one. A player's name is in their class colour, with the guild in brackets, race and class on one line and the faction in its colour. A unit's health bar sits inside its tooltip in class or reaction colour, with health as numbers for players and a percentage for others, and a comparison tooltip's Equipped label moves inside it in grey. On by default.
+- Explain campsite benefits. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows exactly what sitting nearby gives you, such as "Stamina increased by 56 for 1 Hr", and whether you have it now, with the time left. Hovering a campfire lists every benefit a camp can give: the ones you have in green with their time left, the rest in grey. Your Campfire Nearby buff adds the benefits you have and which way the campfire is, once you have lit it or sat by it; your Camp Benefits buff adds the ones you haven't gained yet.
+- Show future spells in the spellbook. Each tab ends with the spells you haven't learned yet under a Future Spells heading, greyed out as the retail spellbook shows them: the ones your trainer can teach you now glow and say "See your trainer", the rest name their level, and the tooltip gives the cost. Only each spell's next rank shows. The server leaves unlearned spells out of the spellbook, so the list comes from your class trainer, remembered per character each time you visit.
+- Modern tooltips: a thin grey border with rounded corners in place of the beige one, over a neutral charcoal that keeps the text crisp over any scenery. Tooltip style switches to the retail game's navy, or keeps the game's own border. A player's name is in their class colour, with the guild in brackets, race and class on one line and the faction in its colour. A unit's health bar sits inside its tooltip in class or reaction colour, with health as numbers for players and a percentage for others, and a comparison tooltip's Equipped label moves inside it in grey. On by default.
 - Larger, clearer nameplates. A taller health bar in a crisp black edge, with the name above its left end and the level, coloured by difficulty, above its right. Your target is outlined in gold with a soft glow, and the other plates fade back while you have one. Casts show in a slim bar with the spell's icon and name inside, grey with a shield when they can't be interrupted. Health numbers inside the bar follow the game's own Nameplates options. Friendly plates in dungeons are the game's own and can't be restyled. On by default; turning it off takes effect after a reload.
 
 **Fishing**
@@ -110,7 +109,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
-| Retail-style tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
+| Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |
 
