@@ -547,7 +547,9 @@ local function Create()
 	header = CreateFrame("Frame", nil, layer, "SpellBookHeaderTemplate") --[[@as SpellBookHeaderTemplate]]
 	pageText = layer:CreateFontString(nil, "OVERLAY", controls.fontName)
 	pageText:SetTextColor(SPELLBOOK_FONT_COLOR:GetRGB())
-	pageText:SetAllPoints(controls.PageText)
+	-- The stock label is only as wide as its own text, so ours keeps just its right edge and its line.
+	pageText:SetPoint("RIGHT", controls.PageText)
+	pageText:SetWordWrap(false)
 	prev = Arrow(controls.PrevPageButton, "PagingControlsPrevPageButtonTemplate", -1)
 	nextPage = Arrow(controls.NextPageButton, "PagingControlsNextPageButtonTemplate", 1)
 
