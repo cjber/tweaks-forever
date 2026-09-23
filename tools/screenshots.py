@@ -28,6 +28,7 @@ from wowmock import (  # ty: ignore[unresolved-import]
     MenuTitle,
     TooltipLine,
     Ui,
+    atlas_markup,
     close_button,
     colored,
     container_frame,
@@ -227,6 +228,58 @@ def zone_levels(ui):
     scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "zonelevels.png")
 
 
+EASTERN_KINGDOMS = 1415
+BLACKROCK_MOUNTAIN = 25  # AreaTable ID
+ENTRANCE_ICON = 32  # the Dungeon and Raid atlases' size; SetScalingLimits(1, 1.0, 1.2) keeps it on screen at min zoom
+
+
+def entrances(ui_map):
+    """Data/DungeonEntrances.lua for one map: [(x, y, instances, area)]."""
+    source = (ROOT / "Data" / "DungeonEntrances.lua").read_text()
+    block = re.search(rf"\[{ui_map}\] = \{{(.*?)\n\t\}},", source, re.S)
+    if not block:
+        raise KeyError(f"no entrances for {ui_map}")
+    pattern = r"x = ([\d.]+), y = ([\d.]+), instances = \{ ([\d, ]+) \}(?:, area = (\d+))?"
+    return [
+        (float(x), float(y), [int(i) for i in ids.split(", ")], int(area) if area else None)
+        for x, y, ids, area in re.findall(pattern, block.group(1))
+    ]
+
+
+def raid_instances():
+    source = (ROOT / "Data" / "DungeonEntrances.lua").read_text()
+    return {int(i) for i in re.findall(r"\[(\d+)\] = true", source.split("ns.RaidInstances", 1)[1])}
+
+
+def dungeon_entrances(ui):
+    """The Eastern Kingdoms with every entrance pinned, pointing at Blackrock Mountain: the POI area label and
+    the pin's tooltip (ANCHOR_RIGHT), titled by the complex with its instances in NORMAL_FONT_COLOR."""
+    art = map_art(ui, EASTERN_KINGDOMS)
+    nav = ("World", "Eastern Kingdoms")
+    frame, rects = world_map_frame(ui, art, nav, arrows=nav[1:])
+    mx, my, mw, mh = rects["map"]
+    raids, maps = raid_instances(), ui.table("Map")
+    hovered = None
+    for x, y, instances, area in entrances(EASTERN_KINGDOMS):
+        atlas = "Raid" if all(i in raids for i in instances) else "Dungeon"
+        px, py = mx + x * mw - ENTRANCE_ICON / 2, my + y * mh - ENTRANCE_ICON / 2
+        frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON)
+        if area == BLACKROCK_MOUNTAIN:
+            hovered = (px, py, instances)
+            # The HIGHLIGHT layer: the same atlas drawn ADD at alpha 0.4.
+            frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON, color=(1, 1, 1, 0.4), blend="ADD")
+    if hovered is None:
+        raise KeyError("no Blackrock Mountain pin on the Eastern Kingdoms")
+    px, py, instances = hovered
+    title = ui.table("AreaTable")[str(BLACKROCK_MOUNTAIN)]["AreaName_lang"]
+    frame.text(mx, my + AREA_LABEL_TOP, title, AREA_LABEL_FONT, justify="CENTER", width=mw)
+    icons = {i: atlas_markup("Raid" if i in raids else "Dungeon", 16, 16) for i in instances}
+    names = [f"{icons[i]} {maps[str(i)]['MapName_lang']}" for i in instances]
+    lines = [TooltipLine(title)] + [TooltipLine(name, NORMAL) for name in names]
+    tip = tooltip(ui, lines)
+    scene(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], MARGIN).save(OUT / "dungeons.png")
+
+
 # Junk.lua marks (account-wide): things this character sells rather than uses. Greys would only show their coin
 # at a merchant, so the bag has none, and every coin here is the addon's.
 JUNK_BAG = [
@@ -384,6 +437,7 @@ def main():
     menu(ui)
     exploration(ui)
     zone_levels(ui)
+    dungeon_entrances(ui)
     junk(ui)
     campsite(ui)
     camp_panel(ui)
