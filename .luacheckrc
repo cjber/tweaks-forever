@@ -94,6 +94,7 @@ read_globals = {
 	"GameTooltip_AddNormalLine",
 	"GameTooltip_Hide",
 	"GameTooltip_SetTitle",
+	"GENERAL",
 	"GetActiveTitle",
 	"GetAvailableQuestInfo",
 	"GetBindingKey",

@@ -19,15 +19,17 @@
 ---@field rank? string
 ---@field level number
 ---@field icon fileID
----@field lineID? integer the class skill line (spellbook tab) the spell belongs to, as a SkillLine ID
+---@field lineID? integer the skill line the spell belongs to, as a SkillLine ID: a class line is its spellbook tab
+---@field general? true its line is not a class line, so it goes on the General tab (Dual Wield, Defense, armour)
 ---@field line? string a trainer visit's name for that line, in the client's language
 ---@field cost? number copper
 
--- A spell a class trainer teaches: { spell, level, fee in copper, class SkillLine ID (spellbook tab) }.
+-- A spell a class trainer teaches: { spell, level, fee in copper (nil when unknown), SkillLine ID }. A class line
+-- is its spellbook tab; any other puts it on the General tab.
 ---@class TFClassSpell
 ---@field [1] integer
 ---@field [2] integer
----@field [3] integer
+---@field [3] integer?
 ---@field [4] integer
 ---@field needs? integer[] the rank before it, which no trainer teaches: any of these must be known first
 ---@field races? integer[] the ChrRaces IDs it is for, when not every race
@@ -132,6 +134,8 @@ TweaksForeverCharDB = nil
 ---@field ClassSpells table<string, TFClassSpells> by class token
 ---@field TrainerSpells fun(): table<integer, TFTrainerSpell>
 ---@field LineName fun(lineID: integer, fallback: string?): string
+---@field GeneralName fun(): string
+---@field OnGeneral fun(lineID: integer): true?
 ---@field LineResolver fun(): fun(id: integer, name: string?): integer?
 ---@field KnownSpell fun(id: integer): boolean
 ---@field ZoneRanges table<integer, [number, number]>

@@ -19,6 +19,9 @@ ns.FutureSpells = Model
 local KEEP = { available = true, unavailable = true }
 -- Retail's glow on a spellbook entry waiting at the trainer (TRAINABLE_FX_ID in Blizzard_SpellBookItem.lua).
 local TRAINABLE_FX = 176
+-- The General tab has no skill line of its own: a spell on a line that isn't a class line (Dual Wield, Defense,
+-- armour, Lockpicking) is listed there. SkillLine IDs start at 1, so this stands for it among them.
+Model.GENERAL = 0
 
 ---@param a TFFutureSpell
 ---@param b TFFutureSpell
@@ -32,10 +35,10 @@ local function InOrder(a, b)
 	return a.spell.name < b.spell.name
 end
 
--- A tab's unlearned spells, or every class tab's with no line: the lowest unlearned rank of each, those your
--- trainer teaches now first, then by level. A row on no class skill line (weapons, riding) is never listed.
+-- A tab's unlearned spells, or every tab's with no line: the lowest unlearned rank of each, those your trainer
+-- teaches now first, then by level. A row on no skill line of the class (weapons, riding) is never listed.
 ---@param spells table<integer, TFTrainerSpell>
----@param lineID integer? the tab's SkillLine ID
+---@param lineID integer? the tab's SkillLine ID, or GENERAL
 ---@param level number
 ---@param Skip fun(id: integer): boolean? known, or hidden by the spellbook's filter
 ---@return TFFutureSpell[]
@@ -46,7 +49,7 @@ function Model.Choose(spells, lineID, level, Skip)
 		local held = byName[spell.name]
 		if
 			spell.lineID
-			and (not lineID or spell.lineID == lineID)
+			and (not lineID or (spell.general and Model.GENERAL or spell.lineID) == lineID)
 			and not Skip(id)
 			and (not held or spell.level < held.spell.level)
 		then
@@ -77,7 +80,8 @@ end
 
 -- What your class trainer teaches: your class's baked list, less other races' spells and ranks whose untrained
 -- earlier rank you lack, with the rows a trainer visit recorded laid over it, as the server has the last word on
--- level and fee. A baked spell the client can't describe is left out, never guessed at.
+-- level and fee. A baked spell the client can't describe is left out, never guessed at; one on a line that is not
+-- a class line goes on the General tab.
 ---@param baked TFClassSpells?
 ---@param live table<integer, TFTrainerSpell>?
 ---@param race integer
@@ -87,6 +91,7 @@ end
 function Model.Spells(baked, live, race, Describe, Known)
 	---@type table<integer, TFTrainerSpell>
 	local spells = {}
+	local lines = baked and baked.lines or {}
 	for _, row in ipairs(baked and baked.spells or {}) do
 		local facts = (not row.races or tContains(row.races, race)) and AnyKnown(row.needs, Known) and Describe(row[1])
 		if facts then
@@ -97,6 +102,7 @@ function Model.Spells(baked, live, race, Describe, Known)
 				level = row[2],
 				cost = row[3],
 				lineID = row[4],
+				general = not tContains(lines, row[4]) or nil,
 			}
 		end
 	end
@@ -243,8 +249,24 @@ function ns.LineName(lineID, fallback)
 	return info and info.name or fallback or C_TradeSkillUI.GetTradeSkillDisplayName(lineID)
 end
 
--- Finds a spell's class skill line ID: the baked row's, else the spellbook tab the trainer names. The trainer names
--- it in the client's language, as the tab does, so the two match in every locale; weapon and riding lines don't.
+-- The General tab's name in the client's language.
+---@return string
+function ns.GeneralName()
+	local info = C_SpellBook.GetSpellBookSkillLineInfo(Enum.SpellBookSkillLineIndex.General)
+	return info and info.name or GENERAL
+end
+
+-- Whether a trainer row's line puts it on the General tab: it is none of the class's lines.
+---@param lineID integer
+---@return true?
+function ns.OnGeneral(lineID)
+	local data = ClassData()
+	return not (data and tContains(data.lines, lineID)) or nil
+end
+
+-- Finds a spell's skill line ID: the baked row's (a General tab row's own line), else the class tab the trainer
+-- names. The trainer names it in the client's language, as the tab does, so the two match in every locale; weapon
+-- and riding lines don't.
 ---@return fun(id: integer, name: string?): integer?
 function ns.LineResolver()
 	local data = ClassData()
@@ -267,7 +289,8 @@ local function Book()
 	return PlayerSpellsFrame.SpellBookFrame
 end
 
--- The class skill line ID on show, or nil on the general, pet and outfit tabs and in search results.
+-- The class skill line ID on show, GENERAL on the General tab, or nil on the pet and outfit tabs and in search
+-- results.
 ---@return integer?
 local function ActiveLine()
 	local book = Book()
@@ -276,10 +299,10 @@ local function ActiveLine()
 	end
 	local category = book:GetActiveCategoryMixin()
 	local index = category and category.skillLineIndex
-	if not index or index == Enum.SpellBookSkillLineIndex.General then
-		return nil
+	if index == Enum.SpellBookSkillLineIndex.General then
+		return Model.GENERAL
 	end
-	return Tabs()[index]
+	return index and Tabs()[index]
 end
 
 -- Where the spellbook's last view ends, read from its split data so it holds on any page.
@@ -530,7 +553,8 @@ end
 
 -- The server, not the baked list, has the last word on what the class trainer teaches and for how much. The trainer
 -- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge by
--- spell and keep only class spellbook lines, so another trainer (weapons, riding) neither replaces nor adds to them.
+-- spell and keep only lines the spellbook shows (class tabs, and the General tab's baked rows), so another trainer
+-- (weapons, riding) neither replaces nor adds to them.
 local function ScanTrainer()
 	if not ns.Active("trainableSpells") or IsTradeskillTrainer() then
 		return
@@ -559,6 +583,7 @@ local function ScanTrainer()
 				level = level or 1,
 				icon = icon,
 				lineID = lineID,
+				general = ns.OnGeneral(lineID),
 				line = line,
 				cost = GetTrainerServiceCost(i),
 			}

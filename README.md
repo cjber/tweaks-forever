@@ -113,7 +113,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |
 
-Addons can use `TweaksForever.API` (`version = 1`). `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned, each spell's next rank only and no weapon skills or riding, as fresh `{spellID, name, level, cost, line, lineID}` tables: `line` is the tab's name in the client's language, for display, and `lineID` its SkillLine ID, the same in every language. It answers whether or not Future Spells is on. It returns `nil` before login and in combat.
+Addons can use `TweaksForever.API` (`version = 1`). `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned, each spell's next rank only and no weapon skills or riding, as fresh `{spellID, name, level, cost, line, lineID, general}` tables: `line` is the tab's name in the client's language, for display, and `lineID` its SkillLine ID, the same in every language. A spell for the General tab (Dual Wield, Parry, Plate Mail) has `general` set and its own skill line as `lineID`, as that tab has none. `cost` is missing when the fee isn't known. It answers whether or not Future Spells is on. It returns `nil` before login and in combat.
 
 ## Install
 

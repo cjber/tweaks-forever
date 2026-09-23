@@ -45,6 +45,8 @@ local env = setmetatable({
 			return "Line " .. lineID
 		end,
 	},
+	Enum = { SpellBookSkillLineIndex = { General = 1 } },
+	GENERAL = "General",
 	tContains = function(list, value)
 		for _, item in ipairs(list) do
 			if item == value then
@@ -76,8 +78,9 @@ local spells = API.TrainableSpells()
 assert(#spells > 10, "a level 18 Shaman who has never seen a trainer still has spells to learn")
 for _, spell in ipairs(spells) do
 	assert(spell.level <= 18 and not known[spell.spellID], "only what your level allows and you haven't learned")
-	assert(type(spell.name) == "string" and type(spell.line) == "string" and spell.cost, "every fact filled in")
-	assert(env.tContains({ 373, 374, 375 }, spell.lineID), "on a Shaman spellbook tab, by SkillLine ID")
+	assert(type(spell.name) == "string" and type(spell.line) == "string", "every fact filled in")
+	assert(spell.cost == nil or spell.cost >= 0, "the fee, when known")
+	assert(spell.general or env.tContains({ 373, 374, 375 }, spell.lineID), "on a Shaman tab, by SkillLine ID")
 end
 local bolt = Find(spells, 548)
 assert(bolt and bolt.name == "Lightning Bolt" and bolt.level == 14 and bolt.cost == 900, "the next rank")
@@ -103,6 +106,12 @@ known[548] = true
 assert(not Find(API.TrainableSpells(), 548), "learned")
 level = 20
 assert(Find(API.TrainableSpells(), 915) and Find(API.TrainableSpells(), 8056), "a level up brings the next ones")
+env.TweaksForeverCharDB = {
+	trainer = { [9999] = { name = "Dual Wield", level = 20, icon = 1, lineID = 118, general = true } },
+}
+local wield = Find(API.TrainableSpells(), 9999)
+assert(wield and wield.general and wield.line == "General" and wield.lineID == 118, "a General tab row, its own line")
+assert(Find(API.TrainableSpells(), 915).general == false, "and a class tab's is not")
 class = "DEATHKNIGHT"
 env.TweaksForeverCharDB = nil
 assert(#API.TrainableSpells() == 0, "no list, no answer")

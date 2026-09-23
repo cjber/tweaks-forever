@@ -28,6 +28,7 @@ local spells = {
 	[7] = { name = "Lightning Bolt", level = 20, lineID = 375 },
 	[8] = { name = "Old Save", level = 4 },
 	[9] = { name = "Two-Handed Swords", level = 1, line = "Two-Handed Swords" },
+	[10] = { name = "Dual Wield", level = 20, lineID = 118, general = true },
 }
 local known = { [5] = true }
 local chosen = Model.Choose(spells, 375, 18, function(id)
@@ -47,8 +48,12 @@ for _, entry in
 		return false
 	end))
 do
-	assert(entry.spell.lineID, "every class tab's, never a weapon or unlined row: " .. entry.spell.name)
+	assert(entry.spell.lineID, "every tab's, never a weapon or unlined row: " .. entry.spell.name)
 end
+chosen = Model.Choose(spells, Model.GENERAL, 18, function()
+	return false
+end)
+assert(#chosen == 1 and chosen[1].id == 10 and not chosen[1].ready, "the General tab lists its own rows only")
 
 -- The baked trainer list, for a level 18 Dwarf Shaman who has never visited a trainer.
 env.tContains = function(list, value)
@@ -108,7 +113,7 @@ assert(not Model.Spells(mage, nil, ORC, Describe, Known)[3561], "but not for an 
 for token, class in pairs(ns.ClassSpells) do
 	assert(#class.spells > 50, token .. " has a full list")
 	for _, row in ipairs(class.spells) do
-		assert(env.tContains(class.lines, row[4]) and row[2] >= 1 and row[3] >= 0, token .. " " .. row[1])
+		assert(row[4] > 0 and row[2] >= 1 and (row[3] == nil or row[3] >= 0), token .. " " .. row[1])
 	end
 end
 
