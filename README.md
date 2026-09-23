@@ -31,6 +31,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 **Vendors**
 - Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat.
 - Sell junk automatically, up to 12 stacks per visit, so everything sold is still in the buyback tab.
+- Grey items show the game's junk coin in your bags all the time, not only at a merchant.
 - Mark any bag item as junk with **Alt+Right-click** (off by default). Marked items get the game's junk coin and a tooltip line, and they are sold with your greys, by the merchant's Sell All Junk button too. Marks are account-wide.
 
 **Gear**

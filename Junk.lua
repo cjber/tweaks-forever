@@ -29,6 +29,15 @@ ns.Feature({
 	conflicts = conflicts,
 })
 
+ns.Feature({
+	key = "greyCoins",
+	category = "Vendors",
+	name = "Junk coin on grey items",
+	tooltip = "Grey items show the game's gold junk coin in your bags all the time, not only while a merchant is open.",
+	default = true,
+	conflicts = conflicts,
+})
+
 local Model = {}
 ns.Junk = Model
 local BATCH_SIZE = 12
@@ -91,16 +100,19 @@ ns.Init(function()
 		return C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
 	end
 
+	-- `icons` records coins we added beyond the game's own, so turning a feature off can take them away again.
 	local function UpdateIcon(button)
-		if not ns.Active("markJunk") and not icons[button] then
+		local greys = ns.Active("greyCoins")
+		if not ns.Active("markJunk") and not greys and not icons[button] then
 			return
 		end
 		local info = Info(button)
 		local marked = info and info.quality ~= POOR and Marks()[info.itemID]
-		icons[button] = marked or nil
+		local grey = info and info.quality == POOR and not info.hasNoValue
+		local merchantGrey = grey and MerchantFrame:IsShown()
+		icons[button] = (marked or grey and greys and not merchantGrey) or nil
 		-- Recompute the native branch too, so unmarking cannot leave an old icon behind.
-		local grey = info and info.quality == POOR and not info.hasNoValue and MerchantFrame:IsShown()
-		button.JunkIcon:SetShown(not not (marked or grey))
+		button.JunkIcon:SetShown(not not (marked or merchantGrey or grey and greys))
 	end
 
 	local function RefreshBags()

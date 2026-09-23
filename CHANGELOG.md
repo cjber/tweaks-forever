@@ -9,6 +9,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 ## [Unreleased]
 
 - **Resurrections from outside your group wait for you.** The addon can only tell whether a group member is in combat, so a resurrection from anyone else is no longer auto-accepted, and a battle resurrection from a stranger is yours to time.
+- **Grey items always show the junk coin.** The game's gold coin marks greys in your bags all the time, not only while a merchant is open. Turn it off under Vendors.
 
 ## [0.3.0] - 2026-09-23
 
