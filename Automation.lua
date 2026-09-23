@@ -53,7 +53,7 @@ ns.Feature({
 	key = "resurrections",
 	category = "Automation",
 	name = "Accept resurrections",
-	tooltip = "Not from someone in combat, so a battle resurrection is still yours to time.",
+	tooltip = "From your group, and not from someone in combat, so a battle resurrection is still yours to time.",
 	default = false,
 	conflicts = { Leatrix("AutoAcceptRes") },
 })
@@ -185,8 +185,10 @@ ns.On("CONFIRM_SUMMON", function()
 	end
 end)
 
+-- The event names the offerer, and a name resolves to a unit only for a group member; anyone
+-- else's combat state is unknown, so their resurrection waits for a click.
 ns.On("RESURRECT_REQUEST", function(offerer)
-	if ns.Active("resurrections") and not UnitAffectingCombat(offerer) then
+	if ns.Active("resurrections") and UnitExists(offerer) and not UnitAffectingCombat(offerer) then
 		AcceptResurrect()
 		StaticPopup_Hide("RESURRECT")
 		StaticPopup_Hide("RESURRECT_NO_SICKNESS")

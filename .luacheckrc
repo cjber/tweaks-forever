@@ -132,6 +132,7 @@ read_globals = {
 	"UIPanelWindows",
 	"UIParent",
 	"UnitAffectingCombat",
+	"UnitExists",
 	"UnitGUID",
 	"UnitIsDead",
 	"unpack",

@@ -23,7 +23,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 - Accept and turn in quests. Hold Shift to talk normally. A quest with a choice of rewards is left to you.
 - Skip gossip when an NPC offers only one thing (vendor, trainer, flight map). Hold Shift to see it.
 - Accept summons, but not in combat.
-- Accept resurrections, but not from someone in combat, so a battle resurrection is still yours to time.
+- Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time.
 - Release your spirit in battlegrounds unless you can resurrect yourself.
 - Decline duels.
 - Faster auto loot: everything at once instead of waiting for the loot window.
