@@ -315,6 +315,16 @@ local function Colour(mark)
 	return Model.Colour(Char().colours, mark.kind, mark.name)
 end
 
+-- For Sections.lua: the lists an item is in, a list's colour, and a call after every refresh of the marks.
+function Model.MarksOf(itemID)
+	return Model.GroupsOf(itemID, Lists())
+end
+Model.ColourOf = Colour
+local refreshed = {}
+function Model.OnRefresh(fn)
+	refreshed[#refreshed + 1] = fn
+end
+
 local function Coloured(mark)
 	local r, g, b = unpack(Colour(mark))
 	return string.format(
@@ -443,6 +453,9 @@ ns.Init(function()
 
 	local function RefreshBags()
 		ns.ForEachBagButton(UpdateMarks)
+		for _, fn in ipairs(refreshed) do
+			fn()
+		end
 	end
 
 	local function ToggleGroup(name, itemID)

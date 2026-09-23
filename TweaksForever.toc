@@ -18,6 +18,7 @@ Vendor.lua
 Modes.lua
 Junk.lua
 Gear.lua
+Sections.lua
 Exploration.lua
 Frames.lua
 Errors.lua
