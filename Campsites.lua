@@ -195,7 +195,7 @@ local function AddFeature(tooltip, aura)
 	end
 end
 
-ns.Init(function()
+local function InitTooltips()
 	local byEntry, byName = {}, {}
 	for _, feature in ipairs(FEATURES) do
 		local spell, entry, aura = unpack(feature)
@@ -259,9 +259,11 @@ ns.Init(function()
 		end
 		tooltip:Show()
 	end)
+end
 
-	-- The panel: a tooltip of our own with a close button, as ItemRefTooltip is, below the buffs and debuffs so
-	-- it stays clear of the minimap and the quest tracker under it.
+-- The panel: a tooltip of our own with a close button, as ItemRefTooltip is, below the buffs and debuffs so
+-- it stays clear of the minimap and the quest tracker under it.
+local function InitPanel()
 	---@type GameTooltip?
 	local panel
 	local instances = {}
@@ -346,4 +348,9 @@ ns.Init(function()
 		Rescan()
 		Refresh()
 	end
+end
+
+ns.Init(function()
+	InitTooltips()
+	InitPanel()
 end)

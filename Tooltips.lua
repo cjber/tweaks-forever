@@ -90,12 +90,7 @@ local function Line(bar, a, b)
 	return line
 end
 
--- The unit health bar Blizzard hangs under GameTooltip, moved inside it. Blizzard still watches the unit and sets the
--- bar's value, which can be secret; this file never reads it. It only anchors, sizes, textures and colours the bar
--- (engine calls) and adds an outline and text of its own.
-local function HealthBar()
-	local tooltip = GameTooltip
-	local bar = tooltip.StatusBar
+local function HealthBarArt(bar)
 	-- The outline leaves its corner pixels out, which rounds it.
 	local art = {
 		Line(bar, { "BOTTOMLEFT", "TOPLEFT", -1, 1 }, { "TOPRIGHT", "TOPRIGHT", 1, 2 }),
@@ -112,6 +107,43 @@ local function HealthBar()
 	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
 	text:SetPoint("CENTER")
 	art[#art + 1] = text
+	return art, text
+end
+
+local function HealthBarStyle(tooltip, bar, art, Update, Fit)
+	local function Style()
+		local retail = ns.Active(KEY)
+		bar:ClearAllPoints()
+		if retail then
+			bar:SetPoint("BOTTOMLEFT", EDGE, BOTTOM)
+			bar:SetPoint("BOTTOMRIGHT", -EDGE, BOTTOM)
+			bar:SetHeight(HEIGHT)
+			bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+		else
+			-- GameTooltip.xml's own placement and art.
+			bar:SetPoint("TOPLEFT", tooltip, "BOTTOMLEFT", 2, -1)
+			bar:SetPoint("TOPRIGHT", tooltip, "BOTTOMRIGHT", -2, -1)
+			bar:SetHeight(8)
+			bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-TargetingFrame-BarFill")
+			bar:SetStatusBarColor(0, 1, 0)
+		end
+		for _, region in ipairs(art) do
+			region:SetShown(retail)
+		end
+		Update()
+		Fit()
+	end
+
+	return Style
+end
+
+-- The unit health bar Blizzard hangs under GameTooltip, moved inside it. Blizzard still watches the unit and sets the
+-- bar's value, which can be secret; this file never reads it. It only anchors, sizes, textures and colours the bar
+-- (engine calls) and adds an outline and text of its own.
+local function HealthBar()
+	local tooltip = GameTooltip
+	local bar = tooltip.StatusBar
+	local art, text = HealthBarArt(bar)
 	-- The unit shown, as the token the tooltip was given, whether it is a player, and the bar's colour.
 	local unit, player
 	local r, g, b = OBJECT[1], OBJECT[2], OBJECT[3]
@@ -151,28 +183,7 @@ local function HealthBar()
 		end
 	end
 
-	local function Style()
-		local retail = ns.Active(KEY)
-		bar:ClearAllPoints()
-		if retail then
-			bar:SetPoint("BOTTOMLEFT", EDGE, BOTTOM)
-			bar:SetPoint("BOTTOMRIGHT", -EDGE, BOTTOM)
-			bar:SetHeight(HEIGHT)
-			bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
-		else
-			-- GameTooltip.xml's own placement and art.
-			bar:SetPoint("TOPLEFT", tooltip, "BOTTOMLEFT", 2, -1)
-			bar:SetPoint("TOPRIGHT", tooltip, "BOTTOMRIGHT", -2, -1)
-			bar:SetHeight(8)
-			bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-TargetingFrame-BarFill")
-			bar:SetStatusBarColor(0, 1, 0)
-		end
-		for _, region in ipairs(art) do
-			region:SetShown(retail)
-		end
-		Update()
-		Fit()
-	end
+	local Style = HealthBarStyle(tooltip, bar, art, Update, Fit)
 
 	-- The token comes from the tooltip's caller, or is the mouseover for a world tooltip, never from the tooltip's
 	-- GUID: UnitTokenFromGUID returns a secret token for an NPC under addon restrictions, and no unit API takes one

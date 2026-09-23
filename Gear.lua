@@ -386,267 +386,252 @@ local function Coloured(mark)
 	)
 end
 
-ns.Init(function()
-	TweaksForeverCharDB = TweaksForeverCharDB or {}
-	Char().groups = Char().groups or {}
-	Char().colours = Char().colours or {}
-	Model.Recolour(Char().colours)
-	-- [button] = { [style] = textures }, made on first use.
-	local hooked = {}
-	---@type table<ContainerFrameItemButtonTemplate, table<string, Texture[]>>
-	local marks = {}
+-- [button] = { [style] = textures }, made on first use.
+local hooked = {}
+---@type table<ContainerFrameItemButtonTemplate, table<string, Texture[]>>
+local marks = {}
 
-	---@param button ContainerFrameItemButtonTemplate
-	---@param style string
-	---@param index integer
-	---@return Texture
-	local function Texture(button, style, index)
-		marks[button] = marks[button] or {}
-		local pool = marks[button][style] or {}
-		marks[button][style] = pool
-		if not pool[index] then
-			pool[index] = button:CreateTexture(nil, LAYERS[style], nil, 2)
-			pool[index]:SetTexture(style == "border" and ICON_FRAME or WHITE)
-			if style == "glow" then
-				pool[index]:SetTexture(C_Texture.GetAtlasInfo(GLOW).file)
-				pool[index]:SetBlendMode("ADD")
-			elseif style == "dots" then
-				pool[index]:SetMask(CIRCLE)
-			end
-		end
-		return pool[index]
-	end
-
-	---@param button ContainerFrameItemButtonTemplate
-	---@param found TFGearMark[]
-	local function Strip(button, found)
-		local back = Texture(button, "strip", 1)
-		back:SetVertexColor(0, 0, 0, 0.8)
-		back:SetPoint("BOTTOMLEFT", 2, 2)
-		back:SetPoint("BOTTOMRIGHT", -2, 2)
-		back:SetHeight(5)
-		back:Show()
-		local width = (button:GetWidth() - 6) / #found
-		for index, mark in ipairs(found) do
-			local segment = Texture(button, "strip", index + 1)
-			segment:SetVertexColor(unpack(Colour(mark)))
-			segment:SetSize(width, 3)
-			segment:SetPoint("BOTTOMLEFT", 3 + (index - 1) * width, 3)
-			segment:Show()
-		end
-	end
-
-	-- One slice per group across the quality border's frame, with the new-item glow behind it split the same way.
-	---@param button ContainerFrameItemButtonTemplate
-	---@param found TFGearMark[]
-	local function Border(button, found)
-		local frame, count = button.IconBorder, math.min(#found, MAX_BORDERS)
-		local glow = C_Texture.GetAtlasInfo(GLOW)
-		local width, glowWidth = frame:GetWidth() / count, glow.width / count
-		local glowSpan = glow.rightTexCoord - glow.leftTexCoord
-		for index = 1, count do
-			local colour = Colour(found[index])
-			local slice = Texture(button, "border", index)
-			slice:SetVertexColor(unpack(colour))
-			slice:SetTexCoord((index - 1) / count, index / count, 0, 1)
-			slice:SetPoint("TOPLEFT", frame, (index - 1) * width, 0)
-			slice:SetPoint("BOTTOMLEFT", frame, (index - 1) * width, 0)
-			slice:SetWidth(width)
-			slice:Show()
-			local halo = Texture(button, "glow", index)
-			halo:SetVertexColor(unpack(colour))
-			halo:SetTexCoord(
-				glow.leftTexCoord + glowSpan * (index - 1) / count,
-				glow.leftTexCoord + glowSpan * index / count,
-				glow.topTexCoord,
-				glow.bottomTexCoord
-			)
-			halo:SetPoint("TOPLEFT", button, "CENTER", -glow.width / 2 + (index - 1) * glowWidth, glow.height / 2)
-			halo:SetSize(glowWidth, glow.height)
-			halo:Show()
-		end
-	end
-
-	---@param button ContainerFrameItemButtonTemplate
-	---@param found TFGearMark[]
-	local function Dots(button, found)
-		for index = 1, math.min(#found, MAX_DOTS) do
-			local ring, dot = Texture(button, "dots", 2 * index - 1), Texture(button, "dots", 2 * index)
-			ring:SetVertexColor(0, 0, 0, 0.9)
-			ring:SetSize(10, 10)
-			ring:SetPoint("TOPRIGHT", -2 - (index - 1) * 8, -2)
-			ring:Show()
-			dot:SetVertexColor(unpack(Colour(found[index])))
-			dot:SetSize(7, 7)
-			dot:SetPoint("CENTER", ring)
-			dot:SetDrawLayer("OVERLAY", 3)
-			dot:Show()
-		end
-	end
-
-	---@param button ContainerFrameItemButtonTemplate
-	local function UpdateMarks(button)
-		for _, pool in pairs(marks[button] or {}) do
-			for _, texture in ipairs(pool) do
-				texture:Hide()
-			end
-		end
-		local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
-		if not ns.Active("gearGroups") or not itemID then
-			return
-		end
-		local style = ns.db.gearMark
-		if style == "none" then
-			return
-		end
-		local found = Model.GroupsOf(itemID, Lists())
-		if #found == 0 then
-			return
-		end
-		if style == "strip" then
-			Strip(button, found)
-		elseif style == "border" then
-			Border(button, found)
+---@param button ContainerFrameItemButtonTemplate
+---@param style string
+---@param index integer
+---@return Texture
+local function Texture(button, style, index)
+	marks[button] = marks[button] or {}
+	local pool = marks[button][style] or {}
+	marks[button][style] = pool
+	if not pool[index] then
+		pool[index] = button:CreateTexture(nil, LAYERS[style], nil, 2)
+		pool[index]:SetTexture(style == "border" and ICON_FRAME or WHITE)
+		if style == "glow" then
+			pool[index]:SetTexture(C_Texture.GetAtlasInfo(GLOW).file)
+			pool[index]:SetBlendMode("ADD")
 		elseif style == "dots" then
-			Dots(button, found)
-		else
-			error("unknown gear mark " .. tostring(style))
+			pool[index]:SetMask(CIRCLE)
 		end
 	end
+	return pool[index]
+end
 
-	local function RefreshBags()
-		ns.ForEachBagButton(UpdateMarks)
-		for _, fn in ipairs(refreshed) do
-			fn()
+---@param button ContainerFrameItemButtonTemplate
+---@param found TFGearMark[]
+local function Strip(button, found)
+	local back = Texture(button, "strip", 1)
+	back:SetVertexColor(0, 0, 0, 0.8)
+	back:SetPoint("BOTTOMLEFT", 2, 2)
+	back:SetPoint("BOTTOMRIGHT", -2, 2)
+	back:SetHeight(5)
+	back:Show()
+	local width = (button:GetWidth() - 6) / #found
+	for index, mark in ipairs(found) do
+		local segment = Texture(button, "strip", index + 1)
+		segment:SetVertexColor(unpack(Colour(mark)))
+		segment:SetSize(width, 3)
+		segment:SetPoint("BOTTOMLEFT", 3 + (index - 1) * width, 3)
+		segment:Show()
+	end
+end
+
+-- One slice per group across the quality border's frame, with the new-item glow behind it split the same way.
+---@param button ContainerFrameItemButtonTemplate
+---@param found TFGearMark[]
+local function Border(button, found)
+	local frame, count = button.IconBorder, math.min(#found, MAX_BORDERS)
+	local glow = C_Texture.GetAtlasInfo(GLOW)
+	local width, glowWidth = frame:GetWidth() / count, glow.width / count
+	local glowSpan = glow.rightTexCoord - glow.leftTexCoord
+	for index = 1, count do
+		local colour = Colour(found[index])
+		local slice = Texture(button, "border", index)
+		slice:SetVertexColor(unpack(colour))
+		slice:SetTexCoord((index - 1) / count, index / count, 0, 1)
+		slice:SetPoint("TOPLEFT", frame, (index - 1) * width, 0)
+		slice:SetPoint("BOTTOMLEFT", frame, (index - 1) * width, 0)
+		slice:SetWidth(width)
+		slice:Show()
+		local halo = Texture(button, "glow", index)
+		halo:SetVertexColor(unpack(colour))
+		halo:SetTexCoord(
+			glow.leftTexCoord + glowSpan * (index - 1) / count,
+			glow.leftTexCoord + glowSpan * index / count,
+			glow.topTexCoord,
+			glow.bottomTexCoord
+		)
+		halo:SetPoint("TOPLEFT", button, "CENTER", -glow.width / 2 + (index - 1) * glowWidth, glow.height / 2)
+		halo:SetSize(glowWidth, glow.height)
+		halo:Show()
+	end
+end
+
+---@param button ContainerFrameItemButtonTemplate
+---@param found TFGearMark[]
+local function Dots(button, found)
+	for index = 1, math.min(#found, MAX_DOTS) do
+		local ring, dot = Texture(button, "dots", 2 * index - 1), Texture(button, "dots", 2 * index)
+		ring:SetVertexColor(0, 0, 0, 0.9)
+		ring:SetSize(10, 10)
+		ring:SetPoint("TOPRIGHT", -2 - (index - 1) * 8, -2)
+		ring:Show()
+		dot:SetVertexColor(unpack(Colour(found[index])))
+		dot:SetSize(7, 7)
+		dot:SetPoint("CENTER", ring)
+		dot:SetDrawLayer("OVERLAY", 3)
+		dot:Show()
+	end
+end
+
+---@param button ContainerFrameItemButtonTemplate
+local function UpdateMarks(button)
+	for _, pool in pairs(marks[button] or {}) do
+		for _, texture in ipairs(pool) do
+			texture:Hide()
 		end
 	end
+	local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
+	if not ns.Active("gearGroups") or not itemID then
+		return
+	end
+	local style = ns.db.gearMark
+	if style == "none" then
+		return
+	end
+	local found = Model.GroupsOf(itemID, Lists())
+	if #found == 0 then
+		return
+	end
+	if style == "strip" then
+		Strip(button, found)
+	elseif style == "border" then
+		Border(button, found)
+	elseif style == "dots" then
+		Dots(button, found)
+	else
+		error("unknown gear mark " .. tostring(style))
+	end
+end
 
-	---@param name string
-	---@param itemID integer
-	local function ToggleGroup(name, itemID)
-		Model.Toggle(Char().groups, name, itemID)
-		if not Char().groups[name] and Char().colours.group then
-			Char().colours.group[name] = nil
-		end
+local function RefreshBags()
+	ns.ForEachBagButton(UpdateMarks)
+	for _, fn in ipairs(refreshed) do
+		fn()
+	end
+end
+
+---@param name string
+---@param itemID integer
+local function ToggleGroup(name, itemID)
+	Model.Toggle(Char().groups, name, itemID)
+	if not Char().groups[name] and Char().colours.group then
+		Char().colours.group[name] = nil
+	end
+	RefreshBags()
+end
+
+---@param mark TFGearMark
+local function PickColour(mark)
+	local colour = Colour(mark)
+	local function Set(r, g, b)
+		colour[1], colour[2], colour[3] = r, g, b
 		RefreshBags()
 	end
+	ColorPickerFrame:SetupColorPickerAndShow({
+		r = colour[1],
+		g = colour[2],
+		b = colour[3],
+		swatchFunc = function()
+			Set(ColorPickerFrame:GetColorRGB())
+		end,
+		cancelFunc = function(previous)
+			Set(previous.r, previous.g, previous.b)
+		end,
+	})
+end
 
-	---@param mark TFGearMark
-	local function PickColour(mark)
-		local colour = Colour(mark)
-		local function Set(r, g, b)
-			colour[1], colour[2], colour[3] = r, g, b
-			RefreshBags()
-		end
-		ColorPickerFrame:SetupColorPickerAndShow({
-			r = colour[1],
-			g = colour[2],
-			b = colour[3],
-			swatchFunc = function()
-				Set(ColorPickerFrame:GetColorRGB())
-			end,
-			cancelFunc = function(previous)
-				Set(previous.r, previous.g, previous.b)
-			end,
-		})
-	end
-
-	---@param itemID integer
-	local function NewGroup(itemID)
-		StaticPopup_ShowCustomGenericInputBox({
-			text = "New gear group",
-			maxLetters = 32,
-			callback = function(text)
-				local name = strtrim(text)
-				if name ~= "" and name ~= BEFORE_FISHING then
-					ToggleGroup(name, itemID)
-				end
-			end,
-		})
-	end
-
-	---@param button Button
-	---@param itemID integer
-	local function OpenMenu(button, itemID)
-		MenuUtil.CreateContextMenu(button, function(_, root)
-			root:CreateTitle(C_Item.GetItemNameByID(itemID) or "")
-			local names = {}
-			for name in pairs(Char().groups) do
-				names[#names + 1] = name
+---@param itemID integer
+local function NewGroup(itemID)
+	StaticPopup_ShowCustomGenericInputBox({
+		text = "New gear group",
+		maxLetters = 32,
+		callback = function(text)
+			local name = strtrim(text)
+			if name ~= "" and name ~= BEFORE_FISHING then
+				ToggleGroup(name, itemID)
 			end
-			table.sort(names)
-			for _, name in ipairs(names) do
-				root:CreateCheckbox(Coloured({ kind = "group", name = name }), function()
-					return Char().groups[name] and Char().groups[name][itemID]
-				end, function()
-					ToggleGroup(name, itemID)
-					-- A refresh cannot add or drop the Equip and Colour entries below, so reopen for fresh ones.
-					return MenuResponse.CloseAll
+		end,
+	})
+end
+
+---@param button Button
+---@param itemID integer
+local function OpenMenu(button, itemID)
+	MenuUtil.CreateContextMenu(button, function(_, root)
+		root:CreateTitle(C_Item.GetItemNameByID(itemID) or "")
+		local names = {}
+		for name in pairs(Char().groups) do
+			names[#names + 1] = name
+		end
+		table.sort(names)
+		for _, name in ipairs(names) do
+			root:CreateCheckbox(Coloured({ kind = "group", name = name }), function()
+				return Char().groups[name] and Char().groups[name][itemID]
+			end, function()
+				ToggleGroup(name, itemID)
+				-- A refresh cannot add or drop the Equip and Colour entries below, so reopen for fresh ones.
+				return MenuResponse.CloseAll
+			end)
+		end
+		root:CreateButton("New group…", function()
+			NewGroup(itemID)
+		end)
+		-- Each source equips its own way, so a group and a set sharing a name stay distinct.
+		local found = Model.GroupsOf(itemID, Lists())
+		if #found > 0 then
+			root:CreateDivider()
+			for _, mark in ipairs(found) do
+				root:CreateButton("Equip " .. mark.name, function()
+					EQUIP[mark.kind](mark.name)
 				end)
 			end
-			root:CreateButton("New group…", function()
-				NewGroup(itemID)
-			end)
-			-- Each source equips its own way, so a group and a set sharing a name stay distinct.
-			local found = Model.GroupsOf(itemID, Lists())
-			if #found > 0 then
-				root:CreateDivider()
-				for _, mark in ipairs(found) do
-					root:CreateButton("Equip " .. mark.name, function()
-						EQUIP[mark.kind](mark.name)
-					end)
-				end
-				local colours = root:CreateButton("Colour")
-				for _, mark in ipairs(found) do
-					colours:CreateButton(Coloured(mark), function()
-						PickColour(mark)
-					end)
-				end
+			local colours = root:CreateButton("Colour")
+			for _, mark in ipairs(found) do
+				colours:CreateButton(Coloured(mark), function()
+					PickColour(mark)
+				end)
 			end
-		end)
-	end
-
-	---@param owner Button
-	---@param bag integer
-	---@param slot integer
-	local function OpenItemMenu(owner, bag, slot)
-		local itemID = C_Container.GetContainerItemID(bag, slot)
-		if itemID and select(4, C_Item.GetItemInfoInstant(itemID)) ~= "" then
-			OpenMenu(owner, itemID)
 		end
+	end)
+end
+
+---@param owner Button
+---@param bag integer
+---@param slot integer
+local function OpenItemMenu(owner, bag, slot)
+	local itemID = C_Container.GetContainerItemID(bag, slot)
+	if itemID and select(4, C_Item.GetItemInfoInstant(itemID)) ~= "" then
+		OpenMenu(owner, itemID)
 	end
+end
 
-	ns.ClickMode({
-		feature = "gearGroups",
-		label = "Group gear",
-		tooltip = "Click bag items to group them, equip their groups or change a group's colour. Right-click or close "
-			.. "your bags to stop.",
-		cursor = "INTERACT_CURSOR",
-		Apply = OpenItemMenu,
-	})
-
-	---@param button ContainerFrameItemButtonTemplate
-	---@param mouseButton string
-	local function Click(button, mouseButton)
-		if
-			mouseButton ~= "RightButton"
-			or not ns.Active("gearGroups")
-			or not IsControlKeyDown()
-			or IsAltKeyDown()
-			or IsShiftKeyDown()
-			or CursorHasItem()
-		then
-			return
-		end
-		-- Mainline has no Ctrl+Right-click bag action; leave user-remapped gestures alone.
-		if ns.IsBagActionClick() then
-			return
-		end
-		OpenItemMenu(button, button:GetBagID(), button:GetID())
+---@param button ContainerFrameItemButtonTemplate
+---@param mouseButton string
+local function Click(button, mouseButton)
+	if
+		mouseButton ~= "RightButton"
+		or not ns.Active("gearGroups")
+		or not IsControlKeyDown()
+		or IsAltKeyDown()
+		or IsShiftKeyDown()
+		or CursorHasItem()
+	then
+		return
 	end
+	-- Mainline has no Ctrl+Right-click bag action; leave user-remapped gestures alone.
+	if ns.IsBagActionClick() then
+		return
+	end
+	OpenItemMenu(button, button:GetBagID(), button:GetID())
+end
 
-	ns.HookBagButtons(hooked, UpdateMarks, Click)
-
+local function InitTooltips()
 	---@param tooltip GameTooltip
 	---@param itemID integer?
 	local function AddTooltipLine(tooltip, itemID)
@@ -670,7 +655,9 @@ ns.Init(function()
 			AddTooltipLine(tooltip, GetInventoryItemID(unit, slot))
 		end
 	end)
+end
 
+local function TrackWeapons()
 	-- What the weapon slots held the last time they settled without a pole. Equipping a two-hander fires an
 	-- event per slot, so reading waits a moment for both to settle. A weapon held only between two events, such
 	-- as one swapped in just before the pole, is caught as it passes.
@@ -725,4 +712,24 @@ ns.Init(function()
 	Settings.SetOnValueChangedCallback("TweaksForever_beforeFishing", RefreshBags)
 	Settings.SetOnValueChangedCallback("TweaksForever_gearMark", RefreshBags)
 	Settle()
+end
+
+ns.Init(function()
+	TweaksForeverCharDB = TweaksForeverCharDB or {}
+	Char().groups = Char().groups or {}
+	Char().colours = Char().colours or {}
+	Model.Recolour(Char().colours)
+	ns.ClickMode({
+		feature = "gearGroups",
+		label = "Group gear",
+		tooltip = "Click bag items to group them, equip their groups or change a group's colour. Right-click or close "
+			.. "your bags to stop.",
+		cursor = "INTERACT_CURSOR",
+		Apply = OpenItemMenu,
+	})
+
+	ns.HookBagButtons(hooked, UpdateMarks, Click)
+
+	InitTooltips()
+	TrackWeapons()
 end)

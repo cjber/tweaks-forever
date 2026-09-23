@@ -69,119 +69,121 @@ function Model.Layout(items, sections, columns)
 	return places, headings, y
 end
 
-ns.Init(function()
-	local bag = ContainerFrameCombinedBags
-	-- Whether the bag is laid out in sections now, so switching them off lays it out once more to undo them.
-	local headings, sectioned = {}, false
+---@type ContainerFrameCombinedBags
+local bag
+-- Whether the bag is laid out in sections now, so switching them off lays it out once more to undo them.
+local headings, sectioned = {}, false
 
+local function Active()
+	return ns.Active("gearGroups") and ns.Active("gearSections") and not InputUtil.IsGamepadUIEnabled()
+end
+
+-- Each item's section (its first list) and the sections in name order, with the list each one shows.
+local function Plan()
+	local items, firsts, sections = {}, {}, {}
+	for _, button in bag:EnumerateValidItems() do
+		local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
+		local mark = itemID and ns.Gear.MarksOf(itemID)[1]
+		local key = mark and mark.kind .. ":" .. mark.name
+		if key and not firsts[key] then
+			firsts[key] = mark
+			sections[#sections + 1] = key
+		end
+		items[#items + 1] = { button = button, section = key }
+	end
+	table.sort(sections, function(a, b)
+		if firsts[a].name ~= firsts[b].name then
+			return firsts[a].name < firsts[b].name
+		end
+		return a < b
+	end)
+	return items, sections, firsts
+end
+
+-- Blizzard's own order, read back from the grid it has just laid out: bottom row first, right to left.
+---@param a TFSectionItem
+---@param b TFSectionItem
+---@return boolean
+local function BlizzardOrder(a, b)
+	local _, _, _, ax, ay = a.button:GetPoint()
+	local _, _, _, bx, by = b.button:GetPoint()
+	if ay ~= by then
+		return ay < by
+	end
+	return ax > bx
+end
+
+---@param index integer
+---@return FontString
+local function Heading(index)
+	if not headings[index] then
+		headings[index] = bag:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+	end
+	return headings[index]
+end
+
+-- Blizzard sizes the bag before laying it out, so this decides for both whether the bag has sections: not when
+-- the taller bag would run off the screen even at the smallest scale, as its top rows could not be reached.
+---@param container ContainerFrameCombinedBags
+local function Grow(container)
+	sectioned = false
+	if not Active() then
+		return
+	end
+	local items, sections = Plan()
+	local _, _, height = Model.Layout(items, sections, container:GetColumns())
+	local total = container:GetHeight() + height - container:GetRows() * STEP
+	if total * MIN_SCALE + CONTAINER_OFFSET_Y > GetScreenHeight() then
+		return
+	end
+	sectioned = true
+	container:SetHeight(total)
+	NineSliceUtil.UpdateCornerCropping(container, total)
+end
+
+---@param container ContainerFrameCombinedBags
+local function Arrange(container)
+	for _, heading in ipairs(headings) do
+		heading:Hide()
+	end
+	if not sectioned then
+		return
+	end
+	local items, sections, firsts = Plan()
+	table.sort(items, BlizzardOrder)
+	local columns = container:GetColumns()
+	local places, heads = Model.Layout(items, sections, columns)
+	local money, base = container.MoneyFrame, ORIGIN_Y + Model.lift
+	for index, item in ipairs(items) do
+		local place = places[index]
+		item.button:ClearAllPoints()
+		item.button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -place.column * STEP, base + place.y)
+	end
+	for index, head in ipairs(heads) do
+		local mark, text = firsts[head.section], Heading(index)
+		text:SetText(mark.kind == "fishing" and FISHING_ICON .. mark.name or mark.name)
+		text:SetTextColor(unpack(ns.Gear.ColourOf(mark)))
+		text:ClearAllPoints()
+		text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, base + head.y + 2)
+		text:Show()
+	end
+end
+
+-- Blizzard lays the bag out only when it opens, so a change of contents or groups redoes it the same way. While
+-- equipped weapons are settling, the refresh that ends it lays the bag out, so the moved weapons do not show
+-- under another section first.
+local function Relayout()
+	if bag:IsShown() and (sectioned or Active()) and not ns.Gear.Settling() then
+		bag:UpdateFrameSize()
+		bag:UpdateItemLayout()
+		UpdateContainerFrameAnchors()
+	end
+end
+
+ns.Init(function()
+	bag = ContainerFrameCombinedBags
 	function Model.Sectioned()
 		return sectioned
-	end
-
-	local function Active()
-		return ns.Active("gearGroups") and ns.Active("gearSections") and not InputUtil.IsGamepadUIEnabled()
-	end
-
-	-- Each item's section (its first list) and the sections in name order, with the list each one shows.
-	local function Plan()
-		local items, firsts, sections = {}, {}, {}
-		for _, button in bag:EnumerateValidItems() do
-			local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
-			local mark = itemID and ns.Gear.MarksOf(itemID)[1]
-			local key = mark and mark.kind .. ":" .. mark.name
-			if key and not firsts[key] then
-				firsts[key] = mark
-				sections[#sections + 1] = key
-			end
-			items[#items + 1] = { button = button, section = key }
-		end
-		table.sort(sections, function(a, b)
-			if firsts[a].name ~= firsts[b].name then
-				return firsts[a].name < firsts[b].name
-			end
-			return a < b
-		end)
-		return items, sections, firsts
-	end
-
-	-- Blizzard's own order, read back from the grid it has just laid out: bottom row first, right to left.
-	---@param a TFSectionItem
-	---@param b TFSectionItem
-	---@return boolean
-	local function BlizzardOrder(a, b)
-		local _, _, _, ax, ay = a.button:GetPoint()
-		local _, _, _, bx, by = b.button:GetPoint()
-		if ay ~= by then
-			return ay < by
-		end
-		return ax > bx
-	end
-
-	---@param index integer
-	---@return FontString
-	local function Heading(index)
-		if not headings[index] then
-			headings[index] = bag:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-		end
-		return headings[index]
-	end
-
-	-- Blizzard sizes the bag before laying it out, so this decides for both whether the bag has sections: not when
-	-- the taller bag would run off the screen even at the smallest scale, as its top rows could not be reached.
-	---@param container ContainerFrameCombinedBags
-	local function Grow(container)
-		sectioned = false
-		if not Active() then
-			return
-		end
-		local items, sections = Plan()
-		local _, _, height = Model.Layout(items, sections, container:GetColumns())
-		local total = container:GetHeight() + height - container:GetRows() * STEP
-		if total * MIN_SCALE + CONTAINER_OFFSET_Y > GetScreenHeight() then
-			return
-		end
-		sectioned = true
-		container:SetHeight(total)
-		NineSliceUtil.UpdateCornerCropping(container, total)
-	end
-
-	---@param container ContainerFrameCombinedBags
-	local function Arrange(container)
-		for _, heading in ipairs(headings) do
-			heading:Hide()
-		end
-		if not sectioned then
-			return
-		end
-		local items, sections, firsts = Plan()
-		table.sort(items, BlizzardOrder)
-		local columns = container:GetColumns()
-		local places, heads = Model.Layout(items, sections, columns)
-		local money, base = container.MoneyFrame, ORIGIN_Y + Model.lift
-		for index, item in ipairs(items) do
-			local place = places[index]
-			item.button:ClearAllPoints()
-			item.button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -place.column * STEP, base + place.y)
-		end
-		for index, head in ipairs(heads) do
-			local mark, text = firsts[head.section], Heading(index)
-			text:SetText(mark.kind == "fishing" and FISHING_ICON .. mark.name or mark.name)
-			text:SetTextColor(unpack(ns.Gear.ColourOf(mark)))
-			text:ClearAllPoints()
-			text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, base + head.y + 2)
-			text:Show()
-		end
-	end
-
-	-- Blizzard lays the bag out only when it opens, so a change of contents or groups redoes it the same way. While
-	-- equipped weapons are settling, the refresh that ends it lays the bag out, so the moved weapons do not show
-	-- under another section first.
-	local function Relayout()
-		if bag:IsShown() and (sectioned or Active()) and not ns.Gear.Settling() then
-			bag:UpdateFrameSize()
-			bag:UpdateItemLayout()
-			UpdateContainerFrameAnchors()
-		end
 	end
 
 	hooksecurefunc(bag, "UpdateFrameSize", Grow)
