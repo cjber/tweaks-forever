@@ -82,6 +82,43 @@ function ns.On(event, fn)
 	table.insert(handlers[event], fn)
 end
 
+-- Hook every bag slot button, including ones made later, recording each in `hooked`. `update` runs whenever the
+-- button redraws its junk coin, and again as a bag opens; `click` runs after a modified click.
+function ns.HookBagButtons(hooked, update, click)
+	-- A bag reports its size before its buttons exist, so a slot can have no button yet.
+	local function Hook(button)
+		if not button or hooked[button] then
+			return
+		end
+		hooked[button] = true
+		hooksecurefunc(button, "UpdateJunkItem", update)
+		-- OnModifiedClick avoids ever running after the ordinary use/equip/sell path.
+		hooksecurefunc(button, "OnModifiedClick", click)
+	end
+	hooksecurefunc(ContainerFrameItemButtonMixin, "OnLoad", Hook)
+	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
+		for _, button in container:EnumerateValidItems() do
+			Hook(button)
+			update(button)
+		end
+	end)
+	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
+		for _, button in container:EnumerateValidItems() do
+			Hook(button)
+		end
+	end
+end
+
+-- Whether the modified click held now is bound to one of the game's bag actions, which may have been remapped.
+function ns.IsBagActionClick()
+	for _, action in ipairs({ "EXPANDITEM", "CHATLINK", "DRESSUP", "SPLITSTACK", "AUTOLOOTTOGGLE" }) do
+		if IsModifiedClick(action) then
+			return true
+		end
+	end
+	return false
+end
+
 -- Run once every addon has loaded (their saved variables are readable, so conflicts are known).
 function ns.Init(fn)
 	if ready then

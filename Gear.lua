@@ -576,36 +576,13 @@ ns.Init(function()
 			return
 		end
 		-- Mainline has no Ctrl+Right-click bag action; leave user-remapped gestures alone.
-		for _, action in ipairs({ "EXPANDITEM", "CHATLINK", "DRESSUP", "SPLITSTACK", "AUTOLOOTTOGGLE" }) do
-			if IsModifiedClick(action) then
-				return
-			end
+		if ns.IsBagActionClick() then
+			return
 		end
 		OpenItemMenu(button, button:GetBagID(), button:GetID())
 	end
 
-	-- A bag reports its size before its buttons exist, so a slot can have no button yet.
-	local function HookButton(button)
-		if not button or hooked[button] then
-			return
-		end
-		hooked[button] = true
-		hooksecurefunc(button, "UpdateJunkItem", UpdateMarks)
-		hooksecurefunc(button, "OnModifiedClick", Click)
-	end
-
-	hooksecurefunc(ContainerFrameItemButtonMixin, "OnLoad", HookButton)
-	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
-		for _, button in container:EnumerateValidItems() do
-			HookButton(button)
-			UpdateMarks(button)
-		end
-	end)
-	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
-		for _, button in container:EnumerateValidItems() do
-			HookButton(button)
-		end
-	end
+	ns.HookBagButtons(hooked, UpdateMarks, Click)
 
 	local function AddTooltipLine(tooltip, itemID)
 		if not ns.Active("gearGroups") or not itemID then
