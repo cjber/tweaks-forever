@@ -6,6 +6,7 @@ globals = {
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER_RELOAD1",
 	"SlashCmdList",
+	"TweaksForever_OnAddonCompartmentClick",
 	"TweaksForeverCharDB",
 	"TweaksForeverDB",
 	"UIErrorsFrame",

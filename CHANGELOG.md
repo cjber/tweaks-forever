@@ -10,7 +10,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 First release: quality-of-life automations that sit inside the game's own settings.
 
-- **Settings in the game's own style**, under Options → AddOns with a page per section, and `/tweaks` as a shortcut. Features another addon already handles are greyed out with that addon named, and this is rechecked each time the settings open.
+- **Settings in the game's own style**, under Options → AddOns with a page per section, with `/tweaks` and the minimap's addon compartment as shortcuts. Features another addon already handles are greyed out with that addon named, and this is rechecked each time the settings open.
 - **Quest, gossip, summon, resurrection, battleground release and duel automations**, all off until you turn them on. Hold Shift to skip quest and gossip automation for one conversation.
 - **Faster auto loot** takes everything as the loot window opens.
 - **Automatic repairs**, using guild funds when the guild covers the cost, with the amount in chat.

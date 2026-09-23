@@ -74,8 +74,11 @@ ns.Init(function()
 	-- Another addon's settings may have changed since login.
 	SettingsPanel:HookScript("OnShow", ns.RefreshConflicts)
 
-	SLASH_TWEAKSFOREVER1 = "/tweaks"
-	SlashCmdList.TWEAKSFOREVER = function()
+	local function Open()
 		Settings.OpenToCategory(category:GetID())
 	end
+	SLASH_TWEAKSFOREVER1 = "/tweaks"
+	SlashCmdList.TWEAKSFOREVER = Open
+	-- The minimap's addon compartment calls this by name (## AddonCompartmentFunc).
+	TweaksForever_OnAddonCompartmentClick = Open
 end)
