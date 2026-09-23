@@ -40,6 +40,7 @@ On-demand tools for audits. Output is candidates, never verdicts.
 | Dead code (Lua) | `luacheck .` (unused locals/args are in the gate) plus the live-roots search below | Model functions used only by specs are live: specs are the reason they are exported. |
 | Dead code (Python) | `uvx vulture tools --min-confidence 60` | none seen |
 | Duplication | `npx --yes jscpd@4 --silent --reporters json --output .sift/runs/jscpd --ignore "**/.sift/**,**/.luals/**,**/Data/Overlays.lua" .` | the spec files share a 10-line `ns` stub preamble on purpose (each spec is standalone) |
+| Duplication, small | same command with `--min-lines 3 --min-tokens 30` and `**/tests/**` added to `--ignore` | the defaults missed the 6–11 line bag-hook clones between Junk.lua and Gear.lua; this run found them. Repeated checkout/setup-uv steps in ci.yml are expected. |
 
 String-named entrypoints (always pass a path: `rg` with no path reads stdin when it is not a terminal):
 
@@ -61,6 +62,9 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
   listed load-on-demand addons.
 - Slash commands: `SLASH_TWEAKSFOREVER1`, `SLASH_TWEAKSFOREVER_RELOAD1` with `SlashCmdList` entries.
 - Global frame `TweaksForeverFishingButton` — the binding clicks it by name.
+- `ns.HookBagButtons` and `ns.IsBagActionClick` (Core.lua) — the one home for bag-slot button hooks and
+  the remappable-click guard, used by Junk.lua and Gear.lua. The specs never run `ns.Init`, so a change here
+  needs a stubbed load of Core + the feature file (hook-registration trace) to show behaviour is unchanged.
 - `ns.Junk`, `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration` — pure `Model` tables exported for the
   specs; `ns.Fishing.IsPole` is also used by `Gear.lua`.
 - Conflict entries name other addons' folders and read their saved variables (`LeaPlusDB.X == "On"`,
@@ -68,6 +72,13 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - `tools/changelog.py` is run by `release.yml`; `tools/gen_overlays.py` is documented in the README.
 - `.pkgmeta` `ignore:` — every non-dot file not listed ships in the addon zip. New tool configs at the root
   (like `ruff.toml`) must be added there; dot-files are skipped by the packager.
+
+## Dismissed candidates
+
+- stringly-typed on `Frames.lua` `Model.LayoutKey`/`Model.Prune` (`"account"`, `"preset"`, character GUID):
+  these strings are the persisted `windowLayouts` key format; changing them changes saved data.
+- stringly-typed on the `gearMark` values (`Gear.lua`): the three-member set already fails loudly on an
+  unknown value (`error("unknown gear mark …")`).
 
 ## Zones
 
