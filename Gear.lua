@@ -26,7 +26,8 @@ ns.Feature({
 	category = "Gear",
 	name = "Mark grouped gear with",
 	tooltip = "How grouped gear shows in your bags, in each group's colour. A strip along the bottom of the slot "
-		.. "keeps clear of the item quality border; a border rings the icon inside it, one ring per group.",
+		.. "keeps clear of the item quality border; a border takes the place of the quality border, split between "
+		.. "groups.",
 	default = "strip",
 	options = {
 		{ "strip", "A coloured strip" },
@@ -39,18 +40,13 @@ ns.Feature({
 
 local BEFORE_FISHING = "Before fishing"
 local WHITE = "Interface\\Buttons\\WHITE8X8"
+-- The quality border's own art, so a group border replaces it exactly.
+local ICON_FRAME = "Interface\\Common\\WhiteIconFrame"
 local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
 -- Dots sit along the top of a slot; more than this would run off its left edge.
 local MAX_DOTS = 4
--- Border rings nest inwards; a third would cover too much of the icon.
-local MAX_BORDERS = 2
--- One border ring: top, bottom, left, right, as { point, x, y, point, x, y } scaled by the ring's inset.
-local EDGES = {
-	{ "TOPLEFT", 1, -1, "TOPRIGHT", -1, -1 },
-	{ "BOTTOMLEFT", 1, 1, "BOTTOMRIGHT", -1, 1 },
-	{ "TOPLEFT", 1, -1, "BOTTOMLEFT", 1, 1 },
-	{ "TOPRIGHT", -1, -1, "BOTTOMRIGHT", -1, 1 },
-}
+-- The border splits into one slice per group; narrower slices stop reading as separate colours.
+local MAX_BORDERS = 4
 -- Colours new groups take in turn.
 local PALETTE = {
 	{ 0.3, 0.65, 1 },
@@ -62,8 +58,8 @@ local PALETTE = {
 	{ 1, 0.35, 0.35 },
 	{ 0.7, 0.55, 1 },
 }
--- The strip sits under the stack count; dots sit over the quality border, clear of the count.
-local LAYERS = { strip = "ARTWORK", border = "ARTWORK", dots = "OVERLAY" }
+-- The strip sits under the stack count; the border and dots sit over the quality border.
+local LAYERS = { strip = "ARTWORK", border = "OVERLAY", dots = "OVERLAY" }
 -- Where a list comes from: a Tweaks group, an Equipment Manager set, or Before fishing.
 local KINDS = { "group", "set", "fishing" }
 
@@ -313,7 +309,7 @@ ns.Init(function()
 		marks[button][style] = pool
 		if not pool[index] then
 			pool[index] = button:CreateTexture(nil, LAYERS[style], nil, 2)
-			pool[index]:SetTexture(WHITE)
+			pool[index]:SetTexture(style == "border" and ICON_FRAME or WHITE)
 			if style == "dots" then
 				pool[index]:SetMask(CIRCLE)
 			end
@@ -339,20 +335,16 @@ ns.Init(function()
 	end
 
 	local function Border(button, found)
-		for index = 1, math.min(#found, MAX_BORDERS) do
-			local inset = 1 + 2 * index
-			for side, edge in ipairs(EDGES) do
-				local texture = Texture(button, "border", 4 * (index - 1) + side)
-				texture:SetVertexColor(unpack(Colour(found[index])))
-				texture:SetPoint(edge[1], edge[2] * inset, edge[3] * inset)
-				texture:SetPoint(edge[4], edge[5] * inset, edge[6] * inset)
-				if side <= 2 then
-					texture:SetHeight(2)
-				else
-					texture:SetWidth(2)
-				end
-				texture:Show()
-			end
+		local frame, count = button.IconBorder, math.min(#found, MAX_BORDERS)
+		local width = frame:GetWidth() / count
+		for index = 1, count do
+			local slice = Texture(button, "border", index)
+			slice:SetVertexColor(unpack(Colour(found[index])))
+			slice:SetTexCoord((index - 1) / count, index / count, 0, 1)
+			slice:SetPoint("TOPLEFT", frame, (index - 1) * width, 0)
+			slice:SetPoint("BOTTOMLEFT", frame, (index - 1) * width, 0)
+			slice:SetWidth(width)
+			slice:Show()
 		end
 	end
 

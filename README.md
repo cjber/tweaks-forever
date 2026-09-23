@@ -35,7 +35,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 **Gear**
 - **Ctrl+Right-click** a bag item to put it in a named group, such as Healing, DPS or Levelling, or to start a new one. The same menu equips a whole group, or an Equipment Manager set the item is in, in one click.
-- Each group has its own colour, which you can change from the same menu. Grouped items get a strip in that colour along the bottom of their bag slot, split when an item is in several groups, and their tooltip names the groups in colour. A coloured border inside the slot, coloured dots or no mark are options. Groups are kept per character.
+- Each group has its own colour, which you can change from the same menu. Grouped items get a strip in that colour along the bottom of their bag slot, split when an item is in several groups, and their tooltip names the groups in colour. A coloured border in place of the quality border, coloured dots or no mark are options. Groups are kept per character.
 - Equipping a fishing pole remembers the weapons it replaced as a **Before fishing** group, so they stand out in your bags. Ctrl+Right-click one to put them back on.
 - No modifier keys needed: pick **Mark junk** or **Group gear** from a bag's portrait menu and the cursor changes, like the merchant's repair mode. Click bag items to mark them or open their gear menu; right-click, close your bags or enter combat to stop.
 
