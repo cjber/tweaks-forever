@@ -8,7 +8,7 @@ Tweaks Forever replaces a handful of single-purpose addons with options in WoW: 
 
 - **Automation**, all off until you turn it on: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, accept summons and resurrections (never mid-combat), release in battlegrounds, decline duels. Faster auto loot is on by default.
 - **Vendors**: repair automatically (from guild funds when allowed) and sell junk, up to 12 stacks so it all stays in buyback. Mark any bag item as junk with Alt+Right-click.
-- **Gear groups**: Ctrl+Right-click a bag item to put it in a named group such as Healing or DPS, and equip a whole group from the same menu. Each group has its own colour, shown as a strip on the bag slot and in the tooltip. Equipping a fishing pole remembers the weapons it replaced, so you can put them back on.
+- **Gear groups**: Ctrl+Right-click a bag item to put it in a named group such as Healing or DPS, and equip a whole group from the same menu. Each group has its own colour, shown on the bag slot (a strip or a glowing border) and in the tooltip, and the combined bag gathers each group under its own heading. Equipping a fishing pole remembers the weapons it replaced, so you can put them back on.
 - **Maps**: reveal unexplored areas on zone maps, tinted so explored ground still stands out.
 - **Interface**: move and scale Blizzard windows from a Windows tab in Edit Mode, per layout. Quiet the errors a spammed macro repeats. `/rl` reloads.
 - **Fishing**: double right-click the world with a pole to cast; with no lure on, the same double-click puts on the best one you can use.
