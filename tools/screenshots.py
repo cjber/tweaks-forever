@@ -177,8 +177,12 @@ def exploration(ui):
 
 
 KALIMDOR = 1414
-# ZoneLevels.lua's font: GameFontNormalSmallOutline (SystemFont_Shadow_Small_Outline), recoloured per zone.
-LABEL_FONT = Font(FRIZQT, 10, NORMAL, (1, -1), outline=True)
+ASHENVALE = 1440
+# AreaLabelFrameTemplate (scale 0.695): its Name, WorldMapTextFont (Friz 32, thick outline, AREA_NAME_FONT_COLOR),
+# sits TOP (0, -20) in a frame anchored TOP (0, -10) on the map's canvas container.
+LABEL_SCALE = 0.695
+AREA_LABEL_FONT = Font(FRIZQT, round(32 * LABEL_SCALE), (1.0, 0.9294, 0.7607), None, outline=True)
+AREA_LABEL_TOP = (10 + 20) * LABEL_SCALE
 # QuestDifficultyColors, as Blizzard's Constants.lua defines them.
 DIFFICULTY = {
     "impossible": (1.00, 0.10, 0.10),
@@ -198,7 +202,7 @@ def zone_ranges():
 
 
 def difficulty(level, low, high):
-    """ZoneLevels.lua's Color: Model.ChallengeLevel fed to GetRelativeDifficultyColor."""
+    """ZoneLevels.lua's colour: Model.ChallengeLevel fed to GetRelativeDifficultyColor."""
     challenge = low if level < low else high - 2 if level > high else level
     diff = challenge - level
     if diff >= 5:
@@ -210,46 +214,16 @@ def difficulty(level, low, high):
     return DIFFICULTY["standard" if -diff <= TRIVIAL_RANGE else "trivial"]
 
 
-def map_rect_on_map(ui, child, parent):
-    """C_Map.GetMapRectOnMap from UiMapAssignment: the child's world rectangle in the parent's normalised
-    coordinates (map x runs along world -Y, map y along world -X)."""
-
-    def assignment(map_id):
-        rows = [r for r in ui.table("UiMapAssignment").values() if r["UiMapID"] == str(map_id)]
-        return min(rows, key=lambda r: int(r["OrderIndex"]))
-
-    def region(row):
-        return [float(row[f"Region_{i}"]) for i in range(6)]
-
-    x0, y0, _, x1, y1, _ = region(assignment(child))
-    p = assignment(parent)
-    px0, py0, _, px1, py1, _ = region(p)
-    u0, v0, u1, v1 = (float(p[k]) for k in ("UiMin_0", "UiMin_1", "UiMax_0", "UiMax_1"))
-
-    def project(wx, wy):
-        return u0 + (py1 - wy) / (py1 - py0) * (u1 - u0), v0 + (px1 - wx) / (px1 - px0) * (v1 - v0)
-
-    (ax, ay), (bx, by) = project(x1, y1), project(x0, y0)
-    return ax, bx, ay, by
-
-
 def zone_levels(ui):
-    """Kalimdor at a level 22 character's zoom-out: every zone's range at the centre of its rectangle."""
+    """Kalimdor with the cursor on Ashenvale: Blizzard's hover label with the addon's range after the name."""
     art = map_art(ui, KALIMDOR)
     nav = ("World", "Kalimdor")
     frame, rects = world_map_frame(ui, art, nav, arrows=nav[1:])
-    mx, my, mw, mh = rects["map"]
-    ranges = zone_ranges()
-    for row in ui.table("UiMap").values():
-        map_id = int(row["ID"])
-        if row["ParentUiMapID"] != str(KALIMDOR) or map_id not in ranges:
-            continue
-        low, high = ranges[map_id]
-        min_x, max_x, min_y, max_y = map_rect_on_map(ui, map_id, KALIMDOR)
-        x, y = mx + (min_x + max_x) / 2 * mw, my + (min_y + max_y) / 2 * mh
-        text = f"{low}-{high}" if low != high else str(low)
-        width = frame.text_width(text, LABEL_FONT)
-        frame.text(x - width / 2, y - LABEL_FONT.height / 2, text, LABEL_FONT, difficulty(PLAYER_LEVEL, low, high))
+    mx, my, mw, _ = rects["map"]
+    low, high = zone_ranges()[ASHENVALE]
+    name = ui.table("UiMap")[str(ASHENVALE)]["Name_lang"]
+    text = name + colored(f" ({low}-{high})", difficulty(PLAYER_LEVEL, low, high))
+    frame.text(mx, my + AREA_LABEL_TOP, text, AREA_LABEL_FONT, justify="CENTER", width=mw)
     scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "zonelevels.png")
 
 

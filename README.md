@@ -17,7 +17,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 </p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/zonelevels.png" width="768" alt="Kalimdor on the world map with a small level range at each zone, coloured for a level 22 character: grey 1-10 starting zones, yellow 10-20 Darkshore and 18-30 Ashenvale, orange and red for the zones above">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/zonelevels.png" width="768" alt="Kalimdor on the world map with the cursor on Ashenvale: the label at the top reads Ashenvale (18-30), the range in yellow for a level 22 character">
 </p>
 
 <p align="center">
@@ -64,7 +64,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 **Maps**
 - Reveal unexplored areas on zone maps, tinted blue so explored ground still stands out (off by default).
-- Show each zone's level range on the continent maps, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Pointing at a zone adds the range after its name too. The ranges are the original game's published ones, since Forever's map data has none of its own; cities, battlegrounds and Forever's new zones have no published range and show none.
+- Point at a zone on the world map to see its level range after the name, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Forever's map data has no ranges of its own, so the original zones show the original game's, and Zephras Isle and Riverglades show the span of their subzones' exploration levels. Cities, battlegrounds, and Forever zones whose subzones carry no level show none.
 
 **Interface**
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
@@ -117,15 +117,16 @@ stylua --check .                                # format
 for spec in tests/*_spec.lua; do luajit "$spec"; done
 python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
 python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
+python3 tools/gen_zonelevels.py                 # regenerate Data/ZoneLevels.lua from wago.tools
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
-CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map and camp data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
+CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp and zone level data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 
 **Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay and camp benefit data come from the game's own files via [wago.tools](https://wago.tools); zone level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)).
+GPL-3.0-or-later. Map overlay, camp benefit and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
