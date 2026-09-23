@@ -86,11 +86,10 @@ Unlisted paths are `production`.
 
 | Path | Zone | Reason |
 |---|---|---|
-| `Data/Overlays.lua` | generated | written by `tools/gen_overlays.py`; never edit or review |
-| `Data/CampBenefits.lua` | generated | written by `tools/gen_camp.py`; never edit or review |
+| `Data/*.lua` | generated | written by the `tools/gen_*.py` script its header names; never edit or review |
 | `tests/` | test | headless LuaJIT specs with stubbed globals |
 | `tools/` | script | release notes and data generation |
-| `.github/`, `.pkgmeta`, `.luacheckrc`, `.luarc.json`, `stylua.toml`, `ruff.toml` | config | |
+| `.github/`, `.gitattributes`, `.pkgmeta`, `.luacheckrc`, `.luarc.json`, `stylua.toml`, `ruff.toml` | config | |
 | `README.md`, `CHANGELOG.md` | docs | CHANGELOG entries are release notes; history by design |
 | `media/` | asset | not reviewed |
 
