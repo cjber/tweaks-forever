@@ -20,6 +20,8 @@ ns.Feature({
 
 -- Yards you move before your position is checked against quest areas again, and before the list is re-sorted.
 local RECHECK, RESORT = 5, 25
+-- Space between the distance column and the item buttons.
+local GAP = 4
 
 local function Format(yards)
 	if yards < 1000 then
@@ -89,6 +91,10 @@ ns.Init(function()
 	end
 
 	-- A quest with no area on this continent shows nothing. Anchors only move when the tracker lays out again.
+	-- The right edge every distance lines up on: left of the item buttons whenever any tracked quest shows one, so
+	-- the column stays straight instead of stepping in beside each button.
+	local column = 0
+
 	local function Update(block, relayout)
 		local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(block.id)
 		if not distanceSq or not onContinent then
@@ -99,7 +105,7 @@ ns.Init(function()
 		if relayout then
 			d.label:ClearAllPoints()
 			d.label:SetPoint("TOP", block.HeaderText, "TOP")
-			d.label:SetPoint("RIGHT", block, "RIGHT", block.rightEdgeOffset or 0, 0)
+			d.label:SetPoint("RIGHT", block, "RIGHT", column, 0)
 		end
 		d.label:SetText(here and "here" or Format(math.sqrt(distanceSq)))
 		if here then
@@ -121,10 +127,19 @@ ns.Init(function()
 		Update(block, true)
 	end
 
+	local function Widen(block)
+		column = math.min(column, block.rightEdgeOffset or 0)
+	end
+
 	for _, module in ipairs(modules) do
 		hooksecurefunc(module, "EndLayout", function()
 			if ns.Active("questDistance") then
 				CheckAreas()
+				column = 0
+				Each(Widen)
+				if column < 0 then
+					column = column - GAP
+				end
 				Each(Relayout)
 			else
 				Each(Hide)
