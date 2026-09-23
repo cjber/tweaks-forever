@@ -82,7 +82,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Nearest quests first. The quest tracker sorts itself by distance as you move and shows how far away each quest is; the one whose area you're standing in reads "here" with a soft gold highlight.
 - Explain campsite benefits. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows exactly what sitting nearby gives you, such as "Stamina increased by 56 for 1 Hr", and whether you have it now, with the time left. Hovering a campfire lists every benefit a camp can give: the ones you have in green with their time left, the rest in grey. Your Campfire Nearby buff adds the benefits you have and which way the campfire is, once you have lit it or sat by it; your Camp Benefits buff adds the ones you haven't gained yet.
-- Show future spells in the spellbook. Each tab ends with the spells you haven't learned yet under a Future Spells heading, greyed out as the retail spellbook shows them: the ones your trainer can teach you now glow and say "See your trainer", the rest name their level, and the tooltip gives the cost. Only each spell's next rank shows. The server leaves unlearned spells out of the spellbook, so the list comes from your class trainer, remembered per character each time you visit.
+- Show future spells in the spellbook. Each tab ends with the spells you haven't learned yet under a Future Spells heading, greyed out as the retail spellbook shows them: the ones your trainer can teach you now glow and say "See your trainer", the rest name their level, and the tooltip gives the cost. Only each spell's next rank shows. Every class trainer's list is built in, so it works from your first login, and visiting your trainer brings its levels and prices up to date.
 - Modern tooltips: a thin grey border with rounded corners in place of the beige one, over a neutral charcoal that keeps the text crisp over any scenery. Tooltip style switches to the retail game's navy, or keeps the game's own border. A player's name is in their class colour, with the guild in brackets, race and class on one line and the faction in its colour. A unit's health bar sits inside its tooltip in class or reaction colour, with health as numbers for players and a percentage for others, and a comparison tooltip's Equipped label moves inside it in grey. On by default.
 - Larger, clearer nameplates. A taller health bar in the retail game's own frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined in white and your focus in gold, and the other plates fade back while you have one. Casts show in a slim bar with the spell's icon and name inside, grey with a shield when they can't be interrupted. Health numbers inside the bar follow the game's own Nameplates options. Friendly plates in dungeons are the game's own and can't be restyled. On by default; turning it off takes effect after a reload.
 
@@ -130,6 +130,7 @@ for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
 python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
 python3 tools/gen_zonelevels.py                 # regenerate Data/ZoneLevels.lua from wago.tools
+python3 tools/gen_classspells.py                # regenerate Data/ClassSpells.lua from CMaNGOS and wago.tools
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
@@ -138,12 +139,12 @@ Ketho WoW API annotations (including pinned FrameXML) into ignored `.types/`, ch
 (including generated data), and rejects every diagnostic. Local contracts in `types/` are editor-only
 and excluded from the release. See [tools/README.md](tools/README.md) for the multi-value rule.
 
-CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp, zone level and dungeon entrance data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
+CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp, zone level, dungeon entrance and class trainer data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 
 **Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)).
+GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
