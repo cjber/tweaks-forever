@@ -148,7 +148,9 @@ local function HealthBar()
 		r, g, b = OBJECT[1], OBJECT[2], OBJECT[3]
 		local color
 		if unit and UnitIsPlayer(unit) then
-			color = C_ClassColor.GetClassColor(select(2, UnitClass(unit)))
+			-- UnitClass also returns the class ID, which GetClassColor would take as its tint colour.
+			local _, classFile = UnitClass(unit)
+			color = C_ClassColor.GetClassColor(classFile)
 		elseif unit then
 			color = FACTION_BAR_COLORS[UnitReaction(unit, "player")]
 		end
