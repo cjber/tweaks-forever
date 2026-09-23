@@ -325,7 +325,8 @@ local function UnitLines()
 		for i = 2, tooltip:NumLines() do
 			local line = _G["GameTooltipTextLeft" .. i]
 			local text = line:GetText()
-			if not text then
+			-- A line's text may be secret; nothing past it is read.
+			if not canaccessvalue(text) or not text then
 				break
 			end
 			if not levelLine and text:find(race, 1, true) and (not level or text:find(tostring(level), 1, true)) then
@@ -343,7 +344,7 @@ local function UnitLines()
 		if levelLine == 3 then
 			local line = _G.GameTooltipTextLeft2
 			local text = line:GetText()
-			if text:sub(1, 1) ~= "<" then
+			if canaccessvalue(text) and text and text:sub(1, 1) ~= "<" then
 				line:SetText("<" .. text .. ">")
 			end
 			line:SetTextColor(GUILD[1], GUILD[2], GUILD[3])

@@ -181,8 +181,11 @@ ns.Init(function()
 		SetOverrideBindingClick(button, true, "BUTTON2", button:GetName())
 	end)
 
-	ns.On("UNIT_SPELLCAST_CHANNEL_START", function(unit, _, spellID)
-		if unit == "player" and C_Spell.GetSpellName(spellID) == fishing then
+	-- Only your own casts: another unit's may carry secret arguments.
+	local channels = CreateFrame("Frame")
+	channels:RegisterUnitEvent("UNIT_SPELLCAST_CHANNEL_START", "player")
+	channels:SetScript("OnEvent", function(_, _, _, _, spellID)
+		if canaccessvalue(spellID) and C_Spell.GetSpellName(spellID) == fishing then
 			WarnNoLure()
 		end
 	end)

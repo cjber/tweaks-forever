@@ -35,36 +35,40 @@ local DIMMED = 0.6
 ---@type table<NamePlateUnitFrame, true>
 local styled = setmetatable({}, { __mode = "k" })
 
--- Asks the game rather than the frame's cached isTarget: the frame's own PLAYER_TARGET_CHANGED handler may run
--- after this addon's.
+-- Retail's selection outline, which Blizzard switches off for the Classic style, white round the target and gold round
+-- the focus, and the other plates faded back while you have a target. Asks the game rather than the frame's cached
+-- isTarget: the frame's own PLAYER_TARGET_CHANGED handler may run after this addon's. In dungeons and raids
+-- UnitIsUnit answers with a secret boolean that addon code cannot test, so there the engine's FromBoolean setters
+-- take it as it is and the focus goes unmarked.
 ---@param frame NamePlateUnitFrame
-local function Dim(frame)
+local function Highlight(frame)
 	local unit = frame.unit
-	local faded = unit and UnitExists("target") and not UnitIsUnit(unit, "target") and not UnitIsUnit(unit, "focus")
-	frame:SetAlpha(faded and DIMMED or 1)
-end
-
--- Retail's selection outline, which Blizzard switches off for the Classic style: white round the target, gold round
--- the focus. Asks the game, as Dim does.
----@param frame NamePlateUnitFrame
-local function Border(frame)
-	local unit = frame.unit
-	local target = unit and UnitIsUnit(unit, "target")
-	local focus = unit and UnitIsUnit(unit, "focus")
 	local border = frame.HealthBarsContainer.healthBar.selectedBorder
-	border:SetShown(target or focus)
+	if not unit then
+		border:Hide()
+		frame:SetAlpha(1)
+		return
+	end
+	local target, focus = UnitIsUnit(unit, "target"), UnitIsUnit(unit, "focus")
+	local fade = UnitExists("target") and DIMMED or 1
+	border:SetVertexColor(1, 1, 1)
+	border:Show()
+	if not (canaccessvalue(target) and canaccessvalue(focus)) then
+		border:SetAlphaFromBoolean(target, 1, 0)
+		frame:SetAlphaFromBoolean(target, 1, fade)
+		return
+	end
 	if focus and not target then
 		border:SetVertexColor(NORMAL_FONT_COLOR:GetRGB())
-	else
-		border:SetVertexColor(1, 1, 1)
 	end
+	border:SetAlpha((target or focus) and 1 or 0)
+	frame:SetAlpha((target or focus) and 1 or fade)
 end
 
 -- Retail's own bar art, as its default style lays it out: the cooldown-manager fill inside its bronze-rimmed trough,
 -- in place of the Classic style's border.
----@param frame NamePlateUnitFrame
 ---@param bar NamePlateHealthBar
-local function HealthArt(frame, bar)
+local function HealthArt(bar)
 	bar.barTexture:SetAtlas("UI-HUD-CoolDownManager-Bar")
 	local trough = bar.bgTexture
 	trough:ClearAllPoints()
@@ -78,7 +82,6 @@ local function HealthArt(frame, bar)
 	border:SetPoint("BOTTOMRIGHT", trough, "BOTTOMRIGHT", -3, 3)
 	-- The others fade back as a whole instead, so the darkening would dim them twice.
 	bar.deselectedOverlay:SetAlpha(0)
-	Border(frame)
 end
 
 ---@param frame NamePlateUnitFrame
@@ -138,7 +141,7 @@ local function Layout(frame)
 
 	-- Health percent and value, when the game's Nameplates options show them, inside the bar's right end.
 	local bar = health.healthBar
-	HealthArt(frame, bar)
+	HealthArt(bar)
 	for _, text in ipairs({ bar.Text, bar.RightText, bar.LeftText }) do
 		text:ClearAllPoints()
 		text:SetFontObject("SystemFont_NamePlate_Outlined")
@@ -148,7 +151,7 @@ local function Layout(frame)
 	bar.RightText:SetPoint("RIGHT", bar.LeftText, "LEFT", -3, 0)
 	bar.Text:SetPoint("RIGHT", bar.RightText, "LEFT", 2, 0)
 
-	Dim(frame)
+	Highlight(frame)
 end
 
 ---@param frame NamePlateUnitFrame
@@ -157,17 +160,16 @@ local function Style(frame)
 		styled[frame] = true
 		hooksecurefunc(frame, "UpdateAnchors", Layout)
 		hooksecurefunc(frame.HealthBarsContainer.healthBar, "UpdateSelectionBorder", function()
-			Border(frame)
+			Highlight(frame)
 		end)
 	end
 	Layout(frame)
 end
 
 ---@param frame NamePlateUnitFrame
-local function Highlight(frame)
+local function Refresh(frame)
 	if styled[frame] then
-		Border(frame)
-		Dim(frame)
+		Highlight(frame)
 	end
 end
 
@@ -193,14 +195,14 @@ ns.Init(function()
 	-- Blizzard resets a unit frame's alpha here; nameplates never fade for range, so it always sets 1.
 	hooksecurefunc("CompactUnitFrame_UpdateCenterStatusIcon", function(frame)
 		if styled[frame] then
-			Dim(frame)
+			Highlight(frame)
 		end
 	end)
 	ns.On("PLAYER_TARGET_CHANGED", function()
-		ForEachPlate(Highlight)
+		ForEachPlate(Refresh)
 	end)
 	ns.On("PLAYER_FOCUS_CHANGED", function()
-		ForEachPlate(Highlight)
+		ForEachPlate(Refresh)
 	end)
 	ForEachPlate(Style)
 end)

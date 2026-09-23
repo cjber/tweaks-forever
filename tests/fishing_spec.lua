@@ -47,7 +47,12 @@ local env = setmetatable({
 		cvars[cvar] = value
 	end,
 	CreateFrame = function()
-		return { RegisterForClicks = function() end, SetAttribute = function() end, SetScript = function() end }
+		return {
+			RegisterForClicks = function() end,
+			RegisterUnitEvent = function() end,
+			SetAttribute = function() end,
+			SetScript = function() end,
+		}
 	end,
 	UIErrorsFrame = {
 		AddMessage = function(_, text)
