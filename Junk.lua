@@ -140,25 +140,18 @@ ns.Init(function()
 			return
 		end
 		-- Mainline has no Alt+Right-click bag action; leave user-remapped gestures alone.
-		for _, action in ipairs({ "EXPANDITEM", "CHATLINK", "DRESSUP", "SPLITSTACK", "AUTOLOOTTOGGLE" }) do
-			if IsModifiedClick(action) then
-				return
-			end
+		if ns.IsBagActionClick() then
+			return
 		end
 		if Toggle(button:GetBagID(), button:GetID()) and GameTooltip:GetOwner() == button then
 			button:OnUpdate()
 		end
 	end
 
-	-- A bag reports its size before its buttons exist, so a slot can have no button yet.
-	local function HookButton(button)
-		if not button or hooked[button] then
-			return
-		end
-		hooked[button] = true
-		hooksecurefunc(button, "UpdateJunkItem", UpdateIcon)
-		-- OnModifiedClick avoids ever running after the ordinary use/equip/sell path.
-		hooksecurefunc(button, "OnModifiedClick", Mark)
+	-- Refundable purchases belong to Blizzard's confirmation flow.
+	local function Refundable(bag, slot)
+		local purchase = C_Container.GetContainerItemPurchaseInfo(bag, slot, false)
+		return purchase and purchase.refundSeconds and purchase.refundSeconds > 0
 	end
 
 	local function Scan(includeGreys, limit)
@@ -175,9 +168,7 @@ ns.Init(function()
 					local price = select(11, C_Item.GetItemInfo(info.hyperlink))
 					pending = pending or price == nil
 					local value = Model.SaleValue(info, price, marks, includeGreys)
-					local purchase = value and C_Container.GetContainerItemPurchaseInfo(bag, slot, false)
-					-- Refundable purchases belong to Blizzard's confirmation flow.
-					if value and not (purchase and purchase.refundSeconds and purchase.refundSeconds > 0) then
+					if value and not Refundable(bag, slot) then
 						result[#result + 1] = { bag = bag, slot = slot, info = info, value = value }
 						if #result == limit then
 							return result, pending
@@ -271,11 +262,10 @@ ns.Init(function()
 			local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
 			local includeGreys = not run.manual and not LeatrixSellsGreys()
 			local price = item.value / item.info.stackCount
-			local purchase = info and C_Container.GetContainerItemPurchaseInfo(item.bag, item.slot, false)
 			if
 				Model.SameStack(item.info, info)
 				and Model.SaleValue(info, price, Marks(), includeGreys)
-				and not (purchase and purchase.refundSeconds and purchase.refundSeconds > 0)
+				and not Refundable(item.bag, item.slot)
 			then
 				run.waiting, run.polls = item, 0
 				if not run.manual then
@@ -313,18 +303,7 @@ ns.Init(function()
 		end
 	end
 
-	hooksecurefunc(ContainerFrameItemButtonMixin, "OnLoad", HookButton)
-	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
-		for _, button in container:EnumerateValidItems() do
-			HookButton(button)
-			UpdateIcon(button)
-		end
-	end)
-	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
-		for _, button in container:EnumerateValidItems() do
-			HookButton(button)
-		end
-	end
+	ns.HookBagButtons(hooked, UpdateIcon, Mark)
 	hooksecurefunc(GameTooltip, "SetBagItem", function(tooltip, bag, slot)
 		local itemID = C_Container.GetContainerItemID(bag, slot)
 		if itemID and Marks()[itemID] then

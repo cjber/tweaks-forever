@@ -86,7 +86,7 @@ python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua f
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
-CI runs lint and the specs on every push. A daily workflow opens a PR with regenerated map data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
+CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 
 **Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
 

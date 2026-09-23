@@ -137,7 +137,9 @@ def generate(tables):
         if chunk:
             chunks.append(chunk)
         lines.append(f"\t[{art}] = " + f'"{chunks[0]}"' + ("," if len(chunks) == 1 else ""))
-        lines.extend(f'\t\t.. "{chunk}"' + ("," if i == len(chunks) - 1 else "") for i, chunk in enumerate(chunks[1:], 1))
+        lines.extend(
+            f'\t\t.. "{chunk}"' + ("," if i == len(chunks) - 1 else "") for i, chunk in enumerate(chunks[1:], 1)
+        )
     lines.extend(("}", ""))
     return "\n".join(lines).encode(), len(packed), count, missing
 
