@@ -129,6 +129,7 @@
     "UIPanelWindows",
     "UIParent",
     "UnitAffectingCombat",
+    "UnitExists",
     "UnitGUID",
     "UnitIsDead",
     "unpack",
