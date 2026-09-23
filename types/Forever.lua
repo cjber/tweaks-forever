@@ -10,6 +10,13 @@ LegacyForeverDB = nil
 ---@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?}?}?}?
 Questie = nil
 
+-- Shortest Path Forever's public API, narrowed to what Navigate.lua calls; each member is feature-detected.
+---@class TFShortestPathAPI
+---@field version? integer
+---@field Navigate? fun(owner: string, map: integer, x: number, y: number, title?: string): boolean
+---@type {API: TFShortestPathAPI?}?
+ShortestPathForever = nil
+
 -- Camelot's character panel dimensions and panel-manager accessor are absent from Retail FrameXML.
 ---@type number
 CHARACTER_FRAME_COLLAPSED_WIDTH = 0

@@ -5,6 +5,7 @@
 ## Version: @project-version@
 ## Category: Quality of Life
 ## IconTexture: Interface\AddOns\TweaksForever\media\Icon
+## OptionalDeps: ShortestPathForever
 ## AddonCompartmentFunc: TweaksForever_OnAddonCompartmentClick
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
@@ -31,6 +32,7 @@ Tooltips.lua
 Nameplates.lua
 Exploration.lua
 ZoneLevels.lua
+Navigate.lua
 DungeonEntrances.lua
 DungeonEntrances.xml
 Frames.lua

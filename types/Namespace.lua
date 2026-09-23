@@ -115,6 +115,8 @@ TweaksForeverCharDB = nil
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
 ---@field Print fun(message: string)
+---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
+---@field NavigateHint fun(): string
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
 ---@field ConflictOf fun(key: string): string?
