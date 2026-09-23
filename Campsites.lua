@@ -6,26 +6,20 @@ ns.Feature({
 	category = "Interface",
 	name = "Explain campsite benefits",
 	tooltip = "Hovering a camp feature, such as a Camp Tent or Mana Well, shows exactly what sitting nearby gives "
-		.. "you and whether you have it. Hovering a campfire or your Camp Benefits buff lists every benefit a camp "
-		.. "can give, with the ones you have and their time left.",
-	default = true,
-})
-
-ns.Feature({
-	key = "campPopup",
-	category = "Interface",
-	name = "Show camp benefits near a campfire",
-	tooltip = "Coming near a campfire opens a small panel below your buffs listing every camp benefit: the ones "
-		.. "you have with their time left, and what the others would give. Closing it hides it until the next "
-		.. "campfire. Hidden in combat.",
+		.. "you and whether you have it. Hovering a campfire lists every benefit a camp can give. Your Campfire "
+		.. "Nearby buff adds the benefits you have, and which way the campfire is once you have lit or sat by it; "
+		.. "your Camp Benefits buff adds the ones you haven't gained yet.",
 	default = true,
 })
 
 local CAMP_BENEFITS, CAMPFIRE_NEARBY = 1229741, 1283391
 local TENT = 1229451
--- Leaving a campfire and coming back within this many seconds doesn't reopen a panel you closed, in case the
--- game drops and re-adds Campfire Nearby while you stand still.
-local REOPEN_AFTER = 10
+-- The placement spells of each campfire tier.
+local CAMPFIRES = { [1307227] = true, [1307252] = true, [1307237] = true }
+-- About the reach of Campfire Nearby: a campfire remembered farther off than this is not the one you are near.
+local NEARBY_YARDS = 120
+-- Closer than this, a direction means nothing.
+local HERE_YARDS = 8
 
 -- { placement spell, object it places, aura it grants }. An upgrade grants its base feature's aura. The object's
 -- name is the placement spell's name; the entry catches an object named otherwise (the two Faction Banners).
@@ -65,12 +59,6 @@ local FEATURES = {
 	{ 1307393, 612123, 1229718 }, -- Spinning Wheel
 }
 
--- The auras that change what the panel shows.
-local WATCHED = { [CAMP_BENEFITS] = true, [CAMPFIRE_NEARBY] = true }
-for _, benefit in ipairs(ns.CampBenefits) do
-	WATCHED[benefit[1]] = true
-end
-
 -- Every camp benefit as { benefit, left }, the ones you have first, each group in the game's order. `remaining`
 -- gives seconds left on an aura, 0 for no expiry, nil without it.
 ---@param remaining fun(aura: integer): number?
@@ -87,31 +75,34 @@ local function Listing(remaining)
 	return have
 end
 
--- Whether an incremental aura update touches a watched aura, keeping `instances` (auraInstanceID -> true) current.
----@param info UnitAuraUpdateInfo
----@param instances TFMarks
----@return boolean
-local function Touches(info, instances)
-	local hit = false
-	for _, aura in ipairs(info.addedAuras or {}) do
-		if WATCHED[aura.spellId] then
-			instances[aura.auraInstanceID] = true
-			hit = true
-		end
+-- Which way the campfire lies, relative to where you face, a whole sector a side.
+local SIDES = {
+	"ahead",
+	"ahead to your left",
+	"to your left",
+	"behind you to the left",
+	"behind you",
+	"behind you to the right",
+	"to your right",
+	"ahead to your right",
+}
+
+-- Where a campfire is, as a tooltip line. Bearings run counter-clockwise from north, as GetPlayerFacing's do.
+---@param north number yards the campfire lies north of you
+---@param west number yards it lies west of you
+---@param facing number
+---@return string
+local function Toward(north, west, facing)
+	local yards = math.sqrt(north ^ 2 + west ^ 2)
+	if yards < HERE_YARDS then
+		return "Campfire: right here"
 	end
-	for _, id in ipairs(info.updatedAuraInstanceIDs or {}) do
-		hit = hit or instances[id] or false
-	end
-	for _, id in ipairs(info.removedAuraInstanceIDs or {}) do
-		if instances[id] then
-			instances[id] = nil
-			hit = true
-		end
-	end
-	return hit
+	local turn = (math.atan2(west, north) - facing) % (2 * math.pi)
+	local side = SIDES[math.floor(turn / (math.pi / 4) + 0.5) % 8 + 1]
+	return ("Campfire: about %d yd %s"):format(math.floor(yards / 5 + 0.5) * 5, side)
 end
 
-ns.Camp = { Listing = Listing, Touches = Touches }
+ns.Camp = { Listing = Listing, Toward = Toward }
 
 -- Aura data is secret in combat and wherever else the game restricts it: no reading, comparing or arithmetic then.
 local function AurasSecret()
@@ -151,7 +142,7 @@ local function AddRow(tooltip, row)
 	tooltip:AddLine(text, color.r, color.g, color.b, true)
 end
 
--- What a camp can give, for the campfire tooltip and the panel. No object scan tells which features this camp
+-- What a camp can give, for the campfire tooltip. No object scan tells which features this camp
 -- has, so it is every benefit there is.
 ---@param tooltip GameTooltip
 local function AddCampList(tooltip)
@@ -195,7 +186,7 @@ local function AddFeature(tooltip, aura)
 	end
 end
 
-local function InitTooltips()
+ns.Init(function()
 	local byEntry, byName = {}, {}
 	for _, feature in ipairs(FEATURES) do
 		local spell, entry, aura = unpack(feature)
@@ -232,17 +223,67 @@ local function InitTooltips()
 		tooltip:Show()
 	end)
 
-	-- The Camp Benefits buff lists only what you have; add what the rest would give. Only your own buff: the list
-	-- is of your auras.
-	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.UnitAura, function(tooltip, data)
-		if tooltip ~= GameTooltip or not ns.Active("campTooltips") or AurasSecret() or data.id ~= CAMP_BENEFITS then
+	-- Where you last lit a campfire or gained Camp Benefits, which only a campfire's side grants.
+	---@type {x: number, y: number, map: integer}?
+	local fire
+	local benefitsInstance
+
+	---@return number?, number?, integer?
+	local function Here()
+		local x, y, _, map = UnitPosition("player")
+		if not (canaccessvalue(x) and canaccessvalue(y) and canaccessvalue(map)) or not (x and y and map) then
+			return nil
+		end
+		return x, y, map
+	end
+
+	local function Remember()
+		local x, y, map = Here()
+		if x and y and map then
+			fire = { x = x, y = y, map = map }
+		end
+	end
+
+	---@return string?
+	local function Direction()
+		local x, y, map = Here()
+		local facing = GetPlayerFacing()
+		if not fire or not x or map ~= fire.map or not canaccessvalue(facing) or not facing then
+			return nil
+		end
+		local north, west = fire.x - x, fire.y - y
+		if north ^ 2 + west ^ 2 > NEARBY_YARDS ^ 2 then
+			return nil
+		end
+		return Toward(north, west, facing)
+	end
+
+	-- Campfire Nearby: the benefits you have and which way the campfire is.
+	---@param tooltip GameTooltip
+	local function AddNearby(tooltip)
+		local direction = Direction()
+		local active = {}
+		for _, row in ipairs(Listing(Remaining)) do
+			if row.left then
+				active[#active + 1] = row
+			end
+		end
+		if not direction and #active == 0 then
 			return
 		end
-		local info = tooltip:GetPrimaryTooltipInfo()
-		local unit = info and info.getterArgs and info.getterArgs[1]
-		if not unit or not UnitIsUnit(unit, "player") then
-			return
+		tooltip:AddLine(" ")
+		if direction then
+			tooltip:AddLine(direction, HIGHLIGHT_FONT_COLOR:GetRGB())
 		end
+		for _, row in ipairs(active) do
+			AddRow(tooltip, row)
+		end
+		tooltip:Show()
+	end
+
+	-- The Camp Benefits buff lists only what you have: add what the rest would give.
+	---@param tooltip GameTooltip
+	local function AddMissing(tooltip)
 		local missing = {}
 		for _, row in ipairs(Listing(Remaining)) do
 			if not row.left then
@@ -258,99 +299,55 @@ local function InitTooltips()
 			AddRow(tooltip, row)
 		end
 		tooltip:Show()
+	end
+
+	-- Only your own buffs: the lines are about your auras.
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.UnitAura, function(tooltip, data)
+		if tooltip ~= GameTooltip or not ns.Active("campTooltips") or AurasSecret() then
+			return
+		end
+		if data.id ~= CAMP_BENEFITS and data.id ~= CAMPFIRE_NEARBY then
+			return
+		end
+		local info = tooltip:GetPrimaryTooltipInfo()
+		local unit = info and info.getterArgs and info.getterArgs[1]
+		if not unit or not UnitIsUnit(unit, "player") then
+			return
+		end
+		if data.id == CAMPFIRE_NEARBY then
+			AddNearby(tooltip)
+		else
+			AddMissing(tooltip)
+		end
 	end)
-end
 
--- The panel: a tooltip of our own with a close button, as ItemRefTooltip is, below the buffs and debuffs so
--- it stays clear of the minimap and the quest tracker under it.
-local function InitPanel()
-	---@type GameTooltip?
-	local panel
-	local instances = {}
-	local dismissed, leftAt = false, nil
-
-	local function Panel()
-		if not panel then
-			-- Generated XML conflates the global GameTooltip's item-comparison children with the frame type.
-			panel = CreateFrame("GameTooltip", "TweaksForeverCampTooltip", UIParent, "GameTooltipTemplate") --[[@as GameTooltip]]
-			panel:SetFrameStrata("MEDIUM")
-			local close = CreateFrame("Button", nil, panel, "UIPanelCloseButtonNoScripts")
-			close:SetPoint("TOPRIGHT", 2, 2)
-			close:SetScript("OnClick", function()
-				dismissed = true
-				panel:Hide()
-			end)
+	ns.On("UNIT_SPELLCAST_SUCCEEDED", function(unit, _, spell)
+		if unit == "player" and canaccessvalue(spell) and CAMPFIRES[spell] then
+			Remember()
 		end
-		return panel
-	end
-
-	local function Hide()
-		if panel then
-			panel:Hide()
-		end
-	end
-
-	local function Rescan()
-		wipe(instances)
-		for spell in pairs(WATCHED) do
-			local aura = C_UnitAuras.GetPlayerAuraBySpellID(spell)
-			if aura then
-				instances[aura.auraInstanceID] = true
-			end
-		end
-	end
-
-	local function Refresh()
-		if AurasSecret() then
-			Hide()
-			return
-		end
-		local near = C_UnitAuras.GetPlayerAuraBySpellID(CAMPFIRE_NEARBY)
-		if not near then
-			leftAt = leftAt or GetTime()
-		elseif leftAt then
-			dismissed = dismissed and GetTime() - leftAt < REOPEN_AFTER
-			leftAt = nil
-		end
-		if not near or dismissed or not ns.Active("campPopup") then
-			Hide()
-			return
-		end
-		local tooltip = Panel()
-		tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-		tooltip:SetPoint("TOPRIGHT", DebuffFrame, "BOTTOMRIGHT", 0, -8)
-		GameTooltip_SetTitle(tooltip, "Camp")
-		AddCampList(tooltip)
-		tooltip:Show()
-	end
-
-	local events = CreateFrame("Frame")
-	events:RegisterUnitEvent("UNIT_AURA", "player")
-	events:SetScript("OnEvent", function(_, _, _, info)
+	end)
+	-- Camp Benefits comes and refreshes only by a campfire, so each is a fresh fix on where it is.
+	local auras = CreateFrame("Frame")
+	auras:RegisterUnitEvent("UNIT_AURA", "player")
+	auras:SetScript("OnEvent", function(_, _, _, info)
 		if AurasSecret() then
 			return
 		end
 		if info.isFullUpdate then
-			Rescan()
-			Refresh()
-		elseif Touches(info, instances) then
-			Refresh()
+			local aura = C_UnitAuras.GetPlayerAuraBySpellID(CAMP_BENEFITS)
+			benefitsInstance = aura and aura.auraInstanceID
+			return
+		end
+		for _, aura in ipairs(info.addedAuras or {}) do
+			if aura.spellId == CAMP_BENEFITS then
+				benefitsInstance = aura.auraInstanceID
+				Remember()
+			end
+		end
+		for _, id in ipairs(info.updatedAuraInstanceIDs or {}) do
+			if id == benefitsInstance then
+				Remember()
+			end
 		end
 	end)
-	ns.On("PLAYER_REGEN_DISABLED", Hide)
-	-- Updates during combat were unreadable, so start again from what the player has now.
-	ns.On("PLAYER_REGEN_ENABLED", function()
-		Rescan()
-		Refresh()
-	end)
-	Settings.SetOnValueChangedCallback("TweaksForever_campPopup", Refresh)
-	if not AurasSecret() then
-		Rescan()
-		Refresh()
-	end
-end
-
-ns.Init(function()
-	InitTooltips()
-	InitPanel()
 end)

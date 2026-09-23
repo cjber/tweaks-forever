@@ -16,14 +16,11 @@ assert(rows[2].benefit[1] == FIRST_AID and rows[2].left == 1200)
 assert(rows[3].benefit[1] == MANA_WELL and rows[3].left == nil, "then what you don't have")
 assert(rows[#rows].benefit[1] == BANNER)
 
--- Aura updates: only watched auras count, and a removal is known by the instance it was added as.
-local CAMPFIRE_NEARBY = 1283391
-local instances = {}
-assert(not Camp.Touches({ addedAuras = { { spellId = 774, auraInstanceID = 1 } } }, instances))
-assert(Camp.Touches({ addedAuras = { { spellId = CAMPFIRE_NEARBY, auraInstanceID = 2 } } }, instances))
-assert(instances[2] and not instances[1])
-assert(not Camp.Touches({ updatedAuraInstanceIDs = { 1 } }, instances))
-assert(Camp.Touches({ updatedAuraInstanceIDs = { 1, 2 } }, instances), "the campfire's refresh re-draws times")
-assert(not Camp.Touches({ removedAuraInstanceIDs = { 1 } }, instances))
-assert(Camp.Touches({ removedAuraInstanceIDs = { 2 } }, instances) and not instances[2])
+-- Directions: bearings run counter-clockwise from north, as the player's facing does.
+local pi = math.pi
+assert(Camp.Toward(40, 0, 0) == "Campfire: about 40 yd ahead")
+assert(Camp.Toward(0, 30, 0) == "Campfire: about 30 yd to your left", "west is left facing north")
+assert(Camp.Toward(0, 30, pi / 2) == "Campfire: about 30 yd ahead", "facing west")
+assert(Camp.Toward(-20, -20, 0) == "Campfire: about 30 yd behind you to the right")
+assert(Camp.Toward(3, 3, 1) == "Campfire: right here")
 print("campsites: ok")
