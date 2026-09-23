@@ -7,6 +7,7 @@ local ns = {
 }
 local NAMES = { [403] = "Lightning Bolt", [529] = "Lightning Bolt", [548] = "Lightning Bolt", [915] = "Lightning Bolt" }
 local known, level, class, combat = { [403] = true, [529] = true }, 18, "SHAMAN", false
+local tabName = "Elemental Combat"
 local env = setmetatable({
 	InCombatLockdown = function()
 		return combat
@@ -31,6 +32,17 @@ local env = setmetatable({
 	C_SpellBook = {
 		IsSpellKnown = function(id)
 			return known[id] == true
+		end,
+		GetSkillLineIndexByID = function(lineID)
+			return lineID == 375 and 2 or nil
+		end,
+		GetSpellBookSkillLineInfo = function(index)
+			return index == 2 and { name = tabName } or nil
+		end,
+	},
+	C_TradeSkillUI = {
+		GetTradeSkillDisplayName = function(lineID)
+			return "Line " .. lineID
 		end,
 	},
 	tContains = function(list, value)
@@ -74,7 +86,9 @@ assert(not Find(spells, 915) and not Find(spells, 8056), "nothing above your lev
 bolt.name = "Changed by caller"
 assert(Find(API.TrainableSpells(), 548).name == "Lightning Bolt", "fresh copies")
 env.TweaksForeverCharDB = {
-	trainer = { [548] = { name = "Lightning Bolt", level = 14, cost = 700, icon = 1, line = "Elemental Combat" } },
+	trainer = {
+		[548] = { name = "Lightning Bolt", level = 14, cost = 700, icon = 1, lineID = 375, line = "Elemental Combat" },
+	},
 }
 assert(Find(API.TrainableSpells(), 548).cost == 700, "a trainer visit's fee wins")
 known[548] = true

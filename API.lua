@@ -17,12 +17,13 @@ function API.TrainableSpells()
 	for _, entry in ipairs(ns.FutureSpells.Choose(ns.TrainerSpells(), nil, UnitLevel("player"), ns.KnownSpell)) do
 		if entry.ready then
 			local spell = entry.spell
+			local lineID = spell.lineID --[[@as integer]] -- Choose lists only rows on a class line
 			trainable[#trainable + 1] = {
 				spellID = entry.id,
 				name = spell.name,
 				level = spell.level,
 				cost = spell.cost,
-				line = spell.line,
+				line = ns.LineName(lineID, spell.line),
 			}
 		end
 	end

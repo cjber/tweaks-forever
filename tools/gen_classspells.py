@@ -7,9 +7,9 @@ TrainerType 0 with a TrainerClass) and what each teaches (npc_trainer, plus npc_
 TrainerTemplateId), with the level and fee. A row there names the trainer's teaching spell, which the Classic
 Era client resolves to the spell you learn (SpellEffect LEARN_SPELL); Forever's client drops most teaching
 spells, so its own SpellEffect only fills in the rest. Forever's SkillLineAbility then puts each learned spell
-on its class skill line (the spellbook tab) and names the races it is for. Where the rank before a spell (by its
-"Rank N" subtext) is one no trainer teaches, such as a talent, a quest reward or a starting spell, the row
-names it: that rank has to be known first.
+on its class skill line (the spellbook tab), kept by SkillLine ID as the tab's name is in the client's locale,
+and names the races it is for. Where the rank before a spell (by its "Rank N" subtext) is one no trainer
+teaches, such as a talent, a quest reward or a starting spell, the row names it: that rank has to be known first.
 
 A learned spell Forever's client doesn't know, or that sits on no class skill line, is left out and counted;
 so are rows gated on a skill rank (rogue poisons). A trainer visit in game records the server's own list,
@@ -200,11 +200,12 @@ def for_class(row, bit):
 
 
 def generate(tables, taught, forever):
-    """Per class token: its skill line names and rows of (spell, level, fee, line index, needs, races)."""
+    """Per class token: its skill line IDs and rows of (spell, level, fee, skill line ID, needs, races)."""
     names = {int(r["ID"]): r["Name_lang"] for r in forever["SpellName"]}
     subtexts = {int(r["ID"]): r["NameSubtext_lang"] for r in forever["Spell"]}
+    # Lines are baked by ID: their names are the client's locale, so an English name matches no other client's tab.
     lines = {
-        int(r["ID"]): r["DisplayName_lang"]
+        int(r["ID"])
         for r in forever["SkillLine"]
         if int(r["CategoryID"]) == CLASS_CATEGORY and not r["DisplayName_lang"].startswith("Pet - ")
     }
@@ -243,9 +244,8 @@ def generate(tables, taught, forever):
             before = by_rank[(line_ids[0], names[spell], int(rank[1]) - 1)] if rank else set()
             needs = None if before & trained else sorted(before) or None
             races = race_ids([(int(r["RaceMasks_0"]), int(r["RaceMasks_1"])) for r in own], forever["ChrRaces"])
-            rows.append((spell, level, cost, lines[line_ids[0]], needs, races))
+            rows.append((spell, level, cost, line_ids[0], needs, races))
         used = sorted({line for _, _, _, line, _, _ in rows})
-        rows = [(s, lv, c, used.index(ln) + 1, n, r) for s, lv, c, ln, n, r in rows]
         result[token] = (used, sorted(rows, key=lambda row: row[:2]))
         stats[token] = len(rows)
     return result, stats
@@ -261,14 +261,13 @@ def render(result, stats):
         "-- A trainer visit in game records the server's own list, which wins over this one.",
         "---@type string, TFNamespace",
         "local _, ns = ...",
-        "-- [class] = { lines = skill line names, spells = { { spell, level, fee in copper, line, needs = earlier",
+        "-- [class] = { lines = SkillLine IDs, spells = { { spell, level, fee in copper, SkillLine ID, needs = earlier",
         "-- rank no trainer teaches, races = the ChrRaces IDs it is for } } }",
         "-- stylua: ignore",
         "ns.ClassSpells = {",
     ]
-    for token, (names, rows) in sorted(result.items()):
-        quoted = ", ".join(f'"{name}"' for name in names)
-        lines += [f"\t{token} = {{", f"\t\tlines = {{ {quoted} }},", "\t\tspells = {"]
+    for token, (line_ids, rows) in sorted(result.items()):
+        lines += [f"\t{token} = {{", f"\t\tlines = {{ {', '.join(map(str, line_ids))} }},", "\t\tspells = {"]
         for spell, level, cost, line, needs, races in rows:
             extra = (f", needs = {{ {', '.join(map(str, needs))} }}" if needs else "") + (
                 f", races = {{ {', '.join(map(str, races))} }}" if races else ""

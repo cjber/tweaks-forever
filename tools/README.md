@@ -50,10 +50,11 @@ for *Show future spells in the spellbook* before you have visited one. Forever's
 has no trainer lists, so the rows come from the class trainers in CMaNGOS classic-db
 (pinned by commit), each teaching spell resolved to the spell you learn through the
 Classic Era client's `SpellEffect` (Forever's drops most teaching spells). Forever's
-`SkillLineAbility` gives each spell's class skill line and races, and `Spell`'s rank
-subtext names the rank before one no trainer teaches (a talent, quest or starting
-spell), which has to be known first. Spells the client lacks or on no class skill
-line are counted and left out. Same cache and flags as `gen_overlays.py`.
+`SkillLineAbility` gives each spell's class skill line, kept by ID as a tab's name is in
+the client's language, and its races; `Spell`'s rank subtext names the rank before one
+no trainer teaches (a talent, quest or starting spell), which has to be known first.
+Spells the client lacks or on no class skill line are counted and left out. Same cache
+and flags as `gen_overlays.py`.
 
 The *Refresh game data* workflow runs `latest_build.py` daily, and when a newer
 build is listed it bumps `BUILD` in every generator, regenerates, runs the checks and

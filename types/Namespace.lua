@@ -19,10 +19,11 @@
 ---@field rank? string
 ---@field level number
 ---@field icon fileID
----@field line? string the class skill line (spellbook tab) the spell belongs to
+---@field lineID? integer the class skill line (spellbook tab) the spell belongs to, as a SkillLine ID
+---@field line? string a trainer visit's name for that line, in the client's language
 ---@field cost? number copper
 
--- A spell a class trainer teaches: { spell, level, fee in copper, index into its class's lines }.
+-- A spell a class trainer teaches: { spell, level, fee in copper, class SkillLine ID (spellbook tab) }.
 ---@class TFClassSpell
 ---@field [1] integer
 ---@field [2] integer
@@ -32,7 +33,7 @@
 ---@field races? integer[] the ChrRaces IDs it is for, when not every race
 
 ---@class TFClassSpells
----@field lines string[] its class skill line names (spellbook tabs)
+---@field lines integer[] its class skill line IDs (spellbook tabs)
 ---@field spells TFClassSpell[]
 
 -- What the client knows of a spell, for a trainer row it has never seen.
@@ -130,6 +131,8 @@ TweaksForeverCharDB = nil
 ---@field FutureSpells TFFutureSpells
 ---@field ClassSpells table<string, TFClassSpells> by class token
 ---@field TrainerSpells fun(): table<integer, TFTrainerSpell>
+---@field LineName fun(lineID: integer, fallback: string?): string
+---@field LineResolver fun(): fun(id: integer, name: string?): integer?
 ---@field KnownSpell fun(id: integer): boolean
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels

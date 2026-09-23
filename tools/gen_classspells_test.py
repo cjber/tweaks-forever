@@ -78,7 +78,7 @@ class GenerateTest(unittest.TestCase):
         result, stats = generate(tables, taught, forever)
         self.assertEqual(
             result["SHAMAN"],
-            (["Elemental Combat"], [(529, 8, 100, 1, [403], None), (8056, 20, 2200, 1, None, [3])]),
+            ([375], [(529, 8, 100, 375, [403], None), (8056, 20, 2200, 375, None, [3])]),
         )
         self.assertEqual((stats["SHAMAN"], stats["not_in_client"], stats["skill_gated"]), (2, 1, 1))
         self.assertEqual(stats["trainers"], 2)

@@ -42,6 +42,7 @@ read_globals = {
 	"C_Texture",
 	"C_Timer",
 	"C_TooltipInfo",
+	"C_TradeSkillUI",
 	"C_Trainer",
 	"C_UI",
 	"C_UnitAuras",
