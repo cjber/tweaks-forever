@@ -68,8 +68,16 @@ Install(2)
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 assert(#journeys == 2 and #waypoints == 3)
 
+-- A version-1 API without Navigate, or the addon without its API: the waypoint, never an error.
+env.ShortestPathForever = { API = { version = 1 } }
+assert(ns.NavigateHint() == "Click to set a waypoint here")
+ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
+env.ShortestPathForever = {}
+ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
+assert(#journeys == 2 and #waypoints == 5)
+
 -- A map that takes no waypoint: the place goes to chat rather than nowhere.
 env.ShortestPathForever, canSet = nil, false
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
-assert(#waypoints == 3 and printed[1] == "Blackrock Mountain is at 35.0, 84.0 in Searing Gorge.", printed[1])
+assert(#waypoints == 5 and printed[1] == "Blackrock Mountain is at 35.0, 84.0 in Searing Gorge.", printed[1])
 print("navigate: ok")
