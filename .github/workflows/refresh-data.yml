@@ -1,4 +1,4 @@
-name: Refresh map data
+name: Refresh game data
 
 # Opens a PR with regenerated data when wago.tools lists a newer Forever build.
 # PRs opened with GITHUB_TOKEN don't trigger CI, so this job runs the full checks itself.
@@ -30,9 +30,9 @@ jobs:
             exit 0
           fi
           echo "new=true" >> "$GITHUB_OUTPUT"
-          sed -i -E "s/^BUILD = \".*\"/BUILD = \"$build\"/" tools/gen_overlays.py
+          sed -i -E "s/^BUILD = \".*\"/BUILD = \"$build\"/" tools/gen_overlays.py tools/gen_camp.py
       - if: steps.build.outputs.new == 'true'
-        run: python3 tools/gen_overlays.py
+        run: python3 tools/gen_overlays.py && python3 tools/gen_camp.py
       - if: steps.build.outputs.new == 'true'
         run: |
           sudo apt-get update && sudo apt-get install -y luajit lua-check
@@ -48,9 +48,9 @@ jobs:
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           branch: data/forever-${{ steps.build.outputs.version }}
-          title: "data: map overlays for Forever ${{ steps.build.outputs.version }}"
-          commit-message: "data: map overlays for Forever ${{ steps.build.outputs.version }}"
+          title: "data: game data for Forever ${{ steps.build.outputs.version }}"
+          commit-message: "data: game data for Forever ${{ steps.build.outputs.version }}"
           body: |
-            Regenerated `Data/Overlays.lua` from the world map overlay DB2s of Forever build ${{ steps.build.outputs.version }}.
+            Regenerated `Data/Overlays.lua` (world map overlays) and `Data/CampBenefits.lua` (camp benefit texts) from the DB2s of Forever build ${{ steps.build.outputs.version }}.
 
-            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up.
+            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up, and read the diff of `Data/CampBenefits.lua` for changed numbers.
