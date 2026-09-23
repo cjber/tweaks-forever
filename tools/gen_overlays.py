@@ -14,7 +14,7 @@ import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
-BUILD = "1.60.1.69913"
+BUILD = "1.60.1.69977"
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / ".cache"
 OUTPUT = ROOT / "Data" / "Overlays.lua"
