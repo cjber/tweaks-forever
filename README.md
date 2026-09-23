@@ -132,7 +132,7 @@ for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
 python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
 python3 tools/gen_zonelevels.py                 # regenerate Data/ZoneLevels.lua from wago.tools
-python3 tools/gen_classspells.py                # regenerate Data/ClassSpells.lua from CMaNGOS and wago.tools
+python3 tools/gen_classspells.py                # regenerate Data/ClassSpells.lua (--crawl reads Wowhead again)
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
@@ -147,6 +147,6 @@ CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linti
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0).
+GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [Wowhead](https://www.wowhead.com/forever)'s Forever database, crawled from the trainers in [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)

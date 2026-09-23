@@ -47,14 +47,24 @@ with no entrance at all are listed. Same cache and flags as `gen_overlays.py`.
 
 `gen_classspells.py` writes `Data/ClassSpells.lua`: what each class trainer teaches,
 for *Show future spells in the spellbook* before you have visited one. Forever's client
-has no trainer lists, so the rows come from the class trainers in CMaNGOS classic-db
-(pinned by commit), each teaching spell resolved to the spell you learn through the
-Classic Era client's `SpellEffect` (Forever's drops most teaching spells). Forever's
-`SkillLineAbility` gives each spell's class skill line, kept by ID as a tab's name is in
-the client's language, and its races; `Spell`'s rank subtext names the rank before one
-no trainer teaches (a talent, quest or starting spell), which has to be known first.
-Spells the client lacks or on no class skill line are counted and left out. Same cache
-and flags as `gen_overlays.py`.
+has no trainer lists, so the rows come from Wowhead's Forever database, which has
+Forever's own spells, levels and fees. `--crawl` starts from the class trainers in
+CMaNGOS classic-db (pinned by commit), reads each one's Teaches lists, and adds every
+trainer Wowhead names for a probe spell (each class's three most widely taught, and every
+spell new to Forever) until no new trainer turns up. It waits 3 seconds between requests,
+as Wowhead blocks a faster crawler for a while; the raw pages are cached in `tools/.cache/wowhead/` and the merged lists saved
+to `tools/wowhead_trainers.json` with the fetch date, which a normal run (and the
+refresh workflow) reads instead of Wowhead. A class's trainers mostly agree; the most
+common level and fee wins, and a fee Wowhead doesn't give is left out. Rows Wowhead
+files under Teaches (other), such as Dual Wield, carry no trainer level, so they take
+the CMaNGOS trainer's, through the Classic Era client's `SpellEffect`. Forever's
+`SkillLineAbility` gives each spell's skill line, kept by ID as a tab's name is in the
+client's language: a class line is its tab, any other (Dual Wield, Defense, armour,
+Lockpicking) puts it on the General tab. It also gives the races, and marks tradeskill
+recipes (rogue poisons), which never enter the spellbook. `Spell`'s rank subtext names
+the rank before one no trainer teaches (a talent, quest or starting spell), which has
+to be known first. Spells the client lacks, recipes and rows with no skill line or
+level are counted and left out. Same cache and flags as `gen_overlays.py`.
 
 The *Refresh game data* workflow runs `latest_build.py` daily, and when a newer
 build is listed it bumps `BUILD` in every generator, regenerates, runs the checks and
