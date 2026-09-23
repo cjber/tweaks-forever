@@ -8,6 +8,10 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-09-23
+
+- **The grouped-gear border takes the place of the quality border.** It is drawn with the game's own item border in the group's colour, split side by side when an item is in several groups, instead of thin rings inside the slot.
+
 ## [0.1.1] - 2026-09-23
 
 - **A coloured border for grouped gear.** Mark grouped gear with a ring inside the bag slot, one ring per group, as well as the strip or dots.
