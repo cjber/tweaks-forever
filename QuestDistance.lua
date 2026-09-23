@@ -33,11 +33,7 @@ local function Format(yards)
 	return ("%.1fk yd"):format(yards / 1000)
 end
 
-ns.Init(function()
-	local modules = { QuestObjectiveTracker, CampaignQuestObjectiveTracker }
-	-- [block] = { label, glow }; our own regions only, never Blizzard's, so the tracker's secure item buttons stay clean.
-	local decor = {}
-
+local function CreateAreaProbe()
 	-- The distance API measures to a quest's map marker, not its area, so "here" asks an invisible quest-area frame
 	-- which area is under your map position, the same test the world map uses for its area tooltips.
 	local probe = CreateFrame("QuestPOIFrame", nil, UIParent)
@@ -68,6 +64,15 @@ ns.Init(function()
 		end
 		probe:DrawNone()
 	end
+
+	return CheckAreas, inside
+end
+
+---@param inside TFMarks
+---@param Each fun(fn: fun(block: TFQuestBlock))
+local function CreateDecorations(inside, Each)
+	-- Our own regions only, so the tracker's secure item buttons stay clean.
+	local decor = {}
 
 	---@param block TFQuestBlock
 	---@return TFQuestDecor
@@ -127,13 +132,6 @@ ns.Init(function()
 		d.glow:SetShown(here)
 	end
 
-	---@param fn fun(block: TFQuestBlock)
-	local function Each(fn)
-		for _, module in ipairs(modules) do
-			module:EnumerateActiveBlocks(fn)
-		end
-	end
-
 	---@param block TFQuestBlock
 	local function Relayout(block)
 		Update(block, true)
@@ -144,16 +142,35 @@ ns.Init(function()
 		column = math.min(column, block.rightEdgeOffset or 0)
 	end
 
+	local function Layout()
+		column = 0
+		Each(Widen)
+		if column < 0 then
+			column = column - GAP
+		end
+		Each(Relayout)
+	end
+
+	return Hide, Update, Layout
+end
+
+ns.Init(function()
+	local modules = { QuestObjectiveTracker, CampaignQuestObjectiveTracker }
+	---@param fn fun(block: TFQuestBlock)
+	local function Each(fn)
+		for _, module in ipairs(modules) do
+			module:EnumerateActiveBlocks(fn)
+		end
+	end
+
+	local CheckAreas, inside = CreateAreaProbe()
+	local Hide, Update, Layout = CreateDecorations(inside, Each)
+
 	for _, module in ipairs(modules) do
 		hooksecurefunc(module, "EndLayout", function()
 			if ns.Active("questDistance") then
 				CheckAreas()
-				column = 0
-				Each(Widen)
-				if column < 0 then
-					column = column - GAP
-				end
-				Each(Relayout)
+				Layout()
 			else
 				Each(Hide)
 			end

@@ -84,6 +84,48 @@ function Model.Label(spell)
 	return spell.rank and ("%s (%s)"):format(spell.name, spell.rank) or spell.name
 end
 
+---@param Refresh fun()
+local function TrackTrainerSpells(Refresh)
+	-- The server keeps unlearned spells out of the spellbook, so the class trainer's list is the only full one. It
+	-- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge
+	-- by spell, so another trainer (weapons, riding) adds to the list rather than replacing it.
+	ns.On("TRAINER_SHOW", function()
+		if not ns.Active("trainableSpells") or IsTradeskillTrainer() then
+			return
+		end
+		if C_Trainer.GetTrainerType() ~= Enum.TrainerType.General then
+			return
+		end
+		local shown = {}
+		for kind in pairs(KEEP) do
+			if not GetTrainerServiceTypeFilter(kind) then
+				shown[#shown + 1] = kind
+				SetTrainerServiceTypeFilter(kind, true, false)
+			end
+		end
+		local spells = TweaksForeverCharDB.trainer or {}
+		for i = 1, GetNumTrainerServices() do
+			local name, kind, icon, level, rank = GetTrainerServiceInfo(i)
+			local data = KEEP[kind] and C_TooltipInfo.GetTrainerService(i)
+			if data and data.id then
+				spells[data.id] = {
+					name = name or C_Spell.GetSpellName(data.id),
+					rank = rank ~= "" and rank or nil,
+					level = level or 1,
+					icon = icon,
+				}
+			end
+		end
+		for _, kind in ipairs(shown) do
+			SetTrainerServiceTypeFilter(kind, false, false)
+		end
+		if next(spells) then
+			TweaksForeverCharDB.trainer = spells
+			Refresh()
+		end
+	end)
+end
+
 ns.Init(function()
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	---@type Frame, FontString, TFTrainerSpell[]?, TFTrainerGroup[]?
@@ -159,44 +201,7 @@ ns.Init(function()
 		bar:SetScript("OnLeave", GameTooltip_Hide)
 	end
 
-	-- The server keeps unlearned spells out of the spellbook, so the class trainer's list is the only full one. It
-	-- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge
-	-- by spell, so another trainer (weapons, riding) adds to the list rather than replacing it.
-	ns.On("TRAINER_SHOW", function()
-		if not ns.Active("trainableSpells") or IsTradeskillTrainer() then
-			return
-		end
-		if C_Trainer.GetTrainerType() ~= Enum.TrainerType.General then
-			return
-		end
-		local shown = {}
-		for kind in pairs(KEEP) do
-			if not GetTrainerServiceTypeFilter(kind) then
-				shown[#shown + 1] = kind
-				SetTrainerServiceTypeFilter(kind, true, false)
-			end
-		end
-		local spells = TweaksForeverCharDB.trainer or {}
-		for i = 1, GetNumTrainerServices() do
-			local name, kind, icon, level, rank = GetTrainerServiceInfo(i)
-			local data = KEEP[kind] and C_TooltipInfo.GetTrainerService(i)
-			if data and data.id then
-				spells[data.id] = {
-					name = name or C_Spell.GetSpellName(data.id),
-					rank = rank ~= "" and rank or nil,
-					level = level or 1,
-					icon = icon,
-				}
-			end
-		end
-		for _, kind in ipairs(shown) do
-			SetTrainerServiceTypeFilter(kind, false, false)
-		end
-		if next(spells) then
-			TweaksForeverCharDB.trainer = spells
-			Refresh()
-		end
-	end)
+	TrackTrainerSpells(Refresh)
 
 	EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Show", function()
 		if not bar then

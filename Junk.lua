@@ -108,50 +108,231 @@ local function LeatrixSellsGreys()
 	return C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On"
 end
 
-ns.Init(function()
-	local hooked, icons = {}, {}
-	local merchant, batch, confirmationVisit
-	local UpdateMerchantButton, Start
-	local extendedButton = false
+local hooked, icons = {}, {}
+local merchant, batch, confirmationVisit
+local UpdateMerchantButton, Start
+local extendedButton = false
 
-	---@param button ContainerFrameItemButtonTemplate
-	local function Info(button)
-		return C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
+---@param button ContainerFrameItemButtonTemplate
+local function Info(button)
+	return C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
+end
+
+-- `icons` records coins we added beyond the game's own, so turning a feature off can take them away again.
+---@param button ContainerFrameItemButtonTemplate
+local function UpdateIcon(button)
+	local greys = ns.Active("greyCoins")
+	if not ns.Active("markJunk") and not greys and not icons[button] then
+		return
 	end
+	local info = Info(button)
+	local marked = info and info.quality ~= POOR and Marks()[info.itemID]
+	local grey = info and info.quality == POOR and not info.hasNoValue
+	local merchantGrey = grey and MerchantFrame:IsShown()
+	icons[button] = (marked or grey and greys and not merchantGrey) or nil
+	-- Recompute the native branch too, so unmarking cannot leave an old icon behind.
+	button.JunkIcon:SetShown(not not (marked or merchantGrey or grey and greys))
+end
 
-	-- `icons` records coins we added beyond the game's own, so turning a feature off can take them away again.
-	---@param button ContainerFrameItemButtonTemplate
-	local function UpdateIcon(button)
-		local greys = ns.Active("greyCoins")
-		if not ns.Active("markJunk") and not greys and not icons[button] then
+local function RefreshBags()
+	ns.ForEachBagButton(UpdateIcon)
+end
+
+---@param bag integer
+---@param slot integer
+local function Toggle(bag, slot)
+	local info = C_Container.GetContainerItemInfo(bag, slot)
+	if not info or info.isLocked then
+		return false
+	end
+	Model.Toggle(TweaksForeverDB.junk, info.itemID)
+	RefreshBags()
+	UpdateMerchantButton()
+	return true
+end
+
+---@param button ContainerFrameItemButtonTemplate
+---@param mouseButton string
+local function Mark(button, mouseButton)
+	if
+		mouseButton ~= "RightButton"
+		or not ns.Active("markJunk")
+		or not IsAltKeyDown()
+		or IsControlKeyDown()
+		or IsShiftKeyDown()
+		or CursorHasItem()
+	then
+		return
+	end
+	-- Mainline has no Alt+Right-click bag action; leave user-remapped gestures alone.
+	if ns.IsBagActionClick() then
+		return
+	end
+	if Toggle(button:GetBagID(), button:GetID()) and GameTooltip:GetOwner() == button then
+		button:OnUpdate()
+	end
+end
+
+-- Refundable purchases belong to Blizzard's confirmation flow.
+---@param bag integer
+---@param slot integer
+local function Refundable(bag, slot)
+	local purchase = C_Container.GetContainerItemPurchaseInfo(bag, slot, false)
+	return purchase and purchase.refundSeconds and purchase.refundSeconds > 0
+end
+
+---@param includeGreys boolean
+---@param limit integer
+local function Scan(includeGreys, limit)
+	local result, pending = {}, false
+	local marks = Marks()
+	for bag = 0, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
+		for slot = 1, C_Container.GetContainerNumSlots(bag) do
+			local info = C_Container.GetContainerItemInfo(bag, slot)
+			if info and info.quality == nil then
+				C_Item.GetItemInfo(info.hyperlink)
+				pending = true
+			end
+			if info and Model.IsJunk(info, marks, includeGreys) and not info.hasNoValue and not info.isLocked then
+				local price = select(11, C_Item.GetItemInfo(info.hyperlink))
+				pending = pending or price == nil
+				local value = Model.SaleValue(info, price, marks, includeGreys)
+				if value and not Refundable(bag, slot) then
+					result[#result + 1] = { bag = bag, slot = slot, info = info, value = value }
+					if #result == limit then
+						return result, pending
+					end
+				end
+			end
+		end
+	end
+	return result, pending
+end
+
+local function ManualEnabled()
+	return ns.Active("markJunk") and not ns.ConflictOf("sellJunk")
+end
+
+UpdateMerchantButton = function()
+	if not MerchantFrame:IsShown() then
+		return
+	end
+	local marked = ManualEnabled() and #Scan(false, 1) > 0
+	if not marked and not extendedButton then
+		return
+	end
+	extendedButton = marked
+	local hasJunk = marked or C_MerchantFrame.GetNumJunkItems() > 0
+	MerchantSellAllJunkButton:SetEnabled(hasJunk)
+	MerchantSellAllJunkButton.Icon:SetDesaturated(not hasJunk)
+end
+
+local function Finish(run)
+	if batch ~= run then
+		return
+	end
+	batch = nil
+	local waiting = run.waiting
+	if waiting and not C_Container.GetContainerItemInfo(waiting.bag, waiting.slot) then
+		run.sold, run.money = run.sold + 1, run.money + waiting.value
+	end
+	if run.sold > 0 then
+		ns.Print(("Sold %d junk stacks for %s."):format(run.sold, C_CurrencyInfo.GetCoinTextureString(run.money)))
+	end
+	UpdateMerchantButton()
+	if run.manualPending and merchant == run.merchant then
+		Start(true)
+	elseif merchant == run.merchant and merchant.retry then
+		merchant.retry = nil
+		Start(false)
+	end
+end
+
+local function Allowed(run)
+	return merchant == run.merchant
+		and MerchantFrame:IsShown()
+		and MerchantFrame.selectedTab == 1
+		and not InCombatLockdown()
+		and not CursorHasItem()
+		and not InRepairMode()
+		and ((run.manual and ManualEnabled()) or (not run.manual and ns.Active("sellJunk")))
+end
+
+local Step
+Step = function(run)
+	if batch ~= run then
+		return
+	end
+	if not Allowed(run) then
+		Finish(run)
+		return
+	end
+	if run.waiting then
+		local item = run.waiting
+		local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
+		if not info then
+			run.sold, run.money = run.sold + 1, run.money + item.value
+			run.waiting = nil
+		elseif run.polls < 10 then
+			run.polls = run.polls + 1
+			C_Timer.After(0.2, function()
+				Step(run)
+			end)
+			return
+		else
+			-- A rejected or unacknowledged sale must not turn into an endless retry loop.
+			Finish(run)
 			return
 		end
-		local info = Info(button)
-		local marked = info and info.quality ~= POOR and Marks()[info.itemID]
-		local grey = info and info.quality == POOR and not info.hasNoValue
-		local merchantGrey = grey and MerchantFrame:IsShown()
-		icons[button] = (marked or grey and greys and not merchantGrey) or nil
-		-- Recompute the native branch too, so unmarking cannot leave an old icon behind.
-		button.JunkIcon:SetShown(not not (marked or merchantGrey or grey and greys))
 	end
-
-	local function RefreshBags()
-		ns.ForEachBagButton(UpdateIcon)
-	end
-
-	---@param bag integer
-	---@param slot integer
-	local function Toggle(bag, slot)
-		local info = C_Container.GetContainerItemInfo(bag, slot)
-		if not info or info.isLocked then
-			return false
+	while run.index <= #run.items do
+		local item = run.items[run.index]
+		run.index = run.index + 1
+		local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
+		local includeGreys = not run.manual and not LeatrixSellsGreys()
+		local price = item.value / item.info.stackCount
+		if
+			Model.SameStack(item.info, info)
+			and Model.SaleValue(info, price, Marks(), includeGreys)
+			and not Refundable(item.bag, item.slot)
+		then
+			run.waiting, run.polls = item, 0
+			if not run.manual then
+				merchant.remaining = merchant.remaining - 1
+			end
+			C_Container.UseContainerItem(item.bag, item.slot)
+			C_Timer.After(0.2, function()
+				Step(run)
+			end)
+			return
 		end
-		Model.Toggle(TweaksForeverDB.junk, info.itemID)
-		RefreshBags()
-		UpdateMerchantButton()
-		return true
 	end
+	Finish(run)
+end
 
+Start = function(manual)
+	if manual and batch then
+		batch.manualPending = true
+	end
+	if not merchant or batch or (not manual and (merchant.remaining == 0 or not ns.Active("sellJunk"))) then
+		return
+	end
+	local run = { merchant = merchant, manual = manual, index = 1, sold = 0, money = 0 }
+	if not Allowed(run) then
+		return
+	end
+	local pending
+	run.items, pending = Scan(not manual and not LeatrixSellsGreys(), manual and BATCH_SIZE or merchant.remaining)
+	if not manual then
+		merchant.pending = pending
+	end
+	if #run.items > 0 then
+		batch = run
+		Step(run)
+	end
+end
+
+ns.Init(function()
 	ns.ClickMode({
 		feature = "markJunk",
 		label = "Mark junk",
@@ -161,187 +342,6 @@ ns.Init(function()
 			Toggle(bag, slot)
 		end,
 	})
-
-	---@param button ContainerFrameItemButtonTemplate
-	---@param mouseButton string
-	local function Mark(button, mouseButton)
-		if
-			mouseButton ~= "RightButton"
-			or not ns.Active("markJunk")
-			or not IsAltKeyDown()
-			or IsControlKeyDown()
-			or IsShiftKeyDown()
-			or CursorHasItem()
-		then
-			return
-		end
-		-- Mainline has no Alt+Right-click bag action; leave user-remapped gestures alone.
-		if ns.IsBagActionClick() then
-			return
-		end
-		if Toggle(button:GetBagID(), button:GetID()) and GameTooltip:GetOwner() == button then
-			button:OnUpdate()
-		end
-	end
-
-	-- Refundable purchases belong to Blizzard's confirmation flow.
-	---@param bag integer
-	---@param slot integer
-	local function Refundable(bag, slot)
-		local purchase = C_Container.GetContainerItemPurchaseInfo(bag, slot, false)
-		return purchase and purchase.refundSeconds and purchase.refundSeconds > 0
-	end
-
-	---@param includeGreys boolean
-	---@param limit integer
-	local function Scan(includeGreys, limit)
-		local result, pending = {}, false
-		local marks = Marks()
-		for bag = 0, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
-			for slot = 1, C_Container.GetContainerNumSlots(bag) do
-				local info = C_Container.GetContainerItemInfo(bag, slot)
-				if info and info.quality == nil then
-					C_Item.GetItemInfo(info.hyperlink)
-					pending = true
-				end
-				if info and Model.IsJunk(info, marks, includeGreys) and not info.hasNoValue and not info.isLocked then
-					local price = select(11, C_Item.GetItemInfo(info.hyperlink))
-					pending = pending or price == nil
-					local value = Model.SaleValue(info, price, marks, includeGreys)
-					if value and not Refundable(bag, slot) then
-						result[#result + 1] = { bag = bag, slot = slot, info = info, value = value }
-						if #result == limit then
-							return result, pending
-						end
-					end
-				end
-			end
-		end
-		return result, pending
-	end
-
-	local function ManualEnabled()
-		return ns.Active("markJunk") and not ns.ConflictOf("sellJunk")
-	end
-
-	UpdateMerchantButton = function()
-		if not MerchantFrame:IsShown() then
-			return
-		end
-		local marked = ManualEnabled() and #Scan(false, 1) > 0
-		if not marked and not extendedButton then
-			return
-		end
-		extendedButton = marked
-		local hasJunk = marked or C_MerchantFrame.GetNumJunkItems() > 0
-		MerchantSellAllJunkButton:SetEnabled(hasJunk)
-		MerchantSellAllJunkButton.Icon:SetDesaturated(not hasJunk)
-	end
-
-	local function Finish(run)
-		if batch ~= run then
-			return
-		end
-		batch = nil
-		local waiting = run.waiting
-		if waiting and not C_Container.GetContainerItemInfo(waiting.bag, waiting.slot) then
-			run.sold, run.money = run.sold + 1, run.money + waiting.value
-		end
-		if run.sold > 0 then
-			ns.Print(("Sold %d junk stacks for %s."):format(run.sold, C_CurrencyInfo.GetCoinTextureString(run.money)))
-		end
-		UpdateMerchantButton()
-		if run.manualPending and merchant == run.merchant then
-			Start(true)
-		elseif merchant == run.merchant and merchant.retry then
-			merchant.retry = nil
-			Start(false)
-		end
-	end
-
-	local function Allowed(run)
-		return merchant == run.merchant
-			and MerchantFrame:IsShown()
-			and MerchantFrame.selectedTab == 1
-			and not InCombatLockdown()
-			and not CursorHasItem()
-			and not InRepairMode()
-			and ((run.manual and ManualEnabled()) or (not run.manual and ns.Active("sellJunk")))
-	end
-
-	local Step
-	Step = function(run)
-		if batch ~= run then
-			return
-		end
-		if not Allowed(run) then
-			Finish(run)
-			return
-		end
-		if run.waiting then
-			local item = run.waiting
-			local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
-			if not info then
-				run.sold, run.money = run.sold + 1, run.money + item.value
-				run.waiting = nil
-			elseif run.polls < 10 then
-				run.polls = run.polls + 1
-				C_Timer.After(0.2, function()
-					Step(run)
-				end)
-				return
-			else
-				-- A rejected or unacknowledged sale must not turn into an endless retry loop.
-				Finish(run)
-				return
-			end
-		end
-		while run.index <= #run.items do
-			local item = run.items[run.index]
-			run.index = run.index + 1
-			local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
-			local includeGreys = not run.manual and not LeatrixSellsGreys()
-			local price = item.value / item.info.stackCount
-			if
-				Model.SameStack(item.info, info)
-				and Model.SaleValue(info, price, Marks(), includeGreys)
-				and not Refundable(item.bag, item.slot)
-			then
-				run.waiting, run.polls = item, 0
-				if not run.manual then
-					merchant.remaining = merchant.remaining - 1
-				end
-				C_Container.UseContainerItem(item.bag, item.slot)
-				C_Timer.After(0.2, function()
-					Step(run)
-				end)
-				return
-			end
-		end
-		Finish(run)
-	end
-
-	Start = function(manual)
-		if manual and batch then
-			batch.manualPending = true
-		end
-		if not merchant or batch or (not manual and (merchant.remaining == 0 or not ns.Active("sellJunk"))) then
-			return
-		end
-		local run = { merchant = merchant, manual = manual, index = 1, sold = 0, money = 0 }
-		if not Allowed(run) then
-			return
-		end
-		local pending
-		run.items, pending = Scan(not manual and not LeatrixSellsGreys(), manual and BATCH_SIZE or merchant.remaining)
-		if not manual then
-			merchant.pending = pending
-		end
-		if #run.items > 0 then
-			batch = run
-			Step(run)
-		end
-	end
 
 	ns.HookBagButtons(hooked, UpdateIcon, Mark)
 	hooksecurefunc(GameTooltip, "SetBagItem", function(tooltip, bag, slot)
