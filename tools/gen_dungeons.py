@@ -8,7 +8,7 @@
 The world map already carries Blizzard's entrance provider, but it asks C_EncounterJournal, and Forever's
 client ships no Journal* tables, so it has nothing to draw. The entrance itself is in Map: Corpse_0/1 on
 CorpseMapID is where a ghost is sent to walk back in, which is the door. UiMapAssignment projects that point
-onto a map, the same way Legacy Here places its instance pins, so a pin lands where Legacy's does.
+onto a map, the same way Legacy Forever places its instance pins, so a pin lands where Legacy's does.
 
 Which zone map owns an entrance is curated (ZONES): zone rectangles overlap, and a point inside several would
 otherwise give Uldaman to Loch Modan. Continent maps take every entrance that projects onto them.
@@ -94,7 +94,7 @@ def db2(name, refresh=False, offline=False):
 
 
 def project(assignment, x, y):
-    """A world point as a map position, or None off the map. Rounded as Legacy Here rounds its pins."""
+    """A world point as a map position, or None off the map. Rounded as Legacy Forever rounds its pins."""
     r0, r1, r3, r4 = (float(assignment[f"Region_{i}"]) for i in (0, 1, 3, 4))
     if not (r0 <= x <= r3 and r1 <= y <= r4):
         return None

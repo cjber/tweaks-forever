@@ -68,7 +68,7 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - `ns.Junk`, `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration` — pure `Model` tables exported for the
   specs; `ns.Fishing.IsPole` is also used by `Gear.lua`.
 - Conflict entries name other addons' folders and read their saved variables (`LeaPlusDB.X == "On"`,
-  `LegacyHereDB`, `LeaMapsDB`, Questie, Mapster via LibStub) — external contracts.
+  `LegacyForeverDB`, `LeaMapsDB`, Questie, Mapster via LibStub) — external contracts.
 - `tools/changelog.py` is run by `release.yml`; `tools/gen_overlays.py` is documented in the README.
 - `.pkgmeta` `ignore:` — every non-dot file not listed ships in the addon zip. New tool configs at the root
   (like `ruff.toml`) must be added there; dot-files are skipped by the packager.

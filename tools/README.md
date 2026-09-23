@@ -36,7 +36,7 @@ content tuning, and fails on any token it can't resolve. Same cache and flags as
 entrance sits on the world map. Blizzard's map asks `C_EncounterJournal`, which is
 empty without the journal's tables that Forever's client lacks. The entrance is
 `Map.Corpse_0/1` on `CorpseMapID`, the point a ghost walks back in from, projected
-through `UiMapAssignment` exactly as Legacy Here places its instance pins. Which zone
+through `UiMapAssignment` exactly as Legacy Forever places its instance pins. Which zone
 map shows an entrance is curated in the script (zone rectangles overlap); continents
 take every entrance on them. Entrances whose icons would overlap on the minimized
 map at its smallest zoom merge into one pin at their centre, and the curated
