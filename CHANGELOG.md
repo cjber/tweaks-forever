@@ -8,6 +8,10 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-09-23
+
+- **Sections for grouped gear in the combined bag.** With Combine Bags on, each group's gear sits together at the top of the bag under a heading in the group's colour, and the bag grows to fit. An item in several groups goes under the first. Turn it off under Gear in the settings; separate bags keep items where they are.
+
 ## [0.1.3] - 2026-09-23
 
 - **The grouped-gear border glows** in the group's colour, the way the bags light up a new item.
