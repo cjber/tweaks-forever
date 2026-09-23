@@ -5,11 +5,17 @@
 <p align="center">
 Small quality-of-life automations for WoW: Forever that feel like part of the default UI.<br>
 <a href="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml"><img src="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+<a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`), with a page for each section.
+Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`, or the addon compartment on the minimap), with a page for each section.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight. This is checked again each time the settings open.
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/gear.png" width="374" alt="A backpack with gear groups marked by coloured strips along the bottom of each slot, and a ring's tooltip ending Gear: DPS, Levelling in the groups' colours">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/menu.png" width="248" alt="The Ctrl+Right-click menu on a ring: group checkboxes, New group, Equip DPS, Equip Levelling and Colour">
+</p>
 
 ## Features
 
@@ -75,9 +81,10 @@ luacheck .                                      # lint
 stylua --check .                                # format
 for spec in tests/*_spec.lua; do luajit "$spec"; done
 python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
+python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
-CI runs lint and the specs on every push.
+CI runs lint and the specs on every push. A daily workflow opens a PR with regenerated map data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 
 **Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
 
