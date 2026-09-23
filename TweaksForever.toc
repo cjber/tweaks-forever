@@ -40,3 +40,4 @@ Spellbook.lua
 Fishing.lua
 Reload.lua
 Settings.lua
+API.lua

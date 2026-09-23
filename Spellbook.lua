@@ -32,9 +32,10 @@ local function InOrder(a, b)
 	return a.spell.name < b.spell.name
 end
 
--- A tab's unlearned spells: the lowest unlearned rank of each, those your trainer teaches now first, then by level.
+-- A tab's unlearned spells, or every tab's with no line: the lowest unlearned rank of each, those your trainer
+-- teaches now first, then by level.
 ---@param spells table<integer, TFTrainerSpell>
----@param line string
+---@param line string?
 ---@param level number
 ---@param Skip fun(id: integer): boolean? known, or hidden by the spellbook's filter
 ---@return TFFutureSpell[]
@@ -43,7 +44,12 @@ function Model.Choose(spells, line, level, Skip)
 	local byName = {}
 	for id, spell in pairs(spells) do
 		local held = byName[spell.name]
-		if spell.line == line and not Skip(id) and (not held or spell.level < held.spell.level) then
+		if
+			spell.line
+			and (not line or spell.line == line)
+			and not Skip(id)
+			and (not held or spell.level < held.spell.level)
+		then
 			byName[spell.name] = { id = id, spell = spell, ready = spell.level <= level }
 		end
 	end

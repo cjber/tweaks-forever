@@ -9,6 +9,7 @@ globals = {
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER_RELOAD1",
 	"SlashCmdList",
+	"TweaksForever",
 	"TweaksForever_OnAddonCompartmentClick",
 	"TweaksForeverCharDB",
 	"TweaksForeverDB",
