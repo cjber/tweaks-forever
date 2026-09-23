@@ -1,6 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+-- Stacks sold per merchant visit, so everything sold is still in the buyback tab.
+local BATCH_SIZE = 12
+
 local conflicts = {
 	{ addon = "Peddler" },
 	{ addon = "Scrap" },
@@ -23,7 +26,7 @@ ns.Feature({
 	key = "sellJunk",
 	category = "Vendors",
 	name = "Sell junk automatically",
-	tooltip = "Sell up to 12 grey or marked stacks per merchant visit."
+	tooltip = ("Sell up to %d grey or marked stacks per merchant visit."):format(BATCH_SIZE)
 		.. " With Leatrix Plus auto-selling, only marked non-grey items are sold here.",
 	default = true,
 	-- Leatrix owns only greys; disabling this feature entirely would strand our marks.
@@ -42,7 +45,6 @@ ns.Feature({
 ---@class TFJunk
 local Model = {}
 ns.Junk = Model
-local BATCH_SIZE = 12
 local POOR = 0
 
 ---@param marks TFMarks
@@ -357,7 +359,7 @@ ns.Init(function()
 	end)
 	MerchantSellAllJunkButton:HookScript("OnEnter", function()
 		if ManualEnabled() then
-			GameTooltip:AddLine("Also sells up to 12 marked non-grey stacks.", 1, 0.82, 0, true)
+			GameTooltip:AddLine(("Also sells up to %d marked non-grey stacks."):format(BATCH_SIZE), 1, 0.82, 0, true)
 			GameTooltip:Show()
 		end
 	end)
