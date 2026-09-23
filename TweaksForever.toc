@@ -21,6 +21,7 @@ Modes.lua
 Junk.lua
 Gear.lua
 Sections.lua
+Reagents.lua
 Campsites.lua
 Exploration.lua
 Frames.lua

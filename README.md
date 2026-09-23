@@ -47,6 +47,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
 - `/rl` reloads the interface.
+- With **Combine Bags** on, the reagent bag sits at the top of the combined bag under its own name, instead of in a small window beside it, and opens and closes with it. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Explain campsites. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows what sitting nearby gives you and whether you have it now, with the time left. Hovering a campfire shows how long your camp benefits last.
 
 **Fishing**
@@ -68,6 +69,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Questie an
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
 | Unexplored areas | Legacy Here, Leatrix Maps, Mapster |
 | Move windows | BlizzMove, MoveAnything |
+| Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Fishing | FishingBuddy, FishingAce |
 
 ## Install

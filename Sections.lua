@@ -23,6 +23,8 @@ local HEADING, GAP = 16, 6
 local FISHING_ICON = "|TInterface\\Icons\\Trade_Fishing:0|t "
 -- The smallest scale Blizzard shrinks bags to so they fit on screen (CONTAINER_SCALE in ContainerFrame.lua).
 local MIN_SCALE = 0.75
+-- Shared with the reagent bag's section (Reagents.lua), so the two line up.
+Model.ITEM, Model.STEP, Model.HEADING, Model.MIN_SCALE = ITEM, STEP, HEADING, MIN_SCALE
 
 -- Where each item and heading goes, bottom-up from the money frame as Blizzard's grid is. `items` is in
 -- Blizzard's order (bottom right first), each { section = key or nil }; `sections` is the keys top to bottom.

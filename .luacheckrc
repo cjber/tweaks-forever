@@ -42,6 +42,8 @@ read_globals = {
 	"CompleteQuest",
 	"ConfirmAcceptQuest",
 	"CONTAINER_OFFSET_Y",
+	"ContainerFrame6",
+	"ContainerFrame_IsReagentBag",
 	"ContainerFrameCombinedBags",
 	"ContainerFrameItemButtonMixin",
 	"ContainerFrameUtil_EnumerateContainerFrames",
