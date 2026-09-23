@@ -12,6 +12,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 - **Resurrections from outside your group wait for you.** The addon can only tell whether a group member is in combat, so a resurrection from anyone else is no longer auto-accepted, and a battle resurrection from a stranger is yours to time.
 - **Grey items always show the junk coin.** The game's gold coin marks greys in your bags all the time, not only while a merchant is open. Turn it off under Vendors.
 - **Nearest quests first.** The quest tracker re-sorts as you move and shows how far away each quest is in small grey text. The quest whose area you're standing in reads "here" with a soft gold highlight. It stays out of the way while Questie's own tracker is on. Turn it off under Interface.
+- **The spellbook shows spells left to train.** A line at the top counts the spells your class trainer can teach you now and names the level of the next ones; hover it for the full list, grouped by level. The list is read from the trainer, so visit yours once to fill it in. Turn it off under Interface.
 
 ## [0.3.0] - 2026-09-23
 
