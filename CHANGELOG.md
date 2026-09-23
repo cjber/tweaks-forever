@@ -8,6 +8,12 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-09-23
+
+- **A softer palette for gear groups:** rose, teal, lavender and pink, still well clear of every item quality colour. Groups on an earlier default colour take one of the new ones; colours you picked yourself stay.
+- **The Before fishing section has the fishing icon** on its heading.
+- **Fixed** equipping a fishing pole briefly showing its weapons under their gear set's section before moving them to Before fishing.
+
 ## [0.2.0] - 2026-09-23
 
 - **Sections for grouped gear in the combined bag.** With Combine Bags on, each group's gear sits together at the top of the bag under a heading in the group's colour, and the bag grows to fit. An item in several groups goes under the first. Turn it off under Gear in the settings; separate bags keep items where they are.
