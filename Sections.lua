@@ -23,6 +23,10 @@ local HEADING, GAP = 16, 6
 local FISHING_ICON = "|TInterface\\Icons\\Trade_Fishing:0|t "
 -- The smallest scale Blizzard shrinks bags to so they fit on screen (CONTAINER_SCALE in ContainerFrame.lua).
 local MIN_SCALE = 0.75
+-- Shared with the reagent bag's section (Reagents.lua), so the two line up.
+Model.ITEM, Model.STEP, Model.ORIGIN_Y, Model.GAP, Model.MIN_SCALE = ITEM, STEP, ORIGIN_Y, GAP, MIN_SCALE
+-- How far the reagent bag's rows at the bottom lift the rest of the bag; Reagents.lua sets it before each layout.
+Model.lift = 0
 
 -- Where each item and heading goes, bottom-up from the money frame as Blizzard's grid is. `items` is in
 -- Blizzard's order (bottom right first), each { section = key or nil }; `sections` is the keys top to bottom.
@@ -63,6 +67,10 @@ ns.Init(function()
 	local bag = ContainerFrameCombinedBags
 	-- Whether the bag is laid out in sections now, so switching them off lays it out once more to undo them.
 	local headings, sectioned = {}, false
+
+	function Model.Sectioned()
+		return sectioned
+	end
 
 	local function Active()
 		return ns.Active("gearGroups") and ns.Active("gearSections") and not InputUtil.IsGamepadUIEnabled()
@@ -136,18 +144,18 @@ ns.Init(function()
 		table.sort(items, BlizzardOrder)
 		local columns = container:GetColumns()
 		local places, heads = Model.Layout(items, sections, columns)
-		local money = container.MoneyFrame
+		local money, base = container.MoneyFrame, ORIGIN_Y + Model.lift
 		for index, item in ipairs(items) do
 			local place = places[index]
 			item.button:ClearAllPoints()
-			item.button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -place.column * STEP, ORIGIN_Y + place.y)
+			item.button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -place.column * STEP, base + place.y)
 		end
 		for index, head in ipairs(heads) do
 			local mark, text = firsts[head.section], Heading(index)
 			text:SetText(mark.kind == "fishing" and FISHING_ICON .. mark.name or mark.name)
 			text:SetTextColor(unpack(ns.Gear.ColourOf(mark)))
 			text:ClearAllPoints()
-			text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, ORIGIN_Y + head.y + 2)
+			text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, base + head.y + 2)
 			text:Show()
 		end
 	end
