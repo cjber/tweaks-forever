@@ -8,6 +8,12 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-09-23
+
+- **A coloured border for grouped gear.** Mark grouped gear with a ring inside the bag slot, one ring per group, as well as the strip or dots.
+- **Clearer click-mode cursors:** a coin while marking junk and a cog while grouping gear.
+- **Fixed** a Lua error when marking junk or changing how grouped gear is marked while the game kept an unused bag frame around.
+
 ## [0.1.0] - 2026-09-23
 
 First release: quality-of-life automations that sit inside the game's own settings.
