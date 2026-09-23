@@ -108,8 +108,8 @@ local function HealthBar()
 	track:SetPoint("TOPLEFT", -1, 1)
 	track:SetPoint("BOTTOMRIGHT", 1, -1)
 	art[#art + 1] = track
-	-- Small Friz Quadrata with a shadow and no outline, as the tooltip's own lines and retail's raid frames draw theirs.
-	local text = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	-- The Arial Narrow outline Blizzard puts on its own bars' numbers (the profession rank bar, retail's damage meter).
+	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
 	text:SetPoint("CENTER")
 	art[#art + 1] = text
 	-- The unit shown, as the token the tooltip was given, whether it is a player, and the bar's colour.
