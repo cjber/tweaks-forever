@@ -24,6 +24,12 @@
 ---@field level number
 ---@field [integer] TFTrainerSpell
 
+---@class TFEntrance
+---@field x number
+---@field y number
+---@field instances integer[]
+---@field area? integer
+
 ---@class TFPosition
 ---@field x number
 ---@field y number
@@ -85,6 +91,9 @@ TweaksForeverCharDB = nil
 ---@field Trainable TFTrainable
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels
+---@field DungeonEntrances table<integer, TFEntrance[]>
+---@field RaidInstances table<integer, boolean>
+---@field Entrances TFEntrances
 ---@field Print fun(message: string)
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()

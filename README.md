@@ -21,6 +21,10 @@ When another addon already does one of these jobs, that feature is greyed out an
 </p>
 
 <p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms on the world map with a dungeon or raid icon at every entrance, and the cursor on Blackrock Mountain: its tooltip lists Blackrock Spire, Blackrock Depths, Molten Core and Blackwing Lair">
+</p>
+
+<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position">
 </p>
 
@@ -65,6 +69,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 **Maps**
 - Reveal unexplored areas on zone maps, tinted blue so explored ground still stands out (off by default).
 - Point at a zone on the world map to see its level range after the name, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Forever's map data has no ranges of its own, so the original zones show the original game's, and Zephras Isle and Riverglades show the span of their subzones' exploration levels. Cities, battlegrounds, and Forever zones whose subzones carry no level show none.
+- Mark every dungeon and raid entrance on zone and continent maps with retail's icons; point at one for its name. Instances sharing a way in, such as Blackrock Mountain, share one pin that lists them. The map's own **Show instance entrances** filter turns them off, and an entrance steps aside where a flight master, Legacy Here objective or Shortest Path Forever portal or dock already marks the spot. Forever's new instances (Dalaran, the Ruins of Lordaeron, the Hall of Thanes and the Wetlands excavation) have no entrance in the game's data yet, so they have no pin.
 
 **Interface**
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
@@ -97,6 +102,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
 | Unexplored areas | Legacy Here, Leatrix Maps, Mapster |
 | Zone level ranges | Leatrix Maps |
+| Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Retail-style tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
@@ -127,12 +133,12 @@ Ketho WoW API annotations (including pinned FrameXML) into ignored `.types/`, ch
 (including generated data), and rejects every diagnostic. Local contracts in `types/` are editor-only
 and excluded from the release. See [tools/README.md](tools/README.md) for the multi-value rule.
 
-CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp and zone level data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
+CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp, zone level and dungeon entrance data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 
 **Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay, camp benefit and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)).
+GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)

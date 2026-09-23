@@ -313,11 +313,11 @@ class Parser:
 def main() -> int:
     paths = [Path(arg) for arg in sys.argv[1:]]
     if not paths:
-        # Follow the release's actual load list, including generated runtime data.
+        # Follow the release's actual load list, including generated runtime data; XML templates carry no Lua.
         paths = [
             Path(line.replace("\\", "/"))
             for line in Path("TweaksForever.toc").read_text().splitlines()
-            if line.strip() and not line.startswith("#")
+            if line.strip().endswith(".lua") and not line.startswith("#")
         ]
     failed = False
     for path in paths:

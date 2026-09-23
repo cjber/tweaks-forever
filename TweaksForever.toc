@@ -16,6 +16,7 @@
 Data\Overlays.lua
 Data\CampBenefits.lua
 Data\ZoneLevels.lua
+Data\DungeonEntrances.lua
 Core.lua
 Automation.lua
 Vendor.lua
@@ -29,6 +30,8 @@ QuestDistance.lua
 Tooltips.lua
 Exploration.lua
 ZoneLevels.lua
+DungeonEntrances.lua
+DungeonEntrances.xml
 Frames.lua
 Errors.lua
 Spellbook.lua

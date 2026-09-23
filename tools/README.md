@@ -3,6 +3,7 @@ Run from the repository root with Python 3.
 ```sh
 python3 tools/gen_overlays.py      # Data/Overlays.lua (stdlib only)
 python3 tools/gen_camp.py          # Data/CampBenefits.lua (stdlib only)
+python3 tools/gen_dungeons.py      # Data/DungeonEntrances.lua (stdlib only)
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/screenshots.py       # docs/screenshots/*.png (Pillow)
@@ -31,8 +32,20 @@ description instead. It refuses to write a number that depends on level, stats o
 content tuning, and fails on any token it can't resolve. Same cache and flags as
 `gen_overlays.py`.
 
+`gen_dungeons.py` writes `Data/DungeonEntrances.lua`: where each dungeon and raid
+entrance sits on the world map. Blizzard's map asks `C_EncounterJournal`, which is
+empty without the journal's tables that Forever's client lacks. The entrance is
+`Map.Corpse_0/1` on `CorpseMapID`, the point a ghost walks back in from, projected
+through `UiMapAssignment` exactly as Legacy Here places its instance pins. Which zone
+map shows an entrance is curated in the script (zone rectangles overlap); continents
+take every entrance on them. Entrances whose icons would overlap on the minimized
+map at its smallest zoom merge into one pin at their centre, and the curated
+complexes (Blackrock Mountain, the Gates of Ahn'Qiraj) always do, named by their
+area. An instance with an entrance but no curated zone fails the run; instances
+with no entrance at all are listed. Same cache and flags as `gen_overlays.py`.
+
 The *Refresh game data* workflow runs `latest_build.py` daily, and when a newer
-build is listed it bumps `BUILD` in both generators, regenerates, runs the checks and
+build is listed it bumps `BUILD` in every generator, regenerates, runs the checks and
 opens a PR.
 
 `changelog.py` prints the section of `CHANGELOG.md` for one version; the release
