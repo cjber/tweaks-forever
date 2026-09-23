@@ -35,6 +35,12 @@
 ---@field lines string[] its class skill line names (spellbook tabs)
 ---@field spells TFClassSpell[]
 
+-- What the client knows of a spell, for a trainer row it has never seen.
+---@class TFSpellFacts
+---@field name string
+---@field icon fileID
+---@field rank? string
+
 ---@class TFFutureSpell
 ---@field id integer
 ---@field spell TFTrainerSpell
@@ -123,6 +129,8 @@ TweaksForeverCharDB = nil
 ---@field Camp TFCamp
 ---@field FutureSpells TFFutureSpells
 ---@field ClassSpells table<string, TFClassSpells> by class token
+---@field TrainerSpells fun(): table<integer, TFTrainerSpell>
+---@field KnownSpell fun(id: integer): boolean
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels
 ---@field DungeonEntrances table<integer, TFEntrance[]>

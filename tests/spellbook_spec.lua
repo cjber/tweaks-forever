@@ -42,6 +42,68 @@ assert(
 		.. table.concat(names, ",")
 )
 
+-- The baked trainer list, for a level 18 Dwarf Shaman who has never visited a trainer.
+env.tContains = function(list, value)
+	for _, item in ipairs(list) do
+		if item == value then
+			return true
+		end
+	end
+	return false
+end
+setfenv(assert(loadfile("Data/ClassSpells.lua")), env)("TweaksForever", ns)
+local DWARF, ORC = 3, 2
+local NAMES = {
+	[403] = "Lightning Bolt",
+	[529] = "Lightning Bolt",
+	[548] = "Lightning Bolt",
+	[915] = "Lightning Bolt",
+	[8056] = "Frost Shock",
+	[8058] = "Frost Shock",
+	[3599] = "Searing Totem",
+	[6363] = "Searing Totem",
+}
+local unknownToClient = { [2645] = true } -- Ghost Wolf
+local function Describe(id)
+	if not unknownToClient[id] then
+		return { name = NAMES[id] or tostring(id), icon = id }
+	end
+end
+known = { [403] = true, [529] = true, [8042] = true }
+local function Known(id)
+	return known[id] == true
+end
+local shaman = Model.Spells(ns.ClassSpells.SHAMAN, nil, DWARF, Describe, Known)
+local function Pick(name, list)
+	for _, entry in ipairs(Model.Choose(list or shaman, "Elemental Combat", 18, Known)) do
+		if entry.spell.name == name then
+			return entry
+		end
+	end
+end
+local frost = Pick("Frost Shock")
+assert(frost and frost.id == 8056 and not frost.ready, "Frost Shock rank 1 comes at 20")
+assert(frost.spell.level == 20 and frost.spell.cost == 2200 and frost.spell.line == "Elemental Combat")
+assert(Pick("Lightning Bolt").id == 548, "the rank after the known ones")
+assert(Pick("Lightning Bolt").ready, "level 14 is ready at 18")
+assert(not Pick("8042") and shaman[8042], "a known spell is left out")
+assert(not shaman[2645], "a spell the client can't describe is left out")
+assert(not shaman[6363], "Searing Totem rank 2 waits for the quest's rank 1")
+known[3599] = true
+assert(Model.Spells(ns.ClassSpells.SHAMAN, nil, DWARF, Describe, Known)[6363], "and shows once it is known")
+local live = { [8056] = { name = "Frost Shock", level = 20, cost = 2000, icon = 1, line = "Elemental Combat" } }
+frost = Pick("Frost Shock", Model.Spells(ns.ClassSpells.SHAMAN, live, DWARF, Describe, Known))
+assert(frost.spell.cost == 2000, "a trainer visit's own fee wins")
+local mage = ns.ClassSpells.MAGE
+assert(Model.Spells(mage, nil, DWARF, Describe, Known)[3561], "Teleport: Stormwind for a Dwarf")
+assert(not Model.Spells(mage, nil, ORC, Describe, Known)[3561], "but not for an Orc")
+for token, class in pairs(ns.ClassSpells) do
+	assert(#class.spells > 50, token .. " has a full list")
+	for _, row in ipairs(class.spells) do
+		assert(class.lines[row[4]] and row[2] >= 1 and row[3] >= 0, token .. " " .. row[1])
+	end
+end
+
 -- Blizzard's grid: two 680x590 views, three 220-wide columns, 60-tall items with 10 padding, 51-tall headers.
 local grid =
 	{ views = 2, width = 680, height = 590, columns = 3, gap = 15, pad = 10, spacer = 20, header = 51, item = 60 }

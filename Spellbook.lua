@@ -7,7 +7,7 @@ ns.Feature({
 	name = "Show future spells in the spellbook",
 	tooltip = "Spells you have not learned yet appear greyed out after the ones you know, as the Retail spellbook "
 		.. "shows them: what your trainer can teach you now, and each spell's next rank with the level it comes at. "
-		.. "The trainer's list is remembered each time you visit one.",
+		.. "Visiting your trainer brings the list and its prices up to date.",
 	default = true,
 })
 
@@ -53,6 +53,52 @@ function Model.Choose(spells, line, level, Skip)
 	end
 	table.sort(chosen, InOrder)
 	return chosen
+end
+
+---@param ids integer[]?
+---@param Known fun(id: integer): boolean
+local function AnyKnown(ids, Known)
+	if not ids then
+		return true
+	end
+	for _, id in ipairs(ids) do
+		if Known(id) then
+			return true
+		end
+	end
+	return false
+end
+
+-- What your class trainer teaches: your class's baked list, less other races' spells and ranks whose untrained
+-- earlier rank you lack, with the rows a trainer visit recorded laid over it, as the server has the last word on
+-- level and fee. A baked spell the client can't describe is left out, never guessed at.
+---@param baked TFClassSpells?
+---@param live table<integer, TFTrainerSpell>?
+---@param race integer
+---@param Describe fun(id: integer): TFSpellFacts?
+---@param Known fun(id: integer): boolean
+---@return table<integer, TFTrainerSpell>
+function Model.Spells(baked, live, race, Describe, Known)
+	---@type table<integer, TFTrainerSpell>
+	local spells = {}
+	local rows, lines = baked and baked.spells or {}, baked and baked.lines or {}
+	for _, row in ipairs(rows) do
+		local facts = (not row.races or tContains(row.races, race)) and AnyKnown(row.needs, Known) and Describe(row[1])
+		if facts then
+			spells[row[1]] = {
+				name = facts.name,
+				rank = facts.rank,
+				icon = facts.icon,
+				level = row[2],
+				cost = row[3],
+				line = lines[row[4]],
+			}
+		end
+	end
+	for id, spell in pairs(live or {}) do
+		spells[id] = spell
+	end
+	return spells
 end
 
 -- Places a header and count entries after the spellbook's own, with its column-first grid rules: a spacer before a
@@ -113,6 +159,30 @@ local layer, blocker, header, pageText, prev, nextPage
 ---@type SpellBookItemTemplate[]
 local items = {}
 local extra, extraPages, lastDisplay = 0, 0, 0
+
+---@param id integer
+---@return TFSpellFacts?
+local function Describe(id)
+	local info = C_Spell.GetSpellInfo(id)
+	if info then
+		local rank = C_Spell.GetSpellSubtext(id)
+		return { name = info.name, icon = info.iconID, rank = rank ~= "" and rank or nil }
+	end
+end
+
+---@param id integer
+---@return boolean
+function ns.KnownSpell(id)
+	return C_SpellBook.IsSpellKnown(id)
+end
+
+-- Everything your class trainer teaches, as far as the baked list and your trainer visits know.
+---@return table<integer, TFTrainerSpell>
+function ns.TrainerSpells()
+	local _, class = UnitClass("player")
+	local live = TweaksForeverCharDB and TweaksForeverCharDB.trainer
+	return Model.Spells(ns.ClassSpells[class], live, (select(3, UnitRace("player"))), Describe, ns.KnownSpell)
+end
 
 local function Book()
 	return PlayerSpellsFrame.SpellBookFrame
@@ -241,11 +311,10 @@ local function Render()
 		item:Hide()
 	end
 	header:Hide()
-	local line = ns.Active("trainableSpells") and TweaksForeverCharDB.trainer and ActiveLine()
+	local line = ns.Active("trainableSpells") and ActiveLine()
 	local chosen = line
-			and Model.Choose(TweaksForeverCharDB.trainer, line, UnitLevel("player"), function(id)
-				return C_SpellBook.IsSpellKnown(id)
-					or (GetCVarBool("spellBookHidePassives") and C_Spell.IsSpellPassive(id))
+			and Model.Choose(ns.TrainerSpells(), line, UnitLevel("player"), function(id)
+				return ns.KnownSpell(id) or (GetCVarBool("spellBookHidePassives") and C_Spell.IsSpellPassive(id))
 			end)
 		or {}
 	if #chosen == 0 then
@@ -381,9 +450,9 @@ local function RenderIfShown()
 	end
 end
 
--- The server keeps unlearned spells out of the spellbook, so the class trainer's list is the only full one. It
--- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge
--- by spell, so another trainer (weapons, riding) adds to the list rather than replacing it.
+-- The server, not the baked list, has the last word on what the class trainer teaches and for how much. The trainer
+-- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge by
+-- spell, so another trainer (weapons, riding) adds to the list rather than replacing it.
 local function ScanTrainer()
 	if not ns.Active("trainableSpells") or IsTradeskillTrainer() then
 		return
