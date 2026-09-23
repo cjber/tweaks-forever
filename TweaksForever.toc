@@ -27,6 +27,7 @@ QuestDistance.lua
 Exploration.lua
 Frames.lua
 Errors.lua
+Spellbook.lua
 Fishing.lua
 Reload.lua
 Settings.lua

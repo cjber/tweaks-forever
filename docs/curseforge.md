@@ -18,7 +18,7 @@ Tweaks Forever replaces a handful of single-purpose addons with options in WoW: 
 - **Vendors**: repair automatically (from guild funds when allowed) and sell junk, up to 12 stacks so it all stays in buyback. Grey items show the junk coin all the time. Mark any bag item as junk with Alt+Right-click.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a named group such as Healing or DPS, and equip a whole group from the same menu. Each group has its own colour, shown on the bag slot (a strip or a glowing border) and in the tooltip, and the combined bag gathers each group under its own heading. Equipping a fishing pole remembers the weapons it replaced, so you can put them back on.
 - **Maps**: reveal unexplored areas on zone maps, tinted so explored ground still stands out.
-- **Interface**: move and scale Blizzard windows from a Windows tab in Edit Mode, per layout. Quiet the errors a spammed macro repeats. The quest tracker sorts nearest first, with distances. Campsite features say what they give and whether you have it. The reagent bag joins the bottom of the combined bag and opens with it. `/rl` reloads.
+- **Interface**: move and scale Blizzard windows from a Windows tab in Edit Mode, per layout. Quiet the errors a spammed macro repeats. The quest tracker sorts nearest first, with distances. Campsite features say what they give and whether you have it. The reagent bag joins the bottom of the combined bag and opens with it. The spellbook shows how many spells you can train now and what comes at which level. `/rl` reloads.
 - **Fishing**: double right-click the world with a pole to cast; with no lure on, the same double-click puts on the best one you can use.
 
 ## Usage
