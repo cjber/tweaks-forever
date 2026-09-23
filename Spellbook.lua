@@ -362,6 +362,7 @@ local function Paint(item, entry)
 	text.Name:SetText(spell.name)
 	text.SubName:SetText(spell.rank or "")
 	text.RequiredLevel:SetText(entry.ready and SPELLBOOK_TRAINABLE or SPELLBOOK_AVAILABLE_AT:format(spell.level))
+	text.RequiredLevel:Show()
 	for _, label in ipairs({ text.Name, text.SubName, text.RequiredLevel }) do
 		label:SetAlpha(item.unlearnedTextAlpha)
 	end
