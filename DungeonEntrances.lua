@@ -24,7 +24,7 @@ local TEMPLATE = "TweaksForeverDungeonEntrancePinTemplate"
 -- Other addons' and Blizzard's markers of a place. An entrance they sit on steps aside for them.
 local MARKERS = {
 	"FlightPointPinTemplate",
-	"LegacyHerePinTemplate",
+	"LegacyForeverPinTemplate",
 	"ShortestPathForeverDockPinTemplate",
 	"ShortestPathForeverFlightPinTemplate",
 	"ShortestPathForeverPortalPinTemplate",

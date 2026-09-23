@@ -9,10 +9,10 @@ ns.Feature({
 	default = false,
 	conflicts = {
 		{
-			addon = "LegacyHere",
-			title = "Legacy Here",
+			addon = "LegacyForever",
+			title = "Legacy Forever",
 			when = function()
-				return not (LegacyHereDB and LegacyHereDB.showAreas == false)
+				return not (LegacyForeverDB and LegacyForeverDB.showAreas == false)
 			end,
 		},
 		{

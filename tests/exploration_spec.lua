@@ -18,11 +18,11 @@ for _, conflict in ipairs(features.exploration.conflicts) do
 	predicates[conflict.addon] = conflict.when
 	assert(conflict.addon ~= "Magnify", "zoom alone is not an exploration conflict")
 end
-assert(predicates.LegacyHere())
-env.LegacyHereDB = { showAreas = false }
-assert(not predicates.LegacyHere())
-env.LegacyHereDB.showAreas = true
-assert(predicates.LegacyHere())
+assert(predicates.LegacyForever())
+env.LegacyForeverDB = { showAreas = false }
+assert(not predicates.LegacyForever())
+env.LegacyForeverDB.showAreas = true
+assert(predicates.LegacyForever())
 env.LeaMapsDB = { RevealMap = "Off" }
 assert(not predicates.Leatrix_Maps())
 env.LeaMapsDB.RevealMap = "On"

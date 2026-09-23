@@ -6,7 +6,7 @@ LeaPlusDB = nil
 ---@type table<string, string>?
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
-LegacyHereDB = nil
+LegacyForeverDB = nil
 ---@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?}?}?}?
 Questie = nil
 

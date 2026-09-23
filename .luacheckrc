@@ -146,7 +146,7 @@ read_globals = {
 	"ItemRefTooltip",
 	"LeaMapsDB",
 	"LeaPlusDB",
-	"LegacyHereDB",
+	"LegacyForeverDB",
 	"LibStub",
 	"LootSlot",
 	"Menu",
