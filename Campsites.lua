@@ -277,10 +277,18 @@ local function InitTooltips()
 
 	---@param data TooltipData
 	---@return integer?
+	-- An object's GUID and name can be secret under the game's restrictions, and a secret is no table key.
 	local function AuraOf(data)
-		local entry = type(data.guid) == "string" and data.guid:match("^GameObject%-%d+%-%d+%-%d+%-%d+%-(%d+)")
+		local guid = data.guid
+		local entry = canaccessvalue(guid)
+			and type(guid) == "string"
+			and guid:match("^GameObject%-%d+%-%d+%-%d+%-%d+%-(%d+)")
+		if entry and byEntry[tonumber(entry)] then
+			return byEntry[tonumber(entry)]
+		end
 		local line = data.lines and data.lines[1]
-		return entry and byEntry[tonumber(entry)] or line and byName[line.leftText]
+		local name = line and line.leftText
+		return canaccessvalue(name) and name and byName[name] or nil
 	end
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Object, function(tooltip, data)
