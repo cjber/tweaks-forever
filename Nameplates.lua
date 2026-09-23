@@ -7,8 +7,9 @@ ns.Feature({
 	key = KEY,
 	category = "Interface",
 	name = "Larger, clearer nameplates",
-	tooltip = "Nameplates get a taller health bar with the name above its left end and the level, coloured by "
-		.. "difficulty, above its right. Your target is outlined in gold and the others fade back while you have one. "
+	tooltip = "Nameplates get a taller health bar in the retail frame, with the full name centred above it and the "
+		.. "level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you "
+		.. "have one. "
 		.. "Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's "
 		.. "Nameplates options. Switching this on or off takes effect after the next reload.",
 	default = true,
@@ -27,15 +28,12 @@ ns.Feature({
 -- Forbidden nameplates (friendly units in instances) are never handed to addon code and keep Blizzard's look.
 -- Blizzard reserves each plate's height from its own style's sizes; this layout is no taller than Forever's
 -- default Thin style, 1 unit shorter, so plates stack as before. Sizes are at Medium and scale with the setting.
-local HEALTH, CAST, GAP, NAME_GAP, HEALTH_TEXT, GLOW = 16, 12, 2, 2, 11, 5
-local DIMMED, GLOW_ALPHA = 0.6, 0.55
-local GOLD = NORMAL_FONT_COLOR
-local TROUGH = { 0.07, 0.07, 0.08, 0.92 }
+local HEALTH, CAST, GAP, NAME_GAP, HEALTH_TEXT = 16, 12, 2, 4, 11
+local DIMMED = 0.6
 
--- [unit frame] = the 1-unit edge drawn around its health bar. Unit frames are pooled, so each is hooked and given
--- its edge once and reused for many units.
----@type table<NamePlateUnitFrame, Texture>
-local edges = setmetatable({}, { __mode = "k" })
+-- Unit frames already hooked. They are pooled, so each is hooked once and reused for many units.
+---@type table<NamePlateUnitFrame, true>
+local styled = setmetatable({}, { __mode = "k" })
 
 -- Asks the game rather than the frame's cached isTarget: the frame's own PLAYER_TARGET_CHANGED handler may run
 -- after this addon's.
@@ -46,36 +44,40 @@ local function Dim(frame)
 	frame:SetAlpha(faded and DIMMED or 1)
 end
 
--- The target's edge is gold, with Blizzard's selection border as a soft glow outside it, in gold too. The focus
--- keeps Blizzard's focus colour on the glow.
+-- Retail's selection outline, which Blizzard switches off for the Classic style: white round the target, gold round
+-- the focus. Asks the game, as Dim does.
 ---@param frame NamePlateUnitFrame
 local function Border(frame)
-	local bar = frame.HealthBarsContainer.healthBar
-	local target = bar:IsTarget()
-	if target then
-		edges[frame]:SetColorTexture(GOLD.r, GOLD.g, GOLD.b)
-		bar.selectedBorder:SetVertexColor(GOLD.r, GOLD.g, GOLD.b)
+	local unit = frame.unit
+	local target = unit and UnitIsUnit(unit, "target")
+	local focus = unit and UnitIsUnit(unit, "focus")
+	local border = frame.HealthBarsContainer.healthBar.selectedBorder
+	border:SetShown(target or focus)
+	if focus and not target then
+		border:SetVertexColor(NORMAL_FONT_COLOR:GetRGB())
 	else
-		edges[frame]:SetColorTexture(0, 0, 0)
+		border:SetVertexColor(1, 1, 1)
 	end
 end
 
--- A flat fill over a dark trough inside a 1-unit edge, in place of the cooldown-manager bar art.
+-- Retail's own bar art, as its default style lays it out: the cooldown-manager fill inside its bronze-rimmed trough,
+-- in place of the Classic style's border.
 ---@param frame NamePlateUnitFrame
 ---@param bar NamePlateHealthBar
 local function HealthArt(frame, bar)
-	bar.barTexture:SetAtlas("widgetstatusbar-fill-white")
-	-- The Classic style moves this background above the fill; the trough goes back under it.
-	bar.bgTexture:ClearAllPoints()
-	bar.bgTexture:SetAllPoints(bar)
-	bar.bgTexture:SetDrawLayer("BACKGROUND", 0)
-	bar.bgTexture:SetColorTexture(unpack(TROUGH))
+	bar.barTexture:SetAtlas("UI-HUD-CoolDownManager-Bar")
+	local trough = bar.bgTexture
+	trough:ClearAllPoints()
+	trough:SetAtlas("UI-HUD-CoolDownManager-Bar-BG")
+	trough:SetDrawLayer("BACKGROUND")
+	trough:SetPoint("TOPLEFT", bar, "TOPLEFT", -2, 3)
+	trough:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 6, -6)
+	local border = bar.selectedBorder
+	border:ClearAllPoints()
+	border:SetPoint("TOPLEFT", trough, "TOPLEFT", -1, 1)
+	border:SetPoint("BOTTOMRIGHT", trough, "BOTTOMRIGHT", -3, 3)
+	-- The others fade back as a whole instead, so the darkening would dim them twice.
 	bar.deselectedOverlay:SetAlpha(0)
-	local glow = bar.selectedBorder
-	glow:ClearAllPoints()
-	glow:SetPoint("TOPLEFT", bar, "TOPLEFT", -GLOW, GLOW)
-	glow:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", GLOW, -GLOW)
-	glow:SetAlpha(GLOW_ALPHA)
 	Border(frame)
 end
 
@@ -112,26 +114,27 @@ local function Layout(frame)
 	health:SetPoint("BOTTOMRIGHT", frame.CastBarsContainer, "TOPRIGHT", 0, GAP * scale)
 	health:SetHeight(HEALTH * scale)
 
-	-- Blizzard's level box, which colours the level by difficulty and shows a skull for ??, without its box.
+	-- Blizzard's plain nameplate font: it notes an outline is harder to read outside the bar. Anchored at one point
+	-- so the name is never cut short, however long.
+	local name = frame.name
+	name:SetFontObject("SystemFont_NamePlate")
+	name:SetTextHeight(NamePlateSetupOptions.healthBarFontHeight)
+	name:ClearAllPoints()
+	name:SetJustifyH("CENTER")
+	name:SetPoint("BOTTOM", health, "TOP", 0, NAME_GAP * scale)
+
+	-- Blizzard's level box after the name, which colours the level by difficulty and shows a skull for ??, without
+	-- its box.
 	local level = frame.PlayerLevelDiffFrame
 	level:ClearAllPoints()
-	level:SetPoint("BOTTOMRIGHT", health, "TOPRIGHT", 0, NAME_GAP * scale)
-	level:SetHeight(frame.name:GetLineHeight())
+	level:SetPoint("LEFT", name, "RIGHT", -4, 0)
+	level:SetHeight(name:GetLineHeight())
 	level.playerLevelDiffIcon:SetAlpha(0)
 	if level.selectedBorder then
 		level.selectedBorder:SetAlpha(0)
 	end
 	-- The Classic style's own level, set into its bar border, would repeat it.
 	frame.LevelFrame:SetAlpha(0)
-
-	-- Blizzard's plain nameplate font: it notes an outline is harder to read outside the bar.
-	local name = frame.name
-	name:SetFontObject("SystemFont_NamePlate")
-	name:SetTextHeight(NamePlateSetupOptions.healthBarFontHeight)
-	name:ClearAllPoints()
-	name:SetJustifyH("LEFT")
-	name:SetPoint("BOTTOMLEFT", health, "TOPLEFT", 0, NAME_GAP * scale)
-	name:SetPoint("RIGHT", level, "LEFT", -4, 0)
 
 	-- Health percent and value, when the game's Nameplates options show them, inside the bar's right end.
 	local bar = health.healthBar
@@ -150,18 +153,22 @@ end
 
 ---@param frame NamePlateUnitFrame
 local function Style(frame)
-	if not edges[frame] then
-		local bar = frame.HealthBarsContainer.healthBar
-		local edge = bar:CreateTexture(nil, "BACKGROUND", nil, -8)
-		edge:SetPoint("TOPLEFT", bar, "TOPLEFT", -1, 1)
-		edge:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 1, -1)
-		edges[frame] = edge
+	if not styled[frame] then
+		styled[frame] = true
 		hooksecurefunc(frame, "UpdateAnchors", Layout)
 		hooksecurefunc(frame.HealthBarsContainer.healthBar, "UpdateSelectionBorder", function()
 			Border(frame)
 		end)
 	end
 	Layout(frame)
+end
+
+---@param frame NamePlateUnitFrame
+local function Highlight(frame)
+	if styled[frame] then
+		Border(frame)
+		Dim(frame)
+	end
 end
 
 ---@param fn fun(frame: NamePlateUnitFrame)
@@ -185,15 +192,15 @@ ns.Init(function()
 	end)
 	-- Blizzard resets a unit frame's alpha here; nameplates never fade for range, so it always sets 1.
 	hooksecurefunc("CompactUnitFrame_UpdateCenterStatusIcon", function(frame)
-		if edges[frame] then
+		if styled[frame] then
 			Dim(frame)
 		end
 	end)
 	ns.On("PLAYER_TARGET_CHANGED", function()
-		ForEachPlate(Dim)
+		ForEachPlate(Highlight)
 	end)
 	ns.On("PLAYER_FOCUS_CHANGED", function()
-		ForEachPlate(Dim)
+		ForEachPlate(Highlight)
 	end)
 	ForEachPlate(Style)
 end)

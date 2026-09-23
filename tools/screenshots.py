@@ -433,8 +433,7 @@ def editmode(ui):
 
 # Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
 # and a 12 cast bar, name and level 2 above the bar, a 5-unit glow on the target, the others at 0.6 alpha.
-PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP, PLATE_GLOW, PLATE_DIMMED = 166, 16, 12, 2, 5, 0.6
-TROUGH = (0.07, 0.07, 0.08, 0.92)
+PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP, PLATE_DIMMED = 166, 16, 12, 2, 0.6
 HOSTILE, ROGUE = (1.0, 0.0, 0.0), (1.0, 0.96, 0.41)
 FAIR, EASY = (1.0, 0.82, 0.0), (0.25, 0.75, 0.25)
 FIREBALL, REND, SUNDER = 135812, 132155, 132363
@@ -451,7 +450,7 @@ PLATES = [
         ("Fireball", FIREBALL, 0.55),
         [(REND, None, 0.4), (SUNDER, 3, 0.8)],
     ),
-    ("Defias Trapper", 12, EASY, HOSTILE, 1.0, False, None, []),
+    ("Defias Tide Crawler", 12, EASY, HOSTILE, 1.0, False, None, []),
     ("Grimtusk", 16, FAIR, ROGUE, 0.45, False, None, []),
 ]
 PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
@@ -471,19 +470,12 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
     x, w = 37, PLATE_W
     cast_y = 110 - PLATE_CAST
     y = cast_y - PLATE_GAP - PLATE_HEALTH
+    # Retail's bar art as its default style lays it out: the trough 2 left, 3 above, 6 right and 6 below the bar,
+    # and the target outline 1 outside the trough's top left and 3 inside its bottom right.
+    c.draw(ui.atlas("UI-HUD-CoolDownManager-Bar-BG"), x - 2, y - 3, w + 8, PLATE_HEALTH + 9)
+    c.draw(ui.atlas("UI-HUD-CoolDownManager-Bar"), x, y, w * health, PLATE_HEALTH, color=(*colour, 1))
     if target:
-        glow = PLATE_GLOW
-        c.draw(
-            ui.atlas("UI-HUD-Nameplates-Selected"),
-            x - glow,
-            y - glow,
-            w + glow * 2,
-            PLATE_HEALTH + glow * 2,
-            color=(*NORMAL, 0.55),
-        )
-    c.fill(x - 1, y - 1, w + 2, PLATE_HEALTH + 2, (*NORMAL, 1) if target else (0, 0, 0, 1))
-    c.fill(x, y, w, PLATE_HEALTH, TROUGH)
-    c.draw(ui.atlas("widgetstatusbar-fill-white"), x, y, w * health, PLATE_HEALTH, color=(*colour, 1))
+        c.draw(ui.atlas("UI-HUD-Nameplates-Selected"), x - 3, y - 4, w + 6, PLATE_HEALTH + 7)
     c.text(
         x,
         y,
@@ -494,10 +486,14 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
         width=w - 4,
     )
 
-    # Blizzard's 28-wide level frame without its box, and the name up to it.
-    name_y = y - 2 - 14
+    # The full name centred above the bar, and Blizzard's 28-wide level frame, without its box, 4 into its end.
+    name_y = y - 4 - 14
+    font = Font(FRIZQT, 14, (1, 1, 1), (1, -1))
+    name_w = c.text_width(name, font)
+    name_x = x + (w - name_w) / 2
+    c.text(name_x, name_y, name, font)
     c.text(
-        x + w - 28,
+        name_x + name_w - 4,
         name_y,
         str(level),
         Font(FRIZQT, 10, level_colour, None, True),
@@ -505,7 +501,6 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
         justify="CENTER",
         width=28,
     )
-    c.text(x, name_y, name, Font(FRIZQT, 14, (1, 1, 1), (1, -1)), width=w - 32)
 
     # Blizzard's own debuff tiles, untouched: 25 square, cooldown-manager mask and frame, stacks bottom right.
     for i, (fdid, count, remaining) in enumerate(debuffs):
