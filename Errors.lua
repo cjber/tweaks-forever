@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({

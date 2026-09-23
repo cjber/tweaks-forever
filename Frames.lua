@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -38,9 +39,14 @@ local windows = {
 }
 
 -- Pure storage/geometry/queue helpers. No frame objects are written to SavedVariables.
+---@class TFFrames
 local Model = {}
 ns.Frames = Model
 
+---@param layout EditModeLayoutInfo?
+---@param index integer
+---@param character string
+---@return string?
 function Model.LayoutKey(layout, index, character)
 	if not layout then
 		return nil
@@ -52,6 +58,10 @@ function Model.LayoutKey(layout, index, character)
 	return owner .. ":" .. layout.layoutType .. ":" .. layout.layoutName
 end
 
+---@param db TFDatabase
+---@param key string?
+---@param create? boolean
+---@return table<string, TFPosition>?
 function Model.Layout(db, key, create)
 	if not key then
 		return nil
@@ -63,6 +73,9 @@ function Model.Layout(db, key, create)
 	return db.windowLayouts and db.windowLayouts[key]
 end
 
+---@param db TFDatabase
+---@param oldKey string?
+---@param newKey string?
 function Model.Rename(db, oldKey, newKey)
 	if db.windowLayouts and oldKey and newKey and oldKey ~= newKey then
 		db.windowLayouts[newKey] = db.windowLayouts[oldKey]
@@ -70,6 +83,9 @@ function Model.Rename(db, oldKey, newKey)
 	end
 end
 
+---@param db TFDatabase
+---@param keys string[]
+---@param character string
 function Model.Prune(db, keys, character)
 	local live = {}
 	for _, key in ipairs(keys) do
@@ -83,6 +99,16 @@ function Model.Prune(db, keys, character)
 	end
 end
 
+---@param x number?
+---@param y number?
+---@param effectiveScale number
+---@param parentScale number
+---@param width number
+---@param height number
+---@param scale number
+---@param left? number
+---@param bottom? number
+---@return TFPosition?
 function Model.Serialize(x, y, effectiveScale, parentScale, width, height, scale, left, bottom)
 	if not x or not y or width <= 0 or height <= 0 then
 		return nil
@@ -94,16 +120,32 @@ function Model.Serialize(x, y, effectiveScale, parentScale, width, height, scale
 	}
 end
 
+---@param position TFPosition
+---@param effectiveScale number
+---@param parentScale number
+---@param width number
+---@param height number
+---@return number, number
 function Model.Restore(position, effectiveScale, parentScale, width, height)
 	return position.x * width * parentScale / effectiveScale, position.y * height * parentScale / effectiveScale
 end
 
+---@param value number
+---@param extent number
+---@param spacing number
+---@return number
 function Model.Snap(value, extent, spacing)
 	return (math.floor((value * extent - extent / 2) / spacing + 0.5) * spacing + extent / 2) / extent
 end
 
+---@param blocked fun(): boolean
+---@return TFFrameQueue
 function Model.NewQueue(blocked)
+	---@class TFFrameQueue
+	---@field pending table<string|TFWindowRecord, fun()>
 	local queue = { pending = {} }
+	---@param key string|TFWindowRecord
+	---@param fn fun()
 	function queue:Run(key, fn)
 		if blocked() then
 			self.pending[key] = fn
@@ -125,8 +167,24 @@ function Model.NewQueue(blocked)
 	return queue
 end
 
-local records, layoutKeys = {}, {}
-local manager, tabs, sheet, faded, dialog, selected, layoutKey
+---@type TFWindowRecord[]
+local records = {}
+---@type string[]
+local layoutKeys = {}
+---@type EditModeManagerFrame
+local manager
+---@type TFTabFrame
+local tabs
+---@type Frame
+local sheet
+---@type table<Region|Frame, number>?
+local faded
+---@type TFScaleDialog
+local dialog
+---@type TFWindowRecord?
+local selected
+---@type string?
+local layoutKey
 local editing, installed, scheduled = false, false, false
 local queue = Model.NewQueue(function()
 	return InCombatLockdown()
@@ -136,11 +194,15 @@ local function Active()
 	return ns.Active("moveWindows")
 end
 
+---@param record TFWindowRecord
+---@return TFPosition?
 local function Position(record)
 	local layout = Model.Layout(ns.db, layoutKey)
 	return layout and layout[record.name]
 end
 
+---@param frame Frame
+---@return TFAnchor[]
 local function Points(frame)
 	local points = {}
 	for index = 1, frame:GetNumPoints() do
@@ -149,6 +211,8 @@ local function Points(frame)
 	return points
 end
 
+---@param frame Frame
+---@param position TFPosition
 local function Place(frame, position)
 	local x, y = Model.Restore(
 		position,
@@ -161,6 +225,9 @@ local function Place(frame, position)
 	frame:SetPoint("CENTER", UIParent, "BOTTOMLEFT", x, y)
 end
 
+---@param frame Frame
+---@param scale number
+---@return TFPosition?
 local function Serialize(frame, scale)
 	local x, y = frame:GetCenter()
 	return Model.Serialize(
@@ -176,6 +243,8 @@ local function Serialize(frame, scale)
 	)
 end
 
+---@param record TFWindowRecord
+---@return boolean?
 local function Apply(record)
 	local frame = record.frame
 	if not frame then
@@ -185,7 +254,9 @@ local function Apply(record)
 	queue:Run(record, function()
 		-- Read the current layout and toggle on execution, never a stale combat-time position.
 		local position = Active() and Position(record)
-		if record.name == "WorldMapFrame" and frame:IsMaximized() then
+		if
+			record.name == "WorldMapFrame" and (frame --[[@as WorldMapFrame]]):IsMaximized()
+		then
 			position = nil
 		end
 		record.applying = true
@@ -197,7 +268,7 @@ local function Apply(record)
 			frame:SetScale(record.scale)
 			frame:ClearAllPoints()
 			for _, point in ipairs(record.points) do
-				frame:SetPoint(unpack(point))
+				frame:SetPoint(point[1], point[2], point[3], point[4], point[5])
 			end
 			record.applied = false
 			restored = true
@@ -207,6 +278,7 @@ local function Apply(record)
 	return restored
 end
 
+---@param record TFWindowRecord
 local function RefreshPreview(record)
 	local preview = record.preview
 	if not preview or record.dragging then
@@ -220,12 +292,14 @@ local function RefreshPreview(record)
 		scale = record.scale * frame:GetParent():GetEffectiveScale() / UIParent:GetEffectiveScale()
 		if record.name == "CharacterFrame" then
 			-- Camelot applies these dimensions only on opening; its inherited XML size is smaller.
-			width = frame:IsRightPaneCollapsed() and CHARACTER_FRAME_COLLAPSED_WIDTH or CHARACTER_FRAME_WIDTH
+			width = (frame --[[@as CharacterFrame]]):IsRightPaneCollapsed() and CHARACTER_FRAME_COLLAPSED_WIDTH
+				or CHARACTER_FRAME_WIDTH
 			height = CHARACTER_FRAME_HEIGHT
 		elseif record.name == "WorldMapFrame" then
 			-- Opened minimized, as the quest log (L) does, with the log beside the map when it is shown.
-			width = frame.minimizedWidth + (frame:ShouldShowQuestLogPanel() and frame.questLogWidth or 0)
-			height = frame.minimizedHeight
+			local map = frame --[[@as WorldMapFrame]]
+			width = map.minimizedWidth + (map:ShouldShowQuestLogPanel() and map.questLogWidth or 0)
+			height = map.minimizedHeight
 		end
 	end
 	preview:SetSize(width, height)
@@ -248,7 +322,12 @@ local function RefreshPreview(record)
 			preview:SetPoint("TOPLEFT", UIParent, "TOPLEFT", x / preview:GetScale(), y)
 		end
 	elseif frame and frame:GetCenter() then
-		Place(preview, Serialize(frame, 1))
+		local current = Serialize(frame, 1)
+		if current then
+			Place(preview, current)
+		else
+			preview:SetPoint("CENTER", UIParent, "CENTER")
+		end
 	else
 		preview:SetPoint("CENTER", UIParent, "CENTER")
 	end
@@ -278,6 +357,7 @@ local function ManagerArt()
 	return art
 end
 
+---@param id integer
 local function ShowTab(id)
 	PanelTemplates_SetTab(tabs, id)
 	local onWindows = id == WINDOWS_TAB
@@ -324,6 +404,9 @@ local function SyncLayouts()
 		return
 	end
 	local character = UnitGUID("player")
+	if not character then
+		return
+	end
 	local keys = {}
 	for index, layout in ipairs(manager:GetLayouts()) do
 		keys[index] = Model.LayoutKey(layout, index, character)
@@ -372,6 +455,7 @@ local function Schedule()
 	end)
 end
 
+---@param record TFWindowRecord
 local function Attach(record)
 	local frame = _G[record.name]
 	if record.frame or not frame or frame.system then
@@ -406,6 +490,9 @@ local function Attach(record)
 	end)
 end
 
+---@param record TFWindowRecord
+---@param scale number
+---@param snap? boolean
 local function SavePreview(record, scale, snap)
 	if not Active() or not editing or not layoutKey or InCombatLockdown() then
 		return
@@ -424,6 +511,12 @@ local function SavePreview(record, scale, snap)
 	RefreshPreview(record)
 end
 
+---@param parent Frame
+---@param text string
+---@param font string
+---@param x number
+---@param y number
+---@return FontString
 local function Label(parent, text, font, x, y)
 	local label = parent:CreateFontString(nil, "OVERLAY", font)
 	label:SetPoint("TOPLEFT", x, y)
@@ -431,8 +524,11 @@ local function Label(parent, text, font, x, y)
 	return label
 end
 
+---@param width number
+---@param height number
+---@return TFScaleDialog
 local function MakePanel(width, height)
-	local panel = CreateFrame("Frame", nil, UIParent)
+	local panel = CreateFrame("Frame", nil, UIParent) --[[@as TFScaleDialog]]
 	panel:Hide()
 	panel:SetSize(width, height)
 	panel:SetFrameStrata("DIALOG")
@@ -452,6 +548,7 @@ local function UpdateSlider()
 	dialog.initializing = false
 end
 
+---@param record TFWindowRecord
 local function Select(record)
 	if not editing or not Active() or InCombatLockdown() or not layoutKey then
 		return
@@ -466,8 +563,9 @@ local function Select(record)
 	dialog:Show()
 end
 
+---@param record TFWindowRecord
 local function MakePreview(record)
-	local preview = CreateFrame("Frame", nil, UIParent)
+	local preview = CreateFrame("Frame", nil, UIParent) --[[@as TFWindowPreview]]
 	preview:Hide()
 	preview:SetMovable(true)
 	preview:SetClampedToScreen(true)
@@ -475,6 +573,7 @@ local function MakePreview(record)
 	preview:SetFrameStrata("MEDIUM")
 	preview:SetFrameLevel(999)
 	local selection = CreateFrame("Frame", nil, preview, "EditModeSystemSelectionTemplate")
+	---@cast selection EditModeSystemSelectionTemplate
 	preview.Selection = selection
 	selection:SetAllPoints()
 	selection:SetSystem({
@@ -506,6 +605,8 @@ local function MakePreview(record)
 	RefreshPreview(record)
 end
 
+---@param record TFWindowRecord
+---@param shown boolean
 local function ShowPreview(record, shown)
 	if not Active() or InCombatLockdown() then
 		return
@@ -528,7 +629,7 @@ end
 
 local function BuildEditor()
 	-- Parented to UIParent, not the manager: a child would join the manager's ResizeLayoutFrame layout.
-	tabs = CreateFrame("Frame", nil, UIParent)
+	tabs = CreateFrame("Frame", nil, UIParent) --[[@as TFTabFrame]]
 	tabs:SetSize(1, 1)
 	tabs:SetFrameStrata("DIALOG")
 	tabs:SetFrameLevel(manager:GetFrameLevel())
@@ -575,6 +676,7 @@ local function BuildEditor()
 	scroll:SetScrollChild(child)
 	for index, record in ipairs(records) do
 		local checkbox = CreateFrame("Frame", nil, child, "EditModeCheckButtonTemplate")
+		---@cast checkbox EditModeCheckButtonTemplate
 		checkbox:SetPoint("TOPLEFT", (index - 1) % 2 * 215, -math.floor((index - 1) / 2) * 32)
 		checkbox:SetLabelText(record.label)
 		checkbox:SetCallback(function(checked)
@@ -588,7 +690,9 @@ local function BuildEditor()
 	dialog:SetPoint("TOPLEFT", manager, "TOPRIGHT", 8, 0)
 	dialog.Title = Label(dialog, "", "GameFontHighlightLarge", 18, -18)
 	Label(dialog, "Scale", "GameFontHighlightMedium", 18, -55)
-	dialog.Slider = CreateFrame("Frame", nil, dialog, "MinimalSliderWithSteppersTemplate")
+	dialog.Slider = (
+		CreateFrame("Frame", nil, dialog, "MinimalSliderWithSteppersTemplate") --[[@as MinimalSliderWithSteppersTemplate]]
+	)
 	dialog.Slider:SetSize(180, 32)
 	dialog.Slider:SetPoint("TOPLEFT", 80, -46)
 	dialog.Value = Label(dialog, "", "GameFontHighlightSmall", 267, -55)
@@ -644,7 +748,7 @@ local function Install()
 	end
 	installed, manager = true, EditModeManagerFrame
 	for _, window in ipairs(windows) do
-		local record = { name = window[1], label = window[2], addon = window[3] }
+		local record = { name = window[1], label = window[2], addon = window[3], scale = 1, points = {} }
 		records[#records + 1] = record
 		Attach(record)
 	end
@@ -670,9 +774,10 @@ local function Install()
 	-- Names/types are the API's only durable identity. Indices shift on insertion/deletion.
 	-- Post-hooks run before our deferred refresh, so the old key is still available after a rename.
 	hooksecurefunc(manager, "RenameLayout", function(_, index)
-		if Active() then
+		local character = UnitGUID("player")
+		if Active() and character then
 			local layout = manager:GetLayouts()[index]
-			Model.Rename(ns.db, layoutKeys[index], Model.LayoutKey(layout, index, UnitGUID("player")))
+			Model.Rename(ns.db, layoutKeys[index], Model.LayoutKey(layout, index, character))
 			Schedule()
 		end
 	end)

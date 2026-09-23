@@ -1,20 +1,26 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 -- Click modes: the bag actions without a modifier key, for keyboards or window managers that swallow Alt or Ctrl.
 -- Like the merchant's repair mode, one is picked from a bag's portrait menu, the cursor changes over bag items
 -- and a left-click applies it. Right-click, closing the bags or entering combat ends it.
+---@type TFClickMode[]
 local modes = {}
+---@type TFClickMode?
 local active
 
 -- Declare a mode: { feature, label, tooltip, cursor, Apply(owner, bag, slot) }.
+---@param mode TFClickMode
 function ns.ClickMode(mode)
 	modes[#modes + 1] = mode
 end
 
 ns.Init(function()
 	-- [item button] = a transparent button over it, so Blizzard's own click path is never touched.
+	---@type table<ContainerFrameItemButtonTemplate, TFClickOverlay>
 	local overlays = {}
 
+	---@param overlay TFClickOverlay
 	local function ShowTooltip(overlay)
 		local button = overlay:GetParent()
 		if not C_Container.GetContainerItemID(button:GetBagID(), button:GetID()) then
@@ -34,8 +40,10 @@ ns.Init(function()
 		ResetCursor()
 	end
 
+	---@param overlay TFClickOverlay
+	---@param mouseButton string
 	local function Click(overlay, mouseButton)
-		if mouseButton == "RightButton" or not ns.Active(active.feature) then
+		if mouseButton == "RightButton" or not active or not ns.Active(active.feature) then
 			Stop()
 			return
 		end
@@ -46,10 +54,11 @@ ns.Init(function()
 		end
 	end
 
+	---@param button ContainerFrameItemButtonTemplate
 	local function Cover(button)
 		local overlay = overlays[button]
 		if not overlay then
-			overlay = CreateFrame("Button", nil, button)
+			overlay = CreateFrame("Button", nil, button) --[[@as TFClickOverlay]]
 			overlay:SetAllPoints()
 			overlay:SetFrameLevel(button:GetFrameLevel() + 10)
 			overlay:RegisterForClicks("LeftButtonUp", "RightButtonUp")
@@ -58,7 +67,9 @@ ns.Init(function()
 			-- The tooltip refreshes through its owner once item data loads; without this our lines drop off.
 			overlay.UpdateTooltip = ShowTooltip
 			overlay:SetScript("OnEnter", function(self)
-				SetCursor(active.cursor)
+				if active then
+					SetCursor(active.cursor)
+				end
 				ShowTooltip(self)
 			end)
 			overlay:SetScript("OnLeave", function()
@@ -70,6 +81,7 @@ ns.Init(function()
 		overlay:Show()
 	end
 
+	---@param mode TFClickMode
 	local function Start(mode)
 		-- The menu can be opened before combat and clicked after it starts.
 		if InCombatLockdown() then
@@ -103,8 +115,10 @@ ns.Init(function()
 		end
 	end)
 
+	---@param owner Button
+	---@param root RootMenuDescriptionProxy
 	local function AddModes(owner, root)
-		local container = owner:GetParent()
+		local container = owner:GetParent() --[[@as ContainerFrameTemplate]]
 		local bag = container:GetBagID()
 		if InCombatLockdown() then
 			return

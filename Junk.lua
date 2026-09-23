@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 local conflicts = {
@@ -38,16 +39,24 @@ ns.Feature({
 	conflicts = conflicts,
 })
 
+---@class TFJunk
 local Model = {}
 ns.Junk = Model
 local BATCH_SIZE = 12
 local POOR = 0
 
+---@param marks TFMarks
+---@param itemID integer
+---@return boolean
 function Model.Toggle(marks, itemID)
 	marks[itemID] = not marks[itemID] or nil
 	return marks[itemID] == true
 end
 
+---@param info ContainerItemInfo?
+---@param marks TFMarks
+---@param includeGreys boolean
+---@return boolean
 function Model.IsJunk(info, marks, includeGreys)
 	if not info or not info.itemID or info.quality == nil then
 		return false
@@ -58,9 +67,15 @@ function Model.IsJunk(info, marks, includeGreys)
 	return marks[info.itemID] == true
 end
 
+---@param info ContainerItemInfo?
+---@param price number?
+---@param marks TFMarks
+---@param includeGreys boolean
+---@return number?
 function Model.SaleValue(info, price, marks, includeGreys)
 	if
-		not Model.IsJunk(info, marks, includeGreys)
+		not info
+		or not Model.IsJunk(info, marks, includeGreys)
 		or info.isLocked
 		or info.hasNoValue
 		or not price
@@ -73,6 +88,9 @@ function Model.SaleValue(info, price, marks, includeGreys)
 	return price * info.stackCount
 end
 
+---@param before ContainerItemInfo
+---@param after ContainerItemInfo?
+---@return boolean?
 function Model.SameStack(before, after)
 	return after
 		and before.itemID == after.itemID
@@ -96,11 +114,13 @@ ns.Init(function()
 	local UpdateMerchantButton, Start
 	local extendedButton = false
 
+	---@param button ContainerFrameItemButtonTemplate
 	local function Info(button)
 		return C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
 	end
 
 	-- `icons` records coins we added beyond the game's own, so turning a feature off can take them away again.
+	---@param button ContainerFrameItemButtonTemplate
 	local function UpdateIcon(button)
 		local greys = ns.Active("greyCoins")
 		if not ns.Active("markJunk") and not greys and not icons[button] then
@@ -119,6 +139,8 @@ ns.Init(function()
 		ns.ForEachBagButton(UpdateIcon)
 	end
 
+	---@param bag integer
+	---@param slot integer
 	local function Toggle(bag, slot)
 		local info = C_Container.GetContainerItemInfo(bag, slot)
 		if not info or info.isLocked then
@@ -140,6 +162,8 @@ ns.Init(function()
 		end,
 	})
 
+	---@param button ContainerFrameItemButtonTemplate
+	---@param mouseButton string
 	local function Mark(button, mouseButton)
 		if
 			mouseButton ~= "RightButton"
@@ -161,11 +185,15 @@ ns.Init(function()
 	end
 
 	-- Refundable purchases belong to Blizzard's confirmation flow.
+	---@param bag integer
+	---@param slot integer
 	local function Refundable(bag, slot)
 		local purchase = C_Container.GetContainerItemPurchaseInfo(bag, slot, false)
 		return purchase and purchase.refundSeconds and purchase.refundSeconds > 0
 	end
 
+	---@param includeGreys boolean
+	---@param limit integer
 	local function Scan(includeGreys, limit)
 		local result, pending = {}, false
 		local marks = Marks()
@@ -176,7 +204,7 @@ ns.Init(function()
 					C_Item.GetItemInfo(info.hyperlink)
 					pending = true
 				end
-				if Model.IsJunk(info, marks, includeGreys) and not info.hasNoValue and not info.isLocked then
+				if info and Model.IsJunk(info, marks, includeGreys) and not info.hasNoValue and not info.isLocked then
 					local price = select(11, C_Item.GetItemInfo(info.hyperlink))
 					pending = pending or price == nil
 					local value = Model.SaleValue(info, price, marks, includeGreys)

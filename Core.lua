@@ -1,23 +1,29 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 -- Features, in declaration order, and by key. Each is { key, category, name, tooltip, default, conflicts }, plus
 -- `options` ({ { value, label } }) for a choice rather than an on/off switch and `parent` (a key) to indent it
 -- under that feature and grey it out while the parent is off.
 ns.features = {}
+---@type table<string, TFFeature>
 local byKey = {}
 -- [key] = title of the addon already doing that feature's job, once addons have loaded.
+---@type table<string, string>
 local conflicted = {}
 local pending, ready = {}, false
 
+---@param fn fun()
 local function Start(fn)
 	xpcall(fn, geterrorhandler())
 end
 
+---@param message string
 function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
 end
 
 -- Every item button in an open bag. A button of a bag frame not in use can still report IsShown with no slot.
+---@param fn fun(button: ContainerFrameItemButtonTemplate)
 function ns.ForEachBagButton(fn)
 	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
 		if container:IsShown() then
@@ -30,6 +36,7 @@ end
 
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
 -- addon's own setting }; with no `when`, the addon being loaded is the conflict.
+---@param feature TFFeature
 function ns.Feature(feature)
 	assert(not byKey[feature.key], "duplicate feature " .. feature.key)
 	feature.conflicts = feature.conflicts or {}
@@ -37,6 +44,8 @@ function ns.Feature(feature)
 	byKey[feature.key] = feature
 end
 
+---@param feature TFFeature
+---@return string?
 local function FindConflict(feature)
 	for _, conflict in ipairs(feature.conflicts) do
 		if C_AddOns.IsAddOnLoaded(conflict.addon) and (not conflict.when or conflict.when()) then
@@ -53,14 +62,18 @@ function ns.RefreshConflicts()
 	end
 end
 
+---@param key string
+---@return string?
 function ns.ConflictOf(key)
 	return conflicted[key]
 end
 
 -- Switched on and not already handled by another addon. Checked when the feature acts, so toggles apply at once.
+---@param key string
+---@return boolean
 function ns.Active(key)
 	assert(byKey[key], "unknown feature " .. key)
-	return ns.db[key] and not conflicted[key]
+	return not not ns.db[key] and not conflicted[key]
 end
 
 local handlers = {}
@@ -74,6 +87,8 @@ events:SetScript("OnEvent", function(_, event, ...)
 	end
 end)
 
+---@param event WowEvent
+---@param fn function
 function ns.On(event, fn)
 	if not handlers[event] then
 		handlers[event] = {}
@@ -84,6 +99,9 @@ end
 
 -- Hook every bag slot button, including ones made later, recording each in `hooked`. `update` runs whenever the
 -- button redraws its junk coin, and again as a bag opens; `click` runs after a modified click.
+---@param hooked table<ContainerFrameItemButtonTemplate, boolean>
+---@param update fun(button: ContainerFrameItemButtonTemplate)
+---@param click fun(button: ContainerFrameItemButtonTemplate, mouseButton: string)
 function ns.HookBagButtons(hooked, update, click)
 	-- A bag reports its size before its buttons exist, so a slot can have no button yet.
 	local function Hook(button)
@@ -120,6 +138,7 @@ function ns.IsBagActionClick()
 end
 
 -- Run once every addon has loaded (their saved variables are readable, so conflicts are known).
+---@param fn fun()
 function ns.Init(fn)
 	if ready then
 		Start(fn)
@@ -131,14 +150,14 @@ end
 local login = CreateFrame("Frame")
 login:RegisterEvent("PLAYER_LOGIN")
 login:SetScript("OnEvent", function()
-	TweaksForeverDB = TweaksForeverDB or {}
-	ns.db = TweaksForeverDB
-	ns.db.junk = ns.db.junk or {}
+	local db = TweaksForeverDB or {}
+	db.junk = db.junk or {}
 	for _, feature in ipairs(ns.features) do
-		if ns.db[feature.key] == nil then
-			ns.db[feature.key] = feature.default
+		if db[feature.key] == nil then
+			db[feature.key] = feature.default
 		end
 	end
+	TweaksForeverDB, ns.db = db, db
 	ns.RefreshConflicts()
 	ready = true
 	for _, fn in ipairs(pending) do

@@ -1,0 +1,69 @@
+---@meta
+
+-- These integrations belong to other addons, so their tables are absent until those addons load.
+---@type table<string, string>?
+LeaPlusDB = nil
+---@type table<string, string>?
+LeaMapsDB = nil
+---@type {showAreas: boolean?}?
+LegacyHereDB = nil
+---@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?}?}?}?
+Questie = nil
+
+-- Camelot's character panel dimensions and panel-manager accessor are absent from Retail FrameXML.
+---@type number
+CHARACTER_FRAME_COLLAPSED_WIDTH = 0
+---@type number
+CHARACTER_FRAME_WIDTH = 0
+---@type number
+CHARACTER_FRAME_HEIGHT = 0
+---@param attribute 'TOP_OFFSET'|'LEFT_OFFSET'
+---@return number
+function GetUIPanelLayoutAttribute(attribute) end
+
+-- Localised client strings are not included in Ketho's API annotations.
+---@type string
+ERR_NOT_IN_COMBAT = ""
+---@type string
+SELL_ALL_JUNK_ITEMS_POPUP = ""
+---@type string
+FACTION_ALLIANCE = ""
+---@type string
+FACTION_HORDE = ""
+
+-- Camelot's pane toggle is a mixin method; Retail's generated CharacterFrame omits it.
+---@class CharacterFrame
+---@field IsRightPaneCollapsed fun(self: CharacterFrame): boolean
+
+-- PanelTemplates sets this in Lua, which the generated XML-only class does not capture.
+---@class MerchantFrame
+---@field selectedTab integer
+
+-- A bag's children include both item buttons and ordinary window controls.
+---@class TFBagChild : Frame
+---@field GetSlotAndBagID? fun(self: TFBagChild): integer, integer
+
+-- Forever's TrainerDocumentation/TrainerConstantsDocumentation; absent from the pinned Retail API.
+C_Trainer = {}
+---@enum Enum.TrainerType
+Enum.TrainerType = { General = 0, TalentsObsolete = 1, Tradeskills = 2, Pet = 3 }
+---@return Enum.TrainerType
+function C_Trainer.GetTrainerType() end
+
+-- Forever's trainer rows include texture, required level and subtext (rank), as its TrainerUI consumes them.
+---@param index integer
+---@return string? name
+---@return string kind
+---@return fileID icon
+---@return number? level
+---@return string? rank
+---@diagnostic disable-next-line: duplicate-set-field -- Replace the pinned legacy four-return signature.
+function GetTrainerServiceInfo(index) end
+
+-- Spell and trainer tooltips carry the spell ID; the pinned TooltipData structure omits it.
+---@class TooltipData
+---@field id? integer
+
+-- Only ShoppingTooltipTemplate supplies this child; ordinary tooltip frames have no comparison header.
+---@class GameTooltip
+---@field CompareHeader? ShoppingTooltipTemplate_CompareHeader

@@ -112,14 +112,20 @@ Download the zip from [Releases](https://github.com/cjber/tweaks-forever/release
 # link the checkout into the game
 ln -s "$PWD" ".../World of Warcraft/_classic_beta_/Interface/AddOns/TweaksForever"
 
+tools/typecheck.sh                              # LuaLS 3.19.1 + multi-value lint
 luacheck .                                      # lint
 stylua --check .                                # format
-for spec in tests/*_spec.lua; do luajit "$spec"; done
+for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
 python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
 python3 tools/gen_zonelevels.py                 # regenerate Data/ZoneLevels.lua from wago.tools
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
+
+Install LuaLS **3.19.1**, Git and Python 3.11+ before running `tools/typecheck.sh`. It fetches the pinned
+Ketho WoW API annotations (including pinned FrameXML) into ignored `.types/`, checks all runtime Lua
+(including generated data), and rejects every diagnostic. Local contracts in `types/` are editor-only
+and excluded from the release. See [tools/README.md](tools/README.md) for the multi-value rule.
 
 CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp and zone level data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 

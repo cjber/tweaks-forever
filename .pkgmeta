@@ -9,6 +9,7 @@ ignore:
   - .release-notes.md
   - tools
   - tests
+  - types
   - docs
   - media/icon.svg
   - media/icon-400.png

@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -72,6 +73,8 @@ end
 
 -- Every camp benefit as { benefit, left }, the ones you have first, each group in the game's order. `remaining`
 -- gives seconds left on an aura, 0 for no expiry, nil without it.
+---@param remaining fun(aura: integer): number?
+---@return TFCampRow[]
 local function Listing(remaining)
 	local have, missing = {}, {}
 	for _, benefit in ipairs(ns.CampBenefits) do
@@ -85,6 +88,9 @@ local function Listing(remaining)
 end
 
 -- Whether an incremental aura update touches a watched aura, keeping `instances` (auraInstanceID -> true) current.
+---@param info UnitAuraUpdateInfo
+---@param instances TFMarks
+---@return boolean
 local function Touches(info, instances)
 	local hit = false
 	for _, aura in ipairs(info.addedAuras or {}) do
@@ -113,17 +119,23 @@ local function AurasSecret()
 end
 
 -- Seconds left on the aura, 0 for no expiry, nil without it. Only call when AurasSecret() is false.
+---@param aura integer
+---@return number?
 local function Remaining(aura)
 	local info = C_UnitAuras.GetPlayerAuraBySpellID(aura)
 	return info and (info.expirationTime > 0 and info.expirationTime - GetTime() or 0)
 end
 
 -- Minutes and up without seconds, but seconds in the last minute rather than an empty string.
+---@param left number
+---@return string
 local function Time(left)
 	return SecondsToTime(left, left >= 60)
 end
 
 -- A benefit as one line of a list: green with its time left if you have it, grey otherwise.
+---@param tooltip GameTooltip
+---@param row TFCampRow
 local function AddRow(tooltip, row)
 	local aura, feature, effect = unpack(row.benefit)
 	local text
@@ -141,6 +153,7 @@ end
 
 -- What a camp can give, for the campfire tooltip and the panel. No object scan tells which features this camp
 -- has, so it is every benefit there is.
+---@param tooltip GameTooltip
 local function AddCampList(tooltip)
 	local hint = "Sit or craft near a camp feature for a minute to gain its benefit:"
 	tooltip:AddLine(hint, 1, 1, 1, true)
@@ -149,6 +162,8 @@ local function AddCampList(tooltip)
 	end
 end
 
+---@param tooltip GameTooltip
+---@param aura integer
 local function AddStatus(tooltip, aura)
 	local left = Remaining(aura)
 	local text
@@ -168,6 +183,8 @@ for _, benefit in ipairs(ns.CampBenefits) do
 	byAura[benefit[1]] = benefit
 end
 
+---@param tooltip GameTooltip
+---@param aura integer
 local function AddFeature(tooltip, aura)
 	local _, _, effect, seconds = unpack(byAura[aura])
 	local text = seconds and "Sitting nearby: " .. effect .. " for " .. Time(seconds) or effect
@@ -189,6 +206,8 @@ ns.Init(function()
 		end
 	end
 
+	---@param data TooltipData
+	---@return integer?
 	local function AuraOf(data)
 		local entry = type(data.guid) == "string" and data.guid:match("^GameObject%-%d+%-%d+%-%d+%-%d+%-(%d+)")
 		local line = data.lines and data.lines[1]
@@ -243,12 +262,15 @@ ns.Init(function()
 
 	-- The panel: a tooltip of our own with a close button, as ItemRefTooltip is, below the buffs and debuffs so
 	-- it stays clear of the minimap and the quest tracker under it.
-	local panel, instances = nil, {}
+	---@type GameTooltip?
+	local panel
+	local instances = {}
 	local dismissed, leftAt = false, nil
 
 	local function Panel()
 		if not panel then
-			panel = CreateFrame("GameTooltip", "TweaksForeverCampTooltip", UIParent, "GameTooltipTemplate")
+			-- Generated XML conflates the global GameTooltip's item-comparison children with the frame type.
+			panel = CreateFrame("GameTooltip", "TweaksForeverCampTooltip", UIParent, "GameTooltipTemplate") --[[@as GameTooltip]]
 			panel:SetFrameStrata("MEDIUM")
 			local close = CreateFrame("Button", nil, panel, "UIPanelCloseButtonNoScripts")
 			close:SetPoint("TOPRIGHT", 2, 2)
