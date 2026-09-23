@@ -1,9 +1,7 @@
 name: Refresh game data
 
 # Opens a PR with regenerated data when wago.tools lists a newer Forever build.
-# PRs opened with GITHUB_TOKEN don't trigger CI on their own: the Lua checks run here before the
-# PR opens, and the ci job dispatches the full CI on its branch at once. Dispatched runs don't show
-# in the PR's checks, so the PR's own pull_request run still needs a maintainer's approval.
+# CI on a PR opened with GITHUB_TOKEN waits for a maintainer's approval; the Lua checks run here first.
 # Daily: beta builds have shipped several times a week.
 on:
   schedule:
@@ -18,9 +16,6 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    outputs:
-      branch: ${{ steps.pr.outputs.pull-request-branch }}
-      operation: ${{ steps.pr.outputs.pull-request-operation }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -51,7 +46,6 @@ jobs:
           version: 2.5.2
           args: --check .
       - if: steps.build.outputs.new == 'true'
-        id: pr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           branch: data/forever-${{ steps.build.outputs.version }}
@@ -62,16 +56,4 @@ jobs:
 
             Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers.
 
-            CI has already run on this branch (the Actions tab, *CI* on `workflow_dispatch`). Approve the pending workflows on this PR so its checks report here too.
-
-  ci:
-    needs: refresh
-    if: needs.refresh.outputs.operation == 'created' || needs.refresh.outputs.operation == 'updated'
-    runs-on: ubuntu-latest
-    permissions:
-      actions: write
-    steps:
-      - run: gh workflow run ci.yml --repo "$GITHUB_REPOSITORY" --ref "$BRANCH"
-        env:
-          GH_TOKEN: ${{ github.token }}
-          BRANCH: ${{ needs.refresh.outputs.branch }}
+            Approve the pending workflows on this PR to run CI.
