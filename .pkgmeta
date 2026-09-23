@@ -8,7 +8,9 @@ ignore:
   - .release-notes.md
   - tools
   - tests
+  - docs
   - media/icon.svg
   - media/icon-400.png
   - .luacheckrc
+  - .luarc.json
   - stylua.toml
