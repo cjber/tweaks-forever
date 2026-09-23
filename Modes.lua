@@ -55,6 +55,8 @@ ns.Init(function()
 			overlay:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 			overlay:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
 			overlay:SetScript("OnClick", Click)
+			-- The tooltip refreshes through its owner once item data loads; without this our lines drop off.
+			overlay.UpdateTooltip = ShowTooltip
 			overlay:SetScript("OnEnter", function(self)
 				SetCursor(active.cursor)
 				ShowTooltip(self)
@@ -75,6 +77,10 @@ ns.Init(function()
 	end
 
 	local function Start(mode)
+		-- The menu can be opened before combat and clicked after it starts.
+		if InCombatLockdown() then
+			return
+		end
 		active = mode
 		for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
 			if container:IsShown() then
