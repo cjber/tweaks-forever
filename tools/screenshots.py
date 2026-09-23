@@ -19,7 +19,9 @@ sys.path.insert(0, str(WOWMOCK))
 # wowmock resolves from $WOWMOCK at runtime (sys.path above), so ty cannot see it.
 from wowmock import (  # ty: ignore[unresolved-import]
     FONTS,
+    FRIZQT,
     NORMAL,
+    Font,
     MenuButton,
     MenuCheckbox,
     MenuDivider,
@@ -172,6 +174,83 @@ def exploration(ui):
     nav = ("World", "Eastern Kingdoms", "Redridge Mountains")
     frame, _ = world_map_frame(ui, art, nav, arrows=nav[1:])
     scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "exploration.png")
+
+
+KALIMDOR = 1414
+# ZoneLevels.lua's font: GameFontNormalSmallOutline (SystemFont_Shadow_Small_Outline), recoloured per zone.
+LABEL_FONT = Font(FRIZQT, 10, NORMAL, (1, -1), outline=True)
+# QuestDifficultyColors, as Blizzard's Constants.lua defines them.
+DIFFICULTY = {
+    "impossible": (1.00, 0.10, 0.10),
+    "verydifficult": (1.00, 0.50, 0.25),
+    "difficult": (1.00, 0.82, 0.00),
+    "standard": (0.25, 0.75, 0.25),
+    "trivial": (0.50, 0.50, 0.50),
+}
+# UnitQuestTrivialLevelRange at the screenshot's level: the classic green band (5 + level // 10 below 40).
+TRIVIAL_RANGE = 5 + PLAYER_LEVEL // 10
+
+
+def zone_ranges():
+    """Data/ZoneLevels.lua: {uiMapID: (low, high)}."""
+    source = (ROOT / "Data" / "ZoneLevels.lua").read_text()
+    return {int(i): (int(lo), int(hi)) for i, lo, hi in re.findall(r"\[(\d+)\] = \{ (\d+), (\d+) \}", source)}
+
+
+def difficulty(level, low, high):
+    """ZoneLevels.lua's Color: Model.ChallengeLevel fed to GetRelativeDifficultyColor."""
+    challenge = low if level < low else high - 2 if level > high else level
+    diff = challenge - level
+    if diff >= 5:
+        return DIFFICULTY["impossible"]
+    if diff >= 3:
+        return DIFFICULTY["verydifficult"]
+    if diff >= -4:
+        return DIFFICULTY["difficult"]
+    return DIFFICULTY["standard" if -diff <= TRIVIAL_RANGE else "trivial"]
+
+
+def map_rect_on_map(ui, child, parent):
+    """C_Map.GetMapRectOnMap from UiMapAssignment: the child's world rectangle in the parent's normalised
+    coordinates (map x runs along world -Y, map y along world -X)."""
+
+    def assignment(map_id):
+        rows = [r for r in ui.table("UiMapAssignment").values() if r["UiMapID"] == str(map_id)]
+        return min(rows, key=lambda r: int(r["OrderIndex"]))
+
+    def region(row):
+        return [float(row[f"Region_{i}"]) for i in range(6)]
+
+    x0, y0, _, x1, y1, _ = region(assignment(child))
+    p = assignment(parent)
+    px0, py0, _, px1, py1, _ = region(p)
+    u0, v0, u1, v1 = (float(p[k]) for k in ("UiMin_0", "UiMin_1", "UiMax_0", "UiMax_1"))
+
+    def project(wx, wy):
+        return u0 + (py1 - wy) / (py1 - py0) * (u1 - u0), v0 + (px1 - wx) / (px1 - px0) * (v1 - v0)
+
+    (ax, ay), (bx, by) = project(x1, y1), project(x0, y0)
+    return ax, bx, ay, by
+
+
+def zone_levels(ui):
+    """Kalimdor at a level 22 character's zoom-out: every zone's range at the centre of its rectangle."""
+    art = map_art(ui, KALIMDOR)
+    nav = ("World", "Kalimdor")
+    frame, rects = world_map_frame(ui, art, nav, arrows=nav[1:])
+    mx, my, mw, mh = rects["map"]
+    ranges = zone_ranges()
+    for row in ui.table("UiMap").values():
+        map_id = int(row["ID"])
+        if row["ParentUiMapID"] != str(KALIMDOR) or map_id not in ranges:
+            continue
+        low, high = ranges[map_id]
+        min_x, max_x, min_y, max_y = map_rect_on_map(ui, map_id, KALIMDOR)
+        x, y = mx + (min_x + max_x) / 2 * mw, my + (min_y + max_y) / 2 * mh
+        text = f"{low}-{high}" if low != high else str(low)
+        width = frame.text_width(text, LABEL_FONT)
+        frame.text(x - width / 2, y - LABEL_FONT.height / 2, text, LABEL_FONT, difficulty(PLAYER_LEVEL, low, high))
+    scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "zonelevels.png")
 
 
 # Junk.lua marks (account-wide): things this character sells rather than uses. Greys would only show their coin
@@ -330,6 +409,7 @@ def main():
     gear(ui)
     menu(ui)
     exploration(ui)
+    zone_levels(ui)
     junk(ui)
     campsite(ui)
     camp_panel(ui)

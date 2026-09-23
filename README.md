@@ -17,6 +17,10 @@ When another addon already does one of these jobs, that feature is greyed out an
 </p>
 
 <p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/zonelevels.png" width="768" alt="Kalimdor on the world map with a small level range at each zone, coloured for a level 22 character: grey 1-10 starting zones, yellow 10-20 Darkshore and 18-30 Ashenvale, orange and red for the zones above">
+</p>
+
+<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position">
 </p>
 
@@ -60,6 +64,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 **Maps**
 - Reveal unexplored areas on zone maps, tinted blue so explored ground still stands out (off by default).
+- Show each zone's level range on the continent maps, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Pointing at a zone adds the range after its name too. The ranges are the original game's published ones, since Forever's map data has none of its own; cities, battlegrounds and Forever's new zones have no published range and show none.
 
 **Interface**
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
@@ -80,7 +85,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Questie and Legacy Here, it steps aside only while that addon's matching option is on.
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Questie and Legacy Here, it steps aside only while that addon's matching option is on.
 
 | Feature | Addons |
 |---|---|
@@ -91,6 +96,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Questie an
 | Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
 | Unexplored areas | Legacy Here, Leatrix Maps, Mapster |
+| Zone level ranges | Leatrix Maps |
 | Move windows | BlizzMove, MoveAnything |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Retail-style tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
@@ -120,6 +126,6 @@ CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linti
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay and camp benefit data come from the game's own files via [wago.tools](https://wago.tools).
+GPL-3.0-or-later. Map overlay and camp benefit data come from the game's own files via [wago.tools](https://wago.tools); zone level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
