@@ -64,6 +64,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Nearest quests first. The quest tracker sorts itself by distance as you move and shows how far away each quest is; the one whose area you're standing in reads "here" with a soft gold highlight.
 - Explain campsites. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows what sitting nearby gives you and whether you have it now, with the time left. Hovering a campfire shows how long your camp benefits last.
+- Tooltips get the retail game's thin silver border in place of the beige one.
 
 **Fishing**
 - Double right-click the world with a fishing pole equipped to cast Fishing. Not in combat or while mounted.
@@ -86,6 +87,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Questie an
 | Unexplored areas | Legacy Here, Leatrix Maps, Mapster |
 | Move windows | BlizzMove, MoveAnything |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
+| Retail tooltip border | Aurora, ElvUI, TinyTooltip, TipTac |
 | Fishing | FishingBuddy, FishingAce |
 
 ## Install

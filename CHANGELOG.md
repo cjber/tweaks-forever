@@ -10,6 +10,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 - **The reagent bag joins the combined bag.** With Combine Bags on, its slots sit at the bottom of the bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking it on the bag bar still opens it on its own. Turn it off under Interface.
 - **Resurrections from outside your group wait for you.** The addon can only tell whether a group member is in combat, so a resurrection from anyone else is no longer auto-accepted, and a battle resurrection from a stranger is yours to time.
+- **Tooltips look like the retail game's.** The beige border gives way to retail's thin silver one, on unit, item and comparison tooltips alike. Turn it off under Interface.
 - **Grey items always show the junk coin.** The game's gold coin marks greys in your bags all the time, not only while a merchant is open. Turn it off under Vendors.
 - **Nearest quests first.** The quest tracker re-sorts as you move and shows how far away each quest is in small grey text. The quest whose area you're standing in reads "here" with a soft gold highlight. It stays out of the way while Questie's own tracker is on. Turn it off under Interface.
 
