@@ -1,20 +1,21 @@
 name: Refresh game data
 
 # Opens a PR with regenerated data when wago.tools lists a newer Forever build.
-# PRs opened with GITHUB_TOKEN don't trigger CI, so this job runs the full checks itself.
+# CI on a PR opened with GITHUB_TOKEN waits for a maintainer's approval; the Lua checks run here first.
 # Daily: beta builds have shipped several times a week.
 on:
   schedule:
     - cron: "0 6 * * *"
   workflow_dispatch:
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   refresh:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -54,3 +55,5 @@ jobs:
             Regenerated `Data/Overlays.lua` (world map overlays), `Data/CampBenefits.lua` (camp benefit texts), `Data/ZoneLevels.lua` (zone level ranges) and `Data/DungeonEntrances.lua` (dungeon and raid entrances) from the DB2s of Forever build ${{ steps.build.outputs.version }}.
 
             Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers.
+
+            Approve the pending workflows on this PR to run CI.
