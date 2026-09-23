@@ -103,6 +103,22 @@ local function Restyle(tooltip, style)
 	end
 end
 
+-- A tooltip takes its style as it hides, so a hidden one already wears the old style for its next show: redraw
+-- those now, Forever's with Blizzard's own default layout and colour. A shown one takes the new style as it hides.
+local function Repaint(tooltips)
+	for _, tooltip in ipairs(tooltips) do
+		if not tooltip:IsShown() and tooltip.NineSlice:IsShown() then
+			if FILES[ns.db[STYLE]] then
+				Restyle(tooltip)
+			else
+				NineSliceUtil.ApplyLayout(tooltip.NineSlice, NineSliceUtil.GetLayout("TooltipDefaultLayout"))
+				local r, g, b = TOOLTIP_DEFAULT_BACKGROUND_COLOR:GetRGB()
+				tooltip.NineSlice:SetCenterColor(r, g, b, 1)
+			end
+		end
+	end
+end
+
 -- A 1-pixel line of the outline, from one point of the bar to another.
 local function Line(bar, a, b)
 	local line = bar:CreateTexture(nil, "BACKGROUND", nil, -8)
@@ -395,14 +411,15 @@ ns.Init(function()
 	hooksecurefunc("SharedTooltip_SetBackdropStyle", Restyle)
 	local styles = { HealthBar() }
 	-- These were styled on load, before the hook, and could be shown before they first hide.
-	for _, tooltip in ipairs({
+	local tooltips = {
 		GameTooltip,
 		ItemRefTooltip,
 		ShoppingTooltip1,
 		ShoppingTooltip2,
 		ItemRefShoppingTooltip1,
 		ItemRefShoppingTooltip2,
-	}) do
+	}
+	for _, tooltip in ipairs(tooltips) do
 		Restyle(tooltip)
 		if tooltip.CompareHeader then
 			styles[#styles + 1] = CompareHeader(tooltip)
@@ -415,5 +432,8 @@ ns.Init(function()
 		end
 	end
 	Settings.SetOnValueChangedCallback("TweaksForever_" .. KEY, Style)
+	Settings.SetOnValueChangedCallback("TweaksForever_" .. STYLE, function()
+		Repaint(tooltips)
+	end)
 	Style()
 end)

@@ -198,6 +198,7 @@ read_globals = {
 	"strtrim",
 	"TextureKitConstants",
 	"tInvert",
+	"TOOLTIP_DEFAULT_BACKGROUND_COLOR",
 	"TooltipDataProcessor",
 	"UIPanelWindows",
 	"UIParent",
