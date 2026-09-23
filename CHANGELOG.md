@@ -8,6 +8,8 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+Campsites explain themselves. Hovering a camp feature, such as a Camp Tent, Mana Well or Anvil, shows what sitting nearby gives you and whether you have it, with the time left; hovering a campfire shows how long your camp benefits last. Upgrades such as the Master Forge name the benefit of the feature they replace. Turn it off under Interface.
+
 ## [0.2.1] - 2026-09-23
 
 - **A softer palette for gear groups:** rose, teal, lavender and pink, still well clear of every item quality colour. Groups on an earlier default colour take one of the new ones; colours you picked yourself stay.
