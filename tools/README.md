@@ -7,7 +7,7 @@ python3 tools/gen_dungeons.py      # Data/DungeonEntrances.lua (stdlib only)
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/screenshots.py       # docs/screenshots/*.png (Pillow)
-python3 tools/tooltip_border.py    # media/TooltipBorder.tga (stdlib only)
+python3 tools/tooltip_border.py    # media/TooltipBorder{Modern,Retail}.tga (stdlib only)
 ```
 
 `gen_overlays.py` pins a Forever build and writes `Data/Overlays.lua`: the map art
@@ -60,10 +60,11 @@ skill. It looks for the library in `$WOWMOCK`, else
 `~/.claude/skills/wow-mock-screenshots`, and needs Pillow. Two runs give
 byte-identical images.
 
-`tooltip_border.py` draws `media/TooltipBorder.tga`, the whole tooltip *Retail-style
-tooltips* draws in place of Forever's beige one: a rounded one-unit grey line lit
+`tooltip_border.py` draws `media/TooltipBorderModern.tga` and
+`media/TooltipBorderRetail.tga`, the whole tooltip *Modern tooltips* draws in place of
+Forever's beige one, one file per Tooltip style: a rounded one-unit grey line lit
 brighter along the top, with the tooltip's background baked in everywhere inside it,
-at two texels per unit. `Tooltips.lua` cuts all nine NineSlice pieces from this one
+at two texels per unit. `Tooltips.lua` cuts all nine NineSlice pieces from one such
 file, the Center included: the 7-unit corners, and a 2-unit middle it stretches along
 each edge and across the middle. Tooltips draw without pixel snapping, so the line and
 the background have to be one image; as two textures meeting edge to edge, a sub-pixel
