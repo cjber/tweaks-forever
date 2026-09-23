@@ -36,7 +36,7 @@ PLAYER_LEVEL = 22
 MARGIN = 28
 
 # Gear.lua PALETTE, taken in turn as the groups were created.
-GROUPS = {"DPS": (0.3, 0.65, 1), "Levelling": (1, 0.55, 0.15), "Tank": (0.45, 0.85, 0.3)}
+GROUPS = {"DPS": (1, 0, 0.3), "Levelling": (0.45, 1, 0.86), "Tank": (0.74, 1, 0.15)}
 HOVERED = 4
 # Backpack slots in order: (itemID, stack count, groups).
 BAG = [

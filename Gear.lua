@@ -42,13 +42,25 @@ local BEFORE_FISHING = "Before fishing"
 local WHITE = "Interface\\Buttons\\WHITE8X8"
 -- The quality border's own art, so a group border replaces it exactly.
 local ICON_FRAME = "Interface\\Common\\WhiteIconFrame"
+-- The glow the bags give a new item, tinted and kept on.
+local GLOW = "bags-glow-white"
 local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
 -- Dots sit along the top of a slot; more than this would run off its left edge.
 local MAX_DOTS = 4
 -- The border splits into one slice per group; narrower slices stop reading as separate colours.
 local MAX_BORDERS = 4
--- Colours new groups take in turn.
+-- Colours new groups take in turn, each far from every item quality colour (CIEDE2000 18 or more) so a
+-- group never reads as a rarity. The next candidates are orange-red, salmon and spring green, too close to
+-- Legendary and Uncommon, so a sixth list repeats a colour instead.
 local PALETTE = {
+	{ 1, 0, 0.3 },
+	{ 0.45, 1, 0.86 },
+	{ 0.74, 1, 0.15 },
+	{ 1, 0.45, 0.72 },
+	{ 0.3, 0.4, 1 },
+}
+-- The palette before 0.1.3, which lists coloured then still carry unless their colour was picked by hand.
+local RETIRED_PALETTE = {
 	{ 0.3, 0.65, 1 },
 	{ 1, 0.55, 0.15 },
 	{ 0.45, 0.85, 0.3 },
@@ -59,7 +71,7 @@ local PALETTE = {
 	{ 0.7, 0.55, 1 },
 }
 -- The strip sits under the stack count; the border and dots sit over the quality border.
-local LAYERS = { strip = "ARTWORK", border = "OVERLAY", dots = "OVERLAY" }
+local LAYERS = { strip = "ARTWORK", border = "OVERLAY", glow = "OVERLAY", dots = "OVERLAY" }
 -- Where a list comes from: a Tweaks group, an Equipment Manager set, or Before fishing.
 local KINDS = { "group", "set", "fishing" }
 
@@ -146,6 +158,24 @@ function Model.Colour(colours, kind, name)
 	end
 	colours[kind][name] = { unpack(pick) }
 	return colours[kind][name]
+end
+
+local function Same(a, b)
+	return math.abs(a[1] - b[1]) < 1e-3 and math.abs(a[2] - b[2]) < 1e-3 and math.abs(a[3] - b[3]) < 1e-3
+end
+
+-- Stored colours still on a retired palette entry move to the current one; hand-picked colours stay.
+function Model.Recolour(colours)
+	for _, byName in pairs(colours) do
+		for name, colour in pairs(byName) do
+			for index, retired in ipairs(RETIRED_PALETTE) do
+				if Same(colour, retired) then
+					byName[name] = { unpack(PALETTE[(index - 1) % #PALETTE + 1]) }
+					break
+				end
+			end
+		end
+	end
 end
 
 -- { { item, slot } } in slot order for a group's items, given each item's inventory type.
@@ -300,6 +330,7 @@ ns.Init(function()
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	Char().groups = Char().groups or {}
 	Char().colours = Char().colours or {}
+	Model.Recolour(Char().colours)
 	-- [button] = { [style] = textures }, made on first use.
 	local hooked, marks = {}, {}
 
@@ -310,7 +341,10 @@ ns.Init(function()
 		if not pool[index] then
 			pool[index] = button:CreateTexture(nil, LAYERS[style], nil, 2)
 			pool[index]:SetTexture(style == "border" and ICON_FRAME or WHITE)
-			if style == "dots" then
+			if style == "glow" then
+				pool[index]:SetTexture(C_Texture.GetAtlasInfo(GLOW).file)
+				pool[index]:SetBlendMode("ADD")
+			elseif style == "dots" then
 				pool[index]:SetMask(CIRCLE)
 			end
 		end
@@ -334,17 +368,32 @@ ns.Init(function()
 		end
 	end
 
+	-- One slice per group across the quality border's frame, with the new-item glow behind it split the same way.
 	local function Border(button, found)
 		local frame, count = button.IconBorder, math.min(#found, MAX_BORDERS)
-		local width = frame:GetWidth() / count
+		local glow = C_Texture.GetAtlasInfo(GLOW)
+		local width, glowWidth = frame:GetWidth() / count, glow.width / count
+		local glowSpan = glow.rightTexCoord - glow.leftTexCoord
 		for index = 1, count do
+			local colour = Colour(found[index])
 			local slice = Texture(button, "border", index)
-			slice:SetVertexColor(unpack(Colour(found[index])))
+			slice:SetVertexColor(unpack(colour))
 			slice:SetTexCoord((index - 1) / count, index / count, 0, 1)
 			slice:SetPoint("TOPLEFT", frame, (index - 1) * width, 0)
 			slice:SetPoint("BOTTOMLEFT", frame, (index - 1) * width, 0)
 			slice:SetWidth(width)
 			slice:Show()
+			local halo = Texture(button, "glow", index)
+			halo:SetVertexColor(unpack(colour))
+			halo:SetTexCoord(
+				glow.leftTexCoord + glowSpan * (index - 1) / count,
+				glow.leftTexCoord + glowSpan * index / count,
+				glow.topTexCoord,
+				glow.bottomTexCoord
+			)
+			halo:SetPoint("TOPLEFT", button, "CENTER", -glow.width / 2 + (index - 1) * glowWidth, glow.height / 2)
+			halo:SetSize(glowWidth, glow.height)
+			halo:Show()
 		end
 	end
 

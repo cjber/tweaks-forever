@@ -32,13 +32,19 @@ assert(table.concat(listed, " ") == "set:Arena group:DPS set:DPS", table.concat(
 
 -- Colours: each new list takes a palette colour nobody has, a freed one is reused, and a stored one sticks.
 local colours = {}
-local blue = Model.Colour(colours, "group", "DPS")
-local orange = Model.Colour(colours, "set", "Arena")
-assert(blue ~= orange and table.concat(blue, ",") ~= table.concat(orange, ","))
-assert(Model.Colour(colours, "group", "DPS") == blue)
-local blueValue = table.concat(blue, ",")
+local first = Model.Colour(colours, "group", "DPS")
+local second = Model.Colour(colours, "set", "Arena")
+assert(first ~= second and table.concat(first, ",") ~= table.concat(second, ","))
+assert(Model.Colour(colours, "group", "DPS") == first)
+local firstValue = table.concat(first, ",")
 colours.group.DPS = nil
-assert(table.concat(Model.Colour(colours, "fishing", "Before fishing"), ",") == blueValue)
+assert(table.concat(Model.Colour(colours, "fishing", "Before fishing"), ",") == firstValue)
+
+-- A colour from the retired palette moves to the current one at the same place; a hand-picked one stays.
+colours = { group = { Old = { 1, 0.55, 0.15 }, Picked = { 0.12, 0.34, 0.56 } } }
+Model.Recolour(colours)
+assert(table.concat(colours.group.Old, ",") == "0.45,1,0.86", table.concat(colours.group.Old, ","))
+assert(table.concat(colours.group.Picked, ",") == "0.12,0.34,0.56")
 
 -- Slots: the second ring and the second one-hander take the second slot; a spare has nowhere to go.
 local types = {

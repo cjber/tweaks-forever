@@ -27,6 +27,7 @@ read_globals = {
 	"C_PaperDollInfo",
 	"C_Spell",
 	"C_SummonInfo",
+	"C_Texture",
 	"C_Timer",
 	"C_UI",
 	"CancelDuel",
