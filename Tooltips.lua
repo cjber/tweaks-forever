@@ -19,7 +19,9 @@ ns.Feature({
 })
 
 -- WoW: Forever resolves the Tooltip-NineSlice atlases to its own beige art. The border is drawn instead from
--- media/TooltipBorder.tga (tools/tooltip_border.py): 7-pixel corners and a 2-pixel middle the edges stretch.
+-- media/TooltipBorder.tga (tools/tooltip_border.py): 7-unit corners and a 2-unit middle the edges stretch. The file
+-- has nothing but the line, which meets the background Blizzard starts 3 units in: tooltips draw unsnapped, so any
+-- dark texel beside the line would be filtered into it wherever an edge falls between screen pixels.
 local FILE = "Interface\\AddOns\\" .. addonName .. "\\media\\TooltipBorder"
 local PIECES = { -- [piece] = { left, right, top, bottom } in sixteenths of the file
 	TopLeftCorner = { 0, 7, 0, 7 },
@@ -100,7 +102,8 @@ local function HealthBar()
 	track:SetPoint("TOPLEFT", -1, 1)
 	track:SetPoint("BOTTOMRIGHT", 1, -1)
 	art[#art + 1] = track
-	local text = bar:CreateFontString(nil, "OVERLAY", "TextStatusBarText")
+	-- The Arial Narrow outline Blizzard puts on its own bars' numbers (the profession rank bar, retail's damage meter).
+	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
 	text:SetPoint("CENTER")
 	art[#art + 1] = text
 	-- The unit shown, as the token the tooltip was given, whether it is a player, and the bar's colour.

@@ -2,29 +2,35 @@
 
     python3 tools/tooltip_border.py
 
-A 16x16 rounded rectangle: a one-pixel line 2.5 pixels in from the edge with a 3.5-pixel corner radius, a
-soft shadow either side of it, and the line lit brighter along the top as the retail tooltip's is. The
-7-pixel corners are the NineSlice's corner pieces and the 2-pixel middle row and column its edges, which
-Tooltips.lua stretches. The line is grey-white; the addon tints it with SetVertexColor. Stdlib only, and the
-output is byte-identical between runs.
+A 16x16-unit rounded rectangle at 2 texels per unit: a one-unit line 2.5 units in from the edge with a
+3.5-unit corner radius, lit brighter along the top as the retail tooltip's is. Blizzard starts the tooltip's
+centre 3 units in, so the line's inner side meets the background and everything outside the line is clear.
+There is no shadow on either side of the line: tooltips turn pixel snapping off (SharedTooltip_OnLoad ->
+NineSliceUtil.DisableSharpening), so an edge that lands between screen pixels is filtered into whatever
+texels sit beside the line, and a dark shadow there shows as a black strip down the tooltip's sides. Two
+texels per unit keeps the line's own edges sharp at the usual UI scales. The 7-unit corners are the
+NineSlice's corner pieces and the 2-unit middle row and column its edges, which Tooltips.lua stretches. The
+line is grey-white; the addon tints it with SetVertexColor. Stdlib only, and the output is byte-identical
+between runs.
 """
 
 import math
 import struct
 from pathlib import Path
 
-SIZE = 16
-INSET = 2.5  # the line's centre, from the outer edge
+UNITS = 16
+TEXELS = 2  # per unit
+SIZE = UNITS * TEXELS
+INSET = 2.5  # the line's centre, in units from the outer edge
 RADIUS = 3.5
 TOP, SIDE = 255, 185  # the line's brightness facing up and facing sideways or down
-OUTER, INNER = (0.55, 2.0), (0.6, 3.0)  # shadow (strongest alpha, reach in pixels) outside and inside the line
 SAMPLES = 8
 OUTPUT = Path(__file__).resolve().parent.parent / "media" / "TooltipBorder.tga"
 
 
 def distance(x: float, y: float) -> tuple[float, float]:
-    """Signed distance from the line's centre (negative inside) and how far the nearest part faces up."""
-    centre, half = SIZE / 2, SIZE / 2 - INSET
+    """Signed distance in units from the line's centre (negative inside) and how far the nearest part faces up."""
+    centre, half = UNITS / 2, UNITS / 2 - INSET
     qx, qy = abs(x - centre) - (half - RADIUS), abs(y - centre) - (half - RADIUS)
     outside = math.hypot(max(qx, 0), max(qy, 0))
     signed = outside + min(max(qx, qy), 0) - RADIUS
@@ -36,20 +42,18 @@ def distance(x: float, y: float) -> tuple[float, float]:
 
 
 def pixel(px: int, py: int) -> tuple[int, int, int, int]:
-    """Supersample one pixel: the line over its shadow, as straight-alpha grey."""
-    light = alpha = 0.0
+    """Supersample one texel: the line's coverage, as straight-alpha grey."""
+    light = covered = 0.0
     for sy in range(SAMPLES):
         for sx in range(SAMPLES):
-            d, up = distance(px + (sx + 0.5) / SAMPLES, py + (sy + 0.5) / SAMPLES)
+            x, y = (px + (sx + 0.5) / SAMPLES) / TEXELS, (py + (sy + 0.5) / SAMPLES) / TEXELS
+            d, up = distance(x, y)
             if abs(d) <= 0.5:
                 light += SIDE + (TOP - SIDE) * up
-                alpha += 1
-            else:
-                strength, reach = OUTER if d > 0 else INNER
-                alpha += strength * max(0.0, 1 - (abs(d) - 0.5) / reach)
-    count = SAMPLES * SAMPLES
-    value = round(light / alpha) if alpha else 0
-    return value, value, value, round(alpha / count * 255)
+                covered += 1
+    # A clear texel takes the line's colour, so filtering at the line's edge fades it rather than darkening it.
+    value = round(light / covered) if covered else SIDE
+    return value, value, value, round(covered / (SAMPLES * SAMPLES) * 255)
 
 
 def main() -> None:

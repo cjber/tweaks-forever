@@ -35,7 +35,10 @@ skill. It looks for the library in `$WOWMOCK`, else
 `~/.claude/skills/wow-mock-screenshots`, and needs Pillow. Two runs give
 byte-identical images.
 
-`tooltip_border.py` draws `media/TooltipBorder.tga`, the rounded one-pixel border
-*Retail-style tooltips* puts on a tooltip in place of Forever's beige one: 7-pixel
-corners and a 2-pixel middle that `Tooltips.lua` stretches along each edge, lit
-brighter along the top and tinted grey in game. Two runs give byte-identical files.
+`tooltip_border.py` draws `media/TooltipBorder.tga`, the rounded one-unit border
+*Retail-style tooltips* puts on a tooltip in place of Forever's beige one, at two
+texels per unit: 7-unit corners and a 2-unit middle that `Tooltips.lua` stretches
+along each edge, lit brighter along the top and tinted grey in game. The file holds
+only the line, with no shadow beside it, because tooltips draw without pixel snapping
+and a dark texel next to the line shows as a black strip. Two runs give
+byte-identical files.
