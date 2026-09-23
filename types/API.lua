@@ -10,7 +10,7 @@
 
 ---@class TFPublicAPI
 ---@field version integer 1
----@field TrainableSpells fun(): TFAPITrainableSpell[] spells your level allows that you haven't learned, each spell's next rank only, in fresh tables; answers whether or not the spellbook shows them
+---@field TrainableSpells fun(): TFAPITrainableSpell[]? spells your level allows that you haven't learned, each spell's next rank only, in fresh tables; answers whether or not the spellbook shows them; nil before login and in combat
 
 ---@class TFPublicAddon
 ---@field API TFPublicAPI

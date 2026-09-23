@@ -6,8 +6,11 @@ local ns = {
 	end,
 }
 local NAMES = { [403] = "Lightning Bolt", [529] = "Lightning Bolt", [548] = "Lightning Bolt", [915] = "Lightning Bolt" }
-local known, level, class = { [403] = true, [529] = true }, 18, "SHAMAN"
+local known, level, class, combat = { [403] = true, [529] = true }, 18, "SHAMAN", false
 local env = setmetatable({
+	InCombatLockdown = function()
+		return combat
+	end,
 	UnitClass = function()
 		return "Shaman", class, 7
 	end,
@@ -44,6 +47,11 @@ for _, file in ipairs({ "Data/ClassSpells.lua", "Spellbook.lua", "API.lua" }) do
 end
 local API = env.TweaksForever.API
 assert(API.version == 1)
+assert(API.TrainableSpells() == nil, "before login the spellbook isn't known yet")
+ns.db = {}
+combat = true
+assert(API.TrainableSpells() == nil, "not in combat")
+combat = false
 
 local function Find(list, id)
 	for _, spell in ipairs(list) do
