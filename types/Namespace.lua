@@ -12,17 +12,37 @@
 
 ---@class TFCamp
 ---@field Listing fun(remaining: fun(aura: integer): number?): TFCampRow[]
----@field Touches fun(info: UnitAuraUpdateInfo, instances: TFMarks): boolean
+---@field Toward fun(north: number, west: number, facing: number): string
 
 ---@class TFTrainerSpell
 ---@field name string
 ---@field rank? string
 ---@field level number
 ---@field icon fileID
+---@field line? string the class skill line (spellbook tab) the spell belongs to
+---@field cost? number copper
 
----@class TFTrainerGroup
----@field level number
----@field [integer] TFTrainerSpell
+---@class TFFutureSpell
+---@field id integer
+---@field spell TFTrainerSpell
+---@field ready boolean your level allows it: waiting at the trainer
+
+---@class TFGrid
+---@field views integer
+---@field width number
+---@field height number
+---@field columns integer
+---@field gap number
+---@field pad number
+---@field spacer number
+---@field header number
+---@field item number
+
+---@class TFSlot
+---@field page integer
+---@field view integer
+---@field x number
+---@field y number
 
 ---@class TFEntrance
 ---@field x number
@@ -88,7 +108,7 @@ TweaksForeverCharDB = nil
 ---@field Reagents TFReagents
 ---@field CampBenefits TFCampBenefit[]
 ---@field Camp TFCamp
----@field Trainable TFTrainable
+---@field FutureSpells TFFutureSpells
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels
 ---@field DungeonEntrances table<integer, TFEntrance[]>

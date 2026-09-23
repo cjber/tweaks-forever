@@ -101,3 +101,31 @@ function GetTrainerServiceInfo(index) end
 
 ---@class NamePlateFrame
 ---@field UnitFrame NamePlateUnitFrame?
+
+-- Our future-spell entries borrow the spellbook item template and keep their own state on it.
+---@class SpellBookItemTemplate
+---@field entry TFFutureSpell
+---@field trainableFXController? {CancelEffect: fun(self)}
+---@field ApplyBorderArt fun(self, atlas: string, anchors: AnchorMixin[]) Camelot's; newer than the pinned FrameXML
+
+-- PagedContentFrame's split of its elements into views, set in Lua and read for where the last view ends.
+---@class TFPagedElement
+---@field gridRow? integer
+---@field isHeader? boolean
+---@field isSpacer? boolean
+
+---@class SpellBookFrameTemplate_PagedSpellsFrame
+---@field viewDataList? TFPagedElement[][]
+
+---@class SpellBookSingleSkillLineCategoryMixin
+---@field skillLineIndex? Enum.SpellBookSkillLineIndex
+
+-- Retail spellbook strings, absent from Ketho's annotations.
+---@type string
+SPELLBOOK_TRAINABLE = ""
+---@type string
+SPELLBOOK_AVAILABLE_AT = ""
+---@type string
+PAGE_NUMBER_WITH_MAX = ""
+---@type string
+COSTS_LABEL = ""
