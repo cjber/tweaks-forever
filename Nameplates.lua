@@ -130,7 +130,9 @@ local function Layout(frame)
 	-- its box.
 	local level = frame.PlayerLevelDiffFrame
 	level:ClearAllPoints()
-	level:SetPoint("LEFT", name, "RIGHT", -4, 0)
+	-- Bottom to bottom, not LEFT to RIGHT: UpdateAnchors reads this point's relativePoint and, on "RIGHT", anchors the
+	-- name back to the level box, an anchor cycle that errors before this hook runs again.
+	level:SetPoint("BOTTOMLEFT", name, "BOTTOMRIGHT", -4, 0)
 	level:SetHeight(name:GetLineHeight())
 	level.playerLevelDiffIcon:SetAlpha(0)
 	if level.selectedBorder then
