@@ -8,6 +8,11 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-09-23
+
+- **The grouped-gear border glows** in the group's colour, the way the bags light up a new item.
+- **Group colours no longer look like item quality.** The old defaults were close to Legendary orange and Rare blue; the new ones (crimson, aquamarine, chartreuse, pink and indigo) are chosen to stand apart from every quality colour. Groups still on an old default colour move to the new ones; colours you picked yourself stay.
+
 ## [0.1.2] - 2026-09-23
 
 - **The grouped-gear border takes the place of the quality border.** It is drawn with the game's own item border in the group's colour, split side by side when an item is in several groups, instead of thin rings inside the slot.
