@@ -113,6 +113,8 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |
 
+Addons can use `TweaksForever.API` (`version = 1`). `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned, each spell's next rank only, as fresh `{spellID, name, level, cost, line}` tables, whether or not Future Spells is on. It returns `nil` before login and in combat.
+
 ## Install
 
 Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.
