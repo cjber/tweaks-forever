@@ -8,7 +8,7 @@ Small quality-of-life automations for WoW: Forever that feel like part of the de
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`, or the addon compartment on the minimap), with a page for each section.
+Tweaks Forever replaces a handful of single-purpose addons with checkboxes in the game's own settings: quest and gossip automation, repairs, junk selling, gear groups, a revealed world map, movable windows and fishing. Nothing opens a window of its own, apart from a small panel of camp benefits by a campfire. Settings live under **Options → AddOns → Tweaks Forever** (or `/tweaks`, or the addon compartment on the minimap), with a page for each section.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight. This is checked again each time the settings open.
 
@@ -27,7 +27,11 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins, and the ring's tooltip ending Marked as junk – Alt+Right-click to unmark">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip with two green lines: Sitting nearby: Boosted Mana Regeneration, and Active: 48 Min">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip in green: Sitting nearby: Restores 29 Mana every 5 seconds for 1 Hr, and Active: 48 Min">
+</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/camp.png" width="327" alt="The Camp panel: a hint to sit or craft near a camp feature for a minute, three benefits in green with their time left, such as First Aid Kit (52 Min): Stamina increased by 56, and the seven others in grey with what they would give">
 </p>
 
 ## Features
@@ -63,7 +67,8 @@ When another addon already does one of these jobs, that feature is greyed out an
 - `/rl` reloads the interface.
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Nearest quests first. The quest tracker sorts itself by distance as you move and shows how far away each quest is; the one whose area you're standing in reads "here" with a soft gold highlight.
-- Explain campsites. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows what sitting nearby gives you and whether you have it now, with the time left. Hovering a campfire shows how long your camp benefits last.
+- Explain campsite benefits. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows exactly what sitting nearby gives you, such as "Stamina increased by 56 for 1 Hr", and whether you have it now, with the time left. Hovering a campfire lists every benefit a camp can give: the ones you have in green with their time left, the rest in grey. Your Camp Benefits buff adds the ones you haven't gained yet.
+- Coming near a campfire opens a small Camp panel below your buffs with the same list, so you know what each feature would give before you sit down. It closes as you walk away or with its close button, until the next campfire, and stays hidden in combat.
 - Show spells left to train. The top of the spellbook says how many spells you can learn now and the level of the next ones; hover it for the list, ready spells in green and later ones by level. The server leaves unlearned spells out of the spellbook, so the list comes from your class trainer, remembered per character each time you visit.
 
 **Fishing**
@@ -103,15 +108,16 @@ luacheck .                                      # lint
 stylua --check .                                # format
 for spec in tests/*_spec.lua; do luajit "$spec"; done
 python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
+python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
-CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
+CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map and camp data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 
 **Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay data comes from the game's own files via [wago.tools](https://wago.tools).
+GPL-3.0-or-later. Map overlay and camp benefit data come from the game's own files via [wago.tools](https://wago.tools).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)

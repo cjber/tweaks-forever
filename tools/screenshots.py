@@ -47,6 +47,7 @@ from wowmock import (  # ty: ignore[unresolved-import]
     ui_panel_button,
     unique_corners_layout,
     world_map_frame,
+    wrap_text,
 )
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -208,24 +209,64 @@ def junk(ui):
     scene(ui, [(bag, 0, 0), (tip, slot_x - tip.width, slot_y - tip.height)], MARGIN).save(OUT / "junk.png")
 
 
-# Campsites.lua for a Mana Well (object 651948, aura 1230587). The aura's Description is empty in this build, so
-# C_Spell.GetSpellDescription gives "" and the line falls back to the aura's name; the aura lasts an hour.
-CAMP_FEATURE = "Mana Well"
-CAMP_AURA = 1230587
-CAMP_MINUTES_LEFT = 48
+# Campsites.lua's texts, from Data/CampBenefits.lua. Wrapped tooltip lines stop at about spell-tooltip width
+# (wowmock NOTES); the client leaves no gap between the lines of one wrapped string, the mock leaves 2 units.
+TOOLTIP_WRAP = 250
+CAMP_HINT = "Sit or craft near a camp feature for a minute to gain its benefit:"
+# Seconds left on the benefits the player has in the scenes; SecondsToTime(left, true) gives MINUTES_ABBR "%d Min".
+CAMP_HAVE = {1230124: 52 * 60, 1230587: 48 * 60, 1229451: 31 * 60}
+CAMP_FEATURE = 1230587  # the Mana Well, hovered with 48 minutes left
+
+
+def camp_benefits():
+    """[(aura, feature, effect, seconds or None)] in Data/CampBenefits.lua's order."""
+    source = (ROOT / "Data" / "CampBenefits.lua").read_text()
+    body = source[source.index("ns.CampBenefits = {") :]
+    entries = re.findall(r'\{\s*(\d+),\s*"([^"]+)",\s*((?:"[^"]*"\s*(?:\.\.\s*)?)+),?\s*(\d+)?,?\s*\}', body)
+    return [(int(a), f, "".join(re.findall(r'"([^"]*)"', e)), int(s) if s else None) for a, f, e, s in entries]
+
+
+def wrapped(ui, text, color):
+    lines = wrap_text(ui.canvas(1, 1), text, FONTS["GameTooltipText"], TOOLTIP_WRAP)
+    return [TooltipLine(line, color) for line in lines]
+
+
+def minutes(seconds):
+    return f"{seconds // 60} Min" if seconds < 3600 else f"{seconds // 3600} Hr"
+
+
+def camp_rows(ui):
+    """AddCampList: the hint, then the benefits the player has (green, time left), then the rest (grey)."""
+    green, grey = ui.global_color("GREEN_FONT_COLOR")[:3], ui.global_color("GRAY_FONT_COLOR")[:3]
+    benefits = camp_benefits()
+    have = [b for b in benefits if b[0] in CAMP_HAVE] + [b for b in benefits if b[0] not in CAMP_HAVE]
+    lines = wrapped(ui, CAMP_HINT, (1, 1, 1))
+    for aura, feature, effect, seconds in have:
+        left = CAMP_HAVE.get(aura)
+        if left is None:
+            lines += wrapped(ui, f"{feature}: {effect}", grey)
+        elif seconds is None:
+            lines += wrapped(ui, f"{feature}: rested, again in {minutes(left)}", green)
+        else:
+            lines += wrapped(ui, f"{feature} ({minutes(left)}): {effect}", green)
+    return lines
 
 
 def campsite(ui):
     green = ui.global_color("GREEN_FONT_COLOR")[:3]
-    aura = ui.table("SpellName")[str(CAMP_AURA)]["Name_lang"]
-    assert not ui.table("Spell").get(str(CAMP_AURA), {}).get("Description_lang"), "the aura has a description now"
-    # SecondsToTime(left, true): MINUTES_ABBR "%d Min".
-    lines = [
-        TooltipLine(CAMP_FEATURE),
-        TooltipLine(f"Sitting nearby: {aura}", green),
-        TooltipLine(f"Active: {CAMP_MINUTES_LEFT} Min", green),
-    ]
+    _, feature, effect, seconds = next(b for b in camp_benefits() if b[0] == CAMP_FEATURE)
+    lines = [TooltipLine(feature)]
+    lines += wrapped(ui, f"Sitting nearby: {effect} for {minutes(seconds)}", green)
+    lines.append(TooltipLine(f"Active: {minutes(CAMP_HAVE[CAMP_FEATURE])}", green))
     scene(ui, [(tooltip(ui, lines), 0, 0)], MARGIN).save(OUT / "campsite.png")
+
+
+def camp_panel(ui):
+    # GameTooltip_SetTitle "Camp", then AddCampList; the close button at the TOPRIGHT (2, 2), as ItemRefTooltip's.
+    panel = tooltip(ui, [TooltipLine("Camp")] + camp_rows(ui))
+    close = ui.canvas(24, 24)
+    close_button(close, 24, 0)
+    scene(ui, [(panel, 0, 0), (close, panel.width + 2 - 24, -2)], MARGIN).save(OUT / "camp.png")
 
 
 # Frames.lua's Edit Mode editor on a 1366x768 UIParent, the Character window picked on the Windows tab.
@@ -291,6 +332,7 @@ def main():
     exploration(ui)
     junk(ui)
     campsite(ui)
+    camp_panel(ui)
     editmode(ui)
 
 
