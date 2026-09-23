@@ -314,15 +314,19 @@ local function InitTooltips()
 		if tooltip ~= GameTooltip or not ns.Active("campTooltips") or AurasSecret() then
 			return
 		end
-		if data.id ~= CAMP_BENEFITS and data.id ~= CAMPFIRE_NEARBY then
+		-- A spell flagged always-secret keeps its id secret even outside restrictions, and on a restricted map
+		-- UnitIsUnit answers with a secret boolean.
+		local id = data.id
+		if not canaccessvalue(id) or (id ~= CAMP_BENEFITS and id ~= CAMPFIRE_NEARBY) then
 			return
 		end
 		local info = tooltip:GetPrimaryTooltipInfo()
 		local unit = info and info.getterArgs and info.getterArgs[1]
-		if not unit or not UnitIsUnit(unit, "player") then
+		local mine = unit and UnitIsUnit(unit, "player")
+		if not canaccessvalue(mine) or not mine then
 			return
 		end
-		if data.id == CAMPFIRE_NEARBY then
+		if id == CAMPFIRE_NEARBY then
 			AddNearby(tooltip)
 		else
 			AddMissing(tooltip)
@@ -331,8 +335,11 @@ local function InitTooltips()
 end
 
 local function TrackCampfire()
-	ns.On("UNIT_SPELLCAST_SUCCEEDED", function(unit, _, spell)
-		if unit == "player" and canaccessvalue(spell) and CAMPFIRES[spell] then
+	-- Only your own casts: another unit's may carry secret arguments.
+	local casts = CreateFrame("Frame")
+	casts:RegisterUnitEvent("UNIT_SPELLCAST_SUCCEEDED", "player")
+	casts:SetScript("OnEvent", function(_, _, _, _, spell)
+		if canaccessvalue(spell) and CAMPFIRES[spell] then
 			Remember()
 		end
 	end)

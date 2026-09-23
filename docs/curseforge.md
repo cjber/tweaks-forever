@@ -18,7 +18,7 @@ Tweaks Forever replaces a handful of single-purpose addons with options in WoW: 
 
 ![The Campfire Nearby buff tooltip: the game's description, then Campfire: about 35 yd ahead to your left, and the three benefits you have in green with their time left, such as First Aid Kit (52 Min): Stamina increased by 56](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/camp.png)
 
-![Three enemy nameplates: the targeted Defias Pillager outlined in gold, its name above the bar's left end, level 15 in yellow above the right and 62% inside the bar, two debuffs above and a Fireball cast in a slim bar below with the spell's icon inside; the other two faded back](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
+![Three enemy nameplates: the targeted Defias Pillager outlined in white in retail's bronze-rimmed bar, its name centred above with level 15 in yellow after it and 62% inside the bar, two debuffs above and a Fireball cast in a slim bar below with the spell's icon inside; the other two faded back](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
 
 ## Features
 
