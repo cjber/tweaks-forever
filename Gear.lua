@@ -53,6 +53,8 @@ local SLOTS = {
 	INVTYPE_RELIC = { 18 },
 	INVTYPE_TABARD = { 19 },
 }
+-- A two-hander also needs the off-hand slot empty.
+local BLOCKS = { INVTYPE_2HWEAPON = 17 }
 
 local Model = {}
 ns.Gear = Model
@@ -92,9 +94,14 @@ function Model.Plan(items, equipLoc)
 	end)
 	local used, plan = {}, {}
 	for _, item in ipairs(ordered) do
-		for _, slot in ipairs(SLOTS[equipLoc(item)] or {}) do
-			if not used[slot] then
+		local loc = equipLoc(item)
+		for _, slot in ipairs(SLOTS[loc] or {}) do
+			local blocks = BLOCKS[loc]
+			if not used[slot] and not (blocks and used[blocks]) then
 				used[slot] = true
+				if blocks then
+					used[blocks] = true
+				end
 				plan[#plan + 1] = { item = item, slot = slot }
 				break
 			end
@@ -140,38 +147,37 @@ local function BeforeFishing()
 	return { [BEFORE_FISHING] = next(items) and items or nil }
 end
 
-local function Equip(name)
+local function EquipPlan(plan)
 	if InCombatLockdown() then
 		UIErrorsFrame:AddExternalErrorMessage(ERR_NOT_IN_COMBAT)
 		return
-	end
-	local _, ids = StockSets()
-	if ids[name] and not Char().groups[name] then
-		C_EquipmentSet.UseEquipmentSet(ids[name])
-		return
-	end
-	local plan = {}
-	if name == BEFORE_FISHING then
-		for slot, itemID in pairs(Char().beforeFishing) do
-			plan[#plan + 1] = { item = itemID, slot = slot }
-		end
-		table.sort(plan, function(a, b)
-			return a.slot < b.slot
-		end)
-	else
-		local items = {}
-		for itemID in pairs(Char().groups[name]) do
-			items[#items + 1] = itemID
-		end
-		plan = Model.Plan(items, function(itemID)
-			return select(4, C_Item.GetItemInfoInstant(itemID))
-		end)
 	end
 	for _, step in ipairs(plan) do
 		if GetInventoryItemID("player", step.slot) ~= step.item and C_Item.GetItemCount(step.item) > 0 then
 			C_Item.EquipItemByName(step.item, step.slot)
 		end
 	end
+end
+
+local function EquipGroup(name)
+	local items = {}
+	for itemID in pairs(Char().groups[name] or {}) do
+		items[#items + 1] = itemID
+	end
+	EquipPlan(Model.Plan(items, function(itemID)
+		return select(4, C_Item.GetItemInfoInstant(itemID))
+	end))
+end
+
+local function EquipBeforeFishing()
+	local plan = {}
+	for slot, itemID in pairs(Char().beforeFishing or {}) do
+		plan[#plan + 1] = { item = itemID, slot = slot }
+	end
+	table.sort(plan, function(a, b)
+		return a.slot < b.slot
+	end)
+	EquipPlan(plan)
 end
 
 ns.Init(function()
@@ -236,17 +242,41 @@ ns.Init(function()
 				end, function()
 					Model.Toggle(Char().groups, name, itemID)
 					RefreshBags()
+					-- An emptied group is gone; its Equip entry below would be stale.
+					if not Char().groups[name] then
+						return MenuResponse.CloseAll
+					end
 				end)
 			end
 			root:CreateButton("New group…", function()
 				NewGroup(itemID)
 			end)
-			local groups = Groups(itemID)
-			if #groups > 0 then
+			-- Each source equips its own way, so a group and a set sharing a name stay distinct.
+			local equips = {}
+			for _, name in ipairs(Model.GroupsOf(itemID, Char().groups)) do
+				equips[#equips + 1] = { name, EquipGroup }
+			end
+			local stock, ids = StockSets()
+			for _, name in ipairs(Model.GroupsOf(itemID, stock)) do
+				equips[#equips + 1] = {
+					name,
+					function()
+						if InCombatLockdown() then
+							UIErrorsFrame:AddExternalErrorMessage(ERR_NOT_IN_COMBAT)
+						elseif ids[name] then
+							C_EquipmentSet.UseEquipmentSet(ids[name])
+						end
+					end,
+				}
+			end
+			if #Model.GroupsOf(itemID, BeforeFishing()) > 0 then
+				equips[#equips + 1] = { BEFORE_FISHING, EquipBeforeFishing }
+			end
+			if #equips > 0 then
 				root:CreateDivider()
-				for _, name in ipairs(groups) do
-					root:CreateButton("Equip " .. name, function()
-						Equip(name)
+				for _, equip in ipairs(equips) do
+					root:CreateButton("Equip " .. equip[1], function()
+						equip[2](equip[1])
 					end)
 				end
 			end
@@ -319,11 +349,22 @@ ns.Init(function()
 	end)
 
 	-- What the weapon slots held the last time they settled without a pole. Equipping a two-hander fires an
-	-- event per slot, so reading waits a moment for both to settle.
-	local worn, pending = {}, false
+	-- event per slot, so reading waits a moment for both to settle. A weapon held only between two events, such
+	-- as one swapped in just before the pole, is caught as it passes.
+	local worn, seen, pending = {}, nil, false
+	local function Weapons()
+		return {
+			[INVSLOT_MAINHAND] = GetInventoryItemID("player", INVSLOT_MAINHAND),
+			[INVSLOT_OFFHAND] = GetInventoryItemID("player", INVSLOT_OFFHAND),
+		}
+	end
 	local function Settle()
 		pending = false
 		local main = GetInventoryItemID("player", INVSLOT_MAINHAND)
+		if seen and seen[INVSLOT_MAINHAND] ~= worn[INVSLOT_MAINHAND] then
+			worn = seen
+		end
+		seen = nil
 		if main and ns.Fishing.IsPole(main) then
 			if not Char().beforeFishing and next(worn) then
 				Char().beforeFishing = worn
@@ -331,12 +372,19 @@ ns.Init(function()
 		elseif main then
 			-- A weapon back in hand ends it; an empty hand keeps it, so a pole put away still leaves the badge.
 			Char().beforeFishing = nil
-			worn = { [INVSLOT_MAINHAND] = main, [INVSLOT_OFFHAND] = GetInventoryItemID("player", INVSLOT_OFFHAND) }
+			worn = Weapons()
 		end
 		RefreshBags()
 	end
 	ns.On("PLAYER_EQUIPMENT_CHANGED", function(slot)
-		if (slot == INVSLOT_MAINHAND or slot == INVSLOT_OFFHAND) and not pending then
+		if slot ~= INVSLOT_MAINHAND and slot ~= INVSLOT_OFFHAND then
+			return
+		end
+		local main = GetInventoryItemID("player", INVSLOT_MAINHAND)
+		if main and not ns.Fishing.IsPole(main) then
+			seen = Weapons()
+		end
+		if not pending then
 			pending = true
 			C_Timer.After(0.2, Settle)
 		end

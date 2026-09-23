@@ -45,4 +45,10 @@ plan = Model.Plan({ 4, 7 }, function(item)
 	return types[item]
 end)
 assert(plan[1].item == 7 and plan[1].slot == 16 and plan[2].item == 4 and plan[2].slot == 17)
+-- A two-hander leaves no room for a shield, whichever is listed first.
+types[8], types[9] = "INVTYPE_2HWEAPON", "INVTYPE_SHIELD"
+plan = Model.Plan({ 9, 8 }, function(item)
+	return types[item]
+end)
+assert(#plan == 1 and plan[1].item == 8 and plan[1].slot == 16)
 print("gear: ok")
