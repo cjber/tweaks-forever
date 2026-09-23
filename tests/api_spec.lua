@@ -77,20 +77,28 @@ assert(#spells > 10, "a level 18 Shaman who has never seen a trainer still has s
 for _, spell in ipairs(spells) do
 	assert(spell.level <= 18 and not known[spell.spellID], "only what your level allows and you haven't learned")
 	assert(type(spell.name) == "string" and type(spell.line) == "string" and spell.cost, "every fact filled in")
+	assert(env.tContains({ 373, 374, 375 }, spell.lineID), "on a Shaman spellbook tab, by SkillLine ID")
 end
 local bolt = Find(spells, 548)
 assert(bolt and bolt.name == "Lightning Bolt" and bolt.level == 14 and bolt.cost == 900, "the next rank")
-assert(bolt.line == "Elemental Combat")
+assert(bolt.line == "Elemental Combat" and bolt.lineID == 375)
+assert(Find(spells, 8017).line == "Line 373", "a line with no tab yet takes the client's name for it")
 assert(not Find(spells, 915) and not Find(spells, 8056), "nothing above your level")
+tabName = "Elementarkampf"
+bolt = Find(API.TrainableSpells(), 548)
+assert(bolt.line == "Elementarkampf" and bolt.lineID == 375, "a German client: the tab's own name, the same ID")
+tabName = "Elemental Combat"
 
 bolt.name = "Changed by caller"
 assert(Find(API.TrainableSpells(), 548).name == "Lightning Bolt", "fresh copies")
 env.TweaksForeverCharDB = {
 	trainer = {
 		[548] = { name = "Lightning Bolt", level = 14, cost = 700, icon = 1, lineID = 375, line = "Elemental Combat" },
+		[202] = { name = "Two-Handed Swords", level = 1, cost = 1000, icon = 1, line = "Two-Handed Swords" },
 	},
 }
 assert(Find(API.TrainableSpells(), 548).cost == 700, "a trainer visit's fee wins")
+assert(not Find(API.TrainableSpells(), 202), "a weapon trainer's row is on no class tab")
 known[548] = true
 assert(not Find(API.TrainableSpells(), 548), "learned")
 level = 20

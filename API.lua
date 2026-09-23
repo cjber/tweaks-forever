@@ -24,6 +24,7 @@ function API.TrainableSpells()
 				level = spell.level,
 				cost = spell.cost,
 				line = ns.LineName(lineID, spell.line),
+				lineID = lineID,
 			}
 		end
 	end
