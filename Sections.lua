@@ -19,6 +19,8 @@ ns.Sections = Model
 local ITEM, STEP, ORIGIN_Y = 37, 42, 4
 -- Room for a heading above its section, and a gap between the sections and the rest of the bag.
 local HEADING, GAP = 16, 6
+-- Before fishing is a moment rather than a set, so its heading carries the fishing icon to say so.
+local FISHING_ICON = "|TInterface\\Icons\\Trade_Fishing:0|t "
 -- The smallest scale Blizzard shrinks bags to so they fit on screen (CONTAINER_SCALE in ContainerFrame.lua).
 local MIN_SCALE = 0.75
 
@@ -142,7 +144,7 @@ ns.Init(function()
 		end
 		for index, head in ipairs(heads) do
 			local mark, text = firsts[head.section], Heading(index)
-			text:SetText(mark.name)
+			text:SetText(mark.kind == "fishing" and FISHING_ICON .. mark.name or mark.name)
 			text:SetTextColor(unpack(ns.Gear.ColourOf(mark)))
 			text:ClearAllPoints()
 			text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, ORIGIN_Y + head.y + 2)
@@ -150,9 +152,11 @@ ns.Init(function()
 		end
 	end
 
-	-- Blizzard lays the bag out only when it opens, so a change of contents or groups redoes it the same way.
+	-- Blizzard lays the bag out only when it opens, so a change of contents or groups redoes it the same way. While
+	-- equipped weapons are settling, the refresh that ends it lays the bag out, so the moved weapons do not show
+	-- under another section first.
 	local function Relayout()
-		if bag:IsShown() and (sectioned or Active()) then
+		if bag:IsShown() and (sectioned or Active()) and not ns.Gear.Settling() then
 			bag:UpdateFrameSize()
 			bag:UpdateItemLayout()
 			UpdateContainerFrameAnchors()

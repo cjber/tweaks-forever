@@ -49,26 +49,35 @@ local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
 local MAX_DOTS = 4
 -- The border splits into one slice per group; narrower slices stop reading as separate colours.
 local MAX_BORDERS = 4
--- Colours new groups take in turn, each far from every item quality colour (CIEDE2000 18 or more) so a
--- group never reads as a rarity. The next candidates are orange-red, salmon and spring green, too close to
--- Legendary and Uncommon, so a sixth list repeats a colour instead.
+-- Colours new groups take in turn: Catppuccin Mocha's rose, teal, lavender and pink, soft on the dark bag and
+-- each at least CIEDE2000 20 from every item quality colour, so a group never reads as a rarity. Its other
+-- accents sit on a quality's hue (green, peach, sky, sapphire, yellow) or next to one of these, so a fifth list
+-- repeats a colour instead.
 local PALETTE = {
-	{ 1, 0, 0.3 },
-	{ 0.45, 1, 0.86 },
-	{ 0.74, 1, 0.15 },
-	{ 1, 0.45, 0.72 },
-	{ 0.3, 0.4, 1 },
+	{ 243 / 255, 139 / 255, 168 / 255 },
+	{ 148 / 255, 226 / 255, 213 / 255 },
+	{ 180 / 255, 190 / 255, 254 / 255 },
+	{ 245 / 255, 194 / 255, 231 / 255 },
 }
--- The palette before 0.1.3, which lists coloured then still carry unless their colour was picked by hand.
-local RETIRED_PALETTE = {
-	{ 0.3, 0.65, 1 },
-	{ 1, 0.55, 0.15 },
-	{ 0.45, 0.85, 0.3 },
-	{ 0.9, 0.35, 0.9 },
-	{ 1, 0.85, 0.2 },
-	{ 0.25, 0.85, 0.8 },
-	{ 1, 0.35, 0.35 },
-	{ 0.7, 0.55, 1 },
+-- Earlier palettes, which lists coloured then still carry unless their colour was picked by hand.
+local RETIRED_PALETTES = {
+	{
+		{ 1, 0, 0.3 },
+		{ 0.45, 1, 0.86 },
+		{ 0.74, 1, 0.15 },
+		{ 1, 0.45, 0.72 },
+		{ 0.3, 0.4, 1 },
+	},
+	{
+		{ 0.3, 0.65, 1 },
+		{ 1, 0.55, 0.15 },
+		{ 0.45, 0.85, 0.3 },
+		{ 0.9, 0.35, 0.9 },
+		{ 1, 0.85, 0.2 },
+		{ 0.25, 0.85, 0.8 },
+		{ 1, 0.35, 0.35 },
+		{ 0.7, 0.55, 1 },
+	},
 }
 -- The strip sits under the stack count; the border and dots sit over the quality border.
 local LAYERS = { strip = "ARTWORK", border = "OVERLAY", glow = "OVERLAY", dots = "OVERLAY" }
@@ -164,14 +173,16 @@ local function Same(a, b)
 	return math.abs(a[1] - b[1]) < 1e-3 and math.abs(a[2] - b[2]) < 1e-3 and math.abs(a[3] - b[3]) < 1e-3
 end
 
--- Stored colours still on a retired palette entry move to the current one; hand-picked colours stay.
+-- Stored colours still on a retired palette entry are forgotten, so each list takes an unused current colour
+-- the next time it is drawn; hand-picked colours stay.
 function Model.Recolour(colours)
 	for _, byName in pairs(colours) do
 		for name, colour in pairs(byName) do
-			for index, retired in ipairs(RETIRED_PALETTE) do
-				if Same(colour, retired) then
-					byName[name] = { unpack(PALETTE[(index - 1) % #PALETTE + 1]) }
-					break
+			for _, retiredPalette in ipairs(RETIRED_PALETTES) do
+				for _, retired in ipairs(retiredPalette) do
+					if Same(colour, retired) then
+						byName[name] = nil
+					end
 				end
 			end
 		end
@@ -622,6 +633,10 @@ ns.Init(function()
 	-- event per slot, so reading waits a moment for both to settle. A weapon held only between two events, such
 	-- as one swapped in just before the pole, is caught as it passes.
 	local worn, seen, pending = {}, nil, false
+	-- Sections wait for this: the weapons a pole replaced reach the bag before they are known as Before fishing.
+	function Model.Settling()
+		return pending
+	end
 	local function Weapons()
 		return {
 			[INVSLOT_MAINHAND] = GetInventoryItemID("player", INVSLOT_MAINHAND),

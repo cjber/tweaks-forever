@@ -40,11 +40,13 @@ local firstValue = table.concat(first, ",")
 colours.group.DPS = nil
 assert(table.concat(Model.Colour(colours, "fishing", "Before fishing"), ",") == firstValue)
 
--- A colour from the retired palette moves to the current one at the same place; a hand-picked one stays.
-colours = { group = { Old = { 1, 0.55, 0.15 }, Picked = { 0.12, 0.34, 0.56 } } }
+-- Colours from retired palettes are forgotten and taken afresh without doubling up; a hand-picked one stays.
+colours = { group = { Old = { 1, 0.55, 0.15 }, Older = { 1, 0, 0.3 }, Picked = { 0.12, 0.34, 0.56 } } }
 Model.Recolour(colours)
-assert(table.concat(colours.group.Old, ",") == "0.45,1,0.86", table.concat(colours.group.Old, ","))
+assert(colours.group.Old == nil and colours.group.Older == nil)
 assert(table.concat(colours.group.Picked, ",") == "0.12,0.34,0.56")
+local old, older = Model.Colour(colours, "group", "Old"), Model.Colour(colours, "group", "Older")
+assert(table.concat(old, ",") ~= table.concat(older, ","), "each takes its own colour")
 
 -- Slots: the second ring and the second one-hander take the second slot; a spare has nowhere to go.
 local types = {
