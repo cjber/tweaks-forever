@@ -2,6 +2,7 @@ Run from the repository root with Python 3.
 
 ```sh
 python3 tools/gen_overlays.py      # Data/Overlays.lua (stdlib only)
+python3 tools/gen_camp.py          # Data/CampBenefits.lua (stdlib only)
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/screenshots.py       # docs/screenshots/*.png (Pillow)
@@ -19,8 +20,19 @@ Downloads are cached in `tools/.cache/`; `--refresh` downloads again and
 overlays gated by a player condition fail before the output is replaced. Overlays
 with no tiles are counted and skipped.
 
-The *Refresh map data* workflow runs `latest_build.py` daily, and when a newer
-build is listed it bumps `BUILD`, regenerates, runs the checks and opens a PR.
+`gen_camp.py` writes `Data/CampBenefits.lua`: what each camp feature gives, in the
+game's own words and numbers. The Camp Benefits aura's description (`Spell`) is a
+template with one `$?a<aura>[Feature: effect][]` branch per feature aura; the
+script takes each branch and fills in `$w` (effect base points, `SpellEffect`), `$t`
+(effect period) and `$d` (`SpellMisc` duration index into `SpellDuration`). The tent's
+branch only says rest was received, so its entry uses the Camp Tent aura's own
+description instead. It refuses to write a number that depends on level, stats or
+content tuning, and fails on any token it can't resolve. Same cache and flags as
+`gen_overlays.py`.
+
+The *Refresh game data* workflow runs `latest_build.py` daily, and when a newer
+build is listed it bumps `BUILD` in both generators, regenerates, runs the checks and
+opens a PR.
 
 `changelog.py` prints the section of `CHANGELOG.md` for one version; the release
 workflow passes it to the packager as the release notes, and fails on a tag with
