@@ -22,6 +22,19 @@
 ---@field line? string the class skill line (spellbook tab) the spell belongs to
 ---@field cost? number copper
 
+-- A spell a class trainer teaches: { spell, level, fee in copper, index into its class's lines }.
+---@class TFClassSpell
+---@field [1] integer
+---@field [2] integer
+---@field [3] integer
+---@field [4] integer
+---@field needs? integer[] the rank before it, which no trainer teaches: any of these must be known first
+---@field races? integer[] the ChrRaces IDs it is for, when not every race
+
+---@class TFClassSpells
+---@field lines string[] its class skill line names (spellbook tabs)
+---@field spells TFClassSpell[]
+
 ---@class TFFutureSpell
 ---@field id integer
 ---@field spell TFTrainerSpell
@@ -109,6 +122,7 @@ TweaksForeverCharDB = nil
 ---@field CampBenefits TFCampBenefit[]
 ---@field Camp TFCamp
 ---@field FutureSpells TFFutureSpells
+---@field ClassSpells table<string, TFClassSpells> by class token
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels
 ---@field DungeonEntrances table<integer, TFEntrance[]>

@@ -17,6 +17,7 @@ Data\Overlays.lua
 Data\CampBenefits.lua
 Data\ZoneLevels.lua
 Data\DungeonEntrances.lua
+Data\ClassSpells.lua
 Core.lua
 Automation.lua
 Vendor.lua

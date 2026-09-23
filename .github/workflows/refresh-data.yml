@@ -30,9 +30,9 @@ jobs:
             exit 0
           fi
           echo "new=true" >> "$GITHUB_OUTPUT"
-          sed -i -E "s/^BUILD = \".*\"/BUILD = \"$build\"/" tools/gen_overlays.py tools/gen_camp.py tools/gen_zonelevels.py tools/gen_dungeons.py
+          sed -i -E "s/^BUILD = \".*\"/BUILD = \"$build\"/" tools/gen_overlays.py tools/gen_camp.py tools/gen_zonelevels.py tools/gen_dungeons.py tools/gen_classspells.py
       - if: steps.build.outputs.new == 'true'
-        run: python3 tools/gen_overlays.py && python3 tools/gen_camp.py && python3 tools/gen_zonelevels.py && python3 tools/gen_dungeons.py
+        run: python3 tools/gen_overlays.py && python3 tools/gen_camp.py && python3 tools/gen_zonelevels.py && python3 tools/gen_dungeons.py && python3 tools/gen_classspells.py
       - if: steps.build.outputs.new == 'true'
         run: |
           sudo apt-get update && sudo apt-get install -y luajit lua-check
@@ -51,6 +51,6 @@ jobs:
           title: "data: game data for Forever ${{ steps.build.outputs.version }}"
           commit-message: "data: game data for Forever ${{ steps.build.outputs.version }}"
           body: |
-            Regenerated `Data/Overlays.lua` (world map overlays), `Data/CampBenefits.lua` (camp benefit texts), `Data/ZoneLevels.lua` (zone level ranges) and `Data/DungeonEntrances.lua` (dungeon and raid entrances) from the DB2s of Forever build ${{ steps.build.outputs.version }}.
+            Regenerated `Data/Overlays.lua` (world map overlays), `Data/CampBenefits.lua` (camp benefit texts), `Data/ZoneLevels.lua` (zone level ranges) and `Data/DungeonEntrances.lua` (dungeon and raid entrances) and `Data/ClassSpells.lua` (class trainer spells) from the DB2s of Forever build ${{ steps.build.outputs.version }}.
 
-            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers.
+            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers, and `Data/ClassSpells.lua` for spells that dropped out.
