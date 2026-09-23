@@ -26,9 +26,14 @@ ns.Feature({
 	category = "Gear",
 	name = "Mark grouped gear with",
 	tooltip = "How grouped gear shows in your bags, in each group's colour. A strip along the bottom of the slot "
-		.. "keeps clear of the item quality border.",
+		.. "keeps clear of the item quality border; a border rings the icon inside it, one ring per group.",
 	default = "strip",
-	options = { { "strip", "A coloured strip" }, { "dots", "Coloured dots" }, { "none", "Nothing" } },
+	options = {
+		{ "strip", "A coloured strip" },
+		{ "border", "A coloured border" },
+		{ "dots", "Coloured dots" },
+		{ "none", "Nothing" },
+	},
 	parent = "gearGroups",
 })
 
@@ -37,6 +42,15 @@ local WHITE = "Interface\\Buttons\\WHITE8X8"
 local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
 -- Dots sit along the top of a slot; more than this would run off its left edge.
 local MAX_DOTS = 4
+-- Border rings nest inwards; a third would cover too much of the icon.
+local MAX_BORDERS = 2
+-- One border ring: top, bottom, left, right, as { point, x, y, point, x, y } scaled by the ring's inset.
+local EDGES = {
+	{ "TOPLEFT", 1, -1, "TOPRIGHT", -1, -1 },
+	{ "BOTTOMLEFT", 1, 1, "BOTTOMRIGHT", -1, 1 },
+	{ "TOPLEFT", 1, -1, "BOTTOMLEFT", 1, 1 },
+	{ "TOPRIGHT", -1, -1, "BOTTOMRIGHT", -1, 1 },
+}
 -- Colours new groups take in turn.
 local PALETTE = {
 	{ 0.3, 0.65, 1 },
@@ -49,7 +63,7 @@ local PALETTE = {
 	{ 0.7, 0.55, 1 },
 }
 -- The strip sits under the stack count; dots sit over the quality border, clear of the count.
-local LAYERS = { strip = "ARTWORK", dots = "OVERLAY" }
+local LAYERS = { strip = "ARTWORK", border = "ARTWORK", dots = "OVERLAY" }
 -- Where a list comes from: a Tweaks group, an Equipment Manager set, or Before fishing.
 local KINDS = { "group", "set", "fishing" }
 
@@ -324,6 +338,24 @@ ns.Init(function()
 		end
 	end
 
+	local function Border(button, found)
+		for index = 1, math.min(#found, MAX_BORDERS) do
+			local inset = 1 + 2 * index
+			for side, edge in ipairs(EDGES) do
+				local texture = Texture(button, "border", 4 * (index - 1) + side)
+				texture:SetVertexColor(unpack(Colour(found[index])))
+				texture:SetPoint(edge[1], edge[2] * inset, edge[3] * inset)
+				texture:SetPoint(edge[4], edge[5] * inset, edge[6] * inset)
+				if side <= 2 then
+					texture:SetHeight(2)
+				else
+					texture:SetWidth(2)
+				end
+				texture:Show()
+			end
+		end
+	end
+
 	local function Dots(button, found)
 		for index = 1, math.min(#found, MAX_DOTS) do
 			local ring, dot = Texture(button, "dots", 2 * index - 1), Texture(button, "dots", 2 * index)
@@ -359,6 +391,8 @@ ns.Init(function()
 		end
 		if style == "strip" then
 			Strip(button, found)
+		elseif style == "border" then
+			Border(button, found)
 		elseif style == "dots" then
 			Dots(button, found)
 		else
@@ -367,11 +401,7 @@ ns.Init(function()
 	end
 
 	local function RefreshBags()
-		for button in pairs(hooked) do
-			if button:IsShown() then
-				UpdateMarks(button)
-			end
-		end
+		ns.ForEachBagButton(UpdateMarks)
 	end
 
 	local function ToggleGroup(name, itemID)
@@ -465,7 +495,7 @@ ns.Init(function()
 		label = "Group gear",
 		tooltip = "Click bag items to group them, equip their groups or change a group's colour. Right-click or close "
 			.. "your bags to stop.",
-		cursor = "INSPECT_CURSOR",
+		cursor = "INTERACT_CURSOR",
 		Apply = OpenItemMenu,
 	})
 

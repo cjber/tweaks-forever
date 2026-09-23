@@ -70,28 +70,20 @@ ns.Init(function()
 		overlay:Show()
 	end
 
-	local function CoverBag(container)
-		for _, button in container:EnumerateValidItems() do
-			Cover(button)
-		end
-	end
-
 	local function Start(mode)
 		-- The menu can be opened before combat and clicked after it starts.
 		if InCombatLockdown() then
 			return
 		end
 		active = mode
-		for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
-			if container:IsShown() then
-				CoverBag(container)
-			end
-		end
+		ns.ForEachBagButton(Cover)
 	end
 
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
 		if active then
-			CoverBag(container)
+			for _, button in container:EnumerateValidItems() do
+				Cover(button)
+			end
 		end
 	end)
 	EventRegistry:RegisterCallback("ContainerFrame.CloseBag", function()

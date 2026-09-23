@@ -104,11 +104,7 @@ ns.Init(function()
 	end
 
 	local function RefreshBags()
-		for button in pairs(hooked) do
-			if button:IsShown() then
-				UpdateIcon(button)
-			end
-		end
+		ns.ForEachBagButton(UpdateIcon)
 	end
 
 	local function Toggle(bag, slot)
@@ -126,7 +122,7 @@ ns.Init(function()
 		feature = "markJunk",
 		label = "Mark junk",
 		tooltip = "Click bag items to mark or unmark them as junk. Right-click or close your bags to stop.",
-		cursor = "BUY_CURSOR",
+		cursor = "Interface\\MoneyFrame\\UI-GoldIcon",
 		Apply = function(_, bag, slot)
 			Toggle(bag, slot)
 		end,

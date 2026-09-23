@@ -16,6 +16,17 @@ function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
 end
 
+-- Every item button in an open bag. A button of a bag frame not in use can still report IsShown with no slot.
+function ns.ForEachBagButton(fn)
+	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
+		if container:IsShown() then
+			for _, button in container:EnumerateValidItems() do
+				fn(button)
+			end
+		end
+	end
+end
+
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
 -- addon's own setting }; with no `when`, the addon being loaded is the conflict.
 function ns.Feature(feature)
