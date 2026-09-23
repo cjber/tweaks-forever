@@ -8,7 +8,13 @@ import urllib.request
 request = urllib.request.Request("https://wago.tools/api/builds", headers={"User-Agent": "TweaksForever/1.0"})
 with urllib.request.urlopen(request, timeout=60) as response:
     builds = json.load(response)["wow_classic_beta"]
-forever = [b["version"] for b in builds if b["version"].startswith("1.6")]
+forever: list[str] = [b["version"] for b in builds if b["version"].startswith("1.6")]
 if not forever:
     raise SystemExit("no Forever build listed on wago.tools")
-print(max(forever, key=lambda v: tuple(int(p) for p in v.split("."))))
+
+
+def version_key(version: str) -> tuple[int, ...]:
+    return tuple(int(part) for part in version.split("."))
+
+
+print(max(forever, key=version_key))

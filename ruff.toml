@@ -4,3 +4,7 @@ target-version = "py311"
 
 [lint]
 select = ["E", "F", "I", "UP", "B", "EXE"]
+
+[lint.per-file-ignores]
+# Imports wowmock after putting its directory on sys.path.
+"tools/screenshots.py" = ["E402"]

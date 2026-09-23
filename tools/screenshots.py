@@ -15,7 +15,8 @@ if not (WOWMOCK / "wowmock.py").exists():
     sys.exit(f"wowmock.py not found in {WOWMOCK}; set WOWMOCK to the directory that holds it")
 sys.path.insert(0, str(WOWMOCK))
 
-from wowmock import (
+# wowmock resolves from $WOWMOCK at runtime (sys.path above), so ty cannot see it.
+from wowmock import (  # ty: ignore[unresolved-import]
     NORMAL,
     MenuButton,
     MenuCheckbox,
@@ -36,7 +37,11 @@ PLAYER_LEVEL = 22
 MARGIN = 28
 
 # Gear.lua PALETTE, taken in turn as the groups were created.
-GROUPS = {"DPS": (243 / 255, 139 / 255, 168 / 255), "Levelling": (148 / 255, 226 / 255, 213 / 255), "Tank": (180 / 255, 190 / 255, 254 / 255)}
+GROUPS = {
+    "DPS": (243 / 255, 139 / 255, 168 / 255),
+    "Levelling": (148 / 255, 226 / 255, 213 / 255),
+    "Tank": (180 / 255, 190 / 255, 254 / 255),
+}
 HOVERED = 4
 # Backpack slots in order: (itemID, stack count, groups).
 BAG = [
