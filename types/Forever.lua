@@ -93,6 +93,7 @@ function GetTrainerServiceInfo(index) end
 ---@field HealthBarsContainer Frame|{healthBar: NamePlateHealthBar}
 ---@field CastBarsContainer Frame|{castBar: NamePlateCastBar}
 ---@field PlayerLevelDiffFrame NamePlateLevelFrame
+---@field LevelFrame Frame
 ---@field name FontString
 ---@field unit UnitToken?
 ---@field widgetsOnlyMode boolean?

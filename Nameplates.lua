@@ -65,8 +65,10 @@ end
 ---@param bar NamePlateHealthBar
 local function HealthArt(frame, bar)
 	bar.barTexture:SetAtlas("widgetstatusbar-fill-white")
+	-- The Classic style moves this background above the fill; the trough goes back under it.
 	bar.bgTexture:ClearAllPoints()
 	bar.bgTexture:SetAllPoints(bar)
+	bar.bgTexture:SetDrawLayer("BACKGROUND", 0)
 	bar.bgTexture:SetColorTexture(unpack(TROUGH))
 	bar.deselectedOverlay:SetAlpha(0)
 	local glow = bar.selectedBorder
@@ -119,6 +121,8 @@ local function Layout(frame)
 	if level.selectedBorder then
 		level.selectedBorder:SetAlpha(0)
 	end
+	-- The Classic style's own level, set into its bar border, would repeat it.
+	frame.LevelFrame:SetAlpha(0)
 
 	-- Blizzard's plain nameplate font: it notes an outline is harder to read outside the bar.
 	local name = frame.name
