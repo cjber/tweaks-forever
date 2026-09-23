@@ -4,9 +4,10 @@ ns.Feature({
 	key = "gearGroups",
 	category = "Gear",
 	name = "Group gear with Ctrl+Right-click",
-	tooltip = "Ctrl+Right-click a bag item to put it in a named group, such as Healing, DPS or Levelling, or to "
-		.. "start a new one. The same menu equips a whole group and picks each group's colour. Items in a group "
-		.. "or an Equipment Manager set are marked in your bags and named in their tooltip.",
+	tooltip = "Ctrl+Right-click a bag item, or pick Group gear from a bag's portrait menu, to put it in a named "
+		.. "group, such as Healing, DPS or Levelling, or to start a new one. The same menu equips a whole group "
+		.. "and picks each group's colour. Items in a group or an Equipment Manager set are marked in your bags "
+		.. "and named in their tooltip.",
 	default = true,
 })
 
@@ -452,6 +453,22 @@ ns.Init(function()
 		end)
 	end
 
+	local function OpenItemMenu(owner, bag, slot)
+		local itemID = C_Container.GetContainerItemID(bag, slot)
+		if itemID and select(4, C_Item.GetItemInfoInstant(itemID)) ~= "" then
+			OpenMenu(owner, itemID)
+		end
+	end
+
+	ns.ClickMode({
+		feature = "gearGroups",
+		label = "Group gear",
+		tooltip = "Click bag items to group them, equip their groups or change a group's colour. Right-click or close "
+			.. "your bags to stop.",
+		cursor = "INSPECT_CURSOR",
+		Apply = OpenItemMenu,
+	})
+
 	local function Click(button, mouseButton)
 		if
 			mouseButton ~= "RightButton"
@@ -469,10 +486,7 @@ ns.Init(function()
 				return
 			end
 		end
-		local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
-		if itemID and select(4, C_Item.GetItemInfoInstant(itemID)) ~= "" then
-			OpenMenu(button, itemID)
-		end
+		OpenItemMenu(button, button:GetBagID(), button:GetID())
 	end
 
 	-- A bag reports its size before its buttons exist, so a slot can have no button yet.

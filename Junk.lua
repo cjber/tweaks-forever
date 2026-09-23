@@ -11,7 +11,8 @@ ns.Feature({
 	key = "markJunk",
 	category = "Vendors",
 	name = "Mark items as junk",
-	tooltip = "Alt+Right-click a bag item to toggle its account-wide junk mark."
+	tooltip = "Alt+Right-click a bag item, or pick Mark junk from a bag's portrait menu, to toggle its account-wide"
+		.. " junk mark."
 		.. " The merchant's Sell All Junk also sells marked items.",
 	default = false,
 	conflicts = conflicts,
@@ -110,6 +111,27 @@ ns.Init(function()
 		end
 	end
 
+	local function Toggle(bag, slot)
+		local info = C_Container.GetContainerItemInfo(bag, slot)
+		if not info or info.isLocked then
+			return false
+		end
+		Model.Toggle(TweaksForeverDB.junk, info.itemID)
+		RefreshBags()
+		UpdateMerchantButton()
+		return true
+	end
+
+	ns.ClickMode({
+		feature = "markJunk",
+		label = "Mark junk",
+		tooltip = "Click bag items to mark or unmark them as junk. Right-click or close your bags to stop.",
+		cursor = "BUY_CURSOR",
+		Apply = function(_, bag, slot)
+			Toggle(bag, slot)
+		end,
+	})
+
 	local function Mark(button, mouseButton)
 		if
 			mouseButton ~= "RightButton"
@@ -127,14 +149,7 @@ ns.Init(function()
 				return
 			end
 		end
-		local info = Info(button)
-		if not info or info.isLocked then
-			return
-		end
-		Model.Toggle(TweaksForeverDB.junk, info.itemID)
-		RefreshBags()
-		UpdateMerchantButton()
-		if GameTooltip:GetOwner() == button then
+		if Toggle(button:GetBagID(), button:GetID()) and GameTooltip:GetOwner() == button then
 			button:OnUpdate()
 		end
 	end

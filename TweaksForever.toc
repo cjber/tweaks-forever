@@ -15,6 +15,7 @@ Data\Overlays.lua
 Core.lua
 Automation.lua
 Vendor.lua
+Modes.lua
 Junk.lua
 Gear.lua
 Exploration.lua
