@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local addonName, ns = ...
 
 local KEY = "retailTooltips"
@@ -135,7 +136,9 @@ local function HealthBar()
 				BreakUpLargeNumbers(UnitHealthMax(unit))
 			)
 		else
-			text:SetFormattedText("%.0f%%", UnitHealthPercent(unit, true, CurveConstants.ScaleTo100))
+			-- ScaleTo100 is numeric; the API's return union also covers colour curves.
+			local percent = UnitHealthPercent(unit, true, CurveConstants.ScaleTo100) --[[@as number]]
+			text:SetFormattedText("%.0f%%", percent)
 		end
 		text:Show()
 	end
@@ -283,8 +286,8 @@ local function UnitLines()
 					line:SetText(text:sub(1, stop) .. " " .. className .. text:sub(stop + 1))
 				end
 			elseif levelLine and (text == FACTION_ALLIANCE or text == FACTION_HORDE) then
-				color = PLAYER_FACTION_COLORS[text == FACTION_ALLIANCE and 1 or 0]
-				line:SetTextColor(color.r, color.g, color.b)
+				local factionColor = PLAYER_FACTION_COLORS[text == FACTION_ALLIANCE and 1 or 0]
+				line:SetTextColor(factionColor.r, factionColor.g, factionColor.b)
 			end
 		end
 		-- One line between the name and the level line is the guild.

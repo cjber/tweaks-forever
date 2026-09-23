@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -80,6 +81,7 @@ local RETIRED_PALETTES = {
 	},
 }
 -- The strip sits under the stack count; the border and dots sit over the quality border.
+---@type table<string, DrawLayer>
 local LAYERS = { strip = "ARTWORK", border = "OVERLAY", glow = "OVERLAY", dots = "OVERLAY" }
 -- Where a list comes from: a Tweaks group, an Equipment Manager set, or Before fishing.
 local KINDS = { "group", "set", "fishing" }
@@ -115,10 +117,23 @@ local SLOTS = {
 -- A two-hander also needs the off-hand slot empty.
 local BLOCKS = { INVTYPE_2HWEAPON = 17 }
 
+---@class TFGearMark
+---@field kind string
+---@field name string
+
+---@class TFEquipStep
+---@field item integer
+---@field slot integer
+
+---@class TFGear
 local Model = {}
 ns.Gear = Model
 
 -- Put itemID in or out of the named group. A group left empty is removed. Returns whether it is now in.
+---@param groups TFGroups
+---@param name string
+---@param itemID integer
+---@return boolean
 function Model.Toggle(groups, name, itemID)
 	local group = groups[name] or {}
 	group[itemID] = not group[itemID] or nil
@@ -127,6 +142,9 @@ function Model.Toggle(groups, name, itemID)
 end
 
 -- Every list an item is in, as { kind, name } sorted by name, from { [kind] = { [name] = { [itemID] = true } } }.
+---@param itemID integer
+---@param lists table<string, TFGroups>
+---@return TFGearMark[]
 function Model.GroupsOf(itemID, lists)
 	local found = {}
 	for _, kind in ipairs(KINDS) do
@@ -146,6 +164,10 @@ function Model.GroupsOf(itemID, lists)
 end
 
 -- A list's { r, g, b }. The first time, it takes the first palette colour no other list has, then cycles.
+---@param colours TFColours
+---@param kind string
+---@param name string|integer
+---@return TFColour
 function Model.Colour(colours, kind, name)
 	colours[kind] = colours[kind] or {}
 	if colours[kind][name] then
@@ -169,12 +191,16 @@ function Model.Colour(colours, kind, name)
 	return colours[kind][name]
 end
 
+---@param a TFColour
+---@param b TFColour
+---@return boolean
 local function Same(a, b)
 	return math.abs(a[1] - b[1]) < 1e-3 and math.abs(a[2] - b[2]) < 1e-3 and math.abs(a[3] - b[3]) < 1e-3
 end
 
 -- Stored colours still on a retired palette entry are forgotten, so each list takes an unused current colour
 -- the next time it is drawn; hand-picked colours stay.
+---@param colours TFColours
 function Model.Recolour(colours)
 	for _, byName in pairs(colours) do
 		for name, colour in pairs(byName) do
@@ -190,6 +216,9 @@ function Model.Recolour(colours)
 end
 
 -- { { item, slot } } in slot order for a group's items, given each item's inventory type.
+---@param items integer[]
+---@param equipLoc fun(itemID: integer): string?
+---@return TFEquipStep[]
 function Model.Plan(items, equipLoc)
 	-- Fewest choices first, so a main-hand-only weapon is not crowded out by a one-hander.
 	local ordered = { unpack(items) }
@@ -273,6 +302,7 @@ local function CanEquip()
 	return true
 end
 
+---@param plan TFEquipStep[]
 local function EquipPlan(plan)
 	if not CanEquip() then
 		return
@@ -284,13 +314,14 @@ local function EquipPlan(plan)
 	end
 end
 
+---@param name string
 local function EquipGroup(name)
 	local items = {}
 	for itemID in pairs(Char().groups[name] or {}) do
 		items[#items + 1] = itemID
 	end
 	EquipPlan(Model.Plan(items, function(itemID)
-		return select(4, C_Item.GetItemInfoInstant(itemID))
+		return (select(4, C_Item.GetItemInfoInstant(itemID)))
 	end))
 end
 
@@ -305,6 +336,7 @@ local function EquipBeforeFishing()
 	EquipPlan(plan)
 end
 
+---@param name string
 local function EquipSet(name)
 	local _, ids = StockSets()
 	if CanEquip() and ids[name] then
@@ -318,6 +350,8 @@ local function Lists()
 	return { group = Char().groups, set = (StockSets()), fishing = BeforeFishing() }
 end
 
+---@param mark TFGearMark
+---@return TFColour
 local function Colour(mark)
 	if mark.kind == "set" then
 		local _, ids = StockSets()
@@ -327,15 +361,20 @@ local function Colour(mark)
 end
 
 -- For Sections.lua: the lists an item is in, a list's colour, and a call after every refresh of the marks.
+---@param itemID integer
+---@return TFGearMark[]
 function Model.MarksOf(itemID)
 	return Model.GroupsOf(itemID, Lists())
 end
 Model.ColourOf = Colour
 local refreshed = {}
+---@param fn fun()
 function Model.OnRefresh(fn)
 	refreshed[#refreshed + 1] = fn
 end
 
+---@param mark TFGearMark
+---@return string
 local function Coloured(mark)
 	local r, g, b = unpack(Colour(mark))
 	return string.format(
@@ -353,8 +392,14 @@ ns.Init(function()
 	Char().colours = Char().colours or {}
 	Model.Recolour(Char().colours)
 	-- [button] = { [style] = textures }, made on first use.
-	local hooked, marks = {}, {}
+	local hooked = {}
+	---@type table<ContainerFrameItemButtonTemplate, table<string, Texture[]>>
+	local marks = {}
 
+	---@param button ContainerFrameItemButtonTemplate
+	---@param style string
+	---@param index integer
+	---@return Texture
 	local function Texture(button, style, index)
 		marks[button] = marks[button] or {}
 		local pool = marks[button][style] or {}
@@ -372,6 +417,8 @@ ns.Init(function()
 		return pool[index]
 	end
 
+	---@param button ContainerFrameItemButtonTemplate
+	---@param found TFGearMark[]
 	local function Strip(button, found)
 		local back = Texture(button, "strip", 1)
 		back:SetVertexColor(0, 0, 0, 0.8)
@@ -390,6 +437,8 @@ ns.Init(function()
 	end
 
 	-- One slice per group across the quality border's frame, with the new-item glow behind it split the same way.
+	---@param button ContainerFrameItemButtonTemplate
+	---@param found TFGearMark[]
 	local function Border(button, found)
 		local frame, count = button.IconBorder, math.min(#found, MAX_BORDERS)
 		local glow = C_Texture.GetAtlasInfo(GLOW)
@@ -418,6 +467,8 @@ ns.Init(function()
 		end
 	end
 
+	---@param button ContainerFrameItemButtonTemplate
+	---@param found TFGearMark[]
 	local function Dots(button, found)
 		for index = 1, math.min(#found, MAX_DOTS) do
 			local ring, dot = Texture(button, "dots", 2 * index - 1), Texture(button, "dots", 2 * index)
@@ -433,6 +484,7 @@ ns.Init(function()
 		end
 	end
 
+	---@param button ContainerFrameItemButtonTemplate
 	local function UpdateMarks(button)
 		for _, pool in pairs(marks[button] or {}) do
 			for _, texture in ipairs(pool) do
@@ -469,6 +521,8 @@ ns.Init(function()
 		end
 	end
 
+	---@param name string
+	---@param itemID integer
 	local function ToggleGroup(name, itemID)
 		Model.Toggle(Char().groups, name, itemID)
 		if not Char().groups[name] and Char().colours.group then
@@ -477,6 +531,7 @@ ns.Init(function()
 		RefreshBags()
 	end
 
+	---@param mark TFGearMark
 	local function PickColour(mark)
 		local colour = Colour(mark)
 		local function Set(r, g, b)
@@ -496,6 +551,7 @@ ns.Init(function()
 		})
 	end
 
+	---@param itemID integer
 	local function NewGroup(itemID)
 		StaticPopup_ShowCustomGenericInputBox({
 			text = "New gear group",
@@ -509,6 +565,8 @@ ns.Init(function()
 		})
 	end
 
+	---@param button Button
+	---@param itemID integer
 	local function OpenMenu(button, itemID)
 		MenuUtil.CreateContextMenu(button, function(_, root)
 			root:CreateTitle(C_Item.GetItemNameByID(itemID) or "")
@@ -548,6 +606,9 @@ ns.Init(function()
 		end)
 	end
 
+	---@param owner Button
+	---@param bag integer
+	---@param slot integer
 	local function OpenItemMenu(owner, bag, slot)
 		local itemID = C_Container.GetContainerItemID(bag, slot)
 		if itemID and select(4, C_Item.GetItemInfoInstant(itemID)) ~= "" then
@@ -564,6 +625,8 @@ ns.Init(function()
 		Apply = OpenItemMenu,
 	})
 
+	---@param button ContainerFrameItemButtonTemplate
+	---@param mouseButton string
 	local function Click(button, mouseButton)
 		if
 			mouseButton ~= "RightButton"
@@ -584,6 +647,8 @@ ns.Init(function()
 
 	ns.HookBagButtons(hooked, UpdateMarks, Click)
 
+	---@param tooltip GameTooltip
+	---@param itemID integer?
 	local function AddTooltipLine(tooltip, itemID)
 		if not ns.Active("gearGroups") or not itemID then
 			return

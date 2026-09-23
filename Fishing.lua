@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 -- Fishing addons that already cast on a double-click and manage lures and sound.
@@ -59,14 +60,21 @@ local LURES = {
 
 local SOUNDS = { Sound_SFXVolume = "1", Sound_MusicVolume = "0", Sound_AmbienceVolume = "0" }
 
+---@class TFFishing
 local Model = {}
 ns.Fishing = Model
 
+---@param last number?
+---@param now number
+---@return boolean
 function Model.IsDoubleClick(last, now)
 	return last ~= nil and now - last < DOUBLE_CLICK and now - last > MIN_DOUBLE_CLICK
 end
 
 -- The best lure carried that this fishing skill can use, or nil. count(item) is how many are in the bags.
+---@param count fun(item: integer): number
+---@param skill number
+---@return integer?
 function Model.BestLure(count, skill)
 	for _, lure in ipairs(LURES) do
 		if skill >= lure.skill and count(lure.item) > 0 then
@@ -75,6 +83,8 @@ function Model.BestLure(count, skill)
 	end
 end
 
+---@param item integer
+---@return boolean
 function Model.IsPole(item)
 	local _, _, _, _, _, classID, subclassID = C_Item.GetItemInfoInstant(item)
 	return classID == Enum.ItemClass.Weapon and subclassID == Enum.ItemWeaponSubclass.Fishingpole

@@ -7,7 +7,7 @@ description: "Project profile for sift in Tweaks Forever: the exact quality-gate
 
 A World of Warcraft addon for the WoW: Forever client (`## Interface: 16001`; the client's own UI code is
 called "Camelot" in comments). Lua 5.1 run by the game, loaded in `.toc` order, no `require`. Packaged by
-the BigWigs packager on a `v*` tag; players install the zip. Two stdlib-only Python scripts under `tools/`
+the BigWigs packager on a `v*` tag; players install the zip. Stdlib-only Python scripts under `tools/`
 support it. Headless specs run under LuaJIT with stubbed WoW globals; they cannot exercise the real client.
 
 ## Gate
@@ -18,6 +18,7 @@ Run in order from the repository root. All must pass before and after any audit 
 |---|---|---|
 | Format (Lua) | `stylua --check .` (StyLua 2.5.2) | exit 0 |
 | Lint (Lua) | `luacheck .` | `0 warnings / 0 errors` |
+| Types (Lua) | `tools/typecheck.sh` (LuaLS 3.19.1) | no diagnostics; multi-value lint and tooling tests pass |
 | Tests (Lua) | specs loop (below) | each prints `…: ok`, exit 0 |
 | Lint + format (Python) | `ruff check tools && ruff format --check tools` (ruff 0.16.8, `ruff.toml`) | exit 0 |
 | Types (Python) | `uvx ty@0.0.83 check tools` | `All checks passed!` |
@@ -36,7 +37,6 @@ On-demand tools for audits. Output is candidates, never verdicts.
 
 | Concern | Command | Known false positives |
 |---|---|---|
-| Types (Lua) | `lua-language-server --check=. --checklevel=Warning --check_format=json --check_out_path=.sift/runs/evidence/luals.json` | `.luarc.json` lists the host globals explicitly (keep it in sync with `.luacheckrc`). Known: 4 `redundant-parameter` hits on the `ShouldDisplayMessageType` stub in `tests/errors_spec.lua`. Exit 1 whenever anything is reported; read the JSON. |
 | Dead code (Lua) | `luacheck .` (unused locals/args are in the gate) plus the live-roots search below | Model functions used only by specs are live: specs are the reason they are exported. |
 | Dead code (Python) | `uvx vulture tools --min-confidence 60` | none seen |
 | Duplication | `npx --yes jscpd@4 --silent --reporters json --output .sift/runs/evidence/jscpd --ignore "**/.sift/**,**/Data/*.lua" .` | the spec files share a 10-line `ns` stub preamble on purpose (each spec is standalone) |

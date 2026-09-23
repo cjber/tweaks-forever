@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -17,18 +18,26 @@ ns.Feature({
 	},
 })
 
+---@class TFReagents
 local Model = {}
 ns.Reagents = Model
 
 local Sections = ns.Sections
 
 -- Rows the reagent bag takes at the bottom of the combined bag.
+---@param slots integer
+---@param columns integer
+---@return integer
 local function Rows(slots, columns)
 	return math.ceil(slots / columns)
 end
 
 -- A reagent slot's column counted from the right and height above the money frame: slot 1 at the top left, read
 -- left to right like the gear sections, the last row resting on the money frame where Blizzard's grid starts.
+---@param slot integer
+---@param slots integer
+---@param columns integer
+---@return integer, number
 function Model.Place(slot, slots, columns)
 	local index = slot - 1
 	local row = math.floor(index / columns)
@@ -36,6 +45,9 @@ function Model.Place(slot, slots, columns)
 end
 
 -- How much the reagent rows and the gap above them lift the rest of the bag.
+---@param slots integer
+---@param columns integer
+---@return number
 function Model.Lift(slots, columns)
 	return Rows(slots, columns) * Sections.STEP + Sections.GAP
 end
@@ -72,7 +84,8 @@ ns.Init(function()
 			chrome = {}
 			for _, child in ipairs({ reagents:GetChildren() }) do
 				-- Item buttons carry the container item mixin; everything else is the window around them.
-				if not child.GetSlotAndBagID then
+				local item = child --[[@as TFBagChild]]
+				if not item.GetSlotAndBagID then
 					chrome[#chrome + 1] = { object = child, alpha = child:GetAlpha(), mouse = child:IsMouseEnabled() }
 				end
 			end
@@ -83,6 +96,8 @@ ns.Init(function()
 		return chrome
 	end
 
+	---@param button ContainerFrameItemButtonTemplate
+	---@return Texture
 	local function Background(button)
 		if not backgrounds[button] then
 			local texture = button:CreateTexture(nil, "BACKGROUND", "ItemSlotBackgroundCombinedBagsTemplate", -6)
@@ -141,6 +156,7 @@ ns.Init(function()
 
 	-- Blizzard sizes the bag before laying it out, so this decides whether the reagent bag is in it: not when the
 	-- taller bag would run off the screen even at the smallest scale, as its top rows could not be reached.
+	---@param container ContainerFrameCombinedBags
 	local function Grow(container)
 		if Wanted() then
 			local lift = Model.Lift(reagents:GetBagSize(), container:GetColumns())

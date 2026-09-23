@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -9,12 +10,15 @@ ns.Feature({
 	default = true,
 })
 
+---@class TFTrainable
 local Model = {}
 ns.Trainable = Model
 
 -- The trainer rows worth keeping: ones you can learn now and ones your level does not allow yet. "used" is learned.
 local KEEP = { available = true, unavailable = true }
 
+---@param a TFTrainerSpell
+---@param b TFTrainerSpell
 local function ByName(a, b)
 	if a.name ~= b.name then
 		return a.name < b.name
@@ -23,7 +27,13 @@ local function ByName(a, b)
 end
 
 -- The remembered spells not yet known: those your level allows, and the rest in groups by level, lowest first.
+---@param spells table<integer, TFTrainerSpell>
+---@param level number
+---@param IsKnown fun(id: integer): boolean?
+---@return TFTrainerSpell[] ready
+---@return TFTrainerGroup[] later
 function Model.Plan(spells, level, IsKnown)
+	---@type TFTrainerSpell[], TFTrainerGroup[], table<number, TFTrainerGroup>
 	local ready, later, byLevel = {}, {}, {}
 	for id, spell in pairs(spells) do
 		if not IsKnown(id) then
@@ -54,6 +64,9 @@ local function Count(n)
 	return n == 1 and "1 spell" or n .. " spells"
 end
 
+---@param ready TFTrainerSpell[]
+---@param later TFTrainerGroup[]
+---@return string
 function Model.Summary(ready, later)
 	local parts = {}
 	if #ready > 0 then
@@ -65,12 +78,15 @@ function Model.Summary(ready, later)
 	return #parts > 0 and table.concat(parts, "  ·  ") or "Every trainer spell learned"
 end
 
+---@param spell TFTrainerSpell
+---@return string
 function Model.Label(spell)
 	return spell.rank and ("%s (%s)"):format(spell.name, spell.rank) or spell.name
 end
 
 ns.Init(function()
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
+	---@type Frame, FontString, TFTrainerSpell[]?, TFTrainerGroup[]?
 	local bar, text, ready, later
 
 	local function Known(id)
@@ -78,7 +94,7 @@ ns.Init(function()
 	end
 
 	local function ShowTooltip()
-		if not ready then
+		if not ready or not later then
 			return
 		end
 		GameTooltip:SetOwner(bar, "ANCHOR_NONE")
@@ -106,6 +122,7 @@ ns.Init(function()
 	end
 
 	-- Level up reports the new level before UnitLevel has it.
+	---@param level? number
 	local function Refresh(level)
 		if not bar or not bar:GetParent():IsVisible() then
 			return
@@ -156,7 +173,7 @@ ns.Init(function()
 		for kind in pairs(KEEP) do
 			if not GetTrainerServiceTypeFilter(kind) then
 				shown[#shown + 1] = kind
-				SetTrainerServiceTypeFilter(kind, true)
+				SetTrainerServiceTypeFilter(kind, true, false)
 			end
 		end
 		local spells = TweaksForeverCharDB.trainer or {}
@@ -173,7 +190,7 @@ ns.Init(function()
 			end
 		end
 		for _, kind in ipairs(shown) do
-			SetTrainerServiceTypeFilter(kind, false)
+			SetTrainerServiceTypeFilter(kind, false, false)
 		end
 		if next(spells) then
 			TweaksForeverCharDB.trainer = spells
