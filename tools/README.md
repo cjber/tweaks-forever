@@ -3,6 +3,7 @@ Run from the repository root with Python 3.
 ```sh
 python3 tools/gen_overlays.py      # Data/Overlays.lua (stdlib only)
 python3 tools/gen_camp.py          # Data/CampBenefits.lua (stdlib only)
+python3 tools/gen_zonelevels.py    # Data/ZoneLevels.lua (stdlib only)
 python3 tools/gen_dungeons.py      # Data/DungeonEntrances.lua (stdlib only)
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
@@ -31,6 +32,14 @@ branch only says rest was received, so its entry uses the Camp Tent aura's own
 description instead. It refuses to write a number that depends on level, stats or
 content tuning, and fails on any token it can't resolve. Same cache and flags as
 `gen_overlays.py`.
+
+`gen_zonelevels.py` writes `Data/ZoneLevels.lua`: each zone's level range, which
+Forever's client leaves empty (its `UiMap` and `AreaTable` carry no content tuning).
+Zones of the original game take their published range, listed in the script. Forever's
+own zones take the lowest and highest `AreaTable.ExplorationLevel` among their
+subzones. Cities and battlegrounds are left out; so is a new zone with no exploration
+level, which the run lists. A published zone missing from the maps fails the run.
+Same cache and flags as `gen_overlays.py`.
 
 `gen_dungeons.py` writes `Data/DungeonEntrances.lua`: where each dungeon and raid
 entrance sits on the world map. Blizzard's map asks `C_EncounterJournal`, which is

@@ -129,6 +129,7 @@ stylua --check .                                # format
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
 python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
+python3 tools/gen_dungeons.py                   # regenerate Data/DungeonEntrances.lua from wago.tools
 python3 tools/gen_zonelevels.py                 # regenerate Data/ZoneLevels.lua from wago.tools
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
