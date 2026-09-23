@@ -186,7 +186,85 @@ local function AddFeature(tooltip, aura)
 	end
 end
 
-ns.Init(function()
+-- Where you last lit a campfire or gained Camp Benefits, which only a campfire's side grants.
+---@type {x: number, y: number, map: integer}?
+local fire
+local benefitsInstance
+
+---@return number?, number?, integer?
+local function Here()
+	local x, y, _, map = UnitPosition("player")
+	if not (canaccessvalue(x) and canaccessvalue(y) and canaccessvalue(map)) or not (x and y and map) then
+		return nil
+	end
+	return x, y, map
+end
+
+local function Remember()
+	local x, y, map = Here()
+	if x and y and map then
+		fire = { x = x, y = y, map = map }
+	end
+end
+
+---@return string?
+local function Direction()
+	local x, y, map = Here()
+	local facing = GetPlayerFacing()
+	if not fire or not x or map ~= fire.map or not canaccessvalue(facing) or not facing then
+		return nil
+	end
+	local north, west = fire.x - x, fire.y - y
+	if north ^ 2 + west ^ 2 > NEARBY_YARDS ^ 2 then
+		return nil
+	end
+	return Toward(north, west, facing)
+end
+
+-- Campfire Nearby: the benefits you have and which way the campfire is.
+---@param tooltip GameTooltip
+local function AddNearby(tooltip)
+	local direction = Direction()
+	local active = {}
+	for _, row in ipairs(Listing(Remaining)) do
+		if row.left then
+			active[#active + 1] = row
+		end
+	end
+	if not direction and #active == 0 then
+		return
+	end
+	tooltip:AddLine(" ")
+	if direction then
+		tooltip:AddLine(direction, HIGHLIGHT_FONT_COLOR:GetRGB())
+	end
+	for _, row in ipairs(active) do
+		AddRow(tooltip, row)
+	end
+	tooltip:Show()
+end
+
+-- The Camp Benefits buff lists only what you have: add what the rest would give.
+---@param tooltip GameTooltip
+local function AddMissing(tooltip)
+	local missing = {}
+	for _, row in ipairs(Listing(Remaining)) do
+		if not row.left then
+			missing[#missing + 1] = row
+		end
+	end
+	if #missing == 0 then
+		return
+	end
+	tooltip:AddLine(" ")
+	tooltip:AddLine("Not yet gained:", GRAY_FONT_COLOR:GetRGB())
+	for _, row in ipairs(missing) do
+		AddRow(tooltip, row)
+	end
+	tooltip:Show()
+end
+
+local function InitTooltips()
 	local byEntry, byName = {}, {}
 	for _, feature in ipairs(FEATURES) do
 		local spell, entry, aura = unpack(feature)
@@ -223,84 +301,6 @@ ns.Init(function()
 		tooltip:Show()
 	end)
 
-	-- Where you last lit a campfire or gained Camp Benefits, which only a campfire's side grants.
-	---@type {x: number, y: number, map: integer}?
-	local fire
-	local benefitsInstance
-
-	---@return number?, number?, integer?
-	local function Here()
-		local x, y, _, map = UnitPosition("player")
-		if not (canaccessvalue(x) and canaccessvalue(y) and canaccessvalue(map)) or not (x and y and map) then
-			return nil
-		end
-		return x, y, map
-	end
-
-	local function Remember()
-		local x, y, map = Here()
-		if x and y and map then
-			fire = { x = x, y = y, map = map }
-		end
-	end
-
-	---@return string?
-	local function Direction()
-		local x, y, map = Here()
-		local facing = GetPlayerFacing()
-		if not fire or not x or map ~= fire.map or not canaccessvalue(facing) or not facing then
-			return nil
-		end
-		local north, west = fire.x - x, fire.y - y
-		if north ^ 2 + west ^ 2 > NEARBY_YARDS ^ 2 then
-			return nil
-		end
-		return Toward(north, west, facing)
-	end
-
-	-- Campfire Nearby: the benefits you have and which way the campfire is.
-	---@param tooltip GameTooltip
-	local function AddNearby(tooltip)
-		local direction = Direction()
-		local active = {}
-		for _, row in ipairs(Listing(Remaining)) do
-			if row.left then
-				active[#active + 1] = row
-			end
-		end
-		if not direction and #active == 0 then
-			return
-		end
-		tooltip:AddLine(" ")
-		if direction then
-			tooltip:AddLine(direction, HIGHLIGHT_FONT_COLOR:GetRGB())
-		end
-		for _, row in ipairs(active) do
-			AddRow(tooltip, row)
-		end
-		tooltip:Show()
-	end
-
-	-- The Camp Benefits buff lists only what you have: add what the rest would give.
-	---@param tooltip GameTooltip
-	local function AddMissing(tooltip)
-		local missing = {}
-		for _, row in ipairs(Listing(Remaining)) do
-			if not row.left then
-				missing[#missing + 1] = row
-			end
-		end
-		if #missing == 0 then
-			return
-		end
-		tooltip:AddLine(" ")
-		tooltip:AddLine("Not yet gained:", GRAY_FONT_COLOR:GetRGB())
-		for _, row in ipairs(missing) do
-			AddRow(tooltip, row)
-		end
-		tooltip:Show()
-	end
-
 	-- Only your own buffs: the lines are about your auras.
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.UnitAura, function(tooltip, data)
 		if tooltip ~= GameTooltip or not ns.Active("campTooltips") or AurasSecret() then
@@ -320,7 +320,9 @@ ns.Init(function()
 			AddMissing(tooltip)
 		end
 	end)
+end
 
+local function TrackCampfire()
 	ns.On("UNIT_SPELLCAST_SUCCEEDED", function(unit, _, spell)
 		if unit == "player" and canaccessvalue(spell) and CAMPFIRES[spell] then
 			Remember()
@@ -350,4 +352,9 @@ ns.Init(function()
 			end
 		end
 	end)
+end
+
+ns.Init(function()
+	InitTooltips()
+	TrackCampfire()
 end)
