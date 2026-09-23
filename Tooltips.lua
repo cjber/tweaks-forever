@@ -1,13 +1,13 @@
 ---@type string, TFNamespace
 local addonName, ns = ...
 
-local KEY = "retailTooltips"
+local KEY, STYLE = "retailTooltips", "tooltipStyle"
 
 ns.Feature({
 	key = KEY,
 	category = "Interface",
-	name = "Retail-style tooltips",
-	tooltip = "Tooltips get a thin grey border with rounded corners, like the retail game's. A player's name "
+	name = "Modern tooltips",
+	tooltip = "Tooltips get a thin grey border with rounded corners in place of the beige one. A player's name "
 		.. "is in their class colour with their race and class on one line, and a unit's health bar sits inside "
 		.. "its tooltip, with the health as numbers for players and as a percentage for others.",
 	default = true,
@@ -19,12 +19,30 @@ ns.Feature({
 	},
 })
 
+ns.Feature({
+	key = STYLE,
+	category = "Interface",
+	name = "Tooltip style",
+	tooltip = "Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail "
+		.. "game's navy, a little see-through. Forever keeps the game's own beige border.",
+	default = "modern",
+	options = {
+		{ "modern", "Modern" },
+		{ "retail", "Retail" },
+		{ "forever", "Forever" },
+	},
+	parent = KEY,
+})
+
 -- WoW: Forever resolves the Tooltip-NineSlice atlases to its own beige art. The whole tooltip is drawn instead from
--- media/TooltipBorder.tga (tools/tooltip_border.py): the line and the background inside it, cut into all nine
+-- media/TooltipBorder<Style>.tga (tools/tooltip_border.py): the line and the background inside it, cut into all nine
 -- pieces, Center included, with 7-unit corners and a 2-unit middle the edges and Center stretch. Blizzard's own
 -- Center starts 3 units in, exactly where the line ends; two textures placed separately and meeting edge to edge
 -- open a gap on whichever side a sub-pixel falls the wrong way, so the background comes from the same file.
-local FILE = "Interface\\AddOns\\" .. addonName .. "\\media\\TooltipBorder"
+local FILES = {
+	modern = "Interface\\AddOns\\" .. addonName .. "\\media\\TooltipBorderModern",
+	retail = "Interface\\AddOns\\" .. addonName .. "\\media\\TooltipBorderRetail",
+}
 local PIECES = { -- [piece] = { left, right, top, bottom } in sixteenths of the file
 	TopLeftCorner = { 0, 7, 0, 7 },
 	TopRightCorner = { 9, 16, 0, 7 },
@@ -51,11 +69,12 @@ local HEADER = 16
 
 -- Taint: only engine calls on the NineSlice's own textures, from a hooksecurefunc hook after Blizzard styled it.
 -- Every restyle puts Blizzard's atlases, Center's anchors and its colour back, so there is nothing to undo.
-local function Paint(tooltip)
+---@param file string
+local function Paint(tooltip, file)
 	local frame = tooltip.NineSlice
 	for name, piece in pairs(PIECES) do
 		local texture = frame[name]
-		texture:SetTexture(FILE)
+		texture:SetTexture(file)
 		-- The atlases tile; the file stretches. Tiling first, as NineSliceUtil does, then the coordinates.
 		texture:SetHorizTile(false)
 		texture:SetVertTile(false)
@@ -71,13 +90,16 @@ local function Paint(tooltip)
 end
 
 local function Restyle(tooltip, style)
+	-- Forever's own style is Blizzard's, which it has just drawn.
+	local file = FILES[ns.db[STYLE]]
 	if
-		ns.Active(KEY)
+		file
+		and ns.Active(KEY)
 		and LAYOUTS[style and style.layoutType or "TooltipDefaultLayout"]
 		-- An embedded tooltip hides its border.
 		and tooltip.NineSlice:IsShown()
 	then
-		Paint(tooltip)
+		Paint(tooltip, file)
 	end
 end
 

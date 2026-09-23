@@ -319,7 +319,9 @@ def junk(ui):
 # Campsites.lua's texts, from Data/CampBenefits.lua. Wrapped tooltip lines stop at about spell-tooltip width
 # (wowmock NOTES); the client leaves no gap between the lines of one wrapped string, the mock leaves 2 units.
 TOOLTIP_WRAP = 250
-CAMP_HINT = "Sit or craft near a camp feature for a minute to gain its benefit:"
+# The Campfire Nearby aura (1283391) as the game describes it, and the way to the campfire in the scene.
+CAMPFIRE_NEARBY = "The pleasant smoke of a campfire drifts in the air from somewhere nearby."
+CAMPFIRE_WAY = "Campfire: about 35 yd ahead to your left"
 # Seconds left on the benefits the player has in the scenes; SecondsToTime(left, true) gives MINUTES_ABBR "%d Min".
 CAMP_HAVE = {1230124: 52 * 60, 1230587: 48 * 60, 1229451: 31 * 60}
 CAMP_FEATURE = 1230587  # the Mana Well, hovered with 48 minutes left
@@ -343,16 +345,14 @@ def minutes(seconds):
 
 
 def camp_rows(ui):
-    """AddCampList: the hint, then the benefits the player has (green, time left), then the rest (grey)."""
-    green, grey = ui.global_color("GREEN_FONT_COLOR")[:3], ui.global_color("GRAY_FONT_COLOR")[:3]
-    benefits = camp_benefits()
-    have = [b for b in benefits if b[0] in CAMP_HAVE] + [b for b in benefits if b[0] not in CAMP_HAVE]
-    lines = wrapped(ui, CAMP_HINT, (1, 1, 1))
-    for aura, feature, effect, seconds in have:
+    """AddNearby's benefit rows: only those the player has, green with their time left, in the game's order."""
+    green = ui.global_color("GREEN_FONT_COLOR")[:3]
+    lines = []
+    for aura, feature, effect, seconds in camp_benefits():
         left = CAMP_HAVE.get(aura)
         if left is None:
-            lines += wrapped(ui, f"{feature}: {effect}", grey)
-        elif seconds is None:
+            continue
+        if seconds is None:
             lines += wrapped(ui, f"{feature}: rested, again in {minutes(left)}", green)
         else:
             lines += wrapped(ui, f"{feature} ({minutes(left)}): {effect}", green)
@@ -368,12 +368,11 @@ def campsite(ui):
     scene(ui, [(tooltip(ui, lines), 0, 0)], MARGIN).save(OUT / "campsite.png")
 
 
-def camp_panel(ui):
-    # GameTooltip_SetTitle "Camp", then AddCampList; the close button at the TOPRIGHT (2, 2), as ItemRefTooltip's.
-    panel = tooltip(ui, [TooltipLine("Camp")] + camp_rows(ui))
-    close = ui.canvas(24, 24)
-    close_button(close, 24, 0)
-    scene(ui, [(panel, 0, 0), (close, panel.width + 2 - 24, -2)], MARGIN).save(OUT / "camp.png")
+def campfire_buff(ui):
+    # The buff's own name and gold description, then AddNearby: a blank line, the way to the fire, the benefits.
+    lines = [TooltipLine("Campfire Nearby")] + wrapped(ui, CAMPFIRE_NEARBY, NORMAL)
+    lines += [TooltipLine(" "), TooltipLine(CAMPFIRE_WAY)] + camp_rows(ui)
+    scene(ui, [(tooltip(ui, lines), 0, 0)], MARGIN).save(OUT / "camp.png")
 
 
 # Frames.lua's Edit Mode editor on a 1366x768 UIParent, the Character window picked on the Windows tab.
@@ -546,7 +545,7 @@ def main():
     dungeon_entrances(ui)
     junk(ui)
     campsite(ui)
-    camp_panel(ui)
+    campfire_buff(ui)
     editmode(ui)
     nameplates(ui)
 
