@@ -46,7 +46,6 @@ read_globals = {
 	"ContainerFrameUtil_EnumerateContainerFrames",
 	"CreateFrame",
 	"CreateSettingsButtonInitializer",
-	"CreateSettingsListSectionHeaderInitializer",
 	"CreateTexturePool",
 	"CursorHasItem",
 	"EditModeManagerFrame",
