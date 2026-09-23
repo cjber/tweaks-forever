@@ -14,17 +14,29 @@ local function Tooltip(feature)
 	end
 end
 
-local function AddCheckbox(category, feature, initializers)
+local function AddSetting(category, feature, initializers)
+	local options = feature.options
 	local setting = Settings.RegisterAddOnSetting(
 		category,
 		"TweaksForever_" .. feature.key,
 		feature.key,
 		ns.db,
-		Settings.VarType.Boolean,
+		options and Settings.VarType.String or Settings.VarType.Boolean,
 		feature.name,
 		feature.default
 	)
-	local initializer = Settings.CreateCheckbox(category, setting, Tooltip(feature))
+	local initializer
+	if options then
+		initializer = Settings.CreateDropdown(category, setting, function()
+			local container = Settings.CreateControlTextContainer()
+			for _, option in ipairs(options) do
+				container:Add(option[1], option[2])
+			end
+			return container:GetData()
+		end, Tooltip(feature))
+	else
+		initializer = Settings.CreateCheckbox(category, setting, Tooltip(feature))
+	end
 	initializer:AddModifyPredicate(function()
 		return not ns.ConflictOf(feature.key)
 	end)
@@ -51,7 +63,7 @@ ns.Init(function()
 	for _, section in ipairs(sections) do
 		local subcategory = Settings.RegisterVerticalLayoutSubcategory(category, section)
 		for _, feature in ipairs(bySection[section]) do
-			AddCheckbox(subcategory, feature, initializers)
+			AddSetting(subcategory, feature, initializers)
 		end
 		-- The index is buttons that open each subpage; search finds the settings themselves instead.
 		layout:AddInitializer(CreateSettingsButtonInitializer(section, "Open", function()
