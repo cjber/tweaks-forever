@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # refresh-data.yml dispatches CI on the data PRs it opens, which GITHUB_TOKEN events cannot trigger.
+  workflow_dispatch:
 
 permissions:
   contents: read
