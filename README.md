@@ -70,6 +70,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 - Explain campsite benefits. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows exactly what sitting nearby gives you, such as "Stamina increased by 56 for 1 Hr", and whether you have it now, with the time left. Hovering a campfire lists every benefit a camp can give: the ones you have in green with their time left, the rest in grey. Your Camp Benefits buff adds the ones you haven't gained yet.
 - Coming near a campfire opens a small Camp panel below your buffs with the same list, so you know what each feature would give before you sit down. It closes as you walk away or with its close button, until the next campfire, and stays hidden in combat.
 - Show spells left to train. The top of the spellbook says how many spells you can learn now and the level of the next ones; hover it for the list, ready spells in green and later ones by level. The server leaves unlearned spells out of the spellbook, so the list comes from your class trainer, remembered per character each time you visit.
+- Retail-style tooltips: a thin grey border with rounded corners in place of the beige one. A player's name is in their class colour, with the guild in brackets, race and class on one line and the faction in its colour. A unit's health bar sits inside its tooltip in class or reaction colour, with health as numbers for players and a percentage for others, and a comparison tooltip's Equipped label moves inside it in grey. On by default.
 
 **Fishing**
 - Double right-click the world with a fishing pole equipped to cast Fishing. Not in combat or while mounted.
@@ -92,6 +93,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Questie an
 | Unexplored areas | Legacy Here, Leatrix Maps, Mapster |
 | Move windows | BlizzMove, MoveAnything |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
+| Retail-style tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Fishing | FishingBuddy, FishingAce |
 
 ## Install

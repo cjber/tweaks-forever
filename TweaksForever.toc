@@ -25,6 +25,7 @@ Sections.lua
 Reagents.lua
 Campsites.lua
 QuestDistance.lua
+Tooltips.lua
 Exploration.lua
 Frames.lua
 Errors.lua
