@@ -19,10 +19,11 @@ ns.Feature({
 	},
 })
 
--- WoW: Forever resolves the Tooltip-NineSlice atlases to its own beige art. The border is drawn instead from
--- media/TooltipBorder.tga (tools/tooltip_border.py): 7-unit corners and a 2-unit middle the edges stretch. The file
--- has nothing but the line, which meets the background Blizzard starts 3 units in: tooltips draw unsnapped, so any
--- dark texel beside the line would be filtered into it wherever an edge falls between screen pixels.
+-- WoW: Forever resolves the Tooltip-NineSlice atlases to its own beige art. The whole tooltip is drawn instead from
+-- media/TooltipBorder.tga (tools/tooltip_border.py): the line and the background inside it, cut into all nine
+-- pieces, Center included, with 7-unit corners and a 2-unit middle the edges and Center stretch. Blizzard's own
+-- Center starts 3 units in, exactly where the line ends; two textures placed separately and meeting edge to edge
+-- open a gap on whichever side a sub-pixel falls the wrong way, so the background comes from the same file.
 local FILE = "Interface\\AddOns\\" .. addonName .. "\\media\\TooltipBorder"
 local PIECES = { -- [piece] = { left, right, top, bottom } in sixteenths of the file
 	TopLeftCorner = { 0, 7, 0, 7 },
@@ -33,11 +34,10 @@ local PIECES = { -- [piece] = { left, right, top, bottom } in sixteenths of the 
 	BottomEdge = { 7, 9, 9, 16 },
 	LeftEdge = { 0, 7, 7, 9 },
 	RightEdge = { 9, 16, 7, 9 },
+	Center = { 7, 9, 7, 9 },
 }
 -- The NineSlice layouts drawn with that border.
 local LAYOUTS = { TooltipDefaultLayout = true, TooltipDefaultDarkLayout = true }
--- The file's line is near-white along the top and dimmer down the sides; this brings it to the retail grey.
-local BORDER = { 0.6, 0.62, 0.65 }
 local GUILD = { 0.6, 0.6, 0.6 }
 
 -- The health bar's fill: this far in from the tooltip's sides and bottom, this tall, and this far below the
@@ -50,30 +50,35 @@ local OBJECT = { 0, 0.6, 0.1 }
 local HEADER = 16
 
 -- Taint: only engine calls on the NineSlice's own textures, from a hooksecurefunc hook after Blizzard styled it.
--- ApplyLayout leaves vertex colours alone, so every other restyle puts the border's colour back.
-local function Paint(tooltip, retail)
+-- Every restyle puts Blizzard's atlases, Center's anchors and its colour back, so there is nothing to undo.
+local function Paint(tooltip)
 	local frame = tooltip.NineSlice
 	for name, piece in pairs(PIECES) do
 		local texture = frame[name]
-		if retail then
-			texture:SetTexture(FILE)
-			texture:SetTexCoord(piece[1] / 16, piece[2] / 16, piece[3] / 16, piece[4] / 16)
-			-- The edge atlases tile; each edge of the file is the same line all along, so it stretches.
-			texture:SetHorizTile(false)
-			texture:SetVertTile(false)
-			texture:SetVertexColor(BORDER[1], BORDER[2], BORDER[3])
-		elseif texture then
-			texture:SetVertexColor(1, 1, 1)
-		end
+		texture:SetTexture(FILE)
+		-- The atlases tile; the file stretches. Tiling first, as NineSliceUtil does, then the coordinates.
+		texture:SetHorizTile(false)
+		texture:SetVertTile(false)
+		texture:SetTexCoord(piece[1] / 16, piece[2] / 16, piece[3] / 16, piece[4] / 16)
+		-- The file's colours are final; this clears SetCenterColor's tint.
+		texture:SetVertexColor(1, 1, 1)
 	end
+	-- Center fills the middle between the corners, where the file's middle is background only.
+	local center = frame.Center
+	center:ClearAllPoints()
+	center:SetPoint("TOPLEFT", frame.TopLeftCorner, "BOTTOMRIGHT")
+	center:SetPoint("BOTTOMRIGHT", frame.BottomRightCorner, "TOPLEFT")
 end
 
 local function Restyle(tooltip, style)
-	local retail = ns.Active(KEY)
+	if
+		ns.Active(KEY)
 		and LAYOUTS[style and style.layoutType or "TooltipDefaultLayout"]
 		-- An embedded tooltip hides its border.
 		and tooltip.NineSlice:IsShown()
-	Paint(tooltip, retail)
+	then
+		Paint(tooltip)
+	end
 end
 
 -- A 1-pixel line of the outline, from one point of the bar to another.
