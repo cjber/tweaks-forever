@@ -12,6 +12,10 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 - **Resurrections from outside your group wait for you.** The addon can only tell whether a group member is in combat, so a resurrection from anyone else is no longer auto-accepted, and a battle resurrection from a stranger is yours to time.
 - **Grey items always show the junk coin.** The game's gold coin marks greys in your bags all the time, not only while a merchant is open. Turn it off under Vendors.
 
+## [Unreleased]
+
+The quest tracker puts the nearest quests first. It re-sorts as you move, shows how far away each quest's area is in small grey text, and marks the one you're standing in "here" with a soft gold highlight. It stays out of the way while Questie's own tracker is on. Turn it off under Interface.
+
 ## [0.3.0] - 2026-09-23
 
 Campsites explain themselves. Hovering a camp feature, such as a Camp Tent, Mana Well or Anvil, shows what sitting nearby gives you and whether you have it, with the time left; hovering a campfire shows how long your camp benefits last. Upgrades such as the Master Forge name the benefit of the feature they replace. Turn it off under Interface.

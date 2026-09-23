@@ -62,6 +62,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
 - `/rl` reloads the interface.
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
+- Nearest quests first. The quest tracker sorts itself by distance as you move and shows how far away each quest's area is; the one you're standing in reads "here" with a soft gold highlight.
 - Explain campsites. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows what sitting nearby gives you and whether you have it now, with the time left. Hovering a campfire shows how long your camp benefits last.
 
 **Fishing**
@@ -77,6 +78,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Questie an
 | Feature | Addons |
 |---|---|
 | Quests | Leatrix Plus, Questie, AutoTurnIn |
+| Nearest quests first | Questie, while its tracker is on |
 | Other automations, repairs, quiet errors | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
 | Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |

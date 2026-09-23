@@ -23,6 +23,7 @@ Gear.lua
 Sections.lua
 Reagents.lua
 Campsites.lua
+QuestDistance.lua
 Exploration.lua
 Frames.lua
 Errors.lua
