@@ -5,6 +5,7 @@ python3 tools/gen_overlays.py      # Data/Overlays.lua (stdlib only)
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/screenshots.py       # docs/screenshots/*.png (Pillow)
+python3 tools/tooltip_border.py    # media/TooltipBorder.tga (stdlib only)
 ```
 
 `gen_overlays.py` pins a Forever build and writes `Data/Overlays.lua`: the map art
@@ -33,3 +34,8 @@ the addon's own modules draw them, using the `wowmock` library from the
 skill. It looks for the library in `$WOWMOCK`, else
 `~/.claude/skills/wow-mock-screenshots`, and needs Pillow. Two runs give
 byte-identical images.
+
+`tooltip_border.py` draws `media/TooltipBorder.tga`, the rounded one-pixel border
+*Retail-style tooltips* puts on a tooltip in place of Forever's beige one: 7-pixel
+corners and a 2-pixel middle that `Tooltips.lua` stretches along each edge, lit
+brighter along the top and tinted grey in game. Two runs give byte-identical files.

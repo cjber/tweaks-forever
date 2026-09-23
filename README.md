@@ -64,7 +64,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Nearest quests first. The quest tracker sorts itself by distance as you move and shows how far away each quest is; the one whose area you're standing in reads "here" with a soft gold highlight.
 - Explain campsites. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows what sitting nearby gives you and whether you have it now, with the time left. Hovering a campfire shows how long your camp benefits last.
-- Retail-style tooltips: a thin grey border in place of the beige one, and a unit's health bar inside its tooltip, in the unit's class or reaction colour with its health as numbers.
+- Retail-style tooltips: a thin grey border with rounded corners in place of the beige one. A player's name is in their class colour, with the guild in brackets, race and class on one line and the faction in its colour. A unit's health bar sits inside its tooltip in class or reaction colour, with health as numbers for players and a percentage for others, and a comparison tooltip's Equipped label moves inside it in grey. On by default.
 
 **Fishing**
 - Double right-click the world with a fishing pole equipped to cast Fishing. Not in combat or while mounted.

@@ -1,11 +1,14 @@
-local _, ns = ...
+local addonName, ns = ...
+
+local KEY = "retailTooltips"
 
 ns.Feature({
-	key = "retailTooltips",
+	key = KEY,
 	category = "Interface",
 	name = "Retail-style tooltips",
-	tooltip = "Tooltips get a thin grey border like the retail game's, and a unit's health bar sits inside its "
-		.. "tooltip in the unit's class or reaction colour, with its health as numbers.",
+	tooltip = "Tooltips get a thin grey border with rounded corners, like the retail game's. A player's name "
+		.. "is in their class colour with their race and class on one line, and a unit's health bar sits inside "
+		.. "its tooltip, with the health as numbers for players and as a percentage for others.",
 	default = true,
 	conflicts = {
 		{ addon = "Aurora" },
@@ -15,31 +18,33 @@ ns.Feature({
 	},
 })
 
--- WoW: Forever resolves an atlas from its own art set first, and that set has a beige "-c60" member for every
--- Tooltip-NineSlice border piece, so SetAtlas never reaches retail's. Retail's sheets still ship, so the pieces are
--- drawn from them by file and texture coordinates. The centre has no Forever member and is already retail's.
-local SHEET, SIDES = "Interface\\Tooltips\\UIFrameTooltip", "Interface\\Tooltips\\UIFrameTooltipVertical"
--- [piece] = { file, left, right, top, bottom }: the retail atlas members' pixels on the 16x64 and 32x16 sheets.
-local PIECES = {
-	TopLeftCorner = { SHEET, 1 / 16, 8 / 16, 37 / 64, 44 / 64 },
-	TopRightCorner = { SHEET, 1 / 16, 8 / 16, 46 / 64, 53 / 64 },
-	BottomLeftCorner = { SHEET, 1 / 16, 8 / 16, 19 / 64, 26 / 64 },
-	BottomRightCorner = { SHEET, 1 / 16, 8 / 16, 28 / 64, 35 / 64 },
-	TopEdge = { SHEET, 0, 1, 10 / 64, 17 / 64 },
-	BottomEdge = { SHEET, 0, 1, 1 / 64, 8 / 64 },
-	LeftEdge = { SIDES, 1 / 32, 8 / 32, 0, 1 },
-	RightEdge = { SIDES, 10 / 32, 17 / 32, 0, 1 },
+-- WoW: Forever resolves the Tooltip-NineSlice atlases to its own beige art. The border is drawn instead from
+-- media/TooltipBorder.tga (tools/tooltip_border.py): 7-pixel corners and a 2-pixel middle the edges stretch.
+local FILE = "Interface\\AddOns\\" .. addonName .. "\\media\\TooltipBorder"
+local PIECES = { -- [piece] = { left, right, top, bottom } in sixteenths of the file
+	TopLeftCorner = { 0, 7, 0, 7 },
+	TopRightCorner = { 9, 16, 0, 7 },
+	BottomLeftCorner = { 0, 7, 9, 16 },
+	BottomRightCorner = { 9, 16, 9, 16 },
+	TopEdge = { 7, 9, 0, 7 },
+	BottomEdge = { 7, 9, 9, 16 },
+	LeftEdge = { 0, 7, 7, 9 },
+	RightEdge = { 9, 16, 7, 9 },
 }
 -- The NineSlice layouts drawn with that border.
 local LAYOUTS = { TooltipDefaultLayout = true, TooltipDefaultDarkLayout = true }
--- Retail's art is a white line lit brighter along the top; this softens it to the grey of the retail tooltip.
-local BORDER = { 0.6, 0.62, 0.66 }
+-- The file's line is near-white along the top and dimmer down the sides; this brings it to the retail grey.
+local BORDER = { 0.6, 0.62, 0.65 }
+local GUILD = { 0.6, 0.6, 0.6 }
 
--- The health bar: this far in from the tooltip's edges, this tall, and this far below the last line. The tooltip's
--- own margin under its lines is 10.
-local EDGE, HEIGHT, GAP = 9, 12, 8
-local PADDING = EDGE + HEIGHT + GAP - 10
+-- The health bar's fill: this far in from the tooltip's sides and bottom, this tall, and this far below the
+-- last line. The tooltip's own margin under its lines is 10. A dark ring and a lighter outline sit around it.
+local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 12, 10
+local PADDING = BOTTOM + HEIGHT + GAP - 10
+local OUTLINE = { 0.38, 0.4, 0.44 }
 local OBJECT = { 0, 0.6, 0.1 }
+-- Room at the top of a comparison tooltip for its "Equipped" header.
+local HEADER = 16
 
 -- Taint: only engine calls on the NineSlice's own textures, from a hooksecurefunc hook after Blizzard styled it.
 -- ApplyLayout leaves vertex colours alone, so every other restyle puts the border's colour back.
@@ -48,10 +53,9 @@ local function Paint(tooltip, retail)
 	for name, piece in pairs(PIECES) do
 		local texture = frame[name]
 		if retail then
-			texture:SetTexture(piece[1])
-			texture:SetTexCoord(piece[2], piece[3], piece[4], piece[5])
-			-- The edge atlases tile; each edge is the same line all along its length, so stretching it draws the
-			-- same.
+			texture:SetTexture(FILE)
+			texture:SetTexCoord(piece[1] / 16, piece[2] / 16, piece[3] / 16, piece[4] / 16)
+			-- The edge atlases tile; each edge of the file is the same line all along, so it stretches.
 			texture:SetHorizTile(false)
 			texture:SetVertTile(false)
 			texture:SetVertexColor(BORDER[1], BORDER[2], BORDER[3])
@@ -62,65 +66,86 @@ local function Paint(tooltip, retail)
 end
 
 local function Restyle(tooltip, style)
-	local retail = ns.Active("retailTooltips")
+	local retail = ns.Active(KEY)
 		and LAYOUTS[style and style.layoutType or "TooltipDefaultLayout"]
 		-- An embedded tooltip hides its border.
 		and tooltip.NineSlice:IsShown()
 	Paint(tooltip, retail)
 end
 
+-- A 1-pixel line of the outline, from one point of the bar to another.
+local function Line(bar, a, b)
+	local line = bar:CreateTexture(nil, "BACKGROUND", nil, -8)
+	line:SetColorTexture(OUTLINE[1], OUTLINE[2], OUTLINE[3])
+	line:SetPoint(a[1], bar, a[2], a[3], a[4])
+	line:SetPoint(b[1], bar, b[2], b[3], b[4])
+	return line
+end
+
 -- The unit health bar Blizzard hangs under GameTooltip, moved inside it. Blizzard still watches the unit and sets the
 -- bar's value, which can be secret; this file never reads it. It only anchors, sizes, textures and colours the bar
--- (engine calls) and adds a track, outline and text of its own.
+-- (engine calls) and adds an outline and text of its own.
 local function HealthBar()
 	local tooltip = GameTooltip
 	local bar = tooltip.StatusBar
-	local outline = bar:CreateTexture(nil, "BACKGROUND", nil, -8)
-	outline:SetColorTexture(0, 0, 0, 0.9)
-	outline:SetPoint("TOPLEFT", -1, 1)
-	outline:SetPoint("BOTTOMRIGHT", 1, -1)
+	-- The outline leaves its corner pixels out, which rounds it.
+	local art = {
+		Line(bar, { "BOTTOMLEFT", "TOPLEFT", -1, 1 }, { "TOPRIGHT", "TOPRIGHT", 1, 2 }),
+		Line(bar, { "TOPLEFT", "BOTTOMLEFT", -1, -1 }, { "BOTTOMRIGHT", "BOTTOMRIGHT", 1, -2 }),
+		Line(bar, { "TOPRIGHT", "TOPLEFT", -1, 1 }, { "BOTTOMLEFT", "BOTTOMLEFT", -2, -1 }),
+		Line(bar, { "TOPLEFT", "TOPRIGHT", 1, 1 }, { "BOTTOMRIGHT", "BOTTOMRIGHT", 2, -1 }),
+	}
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
-	track:SetColorTexture(0.08, 0.08, 0.1, 0.9)
-	track:SetAllPoints()
+	track:SetColorTexture(0.03, 0.035, 0.06)
+	track:SetPoint("TOPLEFT", -1, 1)
+	track:SetPoint("BOTTOMRIGHT", 1, -1)
+	art[#art + 1] = track
 	local text = bar:CreateFontString(nil, "OVERLAY", "TextStatusBarText")
 	text:SetPoint("CENTER")
-	-- The unit shown, as the token the tooltip was given, and the bar's colour.
-	local unit
+	art[#art + 1] = text
+	-- The unit shown, as the token the tooltip was given, whether it is a player, and the bar's colour.
+	local unit, player
 	local r, g, b = OBJECT[1], OBJECT[2], OBJECT[3]
 
 	local function Update()
-		if not ns.Active("retailTooltips") then
+		if not ns.Active(KEY) then
 			return
 		end
 		bar:SetStatusBarColor(r, g, b)
-		-- UnitHealth always may return a secret, and UnitHealthMax does for NPCs under addon restrictions.
-		-- BreakUpLargeNumbers and SetFormattedText both take secrets, so the numbers go straight to the screen with
-		-- no arithmetic or comparison.
-		if unit and UnitExists(unit) then
+		-- UnitHealth may always return a secret, UnitHealthMax does for units that aren't player-controlled, and
+		-- UnitHealthPercent does whenever its inputs are. Each goes straight to an API documented to take secrets
+		-- (BreakUpLargeNumbers, SetFormattedText): no arithmetic or comparison on any of them. The percentage is
+		-- scaled to 0-100 by Blizzard's curve inside UnitHealthPercent.
+		if not unit or not UnitExists(unit) then
+			text:Hide()
+			return
+		end
+		if player then
 			text:SetFormattedText(
 				"%s / %s",
 				BreakUpLargeNumbers(UnitHealth(unit)),
 				BreakUpLargeNumbers(UnitHealthMax(unit))
 			)
-			text:Show()
 		else
-			text:Hide()
+			text:SetFormattedText("%.0f%%", UnitHealthPercent(unit, true, CurveConstants.ScaleTo100))
 		end
+		text:Show()
 	end
 
 	-- Room under the last line for the bar, made with the tooltip's padding, which GameTooltip clears as it shows.
 	local function Fit()
-		if ns.Active("retailTooltips") and bar:IsShown() then
-			tooltip:SetPadding((tooltip:GetPadding()), PADDING, 0, 0)
+		if ns.Active(KEY) and bar:IsShown() then
+			local right, _, left, top = tooltip:GetPadding()
+			tooltip:SetPadding(right, PADDING, left, top)
 		end
 	end
 
 	local function Style()
-		local retail = ns.Active("retailTooltips")
+		local retail = ns.Active(KEY)
 		bar:ClearAllPoints()
 		if retail then
-			bar:SetPoint("BOTTOMLEFT", EDGE, EDGE)
-			bar:SetPoint("BOTTOMRIGHT", -EDGE, EDGE)
+			bar:SetPoint("BOTTOMLEFT", EDGE, BOTTOM)
+			bar:SetPoint("BOTTOMRIGHT", -EDGE, BOTTOM)
 			bar:SetHeight(HEIGHT)
 			bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
 		else
@@ -131,9 +156,9 @@ local function HealthBar()
 			bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-TargetingFrame-BarFill")
 			bar:SetStatusBarColor(0, 1, 0)
 		end
-		outline:SetShown(retail)
-		track:SetShown(retail)
-		text:SetShown(retail)
+		for _, region in ipairs(art) do
+			region:SetShown(retail)
+		end
 		Update()
 		Fit()
 	end
@@ -145,9 +170,10 @@ local function HealthBar()
 	-- a destructible object's.
 	local function Watch(token)
 		unit = UnitExists(token) and token or nil
+		player = unit and UnitIsPlayer(unit)
 		r, g, b = OBJECT[1], OBJECT[2], OBJECT[3]
 		local color
-		if unit and UnitIsPlayer(unit) then
+		if player then
 			-- UnitClass also returns the class ID, which GetClassColor would take as its tint colour.
 			local _, classFile = UnitClass(unit)
 			color = C_ClassColor.GetClassColor(classFile)
@@ -171,18 +197,159 @@ local function HealthBar()
 	bar:HookScript("OnValueChanged", Update)
 	bar:HookScript("OnShow", Fit)
 	bar:HookScript("OnHide", function()
-		if ns.Active("retailTooltips") and tooltip:IsShown() then
-			tooltip:SetPadding((tooltip:GetPadding()), 0, 0, 0)
+		if ns.Active(KEY) and tooltip:IsShown() then
+			local right, _, left, top = tooltip:GetPadding()
+			tooltip:SetPadding(right, 0, left, top)
 		end
 	end)
 	tooltip:HookScript("OnShow", Fit)
-	Settings.SetOnValueChangedCallback("TweaksForever_retailTooltips", Style)
-	Style()
+	return Style
+end
+
+-- A player's lines as the retail game writes them: the name in the class colour, the guild in brackets, race and
+-- class on the level line, and the faction in its colour. Forever gives the class a line of its own; a line
+-- pre-call drops it before it is added, which Blizzard's TooltipDataProcessor allows insecure callers, and the
+-- post-call edits GameTooltip's own left-line font strings in place with SetText and SetTextColor.
+--
+-- Secret values: only a player's tooltip is touched. GetPlayerInfoByGUID takes a secret GUID and returns
+-- nothing for a unit that isn't a player; its returns are not documented as secret, and a player's identity (name,
+-- race, class) is exempt from the identity restriction, so the class and race it returns are ordinary strings and
+-- so are the player's lines. An NPC's lines are left exactly as Blizzard wrote them.
+local function UnitLines()
+	-- The player tooltip being built: its data, class and race, level, whether the level line has gone by, and
+	-- whether the class line was dropped.
+	local building, className, classFile, race, level, passed, dropped
+
+	TooltipDataProcessor.AddTooltipPreCall(Enum.TooltipDataType.Unit, function(tooltip, data)
+		building = nil
+		if tooltip ~= GameTooltip or not ns.Active(KEY) then
+			return
+		end
+		local _
+		className, classFile, race, _, _, _, _, level = GetPlayerInfoByGUID(data.guid)
+		if classFile then
+			building, passed, dropped = data, false, false
+		end
+	end)
+
+	TooltipDataProcessor.AddLinePreCall(TooltipDataProcessor.AllTypes, function(tooltip, line)
+		if not building or tooltip ~= GameTooltip or dropped then
+			return
+		end
+		local info = tooltip:GetProcessingTooltipInfo()
+		if not info or info.tooltipData ~= building then
+			return
+		end
+		local text = line.leftText
+		if type(text) ~= "string" then
+			return
+		end
+		if not passed then
+			passed = text:find(race, 1, true) ~= nil
+		elseif text == className and not line.rightText then
+			dropped = true
+			return true
+		end
+	end)
+
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
+		if not building or data ~= building then
+			return
+		end
+		building = nil
+		local color = C_ClassColor.GetClassColor(classFile)
+		if color then
+			_G.GameTooltipTextLeft1:SetTextColor(color.r, color.g, color.b)
+		end
+		local levelLine
+		for i = 2, tooltip:NumLines() do
+			local line = _G["GameTooltipTextLeft" .. i]
+			local text = line:GetText()
+			if not text then
+				break
+			end
+			if not levelLine and text:find(race, 1, true) and (not level or text:find(tostring(level), 1, true)) then
+				levelLine = i
+				if dropped and not text:find(className, 1, true) then
+					local _, stop = text:find(race, 1, true)
+					line:SetText(text:sub(1, stop) .. " " .. className .. text:sub(stop + 1))
+				end
+			elseif levelLine and (text == FACTION_ALLIANCE or text == FACTION_HORDE) then
+				color = PLAYER_FACTION_COLORS[text == FACTION_ALLIANCE and 1 or 0]
+				line:SetTextColor(color.r, color.g, color.b)
+			end
+		end
+		-- One line between the name and the level line is the guild.
+		if levelLine == 3 then
+			local line = _G.GameTooltipTextLeft2
+			local text = line:GetText()
+			if text:sub(1, 1) ~= "<" then
+				line:SetText("<" .. text .. ">")
+			end
+			line:SetTextColor(GUILD[1], GUILD[2], GUILD[3])
+		end
+	end)
+end
+
+-- A comparison tooltip's "Equipped" header, moved from the tab above the tooltip to a grey line inside its top,
+-- with room made by the tooltip's top padding. Blizzard shows the header before it adds the item's lines, sets its
+-- text and width each time, and hides it when the tooltip clears; it never sets the label's colour or anchors.
+local function CompareHeader(tooltip)
+	local header = tooltip.CompareHeader
+	local label = header.Label
+	local tab
+	for _, region in ipairs({ header:GetRegions() }) do
+		if region:IsObjectType("Texture") then
+			tab = region
+		end
+	end
+	local below = header:GetFrameLevel() - tooltip:GetFrameLevel()
+
+	local function Pad(top)
+		local right, bottom, left = tooltip:GetPadding()
+		tooltip:SetPadding(right, bottom, left, top)
+	end
+
+	local function Fit()
+		if ns.Active(KEY) and header:IsShown() then
+			-- The tooltip's background shares its frame level; the label has to draw above it.
+			header:SetFrameLevel(tooltip:GetFrameLevel() + 1)
+			Pad(HEADER)
+		end
+	end
+
+	local function Style()
+		local retail = ns.Active(KEY)
+		label:ClearAllPoints()
+		if retail then
+			label:SetPoint("TOPLEFT", tooltip, "TOPLEFT", 10, -10)
+			label:SetTextColor(GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b)
+			Fit()
+		else
+			label:SetPoint("CENTER")
+			label:SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+			header:SetFrameLevel(tooltip:GetFrameLevel() + below)
+			if header:IsShown() then
+				Pad(0)
+			end
+		end
+		tab:SetShown(not retail)
+	end
+
+	header:HookScript("OnShow", Fit)
+	tooltip:HookScript("OnShow", Fit)
+	header:HookScript("OnHide", function()
+		if ns.Active(KEY) then
+			Pad(0)
+		end
+	end)
+	return Style
 end
 
 ns.Init(function()
 	-- Blizzard restyles a tooltip every time it hides, so turning the setting off or on shows on the next one.
 	hooksecurefunc("SharedTooltip_SetBackdropStyle", Restyle)
+	local styles = { HealthBar() }
 	-- These were styled on load, before the hook, and could be shown before they first hide.
 	for _, tooltip in ipairs({
 		GameTooltip,
@@ -193,6 +360,16 @@ ns.Init(function()
 		ItemRefShoppingTooltip2,
 	}) do
 		Restyle(tooltip)
+		if tooltip.CompareHeader then
+			styles[#styles + 1] = CompareHeader(tooltip)
+		end
 	end
-	HealthBar()
+	UnitLines()
+	local function Style()
+		for _, style in ipairs(styles) do
+			style()
+		end
+	end
+	Settings.SetOnValueChangedCallback("TweaksForever_" .. KEY, Style)
+	Style()
 end)
