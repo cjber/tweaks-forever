@@ -37,6 +37,7 @@ read_globals = {
 	"ClearOverrideBindings",
 	"CompleteQuest",
 	"ConfirmAcceptQuest",
+	"ColorPickerFrame",
 	"ContainerFrameItemButtonMixin",
 	"ContainerFrameUtil_EnumerateContainerFrames",
 	"CreateFrame",

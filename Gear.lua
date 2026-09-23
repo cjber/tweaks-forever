@@ -5,8 +5,8 @@ ns.Feature({
 	category = "Gear",
 	name = "Group gear with Ctrl+Right-click",
 	tooltip = "Ctrl+Right-click a bag item to put it in a named group, such as Healing, DPS or Levelling, or to "
-		.. "start a new one. The same menu equips a whole group. Items in a group or an Equipment Manager set "
-		.. "get a badge in your bags and a line in their tooltip.",
+		.. "start a new one. The same menu equips a whole group and picks each group's colour. Items in a group "
+		.. "or an Equipment Manager set are marked in your bags and named in their tooltip.",
 	default = true,
 })
 
@@ -14,16 +14,43 @@ ns.Feature({
 	key = "beforeFishing",
 	category = "Gear",
 	name = "Remember the weapons a fishing pole replaces",
-	tooltip = "Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, badged in your "
+	tooltip = "Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your "
 		.. "bags. Ctrl+Right-click one of them to put them back on.",
 	default = true,
 	parent = "gearGroups",
 })
 
+ns.Feature({
+	key = "gearMark",
+	category = "Gear",
+	name = "Mark grouped gear with",
+	tooltip = "How grouped gear shows in your bags, in each group's colour. A strip along the bottom of the slot "
+		.. "keeps clear of the item quality border.",
+	default = "strip",
+	options = { { "strip", "A coloured strip" }, { "dots", "Coloured dots" }, { "none", "Nothing" } },
+	parent = "gearGroups",
+})
+
 local BEFORE_FISHING = "Before fishing"
--- The Equipment Manager's own sidebar tab icon.
-local BADGE = "Interface\\PaperDollInfoFrame\\PaperDollSidebarTabs"
-local BADGE_COORDS = { 0.015625, 0.53125, 0.46875, 0.60546875 }
+local WHITE = "Interface\\Buttons\\WHITE8X8"
+local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
+-- Dots sit along the top of a slot; more than this would run off its left edge.
+local MAX_DOTS = 4
+-- Colours new groups take in turn.
+local PALETTE = {
+	{ 0.3, 0.65, 1 },
+	{ 1, 0.55, 0.15 },
+	{ 0.45, 0.85, 0.3 },
+	{ 0.9, 0.35, 0.9 },
+	{ 1, 0.85, 0.2 },
+	{ 0.25, 0.85, 0.8 },
+	{ 1, 0.35, 0.35 },
+	{ 0.7, 0.55, 1 },
+}
+-- The strip sits under the stack count; dots sit over the quality border, clear of the count.
+local LAYERS = { strip = "ARTWORK", dots = "OVERLAY" }
+-- Where a list comes from: a Tweaks group, an Equipment Manager set, or Before fishing.
+local KINDS = { "group", "set", "fishing" }
 
 -- Equipment slots per inventory type; a second item of a paired type takes the second slot.
 local SLOTS = {
@@ -67,18 +94,47 @@ function Model.Toggle(groups, name, itemID)
 	return group[itemID] == true
 end
 
--- Group names, sorted, from { [name] = { [itemID] = true } } lists.
-function Model.GroupsOf(itemID, ...)
-	local names = {}
-	for index = 1, select("#", ...) do
-		for name, items in pairs(select(index, ...)) do
+-- Every list an item is in, as { kind, name } sorted by name, from { [kind] = { [name] = { [itemID] = true } } }.
+function Model.GroupsOf(itemID, lists)
+	local found = {}
+	for _, kind in ipairs(KINDS) do
+		for name, items in pairs(lists[kind] or {}) do
 			if items[itemID] then
-				names[#names + 1] = name
+				found[#found + 1] = { kind = kind, name = name }
 			end
 		end
 	end
-	table.sort(names)
-	return names
+	table.sort(found, function(a, b)
+		if a.name ~= b.name then
+			return a.name < b.name
+		end
+		return a.kind < b.kind
+	end)
+	return found
+end
+
+-- A list's { r, g, b }. The first time, it takes the first palette colour no other list has, then cycles.
+function Model.Colour(colours, kind, name)
+	colours[kind] = colours[kind] or {}
+	if colours[kind][name] then
+		return colours[kind][name]
+	end
+	local used, count = {}, 0
+	for _, byName in pairs(colours) do
+		for _, colour in pairs(byName) do
+			used[table.concat(colour, ",")] = true
+			count = count + 1
+		end
+	end
+	local pick = PALETTE[count % #PALETTE + 1]
+	for _, colour in ipairs(PALETTE) do
+		if not used[table.concat(colour, ",")] then
+			pick = colour
+			break
+		end
+	end
+	colours[kind][name] = { unpack(pick) }
+	return colours[kind][name]
 end
 
 -- { { item, slot } } in slot order for a group's items, given each item's inventory type.
@@ -133,6 +189,16 @@ local function StockSets()
 		end
 		sets[name], ids[name] = items, id
 	end
+	-- A deleted set frees its colour. Colours follow the set's ID, which survives a rename.
+	local live = {}
+	for _, id in pairs(ids) do
+		live[id] = true
+	end
+	for id in pairs(Char().colours.set or {}) do
+		if not live[id] then
+			Char().colours.set[id] = nil
+		end
+	end
 	stockSets, stockIDs = sets, ids
 	return sets, ids
 end
@@ -147,9 +213,16 @@ local function BeforeFishing()
 	return { [BEFORE_FISHING] = next(items) and items or nil }
 end
 
-local function EquipPlan(plan)
+local function CanEquip()
 	if InCombatLockdown() then
 		UIErrorsFrame:AddExternalErrorMessage(ERR_NOT_IN_COMBAT)
+		return false
+	end
+	return true
+end
+
+local function EquipPlan(plan)
+	if not CanEquip() then
 		return
 	end
 	for _, step in ipairs(plan) do
@@ -180,38 +253,151 @@ local function EquipBeforeFishing()
 	EquipPlan(plan)
 end
 
+local function EquipSet(name)
+	local _, ids = StockSets()
+	if CanEquip() and ids[name] then
+		C_EquipmentSet.UseEquipmentSet(ids[name])
+	end
+end
+
+local EQUIP = { group = EquipGroup, set = EquipSet, fishing = EquipBeforeFishing }
+
+local function Lists()
+	return { group = Char().groups, set = (StockSets()), fishing = BeforeFishing() }
+end
+
+local function Colour(mark)
+	if mark.kind == "set" then
+		local _, ids = StockSets()
+		return Model.Colour(Char().colours, mark.kind, ids[mark.name])
+	end
+	return Model.Colour(Char().colours, mark.kind, mark.name)
+end
+
+local function Coloured(mark)
+	local r, g, b = unpack(Colour(mark))
+	return string.format(
+		"|cff%02x%02x%02x%s|r",
+		math.floor(r * 255),
+		math.floor(g * 255),
+		math.floor(b * 255),
+		mark.name
+	)
+end
+
 ns.Init(function()
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	Char().groups = Char().groups or {}
-	local hooked, badges = {}, {}
+	Char().colours = Char().colours or {}
+	-- [button] = { [style] = textures }, made on first use.
+	local hooked, marks = {}, {}
 
-	local function Groups(itemID)
-		local stock = StockSets()
-		return Model.GroupsOf(itemID, Char().groups, stock, BeforeFishing())
+	local function Texture(button, style, index)
+		marks[button] = marks[button] or {}
+		local pool = marks[button][style] or {}
+		marks[button][style] = pool
+		if not pool[index] then
+			pool[index] = button:CreateTexture(nil, LAYERS[style], nil, 2)
+			pool[index]:SetTexture(WHITE)
+			if style == "dots" then
+				pool[index]:SetMask(CIRCLE)
+			end
+		end
+		return pool[index]
 	end
 
-	local function UpdateBadge(button)
-		local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
-		local shown = ns.Active("gearGroups") and itemID and #Groups(itemID) > 0
-		if shown and not badges[button] then
-			local badge = button:CreateTexture(nil, "OVERLAY", nil, 2)
-			badge:SetTexture(BADGE)
-			badge:SetTexCoord(unpack(BADGE_COORDS))
-			badge:SetSize(16, 16)
-			badge:SetPoint("TOPRIGHT", -1, -1)
-			badges[button] = badge
+	local function Strip(button, found)
+		local back = Texture(button, "strip", 1)
+		back:SetVertexColor(0, 0, 0, 0.8)
+		back:SetPoint("BOTTOMLEFT", 2, 2)
+		back:SetPoint("BOTTOMRIGHT", -2, 2)
+		back:SetHeight(5)
+		back:Show()
+		local width = (button:GetWidth() - 6) / #found
+		for index, mark in ipairs(found) do
+			local segment = Texture(button, "strip", index + 1)
+			segment:SetVertexColor(unpack(Colour(mark)))
+			segment:SetSize(width, 3)
+			segment:SetPoint("BOTTOMLEFT", 3 + (index - 1) * width, 3)
+			segment:Show()
 		end
-		if badges[button] then
-			badges[button]:SetShown(not not shown)
+	end
+
+	local function Dots(button, found)
+		for index = 1, math.min(#found, MAX_DOTS) do
+			local ring, dot = Texture(button, "dots", 2 * index - 1), Texture(button, "dots", 2 * index)
+			ring:SetVertexColor(0, 0, 0, 0.9)
+			ring:SetSize(10, 10)
+			ring:SetPoint("TOPRIGHT", -2 - (index - 1) * 8, -2)
+			ring:Show()
+			dot:SetVertexColor(unpack(Colour(found[index])))
+			dot:SetSize(7, 7)
+			dot:SetPoint("CENTER", ring)
+			dot:SetDrawLayer("OVERLAY", 3)
+			dot:Show()
+		end
+	end
+
+	local function UpdateMarks(button)
+		for _, pool in pairs(marks[button] or {}) do
+			for _, texture in ipairs(pool) do
+				texture:Hide()
+			end
+		end
+		local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
+		if not ns.Active("gearGroups") or not itemID then
+			return
+		end
+		local style = ns.db.gearMark
+		if style == "none" then
+			return
+		end
+		local found = Model.GroupsOf(itemID, Lists())
+		if #found == 0 then
+			return
+		end
+		if style == "strip" then
+			Strip(button, found)
+		elseif style == "dots" then
+			Dots(button, found)
+		else
+			error("unknown gear mark " .. tostring(style))
 		end
 	end
 
 	local function RefreshBags()
 		for button in pairs(hooked) do
 			if button:IsShown() then
-				UpdateBadge(button)
+				UpdateMarks(button)
 			end
 		end
+	end
+
+	local function ToggleGroup(name, itemID)
+		Model.Toggle(Char().groups, name, itemID)
+		if not Char().groups[name] and Char().colours.group then
+			Char().colours.group[name] = nil
+		end
+		RefreshBags()
+	end
+
+	local function PickColour(mark)
+		local colour = Colour(mark)
+		local function Set(r, g, b)
+			colour[1], colour[2], colour[3] = r, g, b
+			RefreshBags()
+		end
+		ColorPickerFrame:SetupColorPickerAndShow({
+			r = colour[1],
+			g = colour[2],
+			b = colour[3],
+			swatchFunc = function()
+				Set(ColorPickerFrame:GetColorRGB())
+			end,
+			cancelFunc = function(previous)
+				Set(previous.r, previous.g, previous.b)
+			end,
+		})
 	end
 
 	local function NewGroup(itemID)
@@ -221,8 +407,7 @@ ns.Init(function()
 			callback = function(text)
 				local name = strtrim(text)
 				if name ~= "" and name ~= BEFORE_FISHING then
-					Model.Toggle(Char().groups, name, itemID)
-					RefreshBags()
+					ToggleGroup(name, itemID)
 				end
 			end,
 		})
@@ -237,46 +422,30 @@ ns.Init(function()
 			end
 			table.sort(names)
 			for _, name in ipairs(names) do
-				root:CreateCheckbox(name, function()
+				root:CreateCheckbox(Coloured({ kind = "group", name = name }), function()
 					return Char().groups[name] and Char().groups[name][itemID]
 				end, function()
-					Model.Toggle(Char().groups, name, itemID)
-					RefreshBags()
-					-- An emptied group is gone; its Equip entry below would be stale.
-					if not Char().groups[name] then
-						return MenuResponse.CloseAll
-					end
+					ToggleGroup(name, itemID)
+					-- A refresh cannot add or drop the Equip and Colour entries below, so reopen for fresh ones.
+					return MenuResponse.CloseAll
 				end)
 			end
 			root:CreateButton("New group…", function()
 				NewGroup(itemID)
 			end)
 			-- Each source equips its own way, so a group and a set sharing a name stay distinct.
-			local equips = {}
-			for _, name in ipairs(Model.GroupsOf(itemID, Char().groups)) do
-				equips[#equips + 1] = { name, EquipGroup }
-			end
-			local stock, ids = StockSets()
-			for _, name in ipairs(Model.GroupsOf(itemID, stock)) do
-				equips[#equips + 1] = {
-					name,
-					function()
-						if InCombatLockdown() then
-							UIErrorsFrame:AddExternalErrorMessage(ERR_NOT_IN_COMBAT)
-						elseif ids[name] then
-							C_EquipmentSet.UseEquipmentSet(ids[name])
-						end
-					end,
-				}
-			end
-			if #Model.GroupsOf(itemID, BeforeFishing()) > 0 then
-				equips[#equips + 1] = { BEFORE_FISHING, EquipBeforeFishing }
-			end
-			if #equips > 0 then
+			local found = Model.GroupsOf(itemID, Lists())
+			if #found > 0 then
 				root:CreateDivider()
-				for _, equip in ipairs(equips) do
-					root:CreateButton("Equip " .. equip[1], function()
-						equip[2](equip[1])
+				for _, mark in ipairs(found) do
+					root:CreateButton("Equip " .. mark.name, function()
+						EQUIP[mark.kind](mark.name)
+					end)
+				end
+				local colours = root:CreateButton("Colour")
+				for _, mark in ipairs(found) do
+					colours:CreateButton(Coloured(mark), function()
+						PickColour(mark)
 					end)
 				end
 			end
@@ -312,7 +481,7 @@ ns.Init(function()
 			return
 		end
 		hooked[button] = true
-		hooksecurefunc(button, "UpdateJunkItem", UpdateBadge)
+		hooksecurefunc(button, "UpdateJunkItem", UpdateMarks)
 		hooksecurefunc(button, "OnModifiedClick", Click)
 	end
 
@@ -320,7 +489,7 @@ ns.Init(function()
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
 		for _, button in container:EnumerateValidItems() do
 			HookButton(button)
-			UpdateBadge(button)
+			UpdateMarks(button)
 		end
 	end)
 	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
@@ -333,9 +502,12 @@ ns.Init(function()
 		if not ns.Active("gearGroups") or not itemID then
 			return
 		end
-		local groups = Groups(itemID)
-		if #groups > 0 then
-			tooltip:AddLine("Gear: " .. table.concat(groups, ", "), 1, 0.82, 0, true)
+		local names = {}
+		for index, mark in ipairs(Model.GroupsOf(itemID, Lists())) do
+			names[index] = Coloured(mark)
+		end
+		if #names > 0 then
+			tooltip:AddLine("Gear: " .. table.concat(names, ", "), 1, 0.82, 0, true)
 			tooltip:Show()
 		end
 	end
@@ -370,7 +542,7 @@ ns.Init(function()
 				Char().beforeFishing = worn
 			end
 		elseif main then
-			-- A weapon back in hand ends it; an empty hand keeps it, so a pole put away still leaves the badge.
+			-- A weapon back in hand ends it; an empty hand keeps it, so a pole put away still leaves the mark.
 			Char().beforeFishing = nil
 			worn = Weapons()
 		end
@@ -396,5 +568,6 @@ ns.Init(function()
 	end)
 	Settings.SetOnValueChangedCallback("TweaksForever_gearGroups", RefreshBags)
 	Settings.SetOnValueChangedCallback("TweaksForever_beforeFishing", RefreshBags)
+	Settings.SetOnValueChangedCallback("TweaksForever_gearMark", RefreshBags)
 	Settle()
 end)

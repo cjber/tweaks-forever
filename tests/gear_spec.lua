@@ -18,9 +18,27 @@ assert(Model.Toggle(groups, "Healing", 11))
 assert(not Model.Toggle(groups, "Healing", 10) and groups.Healing[11])
 assert(not Model.Toggle(groups, "Healing", 11) and groups.Healing == nil)
 
--- Every list an item is in, sorted, across our groups, Equipment Manager sets and Before fishing.
-local names = Model.GroupsOf(5, { DPS = { [5] = true }, Tank = { [6] = true } }, { Arena = { [5] = true } }, {})
-assert(#names == 2 and names[1] == "Arena" and names[2] == "DPS")
+-- Every list an item is in, sorted by name, each knowing where it came from.
+local found = Model.GroupsOf(5, {
+	group = { DPS = { [5] = true }, Tank = { [6] = true } },
+	set = { Arena = { [5] = true }, DPS = { [5] = true } },
+	fishing = {},
+})
+local listed = {}
+for index, mark in ipairs(found) do
+	listed[index] = mark.kind .. ":" .. mark.name
+end
+assert(table.concat(listed, " ") == "set:Arena group:DPS set:DPS", table.concat(listed, " "))
+
+-- Colours: each new list takes a palette colour nobody has, a freed one is reused, and a stored one sticks.
+local colours = {}
+local blue = Model.Colour(colours, "group", "DPS")
+local orange = Model.Colour(colours, "set", "Arena")
+assert(blue ~= orange and table.concat(blue, ",") ~= table.concat(orange, ","))
+assert(Model.Colour(colours, "group", "DPS") == blue)
+local blueValue = table.concat(blue, ",")
+colours.group.DPS = nil
+assert(table.concat(Model.Colour(colours, "fishing", "Before fishing"), ",") == blueValue)
 
 -- Slots: the second ring and the second one-hander take the second slot; a spare has nowhere to go.
 local types = {
