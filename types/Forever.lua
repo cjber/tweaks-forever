@@ -67,3 +67,37 @@ function GetTrainerServiceInfo(index) end
 -- Only ShoppingTooltipTemplate supplies this child; ordinary tooltip frames have no comparison header.
 ---@class GameTooltip
 ---@field CompareHeader? ShoppingTooltipTemplate_CompareHeader
+
+-- Blizzard_NamePlates' unit frame (BaseNamePlateUnitFrameTemplate) is absent from the generated FrameXML
+-- annotations; only the parts Nameplates.lua restyles are declared.
+---@class NamePlateHealthBar : StatusBar
+---@field barTexture Texture
+---@field bgTexture Texture
+---@field selectedBorder Texture
+---@field deselectedOverlay Texture
+---@field Text FontString
+---@field LeftText FontString
+---@field RightText FontString
+---@field IsTarget fun(self: NamePlateHealthBar): boolean?
+
+---@class NamePlateCastBar : StatusBar
+---@field Icon Texture
+---@field Spark Texture
+---@field Text FontString
+
+---@class NamePlateLevelFrame : Frame
+---@field playerLevelDiffIcon Texture
+---@field selectedBorder Texture?
+
+---@class NamePlateUnitFrame : Button
+---@field HealthBarsContainer Frame|{healthBar: NamePlateHealthBar}
+---@field CastBarsContainer Frame|{castBar: NamePlateCastBar}
+---@field PlayerLevelDiffFrame NamePlateLevelFrame
+---@field LevelFrame Frame
+---@field name FontString
+---@field unit UnitToken?
+---@field widgetsOnlyMode boolean?
+---@field IsShowOnlyName fun(self: NamePlateUnitFrame): boolean
+
+---@class NamePlateFrame
+---@field UnitFrame NamePlateUnitFrame?

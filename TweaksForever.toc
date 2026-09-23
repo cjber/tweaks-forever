@@ -28,6 +28,7 @@ Reagents.lua
 Campsites.lua
 QuestDistance.lua
 Tooltips.lua
+Nameplates.lua
 Exploration.lua
 ZoneLevels.lua
 DungeonEntrances.lua

@@ -18,6 +18,7 @@ sys.path.insert(0, str(WOWMOCK))
 
 # wowmock resolves from $WOWMOCK at runtime (sys.path above), so ty cannot see it.
 from wowmock import (  # ty: ignore[unresolved-import]
+    ARIALN,
     FONTS,
     FRIZQT,
     NORMAL,
@@ -431,6 +432,111 @@ def editmode(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).save(OUT / "editmode.png")
 
 
+# Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
+# and a 12 cast bar, name and level 2 above the bar, a 5-unit glow on the target, the others at 0.6 alpha.
+PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP, PLATE_GLOW, PLATE_DIMMED = 166, 16, 12, 2, 5, 0.6
+TROUGH = (0.07, 0.07, 0.08, 0.92)
+HOSTILE, ROGUE = (1.0, 0.0, 0.0), (1.0, 0.96, 0.41)
+FAIR, EASY = (1.0, 0.82, 0.0), (0.25, 0.75, 0.25)
+FIREBALL, REND, SUNDER = 135812, 132155, 132363
+# A level 15 warrior in Westfall, targeting a Pillager casting Fireball: (name, level, level colour, health colour,
+# health, target, (spell, icon, progress) or None, [(icon, stacks, remaining)]).
+PLATES = [
+    (
+        "Defias Pillager",
+        15,
+        FAIR,
+        HOSTILE,
+        0.62,
+        True,
+        ("Fireball", FIREBALL, 0.55),
+        [(REND, None, 0.4), (SUNDER, 3, 0.8)],
+    ),
+    ("Defias Trapper", 12, EASY, HOSTILE, 1.0, False, None, []),
+    ("Grimtusk", 16, FAIR, ROGUE, 0.45, False, None, []),
+]
+PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
+
+
+def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
+    image = ui.texture(fdid)
+    w, h = image.size
+    canvas.draw(
+        image.crop((round(crop * w), round(crop * h), round((1 - crop) * w), round((1 - crop) * h))), x, y, size, size
+    )
+
+
+def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs):
+    """One nameplate as Nameplates.lua lays out Blizzard's, with the Health Percent option on."""
+    c = ui.canvas(240, 120)
+    x, w = 37, PLATE_W
+    cast_y = 110 - PLATE_CAST
+    y = cast_y - PLATE_GAP - PLATE_HEALTH
+    if target:
+        glow = PLATE_GLOW
+        c.draw(
+            ui.atlas("UI-HUD-Nameplates-Selected"),
+            x - glow,
+            y - glow,
+            w + glow * 2,
+            PLATE_HEALTH + glow * 2,
+            color=(*NORMAL, 0.55),
+        )
+    c.fill(x - 1, y - 1, w + 2, PLATE_HEALTH + 2, (*NORMAL, 1) if target else (0, 0, 0, 1))
+    c.fill(x, y, w, PLATE_HEALTH, TROUGH)
+    c.draw(ui.atlas("widgetstatusbar-fill-white"), x, y, w * health, PLATE_HEALTH, color=(*colour, 1))
+    c.text(
+        x,
+        y,
+        f"{round(health * 100)}%",
+        Font(FRIZQT, 11, (1, 1, 1), None, True),
+        box_height=PLATE_HEALTH,
+        justify="RIGHT",
+        width=w - 4,
+    )
+
+    # Blizzard's 28-wide level frame without its box, and the name up to it.
+    name_y = y - 2 - 14
+    c.text(
+        x + w - 28,
+        name_y,
+        str(level),
+        Font(FRIZQT, 10, level_colour, None, True),
+        box_height=14,
+        justify="CENTER",
+        width=28,
+    )
+    c.text(x, name_y, name, Font(FRIZQT, 14, (1, 1, 1), (1, -1)), width=w - 32)
+
+    # Blizzard's own debuff tiles, untouched: 25 square, cooldown-manager mask and frame, stacks bottom right.
+    for i, (fdid, count, remaining) in enumerate(debuffs):
+        tx, ty = x + i * 25, name_y - 25
+        tile = ui.canvas(25, 25)
+        spell_icon(ui, tile, fdid, 0, 0, 25, crop=0)
+        tile.fill(0, 0, 25, 25 * (1 - remaining), (0, 0, 0, 0.5))
+        tile.mask(ui.atlas("UI-HUD-CoolDownManager-Mask").image, 0, 0, 25, 25)
+        c.paste(tile, tx, ty)
+        c.draw(ui.atlas("UI-HUD-CoolDownManager-IconOverlay"), tx - 6, ty - 5, 37, 35)
+        if count:
+            c.text(tx + 13, ty + 14, str(count), Font(ARIALN, 12, (1, 1, 1), None, True), justify="RIGHT", width=12)
+
+    if cast:
+        spell, fdid, progress = cast
+        c.draw(ui.atlas("ui-castingbar-background"), x + 1, cast_y, w - 2, PLATE_CAST)
+        c.draw(ui.atlas("ui-castingbar-filling-standard"), x, cast_y, w * progress, PLATE_CAST)
+        c.draw(ui.atlas("ui-castingbar-pip"), x + w * progress - 2, cast_y, 4, PLATE_CAST)
+        spell_icon(ui, c, fdid, x, cast_y, PLATE_CAST)
+        c.text(x + PLATE_CAST + 3, cast_y, spell, Font(FRIZQT, 10, (1, 1, 1), None, True), box_height=PLATE_CAST)
+    if not target:
+        c.image.putalpha(c.image.getchannel("A").point(lambda a: round(a * PLATE_DIMMED)))
+    return c
+
+
+def nameplates(ui):
+    layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(PLATES, PLATE_POSITIONS, strict=True)]
+    scene(ui, layers, MARGIN).save(OUT / "nameplates.png")
+
+
 def main():
     ui = Ui(scale=2)
     gear(ui)
@@ -442,6 +548,7 @@ def main():
     campsite(ui)
     camp_panel(ui)
     editmode(ui)
+    nameplates(ui)
 
 
 if __name__ == "__main__":

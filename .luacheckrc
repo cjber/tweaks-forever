@@ -3,6 +3,9 @@ max_line_length = 120
 exclude_files = { "tools/.cache/**", ".release/**", ".types/**", "types/**" }
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
+	"C_NamePlate",
+	"NamePlateDriverFrame",
+	"NamePlateSetupOptions",
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER_RELOAD1",
 	"SlashCmdList",
