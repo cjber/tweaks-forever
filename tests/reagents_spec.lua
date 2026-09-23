@@ -6,14 +6,15 @@ assert(loadfile("Sections.lua"))("TweaksForever", ns)
 assert(loadfile("Reagents.lua"))("TweaksForever", ns)
 local Model = ns.Reagents
 
--- Ten columns: slot 1 at the top left under the heading, slot 10 at the top right, slot 11 starting the next row.
+-- A 16-slot bag in ten columns: slot 1 at the top left, slot 11 starting the bottom row on the money frame.
 local function at(slot)
-	local x, y = Model.Place(slot, 10)
-	return x .. "," .. y
+	local column, y = Model.Place(slot, 16, 10)
+	return column .. "," .. y
 end
-assert(at(1) == "-378,-16", at(1))
-assert(at(10) == "0,-16", at(10))
-assert(at(11) == "-378,-58", at(11))
--- The heading and one row per ten slots, a partial row counting whole.
-assert(Model.Height(10, 10) == 58 and Model.Height(12, 10) == 100)
+assert(at(1) == "9,46", at(1))
+assert(at(10) == "0,46", at(10))
+assert(at(11) == "9,4", at(11))
+assert(at(16) == "4,4", at(16))
+-- One row per ten slots, a partial row counting whole, plus the gap under the rest of the bag.
+assert(Model.Lift(10, 10) == 48 and Model.Lift(12, 10) == 90)
 print("reagents: ok")

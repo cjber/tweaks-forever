@@ -4,9 +4,9 @@ ns.Feature({
 	key = "combinedReagents",
 	category = "Interface",
 	name = "Show the reagent bag in the combined bag",
-	tooltip = "With Combine Bags on, the reagent bag sits at the top of the combined bag under its own name "
-		.. "instead of in a small window beside it, and closes with it. Opened on its own from the bag bar, it "
-		.. "keeps its own window.",
+	tooltip = "With Combine Bags on, the reagent bag's slots sit at the bottom of the combined bag, tinted green "
+		.. "under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. "
+		.. "Opened on its own from the bag bar, it keeps its own window.",
 	default = true,
 	conflicts = {
 		{ addon = "AdiBags" },
@@ -21,21 +21,23 @@ local Model = {}
 ns.Reagents = Model
 
 local Sections = ns.Sections
--- The combined bag's grid starts 75 below its top (GetPaddingHeight); a heading above it starts 5 higher, where
--- Sections puts its first. The grid's right edge is the money frame's, 8 in (UpdateCurrencyFrames).
-local TOP, RIGHT = 70, -8
 
--- Offsets of a reagent slot's top right corner from the top right of the section: slot 1 at the top left, reading
--- left to right under the heading like a section of grouped gear.
-function Model.Place(slot, columns)
-	local index = slot - 1
-	local row = math.floor(index / columns)
-	return (index % columns - columns + 1) * Sections.STEP, -Sections.HEADING - row * Sections.STEP
+-- Rows the reagent bag takes at the bottom of the combined bag.
+local function Rows(slots, columns)
+	return math.ceil(slots / columns)
 end
 
--- How much taller the combined bag grows to hold the section.
-function Model.Height(slots, columns)
-	return Sections.HEADING + math.ceil(slots / columns) * Sections.STEP
+-- A reagent slot's column counted from the right and height above the money frame: slot 1 at the top left, read
+-- left to right like the gear sections, the last row resting on the money frame where Blizzard's grid starts.
+function Model.Place(slot, slots, columns)
+	local index = slot - 1
+	local row = math.floor(index / columns)
+	return columns - 1 - index % columns, Sections.ORIGIN_Y + (Rows(slots, columns) - 1 - row) * Sections.STEP
+end
+
+-- How much the reagent rows and the gap above them lift the rest of the bag.
+function Model.Lift(slots, columns)
+	return Rows(slots, columns) * Sections.STEP + Sections.GAP
 end
 
 -- Taint: the reagent bag keeps Blizzard's own window and item buttons, opened and closed only by Blizzard's code, so
@@ -44,13 +46,12 @@ end
 -- which are engine calls, not Lua state, from hooksecurefunc hooks and an EventRegistry callback.
 ns.Init(function()
 	local bag, reagents = ContainerFrameCombinedBags, ContainerFrame6
-	-- The heading, and the corner the reagent slots are laid out from.
-	local section = CreateFrame("Frame", nil, bag)
-	section:SetSize(1, 1)
-	section:SetPoint("TOPRIGHT", bag, "TOPRIGHT", RIGHT, -TOP)
-	section:Hide()
-	local heading = section:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-	-- [item button] = the combined bag's slot art, which the reagent window's buttons lack.
+	-- A faint gold rule between the reagent rows and the rest of the bag.
+	local rule = bag:CreateTexture(nil, "ARTWORK")
+	rule:SetColorTexture(1, 0.82, 0, 0.3)
+	rule:SetHeight(1)
+	rule:Hide()
+	-- [item button] = the combined bag's slot art, tinted green so empty reagent slots read as the reagent bag's.
 	local backgrounds = {}
 	-- The reagent window's border, background, portrait, title and buttons, faded while it sits in the combined bag.
 	local chrome
@@ -86,6 +87,7 @@ ns.Init(function()
 		if not backgrounds[button] then
 			local texture = button:CreateTexture(nil, "BACKGROUND", "ItemSlotBackgroundCombinedBagsTemplate", -6)
 			texture:SetAllPoints()
+			texture:SetVertexColor(0.6, 0.9, 0.6)
 			backgrounds[button] = texture
 		end
 		return backgrounds[button]
@@ -108,10 +110,10 @@ ns.Init(function()
 				part.object:EnableMouse(false)
 			end
 		end
-		section:Show()
 	end
 
 	local function Unfold()
+		Sections.lift = 0
 		if not folded then
 			return
 		end
@@ -126,7 +128,7 @@ ns.Init(function()
 				part.object:EnableMouse(true)
 			end
 		end
-		section:Hide()
+		rule:Hide()
 		for _, background in pairs(backgrounds) do
 			background:Hide()
 		end
@@ -141,9 +143,11 @@ ns.Init(function()
 	-- taller bag would run off the screen even at the smallest scale, as its top rows could not be reached.
 	local function Grow(container)
 		if Wanted() then
-			local height = container:GetHeight() + Model.Height(reagents:GetBagSize(), container:GetColumns())
+			local lift = Model.Lift(reagents:GetBagSize(), container:GetColumns())
+			local height = container:GetHeight() + lift
 			if height * Sections.MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
 				Fold()
+				Sections.lift = lift
 				container:SetHeight(height)
 				NineSliceUtil.UpdateCornerCropping(container, height)
 				return
@@ -156,22 +160,31 @@ ns.Init(function()
 		if not folded then
 			return
 		end
-		local columns = bag:GetColumns()
+		local columns, slots, money = bag:GetColumns(), reagents:GetBagSize(), bag.MoneyFrame
 		for _, button in reagents:EnumerateValidItems() do
-			local x, y = Model.Place(button:GetID(), columns)
+			local column, y = Model.Place(button:GetID(), slots, columns)
 			button:ClearAllPoints()
-			button:SetPoint("TOPRIGHT", section, "TOPRIGHT", x, y)
+			button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -column * Sections.STEP, y)
 			Background(button):Show()
 		end
-		heading:SetText(C_Container.GetBagName(reagents:GetBagID()))
-		heading:ClearAllPoints()
-		heading:SetPoint(
-			"BOTTOMLEFT",
-			section,
-			"TOPRIGHT",
-			-(columns - 1) * Sections.STEP - Sections.ITEM,
-			2 - Sections.HEADING
-		)
+		local y = Sections.ORIGIN_Y + Sections.lift - Sections.GAP
+		rule:ClearAllPoints()
+		rule:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * Sections.STEP - Sections.ITEM, y)
+		rule:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", 0, y)
+		rule:Show()
+	end
+
+	-- Blizzard's grid starts on the money frame, where the reagent rows now sit, so it moves up above them. The gear
+	-- sections, when on, lay the bag out themselves from Sections.lift.
+	local function Lift()
+		if not folded or Sections.Sectioned() then
+			return
+		end
+		for _, button in bag:EnumerateValidItems() do
+			local point, relative, relativePoint, x, y = button:GetPoint()
+			button:ClearAllPoints()
+			button:SetPoint(point, relative, relativePoint, x, y + Sections.lift)
+		end
 	end
 
 	-- UpdateContainerFrameAnchors scales the window like a bag of its own and stands it beside the others.
@@ -179,7 +192,7 @@ ns.Init(function()
 		if folded then
 			reagents:SetScale(1)
 			reagents:ClearAllPoints()
-			reagents:SetPoint("TOPRIGHT", section)
+			reagents:SetPoint("BOTTOMRIGHT", bag.MoneyFrame, "TOPRIGHT")
 		end
 	end
 
@@ -206,8 +219,33 @@ ns.Init(function()
 		end
 	end
 
+	-- With bags combined the Toggle Backpack key opens only the backpack; Blizzard's own Open All Bags binding opens
+	-- the reagent bag with it. An override binding runs that secure binding, so nothing here opens a bag, and the
+	-- player's saved key bindings stay as they are.
+	local binder = CreateFrame("Frame")
+	local function Bind()
+		if InCombatLockdown() then
+			binder:RegisterEvent("PLAYER_REGEN_ENABLED")
+			return
+		end
+		binder:UnregisterEvent("PLAYER_REGEN_ENABLED")
+		ClearOverrideBindings(binder)
+		if ns.Active("combinedReagents") and ContainerFrameSettingsManager:IsUsingCombinedBags() then
+			for _, key in ipairs({ GetBindingKey("TOGGLEBACKPACK") }) do
+				SetOverrideBinding(binder, false, key, "OPENALLBAGS")
+			end
+		end
+	end
+	binder:SetScript("OnEvent", Bind)
+	binder:RegisterEvent("USE_COMBINED_BAGS_CHANGED")
+	hooksecurefunc("SaveBindings", Bind)
+	Bind()
+
 	hooksecurefunc(bag, "UpdateFrameSize", Grow)
-	hooksecurefunc(bag, "UpdateItemLayout", Place)
+	hooksecurefunc(bag, "UpdateItemLayout", function()
+		Lift()
+		Place()
+	end)
 	hooksecurefunc(reagents, "UpdateItemLayout", Place)
 	hooksecurefunc("UpdateContainerFrameAnchors", Anchor)
 	-- Opened while the combined bag is open, it moves in; a different bag in the slot can change its size.
@@ -227,6 +265,9 @@ ns.Init(function()
 		else
 			Close()
 		end
-	end, section)
-	Settings.SetOnValueChangedCallback("TweaksForever_combinedReagents", Relayout)
+	end, binder)
+	Settings.SetOnValueChangedCallback("TweaksForever_combinedReagents", function()
+		Bind()
+		Relayout()
+	end)
 end)

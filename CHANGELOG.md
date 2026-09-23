@@ -8,7 +8,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
-- **The reagent bag joins the combined bag.** With Combine Bags on, it sits at the top of the bag under its own name, laid out like the rest of the bag, instead of in a small window beside it, and it closes with the bag. Clicking it on the bag bar still opens it on its own. Turn it off under Interface.
+- **The reagent bag joins the combined bag.** With Combine Bags on, its slots sit at the bottom of the bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking it on the bag bar still opens it on its own. Turn it off under Interface.
 - **Resurrections from outside your group wait for you.** The addon can only tell whether a group member is in combat, so a resurrection from anyone else is no longer auto-accepted, and a battle resurrection from a stranger is yours to time.
 
 ## [0.3.0] - 2026-09-23
