@@ -36,10 +36,10 @@ On-demand tools for audits. Output is candidates, never verdicts.
 
 | Concern | Command | Known false positives |
 |---|---|---|
-| Types (Lua) | once: `git clone -q --depth 1 --branch 0.22.3 https://github.com/Ketho/vscode-wow-api .luals/wow-api`; then `lua-language-server --check=. --checklevel=Warning --check_format=json --check_out_path=.sift/runs/luals/check.json` | The annotations model the retail client. Known: `SelectActiveQuest`/`SelectAvailableQuest` take an index here (Automation.lua); a submenu `root:CreateButton("Colour")` needs no callback (Gear.lua); `SecureActionButtonTemplate` passed to binding APIs (Fishing.lua); the `ShouldDisplayMessageType` stub in `tests/errors_spec.lua`. Undefined globals are disabled in `.luarc.json`: luacheck owns them. Exit 1 whenever anything is reported; read the JSON. |
+| Types (Lua) | `lua-language-server --check=. --checklevel=Warning --check_format=json --check_out_path=.sift/runs/evidence/luals.json` | `.luarc.json` lists the host globals explicitly (keep it in sync with `.luacheckrc`). Known: 4 `redundant-parameter` hits on the `ShouldDisplayMessageType` stub in `tests/errors_spec.lua`. Exit 1 whenever anything is reported; read the JSON. |
 | Dead code (Lua) | `luacheck .` (unused locals/args are in the gate) plus the live-roots search below | Model functions used only by specs are live: specs are the reason they are exported. |
 | Dead code (Python) | `uvx vulture tools --min-confidence 60` | none seen |
-| Duplication | `npx --yes jscpd@4 --silent --reporters json --output .sift/runs/jscpd --ignore "**/.sift/**,**/.luals/**,**/Data/Overlays.lua" .` | the spec files share a 10-line `ns` stub preamble on purpose (each spec is standalone) |
+| Duplication | `npx --yes jscpd@4 --silent --reporters json --output .sift/runs/evidence/jscpd --ignore "**/.sift/**,**/Data/Overlays.lua" .` | the spec files share a 10-line `ns` stub preamble on purpose (each spec is standalone) |
 | Duplication, small | same command with `--min-lines 3 --min-tokens 30` and `**/tests/**` added to `--ignore` | the defaults missed the 6–11 line bag-hook clones between Junk.lua and Gear.lua; this run found them. Repeated checkout/setup-uv steps in ci.yml are expected. |
 
 String-named entrypoints (always pass a path: `rg` with no path reads stdin when it is not a terminal):
