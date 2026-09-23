@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -11,6 +12,7 @@ ns.Feature({
 	parent = "gearGroups",
 })
 
+---@class TFSections
 local Model = {}
 ns.Sections = Model
 
@@ -31,6 +33,10 @@ Model.lift = 0
 -- Where each item and heading goes, bottom-up from the money frame as Blizzard's grid is. `items` is in
 -- Blizzard's order (bottom right first), each { section = key or nil }; `sections` is the keys top to bottom.
 -- A place is { column counted from the right, y }; the total height the items and headings take is returned.
+---@param items TFSectionItem[]
+---@param sections string[]
+---@param columns integer
+---@return TFSectionPlace[], TFSectionHeading[], number
 function Model.Layout(items, sections, columns)
 	local rest, members = {}, {}
 	for _, key in ipairs(sections) do
@@ -99,6 +105,9 @@ ns.Init(function()
 	end
 
 	-- Blizzard's own order, read back from the grid it has just laid out: bottom row first, right to left.
+	---@param a TFSectionItem
+	---@param b TFSectionItem
+	---@return boolean
 	local function BlizzardOrder(a, b)
 		local _, _, _, ax, ay = a.button:GetPoint()
 		local _, _, _, bx, by = b.button:GetPoint()
@@ -108,6 +117,8 @@ ns.Init(function()
 		return ax > bx
 	end
 
+	---@param index integer
+	---@return FontString
 	local function Heading(index)
 		if not headings[index] then
 			headings[index] = bag:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -117,6 +128,7 @@ ns.Init(function()
 
 	-- Blizzard sizes the bag before laying it out, so this decides for both whether the bag has sections: not when
 	-- the taller bag would run off the screen even at the smallest scale, as its top rows could not be reached.
+	---@param container ContainerFrameCombinedBags
 	local function Grow(container)
 		sectioned = false
 		if not Active() then
@@ -133,6 +145,7 @@ ns.Init(function()
 		NineSliceUtil.UpdateCornerCropping(container, total)
 	end
 
+	---@param container ContainerFrameCombinedBags
 	local function Arrange(container)
 		for _, heading in ipairs(headings) do
 			heading:Hide()

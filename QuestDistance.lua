@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -23,6 +24,8 @@ local RECHECK, RESORT = 5, 25
 -- Space between the distance column and the item buttons.
 local GAP = 4
 
+---@param yards number
+---@return string
 local function Format(yards)
 	if yards < 1000 then
 		return ("%d yd"):format(yards)
@@ -47,7 +50,7 @@ ns.Init(function()
 		wipe(inside)
 		local mapID = C_Map.GetBestMapForUnit("player")
 		local position = mapID and C_Map.GetPlayerMapPosition(mapID, "player")
-		if not position then
+		if not mapID or not position then
 			return
 		end
 		if mapID ~= probeMap then
@@ -66,6 +69,8 @@ ns.Init(function()
 		probe:DrawNone()
 	end
 
+	---@param block TFQuestBlock
+	---@return TFQuestDecor
 	local function Decor(block)
 		local d = decor[block]
 		if not d then
@@ -73,7 +78,9 @@ ns.Init(function()
 			label:SetJustifyH("RIGHT")
 			local glow = block:CreateTexture(nil, "BACKGROUND")
 			glow:SetColorTexture(1, 1, 1)
-			glow:SetGradient("HORIZONTAL", CreateColor(1, 0.82, 0, 0.22), CreateColor(1, 0.82, 0, 0))
+			local start = CreateColor(1, 0.82, 0, 0.22) --[[@as colorRGBA]]
+			local finish = CreateColor(1, 0.82, 0, 0) --[[@as colorRGBA]]
+			glow:SetGradient("HORIZONTAL", start, finish)
 			glow:SetPoint("TOPLEFT", -28, 3)
 			glow:SetPoint("BOTTOMRIGHT", 0, -1)
 			d = { label = label, glow = glow }
@@ -82,6 +89,7 @@ ns.Init(function()
 		return d
 	end
 
+	---@param block TFQuestBlock
 	local function Hide(block)
 		local d = decor[block]
 		if d then
@@ -90,11 +98,13 @@ ns.Init(function()
 		end
 	end
 
-	-- A quest with no area on this continent shows nothing. Anchors only move when the tracker lays out again.
 	-- The right edge every distance lines up on: left of the item buttons whenever any tracked quest shows one, so
 	-- the column stays straight instead of stepping in beside each button.
 	local column = 0
 
+	-- A quest with no area on this continent shows nothing. Anchors only move when the tracker lays out again.
+	---@param block TFQuestBlock
+	---@param relayout? boolean
 	local function Update(block, relayout)
 		local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(block.id)
 		if not distanceSq or not onContinent then
@@ -117,16 +127,19 @@ ns.Init(function()
 		d.glow:SetShown(here)
 	end
 
+	---@param fn fun(block: TFQuestBlock)
 	local function Each(fn)
 		for _, module in ipairs(modules) do
 			module:EnumerateActiveBlocks(fn)
 		end
 	end
 
+	---@param block TFQuestBlock
 	local function Relayout(block)
 		Update(block, true)
 	end
 
+	---@param block TFQuestBlock
 	local function Widen(block)
 		column = math.min(column, block.rightEdgeOffset or 0)
 	end
@@ -150,6 +163,11 @@ ns.Init(function()
 		end)
 	end
 
+	---@param last {x: number?, y: number?}
+	---@param x number
+	---@param y number
+	---@param yards number
+	---@return boolean
 	local function Moved(last, x, y, yards)
 		return not last.x or (x - last.x) ^ 2 + (y - last.y) ^ 2 > yards * yards
 	end

@@ -1,8 +1,10 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 -- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
 -- tall. A feature another addon already handles is greyed out, its tooltip naming that addon.
 
+---@param feature TFFeature
 local function Tooltip(feature)
 	return function()
 		local conflict = ns.ConflictOf(feature.key)
@@ -14,6 +16,9 @@ local function Tooltip(feature)
 	end
 end
 
+---@param category SettingsCategoryMixin
+---@param feature TFFeature
+---@param initializers table<string, SettingsListElementInitializer>
 local function AddSetting(category, feature, initializers)
 	local options = feature.options
 	local setting = Settings.RegisterAddOnSetting(

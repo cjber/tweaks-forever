@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -19,10 +20,14 @@ ns.Feature({
 	},
 })
 
+---@class TFZoneLevels
 local Model = {}
 ns.ZoneLevels = Model
 
 -- The client's own range where it has one, else Data/ZoneLevels.lua's.
+---@param mapID integer
+---@return number? low
+---@return number? high
 function Model.Range(mapID)
 	local low, high = C_Map.GetMapLevels(mapID)
 	if low and high and low > 0 and high > 0 then
@@ -34,12 +39,19 @@ function Model.Range(mapID)
 	end
 end
 
+---@param low number
+---@param high number
+---@return string
 function Model.Text(low, high)
 	return low == high and tostring(low) or low .. "-" .. high
 end
 
 -- The level a zone is coloured as, by the rule of Blizzard's own hover label: the bottom of a zone above you,
 -- your own level inside one, and two under the top of a zone below you so it stops being yellow at its top.
+---@param level number
+---@param low number
+---@param high number
+---@return number
 function Model.ChallengeLevel(level, low, high)
 	if level < low then
 		return low

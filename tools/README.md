@@ -54,3 +54,24 @@ along each edge, lit brighter along the top and tinted grey in game. The file ho
 only the line, with no shadow beside it, because tooltips draw without pixel snapping
 and a dark texel next to the line shows as a black strip. Two runs give
 byte-identical files.
+
+## Lua type checking
+
+Run `tools/typecheck.sh` from any directory with LuaLS 3.19.1, Git and Python 3.11+ on PATH.
+CI uses the same entrypoint and verifies the LuaLS release tarball's SHA-256. API annotations are
+pinned to Ketho/vscode-wow-api `d0b5b51fac4c52c493371b9b18e66ce604ea4326`, including its FrameXML gitlink
+`2ffc9177b0e55a8a3f51baf47c2cfb0f54f685ee`. Modified or differently pinned checkouts fail the gate.
+
+LuaLS checks runtime Lua and `types/`, including TOC-loaded generated data; the headless stubs in
+`tests/` and tooling/cache directories are excluded. Luacheck and specs still cover the harness.
+`types/` declares the addon's contracts and missing Forever/other-addon APIs; it never loads in game.
+
+`python3 tools/lint_multivalue.py` checks every TOC entry, or the file paths supplied as arguments.
+Lua expands an unparenthesised final call in an argument list, array-style table field or return.
+Use `f((select(2, UnitClass(unit))))` or a local for a single value. Intentional expansion requires
+a trailing `-- multi-value: reason` on the closing call/table/return line. A keyed table field,
+assignment, operator or non-final argument already consumes one value.
+
+The gate runs the Python regression tests first; run them separately with
+`python3 -m unittest discover -s tools -p '*_test.py'`. Reports use `file:line: code: message`,
+and missing/malformed reports and checker crashes fail closed.

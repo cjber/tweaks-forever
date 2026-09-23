@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 -- Things the game asks you to click through. Each acts only while its feature is on and not already handled
@@ -138,6 +139,8 @@ ns.On("QUEST_GREETING", function()
 	for index = 1, GetNumActiveQuests() do
 		local _, isComplete = GetActiveTitle(index)
 		if isComplete then
+			-- Forever's quest greeting takes an index; Ketho's legacy signature omits it.
+			---@diagnostic disable-next-line: redundant-parameter
 			SelectActiveQuest(index)
 			return
 		end
@@ -145,6 +148,8 @@ ns.On("QUEST_GREETING", function()
 	for index = 1, GetNumAvailableQuests() do
 		local isTrivial = GetAvailableQuestInfo(index)
 		if not isTrivial then
+			-- Forever's quest greeting takes an index; Ketho's legacy signature omits it.
+			---@diagnostic disable-next-line: redundant-parameter
 			SelectAvailableQuest(index)
 			return
 		end

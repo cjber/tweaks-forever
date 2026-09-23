@@ -1,3 +1,4 @@
+---@type string, TFNamespace
 local _, ns = ...
 
 ns.Feature({
@@ -33,13 +34,21 @@ ns.Feature({
 	},
 })
 
+---@class TFExploration
 local Model = {}
 ns.Exploration = Model
 
+---@param x number
+---@param y number
+---@param width number
+---@param height number
+---@return string
 function Model.OverlayKey(x, y, width, height)
 	return ("%d:%d:%d:%d"):format(x, y, width, height)
 end
 
+---@param encoded string
+---@return table<integer, TFOverlay[]>
 function Model.Decode(encoded)
 	local layers = {}
 	for record in encoded:gmatch("([^;]+);") do
@@ -65,6 +74,11 @@ function Model.Decode(encoded)
 	return layers
 end
 
+---@param total number
+---@param size number
+---@param index integer
+---@param count integer
+---@return number, number
 local function TileSpan(total, size, index, count)
 	if index < count then
 		return size, 1
@@ -81,6 +95,11 @@ local function TileSpan(total, size, index, count)
 end
 
 -- Partial edge tiles occupy power-of-two files, as in MapExplorationPinMixin.
+---@param width number
+---@param height number
+---@param tileWidth number
+---@param tileHeight number
+---@return TFOverlayTile[]
 function Model.OverlayTiles(width, height, tileWidth, tileHeight)
 	local wide, tall = math.ceil(width / tileWidth), math.ceil(height / tileHeight)
 	local tiles = {}
@@ -101,6 +120,9 @@ function Model.OverlayTiles(width, height, tileWidth, tileHeight)
 	return tiles
 end
 
+---@param areas TFOverlay[]
+---@param explored UiMapExplorationInfo[]?
+---@return TFOverlay[]
 function Model.Unexplored(areas, explored)
 	local known, result = {}, {}
 	for _, area in ipairs(explored or {}) do
@@ -116,6 +138,9 @@ end
 
 -- Keep only the viewed art decoded; the source strings stay compact at login.
 local cachedArt, cachedLayers
+---@param art integer
+---@param layer integer
+---@return TFOverlay[]
 local function Areas(art, layer)
 	if cachedArt ~= art then
 		cachedArt = art

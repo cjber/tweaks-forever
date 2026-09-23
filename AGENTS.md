@@ -8,6 +8,7 @@ options in the game's own settings. Players install the zip the BigWigs packager
 ```sh
 stylua --check .
 luacheck .
+tools/typecheck.sh
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 ruff check tools && ruff format --check tools
 uvx ty@0.0.83 check tools
@@ -29,7 +30,12 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
 - The specs are a headless harness with stubbed client APIs. Anything they cannot reach (frames,
   menus, tooltips, the tracker) is checked in game: list those checks in the PR as `/reload` tests
   for the user. Never drive the game client.
-- New globals go in both `.luacheckrc` and `.luarc.json`; the two lists must stay equal.
+- LuaLS 3.19.1 checks every TOC-loaded file against pinned Ketho API/FrameXML annotations.
+  `tools/typecheck.sh` fetches them into an ignored types cache and also checks accidental `select()` expansion.
+- New host globals go in `.luacheckrc`; if upstream lacks their types, declare real types in
+  `types/Forever.lua`. Addon contracts live in `types/`. Never add a LuaLS globals allowlist.
+- A final `select(...)` argument, table element or return must be parenthesised, or carry a
+  trailing `-- multi-value: reason` when expansion is intentional.
 - Commits are signed (`git commit -S`) with the personal email.
 - Quality: load `.agents/skills/sift-project/SKILL.md` before cleanup, dead-code or refactoring
   work.
