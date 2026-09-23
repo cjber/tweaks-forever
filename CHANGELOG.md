@@ -19,7 +19,6 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 - **Nearest quests first.** The quest tracker re-sorts as you move and shows how far away each quest is in small grey text. The quest whose area you're standing in reads "here" with a soft gold highlight. It stays out of the way while Questie's own tracker is on. Turn it off under Interface.
 - **Future spells in the spellbook.** As in the retail game, each spellbook tab ends with the spells you haven't learned yet under a Future Spells heading, greyed out: the ones your trainer can teach you now glow and say "See your trainer", and the rest name the level they come at. Only each spell's next rank shows, and its tooltip gives the training cost. It works from your first login: every class trainer's list is built in, and visiting yours brings its levels and prices up to date. Turn it off under Interface.
 - **Other addons can ask what your trainer teaches.** The version 1 public API lists the spells your level allows that you haven't learned, with each one's level, cost and spellbook tab, so an addon such as Adventure Guide Forever can plan a trainer visit. It answers whether or not Future Spells is on.
-- **Guides know when your trainer has something for you.** Other addons, such as Adventure Guide Forever, can ask which spells your level lets you learn now, with their cost, so they can suggest a trainer visit. This works even with future spells turned off in the spellbook.
 
 ## [0.3.0] - 2026-09-23
 
