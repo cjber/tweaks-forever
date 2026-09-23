@@ -28,7 +28,7 @@ no entry.
 
 `screenshots.py` renders `docs/screenshots/*.png` without the game: the client's
 own UI art, fonts and item icons from wago.tools, laid out as Blizzard's UI code and
-`Gear.lua` draw them, using the `wowmock` library from the
+the addon's own modules draw them, using the `wowmock` library from the
 [wow-mock-screenshots](https://github.com/cjber/skills/tree/main/wow-mock-screenshots)
 skill. It looks for the library in `$WOWMOCK`, else
 `~/.claude/skills/wow-mock-screenshots`, and needs Pillow. Two runs give
