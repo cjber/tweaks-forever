@@ -19,7 +19,7 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
 
 - `Core.lua` — `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, and TOC
   order sets the settings subpage order.
-- `Data/` — generated tables; regenerate with the script named in each file's header.
+- `Data/` — lookup tables; a generated one names the script that regenerates it in its header.
 - `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.
 
 ## Rules

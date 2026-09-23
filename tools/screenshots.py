@@ -19,7 +19,9 @@ sys.path.insert(0, str(WOWMOCK))
 # wowmock resolves from $WOWMOCK at runtime (sys.path above), so ty cannot see it.
 from wowmock import (  # ty: ignore[unresolved-import]
     FONTS,
+    FRIZQT,
     NORMAL,
+    Font,
     MenuButton,
     MenuCheckbox,
     MenuDivider,
@@ -172,6 +174,57 @@ def exploration(ui):
     nav = ("World", "Eastern Kingdoms", "Redridge Mountains")
     frame, _ = world_map_frame(ui, art, nav, arrows=nav[1:])
     scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "exploration.png")
+
+
+KALIMDOR = 1414
+ASHENVALE = 1440
+# AreaLabelFrameTemplate (scale 0.695): its Name, WorldMapTextFont (Friz 32, thick outline, AREA_NAME_FONT_COLOR),
+# sits TOP (0, -20) in a frame anchored TOP (0, -10) on the map's canvas container.
+LABEL_SCALE = 0.695
+AREA_LABEL_FONT = Font(FRIZQT, round(32 * LABEL_SCALE), (1.0, 0.9294, 0.7607), None, outline=True)
+AREA_LABEL_TOP = (10 + 20) * LABEL_SCALE
+# QuestDifficultyColors, as Blizzard's Constants.lua defines them.
+DIFFICULTY = {
+    "impossible": (1.00, 0.10, 0.10),
+    "verydifficult": (1.00, 0.50, 0.25),
+    "difficult": (1.00, 0.82, 0.00),
+    "standard": (0.25, 0.75, 0.25),
+    "trivial": (0.50, 0.50, 0.50),
+}
+# UnitQuestTrivialLevelRange at the screenshot's level: the classic green band (5 + level // 10 below 40).
+TRIVIAL_RANGE = 5 + PLAYER_LEVEL // 10
+
+
+def zone_ranges():
+    """Data/ZoneLevels.lua: {uiMapID: (low, high)}."""
+    source = (ROOT / "Data" / "ZoneLevels.lua").read_text()
+    return {int(i): (int(lo), int(hi)) for i, lo, hi in re.findall(r"\[(\d+)\] = \{ (\d+), (\d+) \}", source)}
+
+
+def difficulty(level, low, high):
+    """ZoneLevels.lua's colour: Model.ChallengeLevel fed to GetRelativeDifficultyColor."""
+    challenge = low if level < low else high - 2 if level > high else level
+    diff = challenge - level
+    if diff >= 5:
+        return DIFFICULTY["impossible"]
+    if diff >= 3:
+        return DIFFICULTY["verydifficult"]
+    if diff >= -4:
+        return DIFFICULTY["difficult"]
+    return DIFFICULTY["standard" if -diff <= TRIVIAL_RANGE else "trivial"]
+
+
+def zone_levels(ui):
+    """Kalimdor with the cursor on Ashenvale: Blizzard's hover label with the addon's range after the name."""
+    art = map_art(ui, KALIMDOR)
+    nav = ("World", "Kalimdor")
+    frame, rects = world_map_frame(ui, art, nav, arrows=nav[1:])
+    mx, my, mw, _ = rects["map"]
+    low, high = zone_ranges()[ASHENVALE]
+    name = ui.table("UiMap")[str(ASHENVALE)]["Name_lang"]
+    text = name + colored(f" ({low}-{high})", difficulty(PLAYER_LEVEL, low, high))
+    frame.text(mx, my + AREA_LABEL_TOP, text, AREA_LABEL_FONT, justify="CENTER", width=mw)
+    scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "zonelevels.png")
 
 
 # Junk.lua marks (account-wide): things this character sells rather than uses. Greys would only show their coin
@@ -330,6 +383,7 @@ def main():
     gear(ui)
     menu(ui)
     exploration(ui)
+    zone_levels(ui)
     junk(ui)
     campsite(ui)
     camp_panel(ui)

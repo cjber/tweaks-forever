@@ -15,6 +15,7 @@
 
 Data\Overlays.lua
 Data\CampBenefits.lua
+Data\ZoneLevels.lua
 Core.lua
 Automation.lua
 Vendor.lua
@@ -27,6 +28,7 @@ Campsites.lua
 QuestDistance.lua
 Tooltips.lua
 Exploration.lua
+ZoneLevels.lua
 Frames.lua
 Errors.lua
 Spellbook.lua
