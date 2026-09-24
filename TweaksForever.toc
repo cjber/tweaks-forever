@@ -18,6 +18,7 @@ Data\Overlays.lua
 Data\CampBenefits.lua
 Data\ZoneLevels.lua
 Data\DungeonEntrances.lua
+Data\ClassSpells.lua
 Core.lua
 Automation.lua
 Vendor.lua
@@ -41,3 +42,4 @@ Spellbook.lua
 Fishing.lua
 Reload.lua
 Settings.lua
+API.lua

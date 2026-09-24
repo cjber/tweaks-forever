@@ -3,7 +3,9 @@ Run from the repository root with Python 3.
 ```sh
 python3 tools/gen_overlays.py      # Data/Overlays.lua (stdlib only)
 python3 tools/gen_camp.py          # Data/CampBenefits.lua (stdlib only)
+python3 tools/gen_zonelevels.py    # Data/ZoneLevels.lua (stdlib only)
 python3 tools/gen_dungeons.py      # Data/DungeonEntrances.lua (stdlib only)
+python3 tools/gen_classspells.py   # Data/ClassSpells.lua (stdlib only)
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/screenshots.py       # docs/screenshots/*.png (Pillow)
@@ -32,6 +34,14 @@ description instead. It refuses to write a number that depends on level, stats o
 content tuning, and fails on any token it can't resolve. Same cache and flags as
 `gen_overlays.py`.
 
+`gen_zonelevels.py` writes `Data/ZoneLevels.lua`: each zone's level range, which
+Forever's client leaves empty (its `UiMap` and `AreaTable` carry no content tuning).
+Zones of the original game take their published range, listed in the script. Forever's
+own zones take the lowest and highest `AreaTable.ExplorationLevel` among their
+subzones. Cities and battlegrounds are left out; so is a new zone with no exploration
+level, which the run lists. A published zone missing from the maps fails the run.
+Same cache and flags as `gen_overlays.py`.
+
 `gen_dungeons.py` writes `Data/DungeonEntrances.lua`: where each dungeon and raid
 entrance sits on the world map. Blizzard's map asks `C_EncounterJournal`, which is
 empty without the journal's tables that Forever's client lacks. The entrance is
@@ -43,6 +53,17 @@ map at its smallest zoom merge into one pin at their centre, and the curated
 complexes (Blackrock Mountain, the Gates of Ahn'Qiraj) always do, named by their
 area. An instance with an entrance but no curated zone fails the run; instances
 with no entrance at all are listed. Same cache and flags as `gen_overlays.py`.
+
+`gen_classspells.py` writes `Data/ClassSpells.lua`: what each class trainer teaches,
+for *Show future spells in the spellbook* before you have visited one. Forever's client
+has no trainer lists, so the rows come from the class trainers in CMaNGOS classic-db
+(pinned by commit), each teaching spell resolved to the spell you learn through the
+Classic Era client's `SpellEffect` (Forever's drops most teaching spells). Forever's
+`SkillLineAbility` gives each spell's class skill line, kept by ID as a tab's name is in
+the client's language, and its races; `Spell`'s rank subtext names the rank before one
+no trainer teaches (a talent, quest or starting spell), which has to be known first.
+Spells the client lacks or on no class skill line are counted and left out. Same cache
+and flags as `gen_overlays.py`.
 
 The *Refresh game data* workflow runs `latest_build.py` daily, and when a newer
 build is listed it bumps `BUILD` in every generator, regenerates, runs the checks and
