@@ -30,7 +30,8 @@ template with one `$?a<aura>[Feature: effect][]` branch per feature aura; the
 script takes each branch and fills in `$w` (effect base points, `SpellEffect`), `$t`
 (effect period) and `$d` (`SpellMisc` duration index into `SpellDuration`). The tent's
 branch only says rest was received, so its entry uses the Camp Tent aura's own
-description instead. It refuses to write a number that depends on level, stats or
+description instead. Each entry also lists the base points it put in for `$w`, in effect
+order, so the addon can put in the values the aura you get actually carries. It refuses to write a number that depends on level, stats or
 content tuning, and fails on any token it can't resolve. Same cache and flags as
 `gen_overlays.py`.
 
