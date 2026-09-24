@@ -32,10 +32,15 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins, and the ring's tooltip ending Marked as junk – Alt+Right-click to unmark">
+</p>
+
+<p align="center">The game's junk coin on greys and on anything you mark yourself.</p>
+
+<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip in green: Sitting nearby: Restores 29 Mana every 5 seconds for 1 Hr, and Active: 48 Min">
 </p>
 
-<p align="center">The game's junk coin on anything you mark, and camp tooltips that say what sitting nearby gives you.</p>
+<p align="center">Camp tooltips say what sitting nearby gives you.</p>
 
 ## Features
 
