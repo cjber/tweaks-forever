@@ -46,7 +46,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 Every feature has its own checkbox. The full detail is in [docs/features.md](docs/features.md).
 
-- **Quest and gossip automation.** Accepts and turns in quests, skips one-option gossip, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on.
+- **Quest and gossip automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map at a flight master, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells greys in batches that stay in the buyback tab. **Alt+Right-click** marks any item as junk, with the game's junk coin.
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. With Combine Bags on, grouped gear sits together at the top.
