@@ -24,6 +24,7 @@ Run in order from the repository root. All must pass before and after any audit 
 | Types (Python) | `uvx ty@0.0.83 check tools` | `All checks passed!` |
 | Workflows | `uvx --from actionlint-py==1.7.12.25 actionlint && uvx zizmor@1.30.1 --offline .github` | no output / `No findings` |
 | Secrets | `gitleaks git --redact --no-banner .` | `no leaks found` |
+| Project rules | `python3 .sift/gate.py --base origin/main && python3 .sift/agents.py check` | exit 0 |
 
 ```sh
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
