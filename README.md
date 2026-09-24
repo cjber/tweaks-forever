@@ -31,7 +31,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 <p align="center">Move and scale Blizzard windows from a tab in Edit Mode.</p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins, and the ring's tooltip ending Marked as junk – Alt+Right-click to unmark">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game\'s gold junk coin on a ring and on stacks of cloth, meat and fins">
 </p>
 
 <p align="center">The game's junk coin on greys and on anything you mark yourself.</p>
