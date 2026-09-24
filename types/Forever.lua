@@ -10,6 +10,21 @@ LegacyForeverDB = nil
 ---@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?}?}?}?
 Questie = nil
 
+-- QuestieDB's public API (contract 2), only the parts QuestGivers.lua reads. Entity reads return packed values.
+---@class TFQuestieEntity
+---@field GetAll fun(id: integer, keys: string[]): table?
+---@field IdsByName fun(name: string): integer[]?
+---@field BuildNameIndex fun()
+
+---@class TFQuestieDB
+---@field RequireContract fun(required: integer): boolean, string?
+---@field Npc TFQuestieEntity
+---@field Quest TFQuestieEntity
+---@field Support {Get: fun(name: string): table?}
+
+---@type TFQuestieDB?
+LibQuestieDB = nil
+
 -- Shortest Path Forever's public API, narrowed to what Navigate.lua calls; each member is feature-detected.
 ---@class TFShortestPathAPI
 ---@field version? integer

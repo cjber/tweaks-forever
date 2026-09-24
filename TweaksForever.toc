@@ -5,7 +5,7 @@
 ## Version: @project-version@
 ## Category: Quality of Life
 ## IconTexture: Interface\AddOns\TweaksForever\media\Icon
-## OptionalDeps: ShortestPathForever
+## OptionalDeps: ShortestPathForever, QuestieDB
 ## AddonCompartmentFunc: TweaksForever_OnAddonCompartmentClick
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
@@ -29,6 +29,7 @@ Sections.lua
 Reagents.lua
 Campsites.lua
 QuestDistance.lua
+QuestGivers.lua
 Tooltips.lua
 Nameplates.lua
 Exploration.lua
