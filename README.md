@@ -70,7 +70,7 @@ Nothing to set up. A few features that act for you are off until you tick them.
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Questie and Legacy Forever, it steps aside only while that addon's matching option is on.
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie and Legacy Forever, it steps aside only while that addon's matching option is on.
 
 | Feature | Addons |
 |---|---|

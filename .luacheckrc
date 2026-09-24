@@ -3,9 +3,6 @@ max_line_length = 120
 exclude_files = { "tools/.cache/**", ".release/**", ".types/**", "types/**" }
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
-	"C_NamePlate",
-	"NamePlateDriverFrame",
-	"NamePlateSetupOptions",
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER_RELOAD1",
 	"SlashCmdList",
@@ -34,6 +31,7 @@ read_globals = {
 	"C_Map",
 	"C_MapExplorationInfo",
 	"C_MerchantFrame",
+	"C_NamePlate",
 	"C_PaperDollInfo",
 	"C_QuestLog",
 	"C_Secrets",
@@ -161,6 +159,8 @@ read_globals = {
 	"MerchantSellAllJunkButton",
 	"MinimalSliderWithSteppersMixin",
 	"MouselookStop",
+	"NamePlateDriverFrame",
+	"NamePlateSetupOptions",
 	"NineSliceUtil",
 	"NORMAL_FONT_COLOR",
 	"NUM_TOTAL_EQUIPPED_BAG_SLOTS",

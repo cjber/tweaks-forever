@@ -6,14 +6,11 @@ manual-changelog:
 
 ignore:
   - AGENTS.md
-  - .release-notes.md
   - tools
   - tests
   - types
   - docs
   - media/icon.svg
   - media/icon-400.png
-  - .luacheckrc
-  - .luarc.json
   - stylua.toml
   - ruff.toml

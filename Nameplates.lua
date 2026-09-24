@@ -195,11 +195,7 @@ ns.Init(function()
 		end
 	end)
 	-- Blizzard resets a unit frame's alpha here; nameplates never fade for range, so it always sets 1.
-	hooksecurefunc("CompactUnitFrame_UpdateCenterStatusIcon", function(frame)
-		if styled[frame] then
-			Highlight(frame)
-		end
-	end)
+	hooksecurefunc("CompactUnitFrame_UpdateCenterStatusIcon", Refresh)
 	ns.On("PLAYER_TARGET_CHANGED", function()
 		ForEachPlate(Refresh)
 	end)

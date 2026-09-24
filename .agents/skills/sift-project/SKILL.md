@@ -42,6 +42,9 @@ On-demand tools for audits. Output is candidates, never verdicts.
 | Dead code (Python) | `uvx vulture tools --min-confidence 60` | none seen |
 | Duplication | `npx --yes jscpd@4 --silent --reporters json --output .sift/runs/evidence/jscpd --ignore "**/.sift/**,**/Data/*.lua" .` | the spec files share a 10-line `ns` stub preamble on purpose (each spec is standalone) |
 | Duplication, small | same command with `--min-lines 3 --min-tokens 30` and `**/tests/**` added to `--ignore` | the defaults missed the 6–11 line bag-hook clones between Junk.lua and Gear.lua; this run found them. Repeated checkout/setup-uv steps in ci.yml are expected. |
+| Writable globals never written | for each `globals` entry, `rg -n 'NAME\s*=' -g '*.lua' -g '!types/**' .` | luacheck accepts a writable global that is only read; move it to `read_globals` (the nameplate APIs sat there from #38 to this audit) |
+| Dead annotation fields | for each `---@field NAME` in `types/`, `rg -w NAME -g '*.lua' -g '!types/**' .` | fields of Blizzard objects the addon only reads through a hook still need one production reader |
+| Standards (`wow-forever-addon`) | `SIFT_STANDARDS_PATH=/home/cjber/skills python3 ~/.agents/skills/sift/scripts/agents.py standards` | without the variable the pack reports as not installed; findings use `rule_id` `standards` with `what` starting `WFA-n:` |
 | Unused allowed globals | for each name in `.luacheckrc`, `rg -wl NAME -g '*.lua' -g '*.xml' -g '!tests/**' -g '!types/**' -g '!Data/**' .` | luacheck never reports an unused `read_globals` entry, so these pile up when a feature drops an API; check open branches before removing one |
 
 String-named entrypoints (always pass a path: `rg` with no path reads stdin when it is not a terminal):
@@ -80,7 +83,8 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - `tools/changelog.py` is run by `release.yml`; `refresh-data.yml` seds `BUILD` in and runs every
   `tools/gen_*.py`, so a new generator must be added there and in both READMEs.
 - `.pkgmeta` `ignore:` — every non-dot file not listed ships in the addon zip. New tool configs at the root
-  (like `ruff.toml`) must be added there; dot-files are skipped by the packager.
+  (like `ruff.toml`) must be added there. The pinned packager prunes every dot-path itself (release.sh:1828 at
+  v2.6.1), so dot-files are never listed.
 
 ## Dismissed candidates
 
@@ -94,6 +98,10 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - `Sections.lua`/`Reagents.lua` `Grow`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
   and `MIN_SCALE` is already one constant; each owns its own state.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
+- `Sections.lua`/`Reagents.lua` `Relayout`: a three-line schedule idiom, not a shared implementation.
+- Gear's colour kinds `"group"`/`"set"`/`"fishing"`: persisted keys in `TweaksForeverCharDB.colours`.
+- Junk `Model.SaleValue`'s `not info` (an empty slot's info is nil; the spec calls the model directly) and
+  Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
 - Gear's `Char()` short alias, Frames' repeated `if Active() then Schedule() end`, and Tooltips'
   single-caller `HealthBarStyle` (kept under the function-length limit).
 
