@@ -9,9 +9,10 @@
 ---@class TFCampRow
 ---@field benefit TFCampBenefit
 ---@field left? number
+---@field points? number[] the aura's values by effect, while you have it
 
 ---@class TFCamp
----@field Listing fun(remaining: fun(aura: integer): number?): TFCampRow[]
+---@field Listing fun(remaining: fun(aura: integer): number?, number[]?): TFCampRow[]
 ---@field Toward fun(north: number, west: number, facing: number): string
 
 ---@class TFTrainerSpell
