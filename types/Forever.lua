@@ -100,7 +100,6 @@ function GetTrainerServiceInfo(index) end
 ---@field Text FontString
 ---@field LeftText FontString
 ---@field RightText FontString
----@field IsTarget fun(self: NamePlateHealthBar): boolean?
 
 ---@class NamePlateCastBar : StatusBar
 ---@field Icon Texture
