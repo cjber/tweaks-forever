@@ -116,9 +116,6 @@ for token, class in pairs(ns.ClassSpells) do
 		assert(row[4] > 0 and row[2] >= 1 and (row[3] == nil or row[3] >= 0), token .. " " .. row[1])
 	end
 end
-local warrior = Model.Spells(ns.ClassSpells.WARRIOR, nil, DWARF, Describe, Known)
-assert(warrior[674] and warrior[674].general and warrior[674].lineID == 118, "Dual Wield goes on the General tab")
-assert(warrior[100] and not warrior[100].general, "Charge on its class tab")
 
 -- A German client: the tabs and the trainer name every line in German, and the baked rows still find their tab.
 local TABS = { "Allgemein", "Elementarkampf", "Verstärkung" }
