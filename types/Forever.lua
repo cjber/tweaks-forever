@@ -126,6 +126,8 @@ SPELLBOOK_TRAINABLE = ""
 ---@type string
 SPELLBOOK_AVAILABLE_AT = ""
 ---@type string
+GENERAL = ""
+---@type string
 PAGE_NUMBER_WITH_MAX = ""
 ---@type string
 COSTS_LABEL = ""

@@ -88,6 +88,8 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |
 
+Addons can use `TweaksForever.API` (`version = 1`). `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned, each spell's next rank only and no weapon skills or riding, as fresh `{spellID, name, level, cost, line, lineID, general}` tables: `line` is the tab's name in the client's language, for display, and `lineID` its SkillLine ID, the same in every language. A spell for the General tab (Dual Wield, Parry, Plate Mail) has `general` set and its own skill line as `lineID`, as that tab has none. `cost` is missing when the fee isn't known. It answers whether or not Future Spells is on. It returns `nil` before login and in combat.
+
 ## Install
 
 Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.
@@ -106,6 +108,7 @@ python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua f
 python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
 python3 tools/gen_dungeons.py                   # regenerate Data/DungeonEntrances.lua from wago.tools
 python3 tools/gen_zonelevels.py                 # regenerate Data/ZoneLevels.lua from wago.tools
+python3 tools/gen_classspells.py                # regenerate Data/ClassSpells.lua from CMaNGOS and wago.tools
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
@@ -114,7 +117,7 @@ Ketho WoW API annotations (including pinned FrameXML) into ignored `.types/`, ch
 (including generated data), and rejects every diagnostic. Local contracts in `types/` are editor-only
 and excluded from the release. See [tools/README.md](tools/README.md) for the multi-value rule.
 
-CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp, zone level and dungeon entrance data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
+CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp, zone level, dungeon entrance and class trainer data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
 
 **Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
 
@@ -122,6 +125,6 @@ CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linti
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)).
+GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)

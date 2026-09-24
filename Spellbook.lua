@@ -7,7 +7,7 @@ ns.Feature({
 	name = "Show future spells in the spellbook",
 	tooltip = "Spells you have not learned yet appear greyed out after the ones you know, as the Retail spellbook "
 		.. "shows them: what your trainer can teach you now, and each spell's next rank with the level it comes at. "
-		.. "The trainer's list is remembered each time you visit one.",
+		.. "Visiting your trainer brings the list and its prices up to date.",
 	default = true,
 })
 
@@ -19,6 +19,9 @@ ns.FutureSpells = Model
 local KEEP = { available = true, unavailable = true }
 -- Retail's glow on a spellbook entry waiting at the trainer (TRAINABLE_FX_ID in Blizzard_SpellBookItem.lua).
 local TRAINABLE_FX = 176
+-- The General tab has no skill line of its own: a spell on a line that isn't a class line (Dual Wield, Defense,
+-- armour, Lockpicking) is listed there. SkillLine IDs start at 1, so this stands for it among them.
+Model.GENERAL = 0
 
 ---@param a TFFutureSpell
 ---@param b TFFutureSpell
@@ -32,18 +35,24 @@ local function InOrder(a, b)
 	return a.spell.name < b.spell.name
 end
 
--- A tab's unlearned spells: the lowest unlearned rank of each, those your trainer teaches now first, then by level.
+-- A tab's unlearned spells, or every tab's with no line: the lowest unlearned rank of each, those your trainer
+-- teaches now first, then by level. A row on no skill line of the class (weapons, riding) is never listed.
 ---@param spells table<integer, TFTrainerSpell>
----@param line string
+---@param lineID integer? the tab's SkillLine ID, or GENERAL
 ---@param level number
 ---@param Skip fun(id: integer): boolean? known, or hidden by the spellbook's filter
 ---@return TFFutureSpell[]
-function Model.Choose(spells, line, level, Skip)
+function Model.Choose(spells, lineID, level, Skip)
 	---@type table<string, TFFutureSpell>
 	local byName = {}
 	for id, spell in pairs(spells) do
 		local held = byName[spell.name]
-		if spell.line == line and not Skip(id) and (not held or spell.level < held.spell.level) then
+		if
+			spell.lineID
+			and (not lineID or (spell.general and Model.GENERAL or spell.lineID) == lineID)
+			and not Skip(id)
+			and (not held or spell.level < held.spell.level)
+		then
 			byName[spell.name] = { id = id, spell = spell, ready = spell.level <= level }
 		end
 	end
@@ -53,6 +62,100 @@ function Model.Choose(spells, line, level, Skip)
 	end
 	table.sort(chosen, InOrder)
 	return chosen
+end
+
+---@param ids integer[]?
+---@param Known fun(id: integer): boolean
+local function AnyKnown(ids, Known)
+	if not ids then
+		return true
+	end
+	for _, id in ipairs(ids) do
+		if Known(id) then
+			return true
+		end
+	end
+	return false
+end
+
+-- What your class trainer teaches: your class's baked list, less other races' spells and ranks whose untrained
+-- earlier rank you lack, with the rows a trainer visit recorded laid over it, as the server has the last word on
+-- level and fee. A baked spell the client can't describe is left out, never guessed at; one on a line that is not
+-- a class line goes on the General tab.
+---@param baked TFClassSpells?
+---@param live table<integer, TFTrainerSpell>?
+---@param race integer
+---@param Describe fun(id: integer): TFSpellFacts?
+---@param Known fun(id: integer): boolean
+---@return table<integer, TFTrainerSpell>
+function Model.Spells(baked, live, race, Describe, Known)
+	---@type table<integer, TFTrainerSpell>
+	local spells = {}
+	local lines = baked and baked.lines or {}
+	for _, row in ipairs(baked and baked.spells or {}) do
+		local facts = (not row.races or tContains(row.races, race)) and AnyKnown(row.needs, Known) and Describe(row[1])
+		if facts then
+			spells[row[1]] = {
+				name = facts.name,
+				rank = facts.rank,
+				icon = facts.icon,
+				level = row[2],
+				cost = row[3],
+				lineID = row[4],
+				general = not tContains(lines, row[4]) or nil,
+			}
+		end
+	end
+	for id, spell in pairs(live or {}) do
+		spells[id] = spell
+	end
+	return spells
+end
+
+-- The class skill line on each spellbook tab, by tab index. A tab tells only its name, in the client's language,
+-- so each baked line's ID is asked for its tab instead of names being compared: the same answer in every locale.
+---@param lineIDs integer[]
+---@param IndexOf fun(lineID: integer): integer?
+---@return table<integer, integer> tab index -> SkillLine ID
+function Model.Tabs(lineIDs, IndexOf)
+	local tabs = {}
+	for _, lineID in ipairs(lineIDs) do
+		local index = IndexOf(lineID)
+		if index then
+			tabs[index] = lineID
+		end
+	end
+	return tabs
+end
+
+-- Saves from before lines were kept by ID hold only the trainer's name for one: give each row its ID, and drop the
+-- rows that have none (weapon and riding rows, which no class tab shows; a spell the next visit records again).
+---@param saved table<integer, TFTrainerSpell>
+---@param Resolve fun(id: integer, name: string?): integer?
+function Model.Migrate(saved, Resolve)
+	for id, spell in pairs(saved) do
+		if type(spell) ~= "table" then
+			saved[id] = nil
+		elseif spell.lineID == nil then
+			spell.lineID = Resolve(id, spell.line)
+			if not spell.lineID then
+				saved[id] = nil
+			end
+		end
+	end
+end
+
+-- How far down a view our entries may reach: its foot, or the top of the pager where the pager covers it (the stock
+-- pager sits over the foot of the last view). Tops are screen offsets, as GetTop gives them; nil before layout.
+---@param height number the view's height
+---@param top number? the view's top
+---@param pagerTop number? the pager's top
+---@return number
+function Model.Room(height, top, pagerTop)
+	if top and pagerTop then
+		return math.min(height, top - pagerTop)
+	end
+	return height
 end
 
 -- Places a header and count entries after the spellbook's own, with its column-first grid rules: a spacer before a
@@ -114,12 +217,94 @@ local layer, blocker, header, pageText, prev, nextPage
 local items = {}
 local extra, extraPages, lastDisplay = 0, 0, 0
 
+---@param id integer
+---@return TFSpellFacts?
+local function Describe(id)
+	local info = C_Spell.GetSpellInfo(id)
+	if info then
+		local rank = C_Spell.GetSpellSubtext(id)
+		return { name = info.name, icon = info.iconID, rank = rank ~= "" and rank or nil }
+	end
+end
+
+---@param id integer
+---@return boolean
+function ns.KnownSpell(id)
+	return C_SpellBook.IsSpellKnown(id)
+end
+
+---@return TFClassSpells?
+local function ClassData()
+	local _, class = UnitClass("player")
+	return ns.ClassSpells[class]
+end
+
+-- Everything your class trainer teaches, as far as the baked list and your trainer visits know.
+---@return table<integer, TFTrainerSpell>
+function ns.TrainerSpells()
+	local live = TweaksForeverCharDB and TweaksForeverCharDB.trainer
+	return Model.Spells(ClassData(), live, (select(3, UnitRace("player"))), Describe, ns.KnownSpell)
+end
+
+---@return table<integer, integer> tab index -> SkillLine ID
+local function Tabs()
+	local data = ClassData()
+	return Model.Tabs(data and data.lines or {}, C_SpellBook.GetSkillLineIndexByID)
+end
+
+-- A class skill line's name in the client's language: its spellbook tab's, else the trainer's, else the client's.
+---@param lineID integer
+---@param fallback string? the name a trainer gave it
+---@return string
+function ns.LineName(lineID, fallback)
+	local index = C_SpellBook.GetSkillLineIndexByID(lineID)
+	local info = index and C_SpellBook.GetSpellBookSkillLineInfo(index)
+	return info and info.name or fallback or C_TradeSkillUI.GetTradeSkillDisplayName(lineID)
+end
+
+-- The General tab's name in the client's language.
+---@return string
+function ns.GeneralName()
+	local info = C_SpellBook.GetSpellBookSkillLineInfo(Enum.SpellBookSkillLineIndex.General)
+	return info and info.name or GENERAL
+end
+
+-- Whether a trainer row's line puts it on the General tab: it is none of the class's lines.
+---@param lineID integer
+---@return true?
+function ns.OnGeneral(lineID)
+	local data = ClassData()
+	return not (data and tContains(data.lines, lineID)) or nil
+end
+
+-- Finds a spell's skill line ID: the baked row's (a General tab row's own line), else the class tab the trainer
+-- names. The trainer names it in the client's language, as the tab does, so the two match in every locale; weapon
+-- and riding lines don't.
+---@return fun(id: integer, name: string?): integer?
+function ns.LineResolver()
+	local data = ClassData()
+	local byID, byName = {}, {}
+	for _, row in ipairs(data and data.spells or {}) do
+		byID[row[1]] = row[4]
+	end
+	for index, lineID in pairs(Tabs()) do
+		local info = C_SpellBook.GetSpellBookSkillLineInfo(index)
+		if info then
+			byName[info.name] = lineID
+		end
+	end
+	return function(id, name)
+		return byID[id] or name and byName[name]
+	end
+end
+
 local function Book()
 	return PlayerSpellsFrame.SpellBookFrame
 end
 
--- The class skill line on show, or nil on the general, pet and outfit tabs and in search results.
----@return string?
+-- The class skill line ID on show, GENERAL on the General tab, or nil on the pet and outfit tabs and in search
+-- results.
+---@return integer?
 local function ActiveLine()
 	local book = Book()
 	if book:IsInSearchResultsMode() then
@@ -127,11 +312,10 @@ local function ActiveLine()
 	end
 	local category = book:GetActiveCategoryMixin()
 	local index = category and category.skillLineIndex
-	if not index or index == Enum.SpellBookSkillLineIndex.General then
-		return nil
+	if index == Enum.SpellBookSkillLineIndex.General then
+		return Model.GENERAL
 	end
-	local info = C_SpellBook.GetSpellBookSkillLineInfo(index)
-	return info and info.name
+	return index and Tabs()[index]
 end
 
 -- Where the spellbook's last view ends, read from its split data so it holds on any page.
@@ -178,6 +362,7 @@ local function Paint(item, entry)
 	text.Name:SetText(spell.name)
 	text.SubName:SetText(spell.rank or "")
 	text.RequiredLevel:SetText(entry.ready and SPELLBOOK_TRAINABLE or SPELLBOOK_AVAILABLE_AT:format(spell.level))
+	text.RequiredLevel:Show()
 	for _, label in ipairs({ text.Name, text.SubName, text.RequiredLevel }) do
 		label:SetAlpha(item.unlearnedTextAlpha)
 	end
@@ -241,11 +426,10 @@ local function Render()
 		item:Hide()
 	end
 	header:Hide()
-	local line = ns.Active("trainableSpells") and TweaksForeverCharDB.trainer and ActiveLine()
+	local line = ns.Active("trainableSpells") and ActiveLine()
 	local chosen = line
-			and Model.Choose(TweaksForeverCharDB.trainer, line, UnitLevel("player"), function(id)
-				return C_SpellBook.IsSpellKnown(id)
-					or (GetCVarBool("spellBookHidePassives") and C_Spell.IsSpellPassive(id))
+			and Model.Choose(ns.TrainerSpells(), line, UnitLevel("player"), function(id)
+				return ns.KnownSpell(id) or (GetCVarBool("spellBookHidePassives") and C_Spell.IsSpellPassive(id))
 			end)
 		or {}
 	if #chosen == 0 then
@@ -262,7 +446,11 @@ local function Render()
 	local grid = {
 		views = paged.viewsPerPage,
 		width = paged.ViewFrames[1]:GetWidth(),
-		height = paged.ViewFrames[1]:GetHeight(),
+		height = Model.Room(
+			paged.ViewFrames[1]:GetHeight(),
+			paged.ViewFrames[1]:GetTop(),
+			paged.PagingControls:GetTop()
+		),
 		columns = paged.columnsPerRow,
 		gap = paged.xPadding,
 		pad = paged.yPadding,
@@ -328,7 +516,8 @@ end
 local function Arrow(controls, template, step)
 	local arrow = CreateFrame("Button", nil, layer, template)
 	arrow:SetAllPoints(controls)
-	arrow:SetFrameLevel(controls:GetFrameLevel() + 10)
+	-- Above our entries and the blocker, which cover the stock pager's own buttons.
+	arrow:SetFrameLevel(layer:GetFrameLevel() + 10)
 	arrow:SetScript("OnClick", function()
 		Turn(step)
 	end)
@@ -358,7 +547,9 @@ local function Create()
 	header = CreateFrame("Frame", nil, layer, "SpellBookHeaderTemplate") --[[@as SpellBookHeaderTemplate]]
 	pageText = layer:CreateFontString(nil, "OVERLAY", controls.fontName)
 	pageText:SetTextColor(SPELLBOOK_FONT_COLOR:GetRGB())
-	pageText:SetAllPoints(controls.PageText)
+	-- The stock label is only as wide as its own text, so ours keeps just its right edge and its line.
+	pageText:SetPoint("RIGHT", controls.PageText)
+	pageText:SetWordWrap(false)
 	prev = Arrow(controls.PrevPageButton, "PagingControlsPrevPageButtonTemplate", -1)
 	nextPage = Arrow(controls.NextPageButton, "PagingControlsNextPageButtonTemplate", 1)
 
@@ -381,9 +572,10 @@ local function RenderIfShown()
 	end
 end
 
--- The server keeps unlearned spells out of the spellbook, so the class trainer's list is the only full one. It
--- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge
--- by spell, so another trainer (weapons, riding) adds to the list rather than replacing it.
+-- The server, not the baked list, has the last word on what the class trainer teaches and for how much. The trainer
+-- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge by
+-- spell and keep only lines the spellbook shows (class tabs, and the General tab's baked rows), so another trainer
+-- (weapons, riding) neither replaces nor adds to them.
 local function ScanTrainer()
 	if not ns.Active("trainableSpells") or IsTradeskillTrainer() then
 		return
@@ -399,16 +591,21 @@ local function ScanTrainer()
 		end
 	end
 	local spells = TweaksForeverCharDB.trainer or {}
+	local Resolve = ns.LineResolver()
 	for i = 1, GetNumTrainerServices() do
 		local name, kind, icon, level, rank = GetTrainerServiceInfo(i)
 		local data = KEEP[kind] and C_TooltipInfo.GetTrainerService(i)
-		if data and data.id then
+		local line = GetTrainerServiceSkillLine(i)
+		local lineID = data and data.id and Resolve(data.id, line)
+		if lineID then
 			spells[data.id] = {
 				name = name or C_Spell.GetSpellName(data.id),
 				rank = rank ~= "" and rank or nil,
 				level = level or 1,
 				icon = icon,
-				line = GetTrainerServiceSkillLine(i),
+				lineID = lineID,
+				general = ns.OnGeneral(lineID),
+				line = line,
 				cost = GetTrainerServiceCost(i),
 			}
 		end
@@ -424,6 +621,9 @@ end
 
 ns.Init(function()
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
+	if type(TweaksForeverCharDB.trainer) == "table" then
+		Model.Migrate(TweaksForeverCharDB.trainer, ns.LineResolver())
+	end
 	ns.On("TRAINER_SHOW", ScanTrainer)
 	EventRegistry:RegisterCallback("PlayerSpellsFrame.SpellBookFrame.Show", function()
 		if not layer then
