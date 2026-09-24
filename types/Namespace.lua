@@ -55,6 +55,33 @@
 ---@field y number
 ---@field scale number
 
+---@class TFGiverPoint
+---@field continent integer
+---@field x number world yards
+---@field y number world yards
+
+---@class TFGiverCandidate
+---@field id integer
+---@field points TFGiverPoint[]
+---@field starts integer[] quest IDs
+---@field ends integer[] quest IDs
+
+---@class TFGiverQuest
+---@field id integer
+---@field title string
+---@field level integer
+---@field min integer the level it opens at
+---@field soon? boolean above your level
+---@field ready? boolean complete, for a quest in your log
+
+---@class TFQuestGivers
+---@field Attach fun(): boolean
+---@field Resolve fun(name: string, continent: integer, x: number, y: number): TFGiverCandidate?
+---@field Quests fun(npc: TFGiverCandidate): TFGiverQuest[], TFGiverQuest[]
+---@field Lines fun(npc: TFGiverCandidate): [string, number, number, number][]
+---@field Names fun(data: TooltipData): string[]
+---@field TooltipLines fun(names: string[]): [string, number, number, number][]
+
 ---@class TFDatabase
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
@@ -114,6 +141,7 @@ TweaksForeverCharDB = nil
 ---@field DungeonEntrances table<integer, TFEntrance[]>
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
+---@field QuestGivers TFQuestGivers
 ---@field Print fun(message: string)
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()

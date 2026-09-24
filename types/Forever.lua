@@ -10,6 +10,21 @@ LegacyForeverDB = nil
 ---@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?}?}?}?
 Questie = nil
 
+-- QuestieDB's public API (contract 2), only the parts QuestGivers.lua reads. Entity reads return packed values.
+---@class TFQuestieEntity
+---@field GetAll fun(id: integer, keys: string[]): table?
+---@field IdsByName fun(name: string): integer[]?
+---@field BuildNameIndex fun()
+
+---@class TFQuestieDB
+---@field RequireContract fun(required: integer): boolean, string?
+---@field Npc TFQuestieEntity
+---@field Quest TFQuestieEntity
+---@field Support {Get: fun(name: string): table?}
+
+---@type TFQuestieDB?
+LibQuestieDB = nil
+
 -- Camelot's character panel dimensions and panel-manager accessor are absent from Retail FrameXML.
 ---@type number
 CHARACTER_FRAME_COLLAPSED_WIDTH = 0

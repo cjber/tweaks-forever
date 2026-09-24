@@ -10,6 +10,7 @@
 ## X-Website: https://github.com/cjber/tweaks-forever
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
+## OptionalDeps: QuestieDB
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
@@ -27,6 +28,7 @@ Sections.lua
 Reagents.lua
 Campsites.lua
 QuestDistance.lua
+QuestGivers.lua
 Tooltips.lua
 Nameplates.lua
 Exploration.lua
