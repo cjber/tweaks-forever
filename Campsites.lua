@@ -12,6 +12,15 @@ ns.Feature({
 	default = true,
 })
 
+ns.Feature({
+	key = "campAlerts",
+	category = "Interface",
+	name = "Announce camp benefits",
+	tooltip = "When you gain a camp benefit, such as Fish Bowl, its name and what it gives show at the top of the "
+		.. "screen, once per benefit. Not for the ones you already had when you logged in.",
+	default = true,
+})
+
 local CAMP_BENEFITS, CAMPFIRE_NEARBY = 1229741, 1283391
 local TENT = 1229451
 -- About the reach of Campfire Nearby: a campfire remembered farther off than this is not the one you are near.
@@ -107,7 +116,47 @@ local function Toward(north, west, facing)
 	return ("Campfire: about %d yd %s"):format(math.floor(yards / 5 + 0.5) * 5, side)
 end
 
-ns.Camp = { Listing = Listing, Toward = Toward }
+-- A number as the game's descriptions print it.
+---@param value number
+---@return string
+local function Number(value)
+	return value % 1 == 0 and ("%d"):format(value) or ("%g"):format(value)
+end
+
+-- The benefit's effect with the aura's own values in place of the spell's base ones, which the aura you get can
+-- differ from. `points` is the aura's values by effect; without all of them the effect keeps the base values.
+---@param benefit TFCampBenefit
+---@param points number[]?
+---@return string
+local function Effect(benefit, points)
+	local effect, bases = benefit[3], benefit[5]
+	if not bases or not points then
+		return effect
+	end
+	local parts, from = {}, 1
+	for index, base in ipairs(bases) do
+		local live = points[index]
+		-- The whole number only: 2 must not match inside 22.
+		local first, last = effect:find("%f[%d.]" .. Number(base):gsub("%.", "%%.") .. "%f[^%d.]", from)
+		if type(live) ~= "number" or not first then
+			return effect
+		end
+		parts[#parts + 1] = effect:sub(from, first - 1) .. Number(live)
+		from = last + 1
+	end
+	return table.concat(parts) .. effect:sub(from)
+end
+
+-- What a newly gained benefit gives, as one line.
+---@param benefit TFCampBenefit
+---@param points number[]?
+---@return string
+local function Announcement(benefit, points)
+	local gives = benefit[1] == TENT and "rested experience" or Effect(benefit, points):gsub("^%u", string.lower)
+	return ("Camp benefit gained: %s (%s)"):format(benefit[2], gives)
+end
+
+ns.Camp = { Listing = Listing, Toward = Toward, Effect = Effect, Announcement = Announcement }
 
 -- Aura data is secret in combat and wherever else the game restricts it: no reading, comparing or arithmetic then.
 local function AurasSecret()
@@ -374,7 +423,40 @@ local function TrackCampfire()
 	end)
 end
 
+-- Each benefit is an aura of its own, which the Camp Benefits buff's description checks for by spell ID; a gain
+-- is one that wasn't there at the last look. The first look and a full update (login, reload, zoning) only take
+-- stock, and while auras are secret nothing is read, so a benefit gained in combat is announced once it ends.
+local function AnnounceBenefits()
+	---@type table<integer, true>?
+	local had
+	---@param announce boolean
+	local function Look(announce)
+		local now = {}
+		for _, benefit in ipairs(ns.CampBenefits) do
+			local aura = C_UnitAuras.GetPlayerAuraBySpellID(benefit[1])
+			if aura then
+				now[benefit[1]] = true
+				if had and not had[benefit[1]] and announce and ns.Active("campAlerts") then
+					UIErrorsFrame:AddMessage(Announcement(benefit, aura.points), YELLOW_FONT_COLOR:GetRGB())
+				end
+			end
+		end
+		had = now
+	end
+	if not AurasSecret() then
+		Look(false)
+	end
+	local frame = CreateFrame("Frame")
+	frame:RegisterUnitEvent("UNIT_AURA", "player")
+	frame:SetScript("OnEvent", function(_, _, _, info)
+		if not AurasSecret() then
+			Look(not info.isFullUpdate)
+		end
+	end)
+end
+
 ns.Init(function()
 	InitTooltips()
 	TrackCampfire()
+	AnnounceBenefits()
 end)

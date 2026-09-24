@@ -4,7 +4,7 @@
 ---@alias TFGroups table<string, TFMarks>
 ---@alias TFColour [number, number, number]
 ---@alias TFColours table<string, table<string|integer, TFColour>>
----@alias TFCampBenefit [integer, string, string, number?]
+---@alias TFCampBenefit [integer, string, string, number?, number[]?]
 
 ---@class TFCampRow
 ---@field benefit TFCampBenefit
