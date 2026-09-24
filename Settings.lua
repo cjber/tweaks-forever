@@ -3,6 +3,10 @@ local _, ns = ...
 
 -- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
 -- tall. A feature another addon already handles is greyed out, its tooltip naming that addon.
+-- Every row goes in through Settings.RegisterInitializer, which inserts it from Blizzard's secure delegate.
+-- Settings.CreateCheckbox/CreateDropdown and layout:AddInitializer insert from our code instead, and the
+-- settings search reads every layout, so that tainted it: a restricted button in the results (Social's
+-- Discord Sign In) was then blocked and blamed on us.
 
 ---@param feature TFFeature
 local function Tooltip(feature)
@@ -32,7 +36,7 @@ local function AddSetting(category, feature, initializers)
 	)
 	local initializer
 	if options then
-		initializer = Settings.CreateDropdown(category, setting, function()
+		initializer = Settings.CreateDropdownInitializer(setting, function()
 			local container = Settings.CreateControlTextContainer()
 			for _, option in ipairs(options) do
 				container:Add(option[1], option[2])
@@ -40,7 +44,7 @@ local function AddSetting(category, feature, initializers)
 			return container:GetData()
 		end, Tooltip(feature))
 	else
-		initializer = Settings.CreateCheckbox(category, setting, Tooltip(feature))
+		initializer = Settings.CreateCheckboxInitializer(setting, nil, Tooltip(feature))
 	end
 	initializer:AddModifyPredicate(function()
 		return not ns.ConflictOf(feature.key)
@@ -51,10 +55,11 @@ local function AddSetting(category, feature, initializers)
 		end)
 	end
 	initializers[feature.key] = initializer
+	Settings.RegisterInitializer(category, initializer)
 end
 
 ns.Init(function()
-	local category, layout = Settings.RegisterVerticalLayoutCategory("Tweaks Forever")
+	local category = Settings.RegisterVerticalLayoutCategory("Tweaks Forever")
 	-- Subpages in the order their first feature loads; several files add to one.
 	local sections, bySection = {}, {}
 	for _, feature in ipairs(ns.features) do
@@ -71,9 +76,12 @@ ns.Init(function()
 			AddSetting(subcategory, feature, initializers)
 		end
 		-- The index is buttons that open each subpage; search finds the settings themselves instead.
-		layout:AddInitializer(CreateSettingsButtonInitializer(section, "Open", function()
-			Settings.OpenToCategory(subcategory:GetID())
-		end, nil, false))
+		Settings.RegisterInitializer(
+			category,
+			CreateSettingsButtonInitializer(section, "Open", function()
+				Settings.OpenToCategory(subcategory:GetID())
+			end, nil, false)
+		)
 	end
 	Settings.RegisterAddOnCategory(category)
 	-- Another addon's settings may have changed since login.

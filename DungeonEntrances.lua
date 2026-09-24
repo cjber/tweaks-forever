@@ -6,7 +6,7 @@ ns.Feature({
 	category = "Maps",
 	name = "Dungeon and raid entrances on the world map",
 	tooltip = "Mark every dungeon and raid entrance on zone and continent maps with the retail icons; point at "
-		.. "one for its name. Follows the map's own Show instance entrances filter.",
+		.. "one for its name, and click it to travel there. Follows the map's own Show instance entrances filter.",
 	default = true,
 	conflicts = {
 		{
@@ -71,6 +71,13 @@ function Model.Describe(entry)
 	return title, table.concat(names, "\n")
 end
 
+-- Travel to the entrance on the map it is drawn on, under the name its tooltip gives it.
+---@param uiMapID integer
+---@param entry TFEntrance
+function Model.Travel(uiMapID, entry)
+	ns.Navigate(uiMapID, entry.x, entry.y, (Model.Describe(entry)))
+end
+
 -- Whether a marker at (mx, my) sits on (x, y), both normalized, within the given half extents.
 ---@return boolean
 function Model.Covers(x, y, mx, my, halfX, halfY)
@@ -107,10 +114,12 @@ ns.Init(function()
 	end
 
 	-- Retail's pin, fed from Data/DungeonEntrances.lua: C_EncounterJournal has no entrances without the journal's
-	-- tables, which Forever's client lacks, so Blizzard's own provider draws nothing. Mouse motion only, so clicks
-	-- reach the map: there is no journal to open.
+	-- tables, which Forever's client lacks, so Blizzard's own provider draws nothing. A left click travels there in
+	-- place of retail's journal; the canvas still passes right clicks through to zoom out.
 	---@class TFEntrancePin : BaseMapPoiPinMixin, Frame
+	---@field entry TFEntrance
 	---@field lines string?
+	---@field OnMouseClickAction fun(self: TFEntrancePin, button: string) the canvas's optional click hook
 	TweaksForeverDungeonEntrancePinMixin = BaseMapPoiPinMixin:CreateSubPin("PIN_FRAME_LEVEL_DUNGEON_ENTRANCE")
 	local Pin = TweaksForeverDungeonEntrancePinMixin
 
@@ -122,6 +131,7 @@ ns.Init(function()
 			atlasName = Model.Atlas(entry),
 			position = CreateVector2D(entry.x, entry.y),
 		})
+		self.entry = entry
 		self.lines = lines
 		self:SetShown(not Covered(self, HalfExtents()))
 	end
@@ -132,6 +142,17 @@ ns.Init(function()
 
 	function Pin:GetBestNameAndDescription()
 		return self.name, self.lines
+	end
+
+	function Pin.GetTooltipInstructions()
+		return ns.NavigateHint()
+	end
+
+	---@param button string
+	function Pin:OnMouseClickAction(button)
+		if button == "LeftButton" then
+			Model.Travel(self:GetMap():GetMapID(), self.entry)
+		end
 	end
 
 	local Provider = CreateFromMixins(CVarMapCanvasDataProviderMixin)

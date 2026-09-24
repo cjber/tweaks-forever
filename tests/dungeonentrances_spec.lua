@@ -70,4 +70,14 @@ assert(title == "instance 47" and lines == "instance 129")
 assert(Model.Covers(0.5, 0.5, 0.505, 0.49, 0.01, 0.02))
 assert(not Model.Covers(0.5, 0.5, 0.52, 0.5, 0.01, 0.02))
 assert(not Model.Covers(0.5, 0.5, 0.5, 0.53, 0.01, 0.02))
+
+-- A click travels to the entrance's own coordinates on the map it is drawn on, named as its tooltip names it.
+local travelled
+function ns.Navigate(uiMapID, x, y, name)
+	travelled = { uiMapID, x, y, name }
+end
+Model.Travel(1415, { x = 0.47, y = 0.61, instances = { 229, 409 }, area = 25 })
+assert(travelled[1] == 1415 and travelled[2] == 0.47 and travelled[3] == 0.61 and travelled[4] == "area 25")
+Model.Travel(1427, { x = 0.35, y = 0.84, instances = { 36 } })
+assert(travelled[1] == 1427 and travelled[4] == "instance 36")
 print("dungeonentrances: ok")

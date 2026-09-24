@@ -5,12 +5,12 @@
 ## Version: @project-version@
 ## Category: Quality of Life
 ## IconTexture: Interface\AddOns\TweaksForever\media\Icon
+## OptionalDeps: ShortestPathForever, QuestieDB
 ## AddonCompartmentFunc: TweaksForever_OnAddonCompartmentClick
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
-## OptionalDeps: QuestieDB
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
@@ -18,6 +18,7 @@ Data\Overlays.lua
 Data\CampBenefits.lua
 Data\ZoneLevels.lua
 Data\DungeonEntrances.lua
+Data\ClassSpells.lua
 Core.lua
 Automation.lua
 Vendor.lua
@@ -33,6 +34,7 @@ Tooltips.lua
 Nameplates.lua
 Exploration.lua
 ZoneLevels.lua
+Navigate.lua
 DungeonEntrances.lua
 DungeonEntrances.xml
 Frames.lua
@@ -41,3 +43,4 @@ Spellbook.lua
 Fishing.lua
 Reload.lua
 Settings.lua
+API.lua
