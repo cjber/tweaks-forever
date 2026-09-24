@@ -5,7 +5,7 @@ ns.Feature({
 	key = "campTooltips",
 	category = "Interface",
 	name = "Explain campsite benefits",
-	tooltip = "Hovering a camp feature, such as a Camp Tent or Mana Well, shows exactly what sitting nearby gives "
+	tooltip = "Hovering a camp feature, such as a Camp Tent or Mana Well, shows what sitting nearby gives "
 		.. "you and whether you have it. Hovering a campfire lists every benefit a camp can give. Your Campfire "
 		.. "Nearby buff adds the benefits you have, and which way the campfire is once you have lit or sat by it; "
 		.. "your Camp Benefits buff adds the ones you haven't gained yet.",
@@ -73,15 +73,15 @@ for _, feature in ipairs(FEATURES) do
 	end
 end
 
--- Every camp benefit as { benefit, left }, the ones you have first, each group in the game's order. `remaining`
--- gives seconds left on an aura, 0 for no expiry, nil without it.
----@param remaining fun(aura: integer): number?
+-- Every camp benefit as { benefit, left, points }, the ones you have first, each group in the game's order.
+-- `remaining` gives seconds left on an aura, 0 for no expiry, nil without it, and then the aura's values.
+---@param remaining fun(aura: integer): number?, number[]?
 ---@return TFCampRow[]
 local function Listing(remaining)
 	local have, missing = {}, {}
 	for _, benefit in ipairs(ns.CampBenefits) do
-		local left = remaining(benefit[1])
-		table.insert(left and have or missing, { benefit = benefit, left = left })
+		local left, points = remaining(benefit[1])
+		table.insert(left and have or missing, { benefit = benefit, left = left, points = points })
 	end
 	for _, row in ipairs(missing) do
 		have[#have + 1] = row
@@ -123,25 +123,43 @@ local function Number(value)
 	return value % 1 == 0 and ("%d"):format(value) or ("%g"):format(value)
 end
 
--- The benefit's effect with the aura's own values in place of the spell's base ones, which the aura you get can
--- differ from. `points` is the aura's values by effect; without all of them the effect keeps the base values.
+-- The benefit's effect with the aura's own values in place of the spell's base ones. The server sets the values
+-- (a low level's First Aid Kit gives 8 Stamina, not the base 56) and no scaling in the game's data says how, so
+-- without all of the aura's values, `points` by effect, the effect names what it raises and no amount.
 ---@param benefit TFCampBenefit
 ---@param points number[]?
 ---@return string
 local function Effect(benefit, points)
 	local effect, bases = benefit[3], benefit[5]
-	if not bases or not points then
+	if not bases then
 		return effect
+	end
+	local live = points
+	for index in ipairs(bases) do
+		if not live or type(live[index]) ~= "number" then
+			live = nil
+		end
 	end
 	local parts, from = {}, 1
 	for index, base in ipairs(bases) do
-		local live = points[index]
 		-- The whole number only: 2 must not match inside 22.
 		local first, last = effect:find("%f[%d.]" .. Number(base):gsub("%.", "%%.") .. "%f[^%d.]", from)
-		if type(live) ~= "number" or not first then
+		if not first then
 			return effect
 		end
-		parts[#parts + 1] = effect:sub(from, first - 1) .. Number(live)
+		local before = effect:sub(from, first - 1)
+		if live then
+			parts[#parts + 1] = before .. Number(live[index])
+		else
+			-- "increased by 8%" loses " by 8%", "Restores 29 Mana" loses "29 ".
+			last = last + #effect:match("^%%?", last + 1)
+			if before:find(" by $") then
+				before = before:sub(1, -5)
+			elseif effect:sub(last + 1, last + 1) == " " then
+				last = last + 1
+			end
+			parts[#parts + 1] = before
+		end
 		from = last + 1
 	end
 	return table.concat(parts) .. effect:sub(from)
@@ -163,12 +181,16 @@ local function AurasSecret()
 	return InCombatLockdown() or C_Secrets.ShouldAurasBeSecret()
 end
 
--- Seconds left on the aura, 0 for no expiry, nil without it. Only call when AurasSecret() is false.
+-- Seconds left on the aura, 0 for no expiry, nil without it, then the aura's values. Only call when AurasSecret()
+-- is false.
 ---@param aura integer
----@return number?
+---@return number?, number[]?
 local function Remaining(aura)
 	local info = C_UnitAuras.GetPlayerAuraBySpellID(aura)
-	return info and (info.expirationTime > 0 and info.expirationTime - GetTime() or 0)
+	if not info then
+		return nil
+	end
+	return (info.expirationTime > 0 and info.expirationTime - GetTime() or 0), info.points
 end
 
 -- Minutes and up without seconds, but seconds in the last minute rather than an empty string.
@@ -182,7 +204,8 @@ end
 ---@param tooltip GameTooltip
 ---@param row TFCampRow
 local function AddRow(tooltip, row)
-	local aura, feature, effect = unpack(row.benefit)
+	local aura, feature = row.benefit[1], row.benefit[2]
+	local effect = Effect(row.benefit, row.points)
 	local text
 	if not row.left then
 		text = feature .. ": " .. effect
@@ -231,11 +254,13 @@ end
 ---@param tooltip GameTooltip
 ---@param aura integer
 local function AddFeature(tooltip, aura)
-	local _, _, effect, seconds = unpack(byAura[aura])
+	local benefit, secret = byAura[aura], AurasSecret()
+	local info = not secret and C_UnitAuras.GetPlayerAuraBySpellID(aura) or nil
+	local effect, seconds = Effect(benefit, info and info.points), benefit[4]
 	local text = seconds and "Sitting nearby: " .. effect .. " for " .. Time(seconds) or effect
 	local r, g, b = GREEN_FONT_COLOR:GetRGB()
 	tooltip:AddLine(text, r, g, b, true)
-	if not AurasSecret() then
+	if not secret then
 		AddStatus(tooltip, aura)
 	end
 end

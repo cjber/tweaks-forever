@@ -76,14 +76,32 @@ for _, benefit in ipairs(ns.CampBenefits) do
 	byAura[benefit[1]] = benefit
 end
 assert(Camp.Effect(byAura[FIRST_AID], { 8 }) == "Stamina increased by 8")
-assert(Camp.Effect(byAura[FIRST_AID], nil) == "Stamina increased by 56", "no values: the base ones")
-assert(Camp.Effect(byAura[FIRST_AID], {}) == "Stamina increased by 56")
 assert(Camp.Effect(byAura[MANA_WELL], { 12 }) == "Restores 12 Mana every 5 seconds", "the period stays")
 assert(
 	Camp.Effect(byAura[LUTE], { 44, 2, 3, 3, 3, 3, 3, 3 })
 		== "Armor increased by 44, all attributes increased by 2, and all resistances increased by 3"
 )
 assert(Camp.Effect(byAura[CHAIR], { 1.5 }) == "Critical strike chance with all spells and attacks increased by 1.5%")
+-- Without the aura's values the amount is unknown: the base one would contradict the buff, so none shows.
+assert(Camp.Effect(byAura[FIRST_AID], nil) == "Stamina increased", "no values: no amount")
+assert(Camp.Effect(byAura[FIRST_AID], {}) == "Stamina increased")
+assert(Camp.Effect(byAura[LUTE], { 44 }) == "Armor increased, all attributes increased, and all resistances increased")
+assert(Camp.Effect(byAura[MANA_WELL], nil) == "Restores Mana every 5 seconds")
+assert(Camp.Effect(byAura[FISH_BOWL], nil) == "All stats increased")
+assert(Camp.Effect(byAura[CHAIR], nil) == "Critical strike chance with all spells and attacks increased")
+assert(Camp.Effect(byAura[TENT], nil) == byAura[TENT][3], "the tent's timings are not amounts")
+for _, benefit in ipairs(ns.CampBenefits) do
+	assert(not Camp.Effect(benefit, nil):find("%d%%?$"), benefit[2] .. ": no amount left over")
+end
+
+-- The rows carry the values of the auras you have, and only those.
+rows = Camp.Listing(function(aura)
+	if aura == FIRST_AID then
+		return 1200, { 8 }
+	end
+end)
+assert(rows[1].benefit[1] == FIRST_AID and Camp.Effect(rows[1].benefit, rows[1].points) == "Stamina increased by 8")
+assert(rows[2].points == nil)
 assert(Camp.Announcement(byAura[FISH_BOWL], { 8 }) == "Camp benefit gained: Fish Bowl (all stats increased by 8%)")
 assert(Camp.Announcement(byAura[TENT], {}) == "Camp benefit gained: Tent (rested experience)")
 
