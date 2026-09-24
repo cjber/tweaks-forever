@@ -386,8 +386,8 @@ local function Coloured(mark)
 	)
 end
 
--- [button] = { [style] = textures }, made on first use.
 local hooked = {}
+-- [button] = { [style] = textures }, made on first use.
 ---@type table<ContainerFrameItemButtonTemplate, table<string, Texture[]>>
 local marks = {}
 
