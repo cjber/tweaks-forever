@@ -12,9 +12,11 @@ tools/typecheck.sh
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 ruff check tools && ruff format --check tools
 uvx ty@0.0.83 check tools
+SIFT='sift[treesitter] @ git+https://github.com/agent-labs-dev/sift@5f6949e653d009056e9ce12554f9248be6e03c80'
+uvx --from "$SIFT" sift check && uvx --from "$SIFT" sift agents check   # local only: sift is private
 ```
 
-The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and history.
+The same gate CI runs, except sift until its public release, plus actionlint, zizmor and gitleaks on the workflows and history.
 
 ## Layout
 
@@ -41,6 +43,8 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
   work.
 - A feature another loaded addon already provides is greyed out with that addon named, never run
   alongside it. Automation that acts for the player is off by default.
+- Store copy, README and posts pitch the addon as looking like it came with the game, in cjber's
+  own voice, never AI marketing: `wow-forever-addon` WFA-23/24, checked before every store paste.
 
 ## Standards
 
