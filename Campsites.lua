@@ -14,8 +14,6 @@ ns.Feature({
 
 local CAMP_BENEFITS, CAMPFIRE_NEARBY = 1229741, 1283391
 local TENT = 1229451
--- The placement spells of each campfire tier.
-local CAMPFIRES = { [1307227] = true, [1307252] = true, [1307237] = true }
 -- About the reach of Campfire Nearby: a campfire remembered farther off than this is not the one you are near.
 local NEARBY_YARDS = 120
 -- Closer than this, a direction means nothing.
@@ -27,9 +25,9 @@ local FEATURES = {
 	{ 1307227, 529161, CAMP_BENEFITS }, -- Basic Campfire
 	{ 1307252, 630660, CAMP_BENEFITS }, -- Journeyman Campfire
 	{ 1307237, 650137, CAMP_BENEFITS }, -- Expert Campfire
-	{ 1307230, 528996, 1229451 }, -- Camp Tent: Boosted Rest
-	{ 1307391, 612140, 1229451 }, -- Sewing Machine
-	{ 1307395, 612122, 1229451 }, -- Tanning Rack
+	{ 1307230, 528996, TENT }, -- Camp Tent: Boosted Rest
+	{ 1307391, 612140, TENT }, -- Sewing Machine
+	{ 1307395, 612122, TENT }, -- Tanning Rack
 	{ 1307229, 612275, 1229519 }, -- Camp Chair: Boosted Critical Chance
 	{ 1307243, 612088, 1229519 }, -- Field Guide
 	{ 1307397, 612082, 1229519 }, -- Trapper's Workbench
@@ -58,6 +56,13 @@ local FEATURES = {
 	{ 1307255, 612142, 1229718 }, -- Loom
 	{ 1307393, 612123, 1229718 }, -- Spinning Wheel
 }
+-- The placement spells of each campfire tier: the features that grant Camp Benefits.
+local CAMPFIRES = {}
+for _, feature in ipairs(FEATURES) do
+	if feature[3] == CAMP_BENEFITS then
+		CAMPFIRES[feature[1]] = true
+	end
+end
 
 -- Every camp benefit as { benefit, left }, the ones you have first, each group in the game's order. `remaining`
 -- gives seconds left on an aura, 0 for no expiry, nil without it.
