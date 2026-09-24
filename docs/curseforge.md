@@ -44,7 +44,7 @@ Camp tooltips say what sitting nearby gives you.
 
 ## Features
 
-- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, accept summons, accept resurrections from your group (never mid-combat), release in battlegrounds, decline duels. Faster auto loot is on by default.
+- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip and go straight to the flight map at a flight master, accept summons, accept resurrections from your group (never mid-combat), release in battlegrounds, decline duels. Faster auto loot is on by default.
 - **Vendors**: repair automatically (from guild funds when allowed) and sell junk, up to 12 stacks so it all stays in buyback. Grey items show the game's junk coin all the time, and Alt+Right-click marks anything else as junk.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a group such as Healing or DPS, and equip a whole group from the same menu. Each group has its own colour on the bag slot and in the tooltip, and the combined bag gathers each group under its own heading. Equipping a fishing pole remembers the weapons it replaced.
 - **Maps**: every dungeon and raid entrance gets retail's icon, named when you point at it; click one to travel there with Shortest Path Forever, or with the game's own waypoint without it. Zones show their level range after the name, coloured like quest levels. Unexplored areas are revealed, tinted so explored ground still stands out.

@@ -7,7 +7,7 @@ The README keeps one line per feature; this is the detail. Every feature can be 
 All off until you turn them on, except faster auto loot.
 
 - Accept and turn in quests. Hold Shift to talk normally. A quest with a choice of rewards is left to you.
-- Skip gossip when an NPC offers only one thing (vendor, trainer, flight map). Hold Shift to see it.
+- Skip gossip when an NPC offers only one thing (vendor, trainer), and go straight to the flight map at a flight master, whatever else they offer. Hold Shift to see it.
 - Accept summons, but not in combat.
 - Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time.
 - Release your spirit in battlegrounds unless you can resurrect yourself.

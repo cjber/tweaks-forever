@@ -36,7 +36,7 @@ ns.Feature({
 	key = "gossip",
 	category = "Automation",
 	name = "Skip gossip with a single option",
-	tooltip = "Goes straight to the only thing an NPC offers (vendor, trainer, flight map). Hold Shift to see it.",
+	tooltip = "Goes straight to the only thing an NPC offers, or a flight master's flight map. Hold Shift to see it.",
 	default = false,
 	conflicts = { Leatrix("AutomateGossip") },
 })
@@ -106,19 +106,30 @@ local function PickGossipQuest()
 	return false
 end
 
--- The game already skips an option it flags (selectOptionWhenOnlyOption); this extends that to any lone option.
+-- The server sends each option's type and the game draws its icon from it, so every taxi option carries this
+-- icon (Interface\GossipFrame\TaxiGossipIcon) whatever its text or language.
+local TAXI_ICON = 132057
+
+-- A lone option, or a flight master's taxi among several. The game already selects a lone option it flags
+-- (selectOptionWhenOnlyOption) unless the NPC forces gossip, and selecting it again would repeat the request.
+local function GossipOption(options)
+	if #options == 1 and not C_GossipInfo.ForceGossip() then
+		return not options[1].selectOptionWhenOnlyOption and options[1] or nil
+	end
+	for _, option in ipairs(options) do
+		if option.icon == TAXI_ICON then
+			return option
+		end
+	end
+	return nil
+end
+
 local function SkipGossip()
-	local options = C_GossipInfo.GetOptions()
-	if
-		#options ~= 1
-		or C_GossipInfo.GetNumAvailableQuests() > 0
-		or C_GossipInfo.GetNumActiveQuests() > 0
-		or C_GossipInfo.ForceGossip()
-	then
+	if C_GossipInfo.GetNumAvailableQuests() > 0 or C_GossipInfo.GetNumActiveQuests() > 0 then
 		return
 	end
-	local option = options[1]
-	if option.status == Enum.GossipOptionStatus.Available and not option.selectOptionWhenOnlyOption then
+	local option = GossipOption(C_GossipInfo.GetOptions())
+	if option and option.status == Enum.GossipOptionStatus.Available then
 		C_GossipInfo.SelectOptionByIndex(option.orderIndex)
 	end
 end
