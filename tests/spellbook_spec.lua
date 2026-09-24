@@ -7,13 +7,7 @@ local ns = {
 		initializers[#initializers + 1] = fn
 	end,
 }
-local env = setmetatable({
-	GREEN_FONT_COLOR = {
-		WrapTextInColorCode = function(_, text)
-			return "<" .. text .. ">"
-		end,
-	},
-}, { __index = _G })
+local env = setmetatable({}, { __index = _G })
 setfenv(assert(loadfile("Spellbook.lua")), env)("TweaksForever", ns)
 local Model = ns.FutureSpells
 assert(features.trainableSpells.default and #initializers == 1)
