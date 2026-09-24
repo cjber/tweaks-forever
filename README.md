@@ -55,6 +55,7 @@ Every feature has its own checkbox. The full detail is in [docs/features.md](doc
 - **Nameplates.** A taller bar in retail's own frame, with name and level above, your target outlined and cast bars with the spell's icon.
 - **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
+- **Quests on minimap givers.** Pointing at a ! or ? on the minimap lists that giver's quests for you. Needs QuestieDB.
 - **Camp benefits.** Camp tooltips say what sitting nearby gives you and how long you have left on it.
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
