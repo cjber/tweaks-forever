@@ -4,23 +4,43 @@ If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or si
 
 ![The Eastern Kingdoms on the world map with a dungeon or raid icon at every entrance, and the cursor on Blackrock Mountain: its tooltip lists Blackrock Spire, Blackrock Depths, Molten Core and Blackwing Lair](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png)
 
+Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.
+
 ![Three enemy nameplates: the targeted Defias Pillager outlined in white in retail's bronze-rimmed bar, its name centred above with level 15 in yellow after it and 62% inside the bar, two debuffs above and a Fireball cast in a slim bar below with the spell's icon inside; the other two faded back](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
+
+Nameplates in retail's own frame, with your target outlined and casts in a slim bar.
 
 ![Kalimdor on the world map with the cursor on Ashenvale: the label at the top reads Ashenvale (18-30), the range in yellow for a level 22 character](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/zonelevels.png)
 
+Zone level ranges on the world map, coloured like quest levels.
+
 ![A backpack with gear groups marked by coloured strips along the bottom of each slot, and a ring's tooltip ending Gear: DPS, Levelling in the groups' colours](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/gear.png)
+
+Gear groups mark each item with a strip in the group's colour.
 
 ![The Ctrl+Right-click menu on a ring: group checkboxes, New group, Equip DPS, Equip Levelling and Colour](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/menu.png)
 
+Ctrl+Right-click an item to group it, or to equip a whole group.
+
 ![Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png)
+
+Move and scale Blizzard windows from a tab in Edit Mode.
 
 ![The Redridge Mountains map with its unexplored east revealed in a cool blue tint, beside the explored areas in full colour](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/exploration.png)
 
+Unexplored areas revealed in a blue tint, so you can still tell where you've been.
+
 ![A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins, and the ring's tooltip ending Marked as junk – Alt+Right-click to unmark](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png)
+
+The game's junk coin on greys and on anything you mark yourself.
 
 ![The Campfire Nearby buff tooltip: the game's description, then Campfire: about 35 yd ahead to your left, and the three benefits you have in green with their time left, such as First Aid Kit (52 Min): Stamina increased by 56](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/camp.png)
 
+Your Campfire Nearby buff says which way the fire is and what you have from it.
+
 ![A Mana Well tooltip in green: Sitting nearby: Restores 29 Mana every 5 seconds for 1 Hr, and Active: 48 Min](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png)
+
+Camp tooltips say what sitting nearby gives you.
 
 ## Features
 

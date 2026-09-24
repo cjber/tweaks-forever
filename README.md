@@ -13,21 +13,29 @@ I wanted the handful of little addons I always install in one place, looking lik
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms on the world map with a dungeon or raid icon at every entrance, and the cursor on Blackrock Mountain: its tooltip lists Blackrock Spire, Blackrock Depths, Molten Core and Blackwing Lair">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms with a dungeon or raid icon at every entrance, and Blackrock Mountain\'s tooltip listing its four instances">
 </p>
 
+<p align="center">Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.</p>
+
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates: the targeted Defias Pillager outlined in white in retail's bronze-rimmed bar, its name centred above with level 15 in yellow after it and 62% inside the bar, two debuffs above and a Fireball cast in a slim bar below with the spell's icon inside; the other two faded back">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates in retail\'s bronze-rimmed bar, the targeted Defias Pillager outlined in white, with debuffs above and a Fireball cast below">
 </p>
+
+<p align="center">Nameplates in retail's own frame, with your target outlined and casts in a slim bar.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position">
 </p>
 
+<p align="center">Move and scale Blizzard windows from a tab in Edit Mode.</p>
+
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins, and the ring's tooltip ending Marked as junk – Alt+Right-click to unmark">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip in green: Sitting nearby: Restores 29 Mana every 5 seconds for 1 Hr, and Active: 48 Min">
 </p>
+
+<p align="center">The game's junk coin on anything you mark, and camp tooltips that say what sitting nearby gives you.</p>
 
 ## Features
 
