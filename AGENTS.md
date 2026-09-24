@@ -41,6 +41,8 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
   work.
 - A feature another loaded addon already provides is greyed out with that addon named, never run
   alongside it. Automation that acts for the player is off by default.
+- Store copy, README and posts pitch the addon as looking like it came with the game, in cjber's
+  own voice, never AI marketing: `wow-forever-addon` WFA-18/19, checked before every store paste.
 
 ## Standards
 
