@@ -8,6 +8,8 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-25
+
 - **`/tweaksforever` opens the settings too.** It does the same as `/tweaks`, for when you can't remember which short name an addon uses.
 - **Other addons can ask where a dungeon entrance is.** The version 1 public API returns each instance's own entrance, even when the map combines several into one pin or entrance pins are off.
 - **Hide macro names.** Macros on your action bars can show just their icon, without the name across the bottom. The game has no option for it. Off by default; turn it on under Interface, and it applies straight away.
