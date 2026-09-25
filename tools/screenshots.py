@@ -6,10 +6,13 @@ Needs Pillow and the wowmock library (env WOWMOCK, default ~/.claude/skills/wow-
 are fetched from wago.tools once and cached under ~/.cache/wowmock/<build>/.
 """
 
+import io
 import os
 import re
 import sys
 from pathlib import Path
+
+from PIL import Image  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
 
 WOWMOCK = Path(os.environ.get("WOWMOCK", Path.home() / ".claude" / "skills" / "wow-mock-screenshots"))
 if not (WOWMOCK / "wowmock.py").exists():
@@ -30,6 +33,7 @@ from wowmock import (  # ty: ignore[unresolved-import]
     TooltipLine,
     Ui,
     atlas_markup,
+    backdrop,
     close_button,
     colored,
     container_frame,
@@ -255,6 +259,11 @@ def raid_instances():
 def dungeon_entrances(ui):
     """The Eastern Kingdoms with every entrance pinned, pointing at Blackrock Mountain: the POI area label and
     the pin's tooltip (ANCHOR_RIGHT), titled by the complex with its instances in NORMAL_FONT_COLOR."""
+    dungeon_layers(ui)[0].save(OUT / "dungeons.png")
+
+
+def dungeon_layers(ui):
+    """The dungeons scene, and the same framing before the pointer reaches Blackrock Mountain."""
     art = map_art(ui, EASTERN_KINGDOMS)
     nav = ("World", "Eastern Kingdoms")
     frame, rects = world_map_frame(ui, art, nav, arrows=nav[1:])
@@ -267,18 +276,21 @@ def dungeon_entrances(ui):
         frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON)
         if area == BLACKROCK_MOUNTAIN:
             hovered = (px, py, instances)
-            # The HIGHLIGHT layer: the same atlas drawn ADD at alpha 0.4.
-            frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON, color=(1, 1, 1, 0.4), blend="ADD")
     if hovered is None:
         raise KeyError("no Blackrock Mountain pin on the Eastern Kingdoms")
     px, py, instances = hovered
     title = ui.table("AreaTable")[str(BLACKROCK_MOUNTAIN)]["AreaName_lang"]
+    idle = ui.canvas(frame.width, frame.height)
+    idle.paste(frame, 0, 0)
+    atlas = "Raid" if all(i in raids for i in instances) else "Dungeon"
+    # The HIGHLIGHT layer: the same atlas drawn ADD at alpha 0.4.
+    frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON, color=(1, 1, 1, 0.4), blend="ADD")
     frame.text(mx, my + AREA_LABEL_TOP, title, AREA_LABEL_FONT, justify="CENTER", width=mw)
     icons = {i: atlas_markup("Raid" if i in raids else "Dungeon", 16, 16) for i in instances}
     names = [f"{icons[i]} {maps[str(i)]['MapName_lang']}" for i in instances]
     lines = [TooltipLine(title)] + [TooltipLine(name, NORMAL) for name in names]
     tip = tooltip(ui, lines)
-    scene(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], MARGIN).save(OUT / "dungeons.png")
+    return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
 
 
 # Junk.lua marks (account-wide): things this character sells rather than uses. Greys would only show their coin
@@ -306,6 +318,11 @@ JUNK_LINE = "Marked as junk \u2013 Alt+Right-click to unmark"
 
 
 def junk(ui):
+    junk_layers(ui)[0].save(OUT / "junk.png")
+
+
+def junk_layers(ui):
+    """The junk scene, and the same framing before the pointer reaches the marked ring."""
     marked = {i for i, (_, _, mark) in enumerate(JUNK_BAG) if mark}
     slots = [(item, count) for item, count, _ in JUNK_BAG]
     bag, rects = container_frame(ui, "Backpack", 133633, slots, MONEY, hover=JUNK_HOVERED, junk=marked)
@@ -313,7 +330,19 @@ def junk(ui):
     # Junk.lua's SetBagItem post-hook: AddLine(text, 1, 0.82, 0, true).
     tip = tooltip(ui, item_tooltip_lines(ui, item, PLAYER_LEVEL) + [TooltipLine(JUNK_LINE, (1, 0.82, 0))])
     slot_x, slot_y, _, _ = rects["slots"][JUNK_HOVERED]
-    scene(ui, [(bag, 0, 0), (tip, slot_x - tip.width, slot_y - tip.height)], MARGIN).save(OUT / "junk.png")
+    idle, _ = container_frame(ui, "Backpack", 133633, slots, MONEY, junk=marked)
+    return framed(ui, [(bag, 0, 0), (tip, slot_x - tip.width, slot_y - tip.height)], [(idle, 0, 0)])
+
+
+def framed(ui, layers, before):
+    """scene(layers), and `before` drawn over the same backdrop and framing, for the moment before a hover."""
+    shown = scene(ui, layers, MARGIN)
+    left = min(x + canvas.image.getbbox()[0] / ui.scale for canvas, x, _ in layers) - MARGIN
+    top = min(y + canvas.image.getbbox()[1] / ui.scale for canvas, _, y in layers) - MARGIN
+    earlier = backdrop(ui, shown.width, shown.height)
+    for canvas, x, y in before:
+        earlier.paste(canvas, x - left, y - top)
+    return shown, earlier
 
 
 # Campsites.lua's texts, from Data/CampBenefits.lua. Wrapped tooltip lines stop at about spell-tooltip width
@@ -549,8 +578,65 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
 
 
 def nameplates(ui):
+    nameplates_scene(ui).save(OUT / "nameplates.png")
+
+
+def nameplates_scene(ui):
     layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(PLATES, PLATE_POSITIONS, strict=True)]
-    scene(ui, layers, MARGIN).save(OUT / "nameplates.png")
+    return scene(ui, layers, MARGIN)
+
+
+# The demo: a short tour of dungeon pins, nameplates and junk coins, at 10 frames a second.
+DEMO_SIZE = (760, 520)
+DEMO_LIMIT = 3_000_000
+# (scene, tenths of a second held); a cut to a new scene crossfades over DEMO_FADE tenths.
+DEMO_SHOTS = [("dungeons idle", 10), ("dungeons", 20), ("nameplates", 20), ("junk idle", 6), ("junk", 19)]
+DEMO_FADE = 5
+DEMO_HOVERS = {("dungeons idle", "dungeons"), ("junk idle", "junk")}
+
+
+def fitted(canvas):
+    """A scene scaled to fit the demo frame, centred on the scenes' own backdrop colour."""
+    image = canvas.image.convert("RGB")
+    fit = min(DEMO_SIZE[0] / image.width, DEMO_SIZE[1] / image.height)
+    size = (round(image.width * fit), round(image.height * fit))
+    frame = Image.new("RGB", DEMO_SIZE, image.getpixel((0, 0)))
+    frame.paste(
+        image.resize(size, Image.Resampling.LANCZOS), ((DEMO_SIZE[0] - size[0]) // 2, (DEMO_SIZE[1] - size[1]) // 2)
+    )
+    return frame
+
+
+def demo(ui):
+    dungeons, dungeons_idle = dungeon_layers(ui)
+    junk_shown, junk_idle = junk_layers(ui)
+    shots = {
+        "dungeons idle": fitted(dungeons_idle),
+        "dungeons": fitted(dungeons),
+        "nameplates": fitted(nameplates_scene(ui)),
+        "junk idle": fitted(junk_idle),
+        "junk": fitted(junk_shown),
+    }
+    frames, previous = [], None
+    for name, tenths in DEMO_SHOTS:
+        # A hover shows at once, as the game draws it; a new scene fades in.
+        if previous and (previous, name) not in DEMO_HOVERS:
+            for step in range(1, DEMO_FADE + 1):
+                frames.append(Image.blend(shots[previous], shots[name], step / (DEMO_FADE + 1)))
+        frames += [shots[name]] * tenths
+        previous = name
+    # One palette for every frame, from each scene, so colours hold still and two runs encode the same bytes.
+    sample = Image.new("RGB", (DEMO_SIZE[0], DEMO_SIZE[1] * 3))
+    for index, name in enumerate(("dungeons", "nameplates", "junk")):
+        sample.paste(shots[name], (0, DEMO_SIZE[1] * index))
+    palette = sample.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
+    indexed = [frame.quantize(palette=palette, dither=Image.Dither.NONE) for frame in frames]
+    buffer = io.BytesIO()
+    indexed[0].save(buffer, format="GIF", save_all=True, append_images=indexed[1:], duration=100, loop=0, optimize=True)
+    data = buffer.getvalue()
+    assert len(data) <= DEMO_LIMIT, f"demo.gif is {len(data)} bytes, over {DEMO_LIMIT}"
+    (OUT / "demo.gif").write_bytes(data)
+    return len(frames), len(data)
 
 
 def main():
@@ -565,6 +651,8 @@ def main():
     campfire_buff(ui)
     editmode(ui)
     nameplates(ui)
+    frames, size = demo(ui)
+    print(f"demo.gif: {frames} frames, {size} bytes")
 
 
 if __name__ == "__main__":

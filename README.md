@@ -13,6 +13,12 @@ I wanted the handful of little addons I always install in one place, looking lik
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
 <p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Dungeon entrances on the map, then enemy nameplates, then a backpack with a ring marked as junk">
+</p>
+
+<p align="center">Dungeon entrances on the map, nameplates, and the junk coin in your bags.</p>
+
+<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms map with an icon at every dungeon entrance and Blackrock Mountain's tooltip">
 </p>
 
@@ -105,6 +111,8 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |
+
+It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
 
 ## Development
 
