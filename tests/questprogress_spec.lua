@@ -10,7 +10,7 @@ local ns = {
 
 -- A synthetic QuestieDB. Quest 1: kill wolves (creature 10), then collect fangs (item 500) that wolves and bears
 -- (11) drop. Quest 2: kill credit from ghouls (20, 21) on a bunny (29), with the item listed first by a hint.
--- Quest 3: boars (30) to kill and an object to use. Quest 4 isn't in QuestieDB.
+-- Quest 3: boars (30) to kill and an object to use. Quest 4 isn't in QuestieDB, so nothing counts toward it.
 local quests = {
 	[1] = { objectives = { { { 10 } }, nil, { { 500 } } } },
 	[2] = { objectives = { nil, nil, { { 501 } }, nil, { { { 20, 21 }, 29, "Ghoul slain" } } } },
@@ -48,8 +48,7 @@ local log = {
 	{ questID = 3, title = "Boars" },
 	{ questID = 4, title = "Kobolds" },
 }
--- Forever's enUS text for a kill objective, and objectives the game wrote with it or with text of their own.
-local SLAIN = "%2$d/%3$d %1$s slain"
+-- Objectives the game wrote for kills, and ones with text of their own.
 local function Kill(name, count, required)
 	return {
 		text = ("%d/%d %s slain"):format(count, required, name),
@@ -96,7 +95,7 @@ local function Texture()
 	return texture
 end
 
-local plates, guids, names = {}, {}, {}
+local plates, guids = {}, {}
 local env = setmetatable({
 	C_QuestLog = {
 		GetNumQuestLogEntries = function()
@@ -135,10 +134,6 @@ local env = setmetatable({
 	UnitGUID = function(unit)
 		return guids[unit]
 	end,
-	UnitName = function(unit)
-		return names[unit]
-	end,
-	QUEST_MONSTERS_KILLED = SLAIN,
 	Settings = {
 		SetOnValueChangedCallback = function(name, fn)
 			changed[name] = fn
@@ -171,37 +166,25 @@ env.Questie = { db = { profile = { enableTooltips = true, nameplateEnabled = fal
 assert(features.questTooltips.conflicts[1].when() and not features.questPlates.conflicts[1].when())
 env.Questie = nil
 
--- Creature IDs come from creature and vehicle GUIDs only, and never from a secret one; names never secret either.
+-- Creature IDs come from creature and vehicle GUIDs only, and never from a secret one.
 assert(Model.NpcId("Creature-0-3113-0-47-1234-0000ABCDEF") == 1234)
 assert(Model.NpcId("Vehicle-0-3113-0-47-55-0000ABCDEF") == 55)
 assert(Model.NpcId("Player-4395-0ABCDEF1") == nil)
 assert(Model.NpcId("GameObject-0-3113-0-47-1234-0000ABCDEF") == nil)
 assert(Model.NpcId("secret") == nil and Model.NpcId(nil) == nil)
-assert(Model.Name("Boar") == "Boar" and Model.Name("secret") == nil and Model.Name("") == nil)
 
--- Without QuestieDB, the log alone: a kill objective in the game's own words for that creature's name.
-assert(not Model.Attach())
+-- Both need QuestieDB: without it they are off and greyed out, and nothing counts, whatever the log's text says.
+local needs = features.questTooltips.needs
+assert(needs.title == "QuestieDB" and features.questPlates.needs == needs)
+assert(not needs.check() and not Model.Attach())
 Model.Rebuild()
-local lines = Model.Lines(10, "Mangy Wolf")
-assert(#lines == 2 and lines[1][1] == "Wolves and Fangs" and lines[1][3] == 0.82, "the title in the game's yellow")
-assert(lines[2][1] == " - 3/10 Mangy Wolf slain" and lines[2][2] == 1, "white until done")
-lines = Model.Lines(nil, "Kobold Vermin")
-assert(#lines == 2 and lines[1][1] == "Kobolds", "no ID needed")
-assert(#Model.Lines(11, "Bear") == 0, "the items a creature drops need QuestieDB")
-assert(#Model.Lines(21, "Ghoul") == 0, "and so does an objective with text of its own")
-assert(#Model.Lines(10, "Mangy") == 0 and #Model.Lines(10, nil) == 0)
-assert(Model.Needed(nil, "Boar") and not Model.Needed(10, "Bear"))
--- A locale whose string takes its values in turn.
-objectives[4][1].text = "Kobold Vermin slain: 2/8"
-env.QUEST_MONSTERS_KILLED = "%s slain: %d/%d"
-assert(#Model.Lines(nil, "Kobold Vermin") == 2)
-env.QUEST_MONSTERS_KILLED = SLAIN
-assert(#Model.Lines(nil, "Kobold Vermin") == 0)
-objectives[4][1].text = "2/8 Kobold Vermin slain"
+assert(#Model.Lines(10) == 0 and not Model.Needed(10) and #Model.Targets(1) == 0)
+env.LibQuestieDB = { Quest = library.Quest }
+assert(not needs.check() and not Model.Attach(), "a QuestieDB without items isn't enough")
 
--- With QuestieDB, its IDs add drops, kill credit and objectives with text of their own.
+-- With QuestieDB, its IDs give kills, drops, kill credit and objectives with text of their own.
 env.LibQuestieDB = library
-assert(Model.Attach())
+assert(needs.check() and Model.Attach())
 
 -- Objectives in the log's order: by kind, with a hinted kind moved to the front and the event last.
 local targets = Model.Targets(2)
@@ -216,18 +199,17 @@ assert(reads - before == 2, "a quest and its item are read once")
 assert(#Model.Targets(4) == 0)
 
 Model.Rebuild()
-lines = Model.Lines(10, "Mangy Wolf")
-assert(#lines == 3 and lines[2][1] == " - 3/10 Mangy Wolf slain" and lines[3][1] == " - 5/5 Wolf Fang")
-assert(lines[3][2] == 0.5, "grey once done")
-lines = Model.Lines(11, "Bear")
+local lines = Model.Lines(10)
+assert(#lines == 3 and lines[1][1] == "Wolves and Fangs" and lines[1][3] == 0.82, "the title in the game's yellow")
+assert(lines[2][1] == " - 3/10 Mangy Wolf slain" and lines[2][2] == 1, "white until done")
+assert(lines[3][1] == " - 5/5 Wolf Fang" and lines[3][2] == 0.5, "grey once done")
+lines = Model.Lines(11)
 assert(#lines == 2 and lines[2][1] == " - 5/5 Wolf Fang", "bears only drop the fangs")
-lines = Model.Lines(21, "Ghoul")
+lines = Model.Lines(21)
 assert(#lines == 2 and lines[1][1] == "Ghoulish" and lines[2][1] == " - 1/8 Ghouls laid to rest")
-assert(#Model.Lines(40, "Ghast") == 2, "a hinted item objective is the first")
-assert(#Model.Lines(30, "Sow") == 0, "a position whose kind disagrees is left out")
-lines = Model.Lines(30, "Boar")
-assert(#lines == 2 and lines[2][1] == " - 0/6 Boar slain", "the game's own text still counts")
-assert(#Model.Lines(99, "Nobody") == 0)
+assert(#Model.Lines(40) == 2, "a hinted item objective is the first")
+assert(#Model.Lines(30) == 0, "a position whose kind disagrees is left out, though the log's text names boars")
+assert(#Model.Lines(99) == 0 and #Model.Lines(nil) == 0)
 
 -- Needed: an unfinished objective in a quest that isn't complete.
 assert(Model.Needed(10) and not Model.Needed(11) and Model.Needed(21) and not Model.Needed(99))
@@ -267,12 +249,12 @@ env.GameTooltip = tooltip
 postCalls[2](tooltip, { guid = wolf, lines = { { leftText = "Mangy Wolf" } } })
 assert(#added == 3 and shown)
 postCalls[2](tooltip, { guid = "secret", lines = { { leftText = "Kobold Vermin" } } })
-assert(#added == 5 and added[4] == "Kobolds", "by name alone")
+assert(#added == 3, "never by name")
 postCalls[2](tooltip, { guid = wolf, lines = { { leftText = "Mangy Wolf" }, { type = 8 } } })
-assert(#added == 5, "the game already listed them")
+assert(#added == 3, "the game already listed them")
 ns.db.questTooltips = false
 postCalls[2](tooltip, { guid = wolf, lines = {} })
-assert(#added == 5, "switched off")
+assert(#added == 3, "switched off")
 
 local plate = { UnitFrame = { HealthBarsContainer = {} } }
 plates.nameplate1, guids.nameplate1 = plate, wolf
@@ -302,8 +284,13 @@ events.NAME_PLATE_UNIT_ADDED("nameplate2")
 plates.nameplate3, guids.nameplate3 = { UnitFrame = { HealthBarsContainer = {} } }, "secret"
 events.NAME_PLATE_UNIT_ADDED("nameplate3")
 assert(#icons == 1)
--- A kill the log names, with no ID to go on.
-plates.nameplate4, names.nameplate4 = { UnitFrame = { HealthBarsContainer = {} } }, "Kobold Vermin"
+-- A kill the log names but QuestieDB doesn't know: no icon.
+plates.nameplate4, guids.nameplate4 = { UnitFrame = { HealthBarsContainer = {} } }, "Creature-0-3113-0-47-50-0000ABCDEF"
 events.NAME_PLATE_UNIT_ADDED("nameplate4")
-assert(#icons == 2 and icons[2].shown)
+assert(#icons == 1)
+
+-- Without QuestieDB the initializer hooks nothing.
+env.LibQuestieDB, postCalls[2] = nil, nil
+initializers[1]()
+assert(postCalls[2] == nil)
 print("questprogress: ok")

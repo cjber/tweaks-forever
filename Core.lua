@@ -2,14 +2,18 @@
 local _, ns = ...
 
 -- Features, in declaration order, and by key. Each is { key, category, name, tooltip, default, conflicts }, plus
--- `options` ({ { value, label } }) for a choice rather than an on/off switch and `parent` (a key) to indent it
--- under that feature and grey it out while the parent is off.
+-- `options` ({ { value, label } }) for a choice rather than an on/off switch, `parent` (a key) to indent it
+-- under that feature and grey it out while the parent is off, and `needs` ({ title, check }) for another addon it
+-- can't work without: off and greyed out while `check` finds it missing.
 ns.features = {}
 ---@type table<string, TFFeature>
 local byKey = {}
 -- [key] = title of the addon already doing that feature's job, once addons have loaded.
 ---@type table<string, string>
 local conflicted = {}
+-- [key] = title of the addon a feature needs and can't find, once addons have loaded.
+---@type table<string, string>
+local missing = {}
 local pending, ready = {}, false
 
 ---@param fn fun()
@@ -59,7 +63,20 @@ function ns.RefreshConflicts()
 	for _, feature in ipairs(ns.features) do
 		local ok, title = pcall(FindConflict, feature)
 		conflicted[feature.key] = ok and title or nil
+		local needs = feature.needs
+		local found, present = true, true
+		if needs then
+			found, present = pcall(needs.check)
+		end
+		missing[feature.key] = not (found and present) and needs and needs.title or nil
 	end
+end
+
+-- The addon a feature needs and can't find, if any.
+---@param key string
+---@return string?
+function ns.MissingOf(key)
+	return missing[key]
 end
 
 ---@param key string
@@ -68,12 +85,13 @@ function ns.ConflictOf(key)
 	return conflicted[key]
 end
 
--- Switched on and not already handled by another addon. Checked when the feature acts, so toggles apply at once.
+-- Switched on, not already handled by another addon and not missing one it needs. Checked when the feature acts,
+-- so toggles apply at once.
 ---@param key string
 ---@return boolean
 function ns.Active(key)
 	assert(byKey[key], "unknown feature " .. key)
-	return not not ns.db[key] and not conflicted[key]
+	return not not ns.db[key] and not conflicted[key] and not missing[key]
 end
 
 local handlers = {}

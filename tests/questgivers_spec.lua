@@ -160,14 +160,16 @@ setfenv(assert(loadfile("QuestGivers.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestGivers
 assert(features.giverTooltips.default == true and #initializers == 1)
 
--- Without the Forever build of a contract-2 QuestieDB there is nothing to read.
+-- Without the Forever build of a contract-2 QuestieDB there is nothing to read, and the option is greyed out.
+local needs = features.giverTooltips.needs
+assert(needs.title == "QuestieDB")
 flavour = "Vanilla"
-assert(not Model.Attach())
+assert(not Model.Attach() and not needs.check())
 flavour = "Forever"
 env.LibQuestieDB = nil
-assert(not Model.Attach())
+assert(not Model.Attach() and not needs.check())
 env.LibQuestieDB = library
-assert(Model.Attach())
+assert(Model.Attach() and needs.check())
 
 -- Names: one per line, icons and colours stripped, and secret text skipped.
 local names = Model.Names({

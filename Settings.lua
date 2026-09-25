@@ -2,7 +2,8 @@
 local _, ns = ...
 
 -- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
--- tall. A feature another addon already handles is greyed out, its tooltip naming that addon.
+-- tall. A feature another addon already handles, or one missing an addon it needs, is greyed out, its tooltip
+-- naming that addon.
 -- Every row goes in through Settings.RegisterInitializer, which inserts it from Blizzard's secure delegate.
 -- Settings.CreateCheckbox/CreateDropdown and layout:AddInitializer insert from our code instead, and the
 -- settings search reads every layout, so that tainted it: a restricted button in the results (Social's
@@ -11,11 +12,14 @@ local _, ns = ...
 ---@param feature TFFeature
 local function Tooltip(feature)
 	return function()
-		local conflict = ns.ConflictOf(feature.key)
-		if not conflict then
+		local conflict, missing = ns.ConflictOf(feature.key), ns.MissingOf(feature.key)
+		if not conflict and not missing then
 			return feature.tooltip
 		end
-		local note = RED_FONT_COLOR:WrapTextInColorCode(conflict .. " already does this, so it is off here.")
+		local note = RED_FONT_COLOR:WrapTextInColorCode(
+			conflict and conflict .. " already does this, so it is off here."
+				or "Needs " .. missing .. ", which isn't loaded, so it is off here."
+		)
 		return feature.tooltip and feature.tooltip .. "\n\n" .. note or note
 	end
 end
@@ -47,7 +51,7 @@ local function AddSetting(category, feature, initializers)
 		initializer = Settings.CreateCheckboxInitializer(setting, nil, Tooltip(feature))
 	end
 	initializer:AddModifyPredicate(function()
-		return not ns.ConflictOf(feature.key)
+		return not ns.ConflictOf(feature.key) and not ns.MissingOf(feature.key)
 	end)
 	if feature.parent then
 		initializer:SetParentInitializer(initializers[feature.parent], function()
