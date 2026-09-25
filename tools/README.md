@@ -110,6 +110,12 @@ Use `f((select(2, UnitClass(unit))))` or a local for a single value. Intentional
 a trailing `-- multi-value: reason` on the closing call/table/return line. A keyed table field,
 assignment, operator or non-final argument already consumes one value.
 
+`python3 -m tools.lint_taint` checks the same files for code that taints Blizzard's UI on Forever:
+`hooksecurefunc` on an object rather than a function name or a table the file built itself, a field
+written or method defined on a global the addon does not own, and calls to Blizzard's bag and panel
+layout, its lazy bag caches, `SetParentInitializer` and `AddMaskableTexture`. AGENTS.md lists what to
+use instead. A deliberate exception takes a trailing `-- taint-ok: reason` on the flagged line.
+
 The gate runs the Python regression tests first; run them separately with
 `python3 -m unittest discover -s tools -p '*_test.py'`. Reports use `file:line: code: message`,
 and missing/malformed reports and checker crashes fail closed.

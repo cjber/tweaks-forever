@@ -310,15 +310,17 @@ class Parser:
         return self.findings
 
 
+def toc_paths() -> list[Path]:
+    # Follow the release's actual load list, including generated runtime data; XML templates carry no Lua.
+    return [
+        Path(line.replace("\\", "/"))
+        for line in Path("TweaksForever.toc").read_text().splitlines()
+        if line.strip().endswith(".lua") and not line.startswith("#")
+    ]
+
+
 def main() -> int:
-    paths = [Path(arg) for arg in sys.argv[1:]]
-    if not paths:
-        # Follow the release's actual load list, including generated runtime data; XML templates carry no Lua.
-        paths = [
-            Path(line.replace("\\", "/"))
-            for line in Path("TweaksForever.toc").read_text().splitlines()
-            if line.strip().endswith(".lua") and not line.startswith("#")
-        ]
+    paths = [Path(arg) for arg in sys.argv[1:]] or toc_paths()
     failed = False
     for path in paths:
         try:
