@@ -2,7 +2,7 @@
 -- Level ranges by UiMap ID. The original game's zones take its published range:
 -- https://warcraft.wiki.gg/wiki/Zones_by_level_(original)
 -- Forever's own zones take the lowest and highest exploration level of their subzones
--- (AreaTable.ExplorationLevel, build 1.60.1.69977). C_Map.GetMapLevels wins wherever it returns a range.
+-- (AreaTable.ExplorationLevel, build 1.60.1.70009). C_Map.GetMapLevels wins wherever it returns a range.
 local _, ns = ...
 ns.ZoneRanges = {
 	[1411] = { 1, 10 }, -- Durotar

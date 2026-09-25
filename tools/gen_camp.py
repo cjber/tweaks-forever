@@ -12,7 +12,7 @@ import re
 import urllib.request
 from pathlib import Path
 
-BUILD = "1.60.1.69977"
+BUILD = "1.60.1.70009"
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / ".cache"
 OUTPUT = ROOT / "Data" / "CampBenefits.lua"
