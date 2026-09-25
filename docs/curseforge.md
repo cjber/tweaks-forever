@@ -51,7 +51,7 @@ Camp tooltips say what sitting nearby gives you.
 - **Nameplates**: a taller bar with the name and level above it, your target outlined in white and your focus in gold, the rest faded back, and casts in a slim bar with the spell inside.
 - **Tooltips**: a thin rounded border over charcoal, retail's navy or the game's own; player names in class colour with race and class on one line; the health bar inside, with numbers or a percentage.
 - **Windows**: move and scale Blizzard windows from a Windows tab in Edit Mode, saved per layout.
-- **Quests and camps**: the quest tracker sorts nearest first, with distances. With QuestieDB installed, pointing at a ! or ? on the minimap lists that giver's quests for you. Campsite features say what they give and whether you have it, and the Campfire Nearby buff lists your camp benefits and which way the fire is. Each benefit you gain is named at the top of the screen.
+- **Quests and camps**: the quest tracker sorts nearest first, with distances. With QuestieDB installed, pointing at a quest giver on the minimap lists their quests for you. Campsite features say what they give and whether you have it, and the Campfire Nearby buff lists your camp benefits and which way the fire is. Each benefit you gain is named at the top of the screen.
 - **Spellbook and bags**: the spellbook shows spells you haven't learned yet, greyed out after your own, as retail does. The reagent bag joins the bottom of the combined bag.
 - **Fishing**: double right-click the world with a pole to cast; with no lure on, the same double-click puts on the best one you can use.
 - **Also**: quiet the errors a spammed macro repeats, and `/rl` reloads.

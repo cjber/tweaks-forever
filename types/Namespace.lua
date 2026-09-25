@@ -14,6 +14,8 @@
 ---@class TFCamp
 ---@field Listing fun(remaining: fun(aura: integer): number?, number[]?): TFCampRow[]
 ---@field Toward fun(north: number, west: number, facing: number): string
+---@field Effect fun(benefit: TFCampBenefit, points: number[]?): string
+---@field Announcement fun(benefit: TFCampBenefit, points: number[]?): string
 
 ---@class TFTrainerSpell
 ---@field name string

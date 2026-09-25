@@ -158,6 +158,7 @@ login:SetScript("OnEvent", function()
 		end
 	end
 	TweaksForeverDB, ns.db = db, db
+	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	ns.RefreshConflicts()
 	ready = true
 	for _, fn in ipairs(pending) do
