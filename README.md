@@ -13,38 +13,14 @@ I wanted the handful of little addons I always install in one place, looking lik
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms with a dungeon or raid icon at every entrance, and Blackrock Mountain\'s tooltip listing its four instances">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms map with an icon at every dungeon entrance and Blackrock Mountain's tooltip">
 </p>
 
 <p align="center">Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.</p>
 
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates in retail\'s bronze-rimmed bar, the targeted Defias Pillager outlined in white with a gold quest icon beside it, debuffs above and a Fireball cast below">
-</p>
-
-<p align="center">Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.</p>
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position">
-</p>
-
-<p align="center">Move and scale Blizzard windows from a tab in Edit Mode.</p>
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game\'s gold junk coin on a ring and on stacks of cloth, meat and fins">
-</p>
-
-<p align="center">The game's junk coin on greys and on anything you mark yourself.</p>
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip in green: Sitting nearby: Restores 29 Mana every 5 seconds for 1 Hr, and Active: 48 Min">
-</p>
-
-<p align="center">Camp tooltips say what sitting nearby gives you.</p>
-
 ## Features
 
-Every feature has its own checkbox. The full detail is in [docs/features.md](docs/features.md).
+Every feature has its own checkbox; [docs/features.md](docs/features.md) has the detail.
 
 - **Quest and gossip automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map at a flight master, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
@@ -56,19 +32,53 @@ Every feature has its own checkbox. The full detail is in [docs/features.md](doc
 - **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
 - **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs [QuestieDB](https://github.com/Questie/QuestieDB).
-- **Quest progress.** A creature you need for a quest, to kill or for an item it drops, shows the quest and your progress in its tooltip, and a small quest icon beside its nameplate until you have enough. Needs [QuestieDB](https://github.com/Questie/QuestieDB).
-- **Camp benefits.** Camp tooltips say what sitting nearby gives you and how long you have left on it, and each benefit you gain is named at the top of the screen.
+- **Quest progress.** A creature you still need for a quest shows your progress in its tooltip and a quest icon beside its nameplate. Needs [QuestieDB](https://github.com/Questie/QuestieDB).
+- **Camp benefits.** Camp tooltips say what sitting nearby gives you and for how long, and each benefit you gain is named on screen.
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
 - **Hide macro names.** Macros on your action bars show just their icon. Off until you turn it on.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and optionally hear splashes over everything else.
 
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined in white with a quest icon and a Fireball cast">
+</p>
+
+<p align="center">Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab and the Character window's Scale slider">
+</p>
+
+<p align="center">Move and scale Blizzard windows from a tab in Edit Mode.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins">
+</p>
+
+<p align="center">The game's junk coin on greys and on anything you mark yourself.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip saying what sitting nearby restores">
+</p>
+
+<p align="center">Camp tooltips say what sitting nearby gives you.</p>
+
+## Install
+
+Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.
+
+The quest features (quests on minimap givers, quest progress on tooltips and nameplates) read [QuestieDB](https://github.com/Questie/QuestieDB)'s quest data and are greyed out without it. The QuestieDB addon on its own is enough; you don't need Questie itself.
+
 ## Usage
 
-- `/tweaks` opens the settings, also under **Options → AddOns → Tweaks Forever** or from the addon compartment on the minimap.
+- `/tweaks` or `/tweaksforever` opens the settings, also under **Options → AddOns → Tweaks Forever** or from the addon compartment on the minimap.
 - `/rl` reloads the interface.
 
 Nothing to set up. A few features that act for you are off until you tick them.
+
+## For addon authors
+
+`TweaksForever.API` (`version = 1`) gives the class trainer spells you can learn and each dungeon's own entrance. [docs/features.md](docs/features.md#for-addon-authors) has the details.
 
 ## Works alongside
 
@@ -94,16 +104,6 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |
 
-Addons can use `TweaksForever.API` (`version = 1`). `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned, each spell's next rank only and no weapon skills or riding, as fresh `{spellID, name, level, cost, line, lineID, general}` tables: `line` is the tab's name in the client's language, for display, and `lineID` its SkillLine ID, the same in every language. A spell for the General tab (Dual Wield, Parry, Plate Mail) has `general` set and its own skill line as `lineID`, as that tab has none. `cost` is missing when the fee isn't known. It answers whether or not Future Spells is on. It returns `nil` before login and in combat.
-
-`DungeonEntrance(instanceID)` takes an instance's Map ID (230 for Blackrock Depths) and returns a fresh `{map, x, y}` table: the entrance on its zone map, as a UiMapID and 0–1 coordinates. It's that instance's own door, not the one pin the map draws for Blackrock Mountain or the Gates of Ahn'Qiraj, and it answers with the entrance pins off, before login and in combat. It returns `nil` for an instance with no entrance in the client, such as Naxxramas.
-
-## Install
-
-Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.
-
-The quest features (quests on minimap givers, quest progress on tooltips and nameplates) read [QuestieDB](https://github.com/Questie/QuestieDB)'s quest data and are greyed out without it. The QuestieDB addon on its own is enough; you don't need Questie itself.
-
 ## Development
 
 ```sh
@@ -114,22 +114,12 @@ tools/typecheck.sh                              # LuaLS 3.19.1 + multi-value lin
 luacheck .                                      # lint
 stylua --check .                                # format
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
-python3 tools/gen_overlays.py                   # regenerate Data/Overlays.lua from wago.tools
-python3 tools/gen_camp.py                       # regenerate Data/CampBenefits.lua from wago.tools
-python3 tools/gen_dungeons.py                   # regenerate Data/DungeonEntrances.lua from wago.tools
-python3 tools/gen_zonelevels.py                 # regenerate Data/ZoneLevels.lua from wago.tools
-python3 tools/gen_classspells.py                # regenerate Data/ClassSpells.lua from CMaNGOS and wago.tools
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
-Install LuaLS **3.19.1**, Git and Python 3.11+ before running `tools/typecheck.sh`. It fetches the pinned
-Ketho WoW API annotations (including pinned FrameXML) into ignored `.types/`, checks all runtime Lua
-(including generated data), and rejects every diagnostic. Local contracts in `types/` are editor-only
-and excluded from the release. See [tools/README.md](tools/README.md) for the multi-value rule.
+`tools/typecheck.sh` needs LuaLS **3.19.1**, Git and Python 3.11+. [tools/README.md](tools/README.md) covers the multi-value rule and the `Data/` generators. CI also runs ruff and ty on `tools/`, workflow linting and a secret scan, and a daily workflow opens a PR with regenerated data for each new Forever build.
 
-CI runs these checks on every push, plus ruff and ty on `tools/`, workflow linting and a secret scan. A daily workflow opens a PR with regenerated map, camp, zone level, dungeon entrance and class trainer data when wago.tools lists a newer Forever build. [tools/README.md](tools/README.md) covers the generators.
-
-**Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the zip and attaches it to a GitHub release, with that version's entry (`tools/changelog.py`) as the release notes.
+**Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the release with that entry as its notes.
 
 **Contributing:** see [CONTRIBUTING.md](https://github.com/cjber/.github/blob/main/CONTRIBUTING.md) and this repository's [AGENTS.md](AGENTS.md); report security problems privately as [SECURITY.md](https://github.com/cjber/.github/blob/main/SECURITY.md) describes.
 
