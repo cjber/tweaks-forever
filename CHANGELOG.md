@@ -10,6 +10,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 - **Quest progress on tooltips.** Pointing at a creature you need for a quest, to kill or for an item it drops, adds the quest and your progress under its tooltip, as the retail game does, such as " - Mangy Wolf slain: 3/10", white until that objective is done and grey after. It needs [QuestieDB](https://github.com/Questie/QuestieDB), which works on its own: you don't need Questie itself. It stays out of the way while Questie's own tooltips are on. Turn it off under Interface.
 - **Quest icons on nameplates.** A small gold quest icon sits beside the nameplate of each creature you still need for a quest, and goes once you have enough. It needs QuestieDB too, and stays out of the way while Questie's own nameplate icons are on. Turn it off under Interface.
+- **No more "blocked from an action" warnings.** Opening the bank, searching the settings (for Discord, say) and a few other places could make the game say Tweaks Forever had been blocked from an action only available to the Blizzard UI, or throw a Lua error from the map or a tooltip. Tweaks Forever no longer hooks into or rewrites any of the game's own interface code, only its own frames and the game's events, so those are gone.
 - **Quest options say when QuestieDB is missing.** Without QuestieDB, quest progress, quest icons on nameplates and quests on minimap givers are greyed out in the settings, and their tooltip says so.
 
 ## [0.4.1] - 2026-09-25
