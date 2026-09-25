@@ -97,6 +97,7 @@ ns.Init(function()
 		Settings.OpenToCategory(category:GetID())
 	end
 	SLASH_TWEAKSFOREVER1 = "/tweaks"
+	SLASH_TWEAKSFOREVER2 = "/tweaksforever"
 	SlashCmdList.TWEAKSFOREVER = Open
 	-- The minimap's addon compartment calls this by name (## AddonCompartmentFunc).
 	TweaksForever_OnAddonCompartmentClick = Open

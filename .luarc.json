@@ -10,7 +10,8 @@
     "tests",
     "tools",
     ".release",
-    ".sift"
+    ".sift",
+    ".claude"
   ],
   "workspace.checkThirdParty": false,
   "diagnostics.libraryFiles": "Disable",

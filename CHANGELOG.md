@@ -8,6 +8,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+- **`/tweaksforever` opens the settings too.** It does the same as `/tweaks`, for when you can't remember which short name an addon uses.
 - **Other addons can ask where a dungeon entrance is.** The version 1 public API returns each instance's own entrance, even when the map combines several into one pin or entrance pins are off.
 - **Hide macro names.** Macros on your action bars can show just their icon, without the name across the bottom. The game has no option for it. Off by default; turn it on under Interface, and it applies straight away.
 - **Quest progress on tooltips.** Pointing at a creature you need for a quest, to kill or for an item it drops, adds the quest and your progress under its tooltip, as the retail game does, such as " - Mangy Wolf slain: 3/10", white until that objective is done and grey after. It needs [QuestieDB](https://github.com/Questie/QuestieDB), which works on its own: you don't need Questie itself. It stays out of the way while Questie's own tooltips are on. Turn it off under Interface.

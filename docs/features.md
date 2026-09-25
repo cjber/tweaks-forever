@@ -58,3 +58,10 @@ All off until you turn them on, except faster auto loot.
 - If the pole has no lure, that double-click puts on the best lure in your bags that your fishing skill allows. Double right-click again to cast.
 - A warning when you log in, equip a pole or cast without a lure.
 - Louder splashes (off by default): full sound effects, no music or ambience while a pole is equipped. Your volumes come back when you unequip it or log out.
+
+## For addon authors
+
+`TweaksForever.API` (`version = 1`) answers whether or not the matching feature is on.
+
+- `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned (next rank only, no weapon skills or riding) as fresh `{spellID, name, level, cost, line, lineID, general}` tables. `line` is the tab's localised name, `lineID` its SkillLine ID. A General tab spell (Dual Wield, Parry, Plate Mail) has `general` set and its own skill line as `lineID`. `cost` is missing when the fee isn't known. It returns `nil` before login and in combat.
+- `DungeonEntrance(instanceID)` takes an instance's Map ID (230 for Blackrock Depths) and returns a fresh `{map, x, y}`: its own entrance as a UiMapID and 0–1 coordinates, not the shared pin for Blackrock Mountain or the Gates of Ahn'Qiraj. It works before login and in combat, and returns `nil` for an instance with no entrance in the client, such as Naxxramas.

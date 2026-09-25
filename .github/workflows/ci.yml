@@ -4,6 +4,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  # refresh-data.yml dispatches CI on the data PR it opens (WFA-19).
+  workflow_dispatch:
 
 permissions:
   contents: read

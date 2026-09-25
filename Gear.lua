@@ -427,7 +427,8 @@ local function Strip(button, found)
 		segment:SetVertexColor(unpack(Colour(mark)))
 		segment:SetSize(width, 3)
 		segment:SetPoint("BOTTOMLEFT", 3 + (index - 1) * width, 3)
-		segment:Show()
+		-- The client draws a texture sized to 0 at its native width, so a button not laid out yet shows none.
+		segment:SetShown(width > 0)
 	end
 end
 
@@ -447,7 +448,8 @@ local function Border(button, found)
 		slice:SetPoint("TOPLEFT", frame, (index - 1) * width, 0)
 		slice:SetPoint("BOTTOMLEFT", frame, (index - 1) * width, 0)
 		slice:SetWidth(width)
-		slice:Show()
+		-- As in Strip: a 0 width would draw the slice at its native width.
+		slice:SetShown(width > 0)
 		local halo = Texture(button, "glow", index)
 		halo:SetVertexColor(unpack(colour))
 		halo:SetTexCoord(
