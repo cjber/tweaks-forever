@@ -6,6 +6,10 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The entries are prose rather than bare
 Added/Fixed lists. Each version's entry is also its release notes on GitHub, CurseForge and Wago.
 
+## [0.4.1] - 2026-09-25
+
+Updated for Forever build 1.60.1.70009. The build changes none of the map overlays, dungeon entrances, camp benefits, zone levels or trainer spells the addon carries, so nothing looks different.
+
 ## [0.4.0] - 2026-09-25
 
 - **Camp benefits are announced.** Gaining a camp benefit names it at the top of the screen, in the game's yellow, with what it gives you, such as "Camp benefit gained: Fish Bowl (all stats increased by 8%)". The numbers are the ones your buff actually has. Each benefit shows once as you gain it, never for the ones you already had when you logged in, and one gained mid-fight waits for the fight to end. Turn it off under Interface.
