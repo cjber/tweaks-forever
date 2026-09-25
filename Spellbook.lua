@@ -374,7 +374,7 @@ local function Paint(item, entry)
 	end
 	button.Icon:SetTexture(spell.icon)
 	button.Icon:SetDesaturated(true)
-	button.Icon:SetVertexColor(SPELLBOOK_UNLEARNED_TINT_COLOR:GetRGB())
+	button.Icon:SetVertexColor(SPELLBOOK_UNLEARNED_TINT_COLOR:GetRGB()) -- multi-value: r, g, b
 	button.Icon:SetAlpha(item.unlearnedIconAlpha)
 	button.IconMask:SetAtlas(art.iconMask, TextureKitConstants.IgnoreAtlasSize)
 	button.IconMask:Show()
@@ -552,7 +552,7 @@ local function Create()
 	blocker:Hide()
 	header = CreateFrame("Frame", nil, layer, "SpellBookHeaderTemplate") --[[@as SpellBookHeaderTemplate]]
 	pageText = layer:CreateFontString(nil, "OVERLAY", controls.fontName)
-	pageText:SetTextColor(SPELLBOOK_FONT_COLOR:GetRGB())
+	pageText:SetTextColor(SPELLBOOK_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 	-- The stock label is only as wide as its own text, so ours keeps just its right edge and its line.
 	pageText:SetPoint("RIGHT", controls.PageText)
 	pageText:SetWordWrap(false)

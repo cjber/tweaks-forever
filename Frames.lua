@@ -223,7 +223,7 @@ end
 local function Points(frame)
 	local points = {}
 	for index = 1, frame:GetNumPoints() do
-		points[index] = { frame:GetPoint(index) }
+		points[index] = { frame:GetPoint(index) } -- multi-value: the anchor's point, relative frame and offsets
 	end
 	return points
 end

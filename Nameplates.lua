@@ -60,7 +60,7 @@ local function Highlight(frame)
 		return
 	end
 	if focus and not target then
-		border:SetVertexColor(NORMAL_FONT_COLOR:GetRGB())
+		border:SetVertexColor(NORMAL_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 	end
 	border:SetAlpha((target or focus) and 1 or 0)
 	frame:SetAlpha((target or focus) and 1 or fade)

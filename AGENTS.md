@@ -35,7 +35,8 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
   `tools/typecheck.sh` fetches them into an ignored types cache and also checks accidental `select()` expansion.
 - New host globals go in `.luacheckrc`; if upstream lacks their types, declare real types in
   `types/Forever.lua`. Addon contracts live in `types/`. Never add a LuaLS globals allowlist.
-- A final `select(...)` argument, table element or return must be parenthesised, or carry a
+- A final `select(...)` or multi-return call (`GetDrawLayer`, `GetPoint`, `GetRGB`, … in
+  `tools/lint_multivalue.py`) as an argument, table element or return must be parenthesised, or carry a
   trailing `-- multi-value: reason` when expansion is intentional.
 - Never touch Blizzard's Lua state. Forever runs its UI through secure delegates, so an addon hook, write or
   first call there makes Blizzard's own code fail or be blocked, blamed on this addon. React through
