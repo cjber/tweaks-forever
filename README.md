@@ -60,6 +60,7 @@ Every feature has its own checkbox. The full detail is in [docs/features.md](doc
 - **Camp benefits.** Camp tooltips say what sitting nearby gives you and how long you have left on it, and each benefit you gain is named at the top of the screen.
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
+- **Hide macro names.** Macros on your action bars show just their icon. Off until you turn it on.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and optionally hear splashes over everything else.
 
 ## Usage
@@ -87,6 +88,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Zone level ranges | Leatrix Maps |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
+| Hide macro names | Dominos, Bartender4, ElvUI |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |

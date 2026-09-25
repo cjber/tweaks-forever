@@ -54,9 +54,9 @@ Camp tooltips say what sitting nearby gives you.
 - **Quests and camps**: the quest tracker sorts nearest first, with distances. With [QuestieDB](https://github.com/Questie/QuestieDB) installed, a creature you need for a quest, to kill or for an item it drops, shows your progress in its tooltip and a quest icon by its nameplate, and pointing at a quest giver on the minimap lists their quests for you. The QuestieDB addon on its own is enough; you don't need Questie itself. Campsite features say what they give and whether you have it, and the Campfire Nearby buff lists your camp benefits and which way the fire is. Each benefit you gain is named at the top of the screen.
 - **Spellbook and bags**: the spellbook shows spells you haven't learned yet, greyed out after your own, as retail does. The reagent bag joins the bottom of the combined bag.
 - **Fishing**: double right-click the world with a pole to cast; with no lure on, the same double-click puts on the best one you can use.
-- **Also**: quiet the errors a spammed macro repeats, and `/rl` reloads.
+- **Also**: quiet the errors a spammed macro repeats, hide macro names on your action bars, and `/rl` reloads.
 
-It doesn't touch your action bars or unit frames, and isn't trying to.
+Beyond hiding macro names if you ask, it leaves your action bars and unit frames alone.
 
 ## Usage
 

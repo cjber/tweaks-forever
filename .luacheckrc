@@ -16,6 +16,7 @@ globals = {
 read_globals = {
 	"AcceptQuest",
 	"AcceptResurrect",
+	"ActionBarButtonEventsFrame",
 	"AreaLabelDataProviderMixin",
 	"BaseMapPoiPinMixin",
 	"bit",
