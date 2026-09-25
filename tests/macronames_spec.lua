@@ -1,4 +1,4 @@
-local features, initializers = {}, {}
+local features, initializers, events = {}, {}, {}
 local db = {}
 local ns = {
 	Feature = function(feature)
@@ -9,6 +9,9 @@ local ns = {
 	end,
 	Active = function(key)
 		return db[key]
+	end,
+	On = function(event, fn)
+		events[event] = fn
 	end,
 }
 
@@ -35,12 +38,8 @@ end
 local changed
 local env = setmetatable({
 	ActionBarButtonEventsFrame = registry,
-	hooksecurefunc = function(target, method, hook)
-		local original = target[method]
-		target[method] = function(...)
-			original(...)
-			hook(...)
-		end
+	hooksecurefunc = function()
+		error("the action bars' events frame is never hooked")
 	end,
 	Settings = {
 		SetOnValueChangedCallback = function(variable, fn)
@@ -62,9 +61,11 @@ db.hideMacroNames = true
 changed()
 assert(first.Name.alpha == 0 and second.Name.alpha == 0, "switching on hides names at once")
 
+-- A load-on-demand bar registers its buttons as it loads.
 local late = Button(true)
 registry:RegisterFrame(late)
-assert(late.Name.alpha == 0, "a button made later is hidden as it registers")
+events.ADDON_LOADED("Blizzard_GamepadActionBars")
+assert(late.Name.alpha == 0, "a button made later is hidden once its addon loads")
 
 -- Somebody else's alpha on a button this never faded is left as it was.
 local other = Button(true)

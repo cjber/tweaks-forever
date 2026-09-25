@@ -37,9 +37,9 @@ local function ApplyAll()
 end
 
 ns.Init(function()
-	hooksecurefunc(ActionBarButtonEventsFrame, "RegisterFrame", function(_, button)
-		Apply(button)
-	end)
+	-- The bars' buttons exist before login; a load-on-demand bar (the gamepad bars) makes its own as it loads.
+	-- Never hooksecurefunc on the events frame's RegisterFrame: that writes into the action bars' secure code.
+	ns.On("ADDON_LOADED", ApplyAll)
 	ApplyAll()
 	Settings.SetOnValueChangedCallback("TweaksForever_hideMacroNames", ApplyAll)
 end)
