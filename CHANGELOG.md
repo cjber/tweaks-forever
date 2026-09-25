@@ -8,7 +8,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
-- **Ready for translation.** Every setting, tooltip line and chat message can be translated on CurseForge, and translations arrive with the next update. Anything not translated yet stays in English.
+- **Ready for translation.** Every setting, tooltip line and chat message can be translated, and anything not translated yet stays in English. Translations are welcome on GitHub.
 - **What's new after an update.** The first time you log in after Tweaks Forever updates, one line in chat says what changed, such as "Tweaks Forever: updated to 0.6.0." and the headline. Nothing on a first install. Turn it off under Interface.
 - **Dungeon entrances point you to Shortest Path Forever.** Without it, an entrance's tooltip ends with a grey line saying to install it for walked routes and boat times, or to enable it when it is installed but switched off. Turn these hints off with Suggest companion addons under Interface.
 
