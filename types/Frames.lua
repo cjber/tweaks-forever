@@ -25,6 +25,8 @@
 ---@field preview? TFWindowPreview
 ---@field checkbox? EditModeCheckButtonTemplate
 ---@field applied? boolean
+---@field placed? TFAnchor[]
+---@field placedScale? number
 ---@field applying? boolean
 ---@field dragging? boolean
 

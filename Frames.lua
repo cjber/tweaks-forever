@@ -211,6 +211,23 @@ local function Points(frame)
 	return points
 end
 
+---@param a TFAnchor[]?
+---@param b TFAnchor[]?
+---@return boolean
+local function SamePoints(a, b)
+	if not a or not b or #a ~= #b then
+		return false
+	end
+	for index, point in ipairs(a) do
+		for field = 1, 5 do
+			if point[field] ~= b[index][field] then
+				return false
+			end
+		end
+	end
+	return true
+end
+
 ---@param frame Frame
 ---@param position TFPosition
 local function Place(frame, position)
@@ -244,14 +261,22 @@ local function Serialize(frame, scale)
 end
 
 ---@param record TFWindowRecord
----@return boolean?
 local function Apply(record)
 	local frame = record.frame
 	if not frame then
 		return
 	end
-	local restored = false
 	queue:Run(record, function()
+		-- Blizzard's own placement, kept for reset: whatever differs from where this last left the window.
+		-- Read here rather than from SetPoint/SetScale hooks, which would put addon functions on Blizzard's
+		-- panels and taint the panel manager's secure ShowUIPanel (bank, Settings).
+		local points = Points(frame)
+		if not record.applied or not SamePoints(points, record.placed) then
+			record.points = points
+		end
+		if not record.applied or frame:GetScale() ~= record.placedScale then
+			record.scale = frame:GetScale()
+		end
 		-- Read the current layout and toggle on execution, never a stale combat-time position.
 		local position = Active() and Position(record)
 		if
@@ -263,19 +288,17 @@ local function Apply(record)
 		if position then
 			frame:SetScale(record.scale * position.scale)
 			Place(frame, position)
-			record.applied = true
+			record.applied, record.placed, record.placedScale = true, Points(frame), frame:GetScale()
 		elseif record.applied then
 			frame:SetScale(record.scale)
 			frame:ClearAllPoints()
 			for _, point in ipairs(record.points) do
 				frame:SetPoint(point[1], point[2], point[3], point[4], point[5])
 			end
-			record.applied = false
-			restored = true
+			record.applied, record.placed, record.placedScale = false, nil, nil
 		end
 		record.applying = false
 	end)
-	return restored
 end
 
 ---@param record TFWindowRecord
@@ -429,16 +452,11 @@ end
 
 local function RefreshAll()
 	SyncLayouts()
-	local restored = false
 	for _, record in ipairs(records) do
-		restored = Apply(record) or restored
+		Apply(record)
 		if editing and Active() then
 			RefreshPreview(record)
 		end
-	end
-	if restored then
-		-- Native offsets were calculated at the old scale. Recompute them at Blizzard's scale.
-		UpdateUIPanelPositions()
 	end
 end
 
@@ -462,22 +480,8 @@ local function Attach(record)
 		return
 	end
 	record.frame, record.scale, record.points = frame, frame:GetScale(), Points(frame)
-	-- Keep Blizzard's latest anchors for reset. Do not detach area/doublewide panels or write
-	-- UIPanelWindows / UIPanelLayout-*; the native manager must retain occupancy and close rules.
-	hooksecurefunc(frame, "SetPoint", function()
-		if record.applying or not Active() then
-			return
-		end
-		record.points = Points(frame)
-		Schedule()
-	end)
-	hooksecurefunc(frame, "SetScale", function(_, scale)
-		if record.applying or not Active() then
-			return
-		end
-		record.scale = scale
-		Schedule()
-	end)
+	-- Do not detach area/doublewide panels or write UIPanelWindows / UIPanelLayout-*; the native manager
+	-- must retain occupancy and close rules.
 	frame:HookScript("OnShow", function()
 		if Active() then
 			Schedule()
@@ -715,7 +719,6 @@ local function BuildEditor()
 			layout[selected.name] = nil
 		end
 		Apply(selected)
-		UpdateUIPanelPositions()
 		RefreshPreview(selected)
 		UpdateSlider()
 	end)
@@ -753,6 +756,15 @@ local function Install()
 		Attach(record)
 	end
 	SyncLayouts()
+	-- The panel manager moves open windows as others open and close; put ours back after it.
+	local function Moved()
+		if Active() then
+			Schedule()
+		end
+	end
+	hooksecurefunc("ShowUIPanel", Moved)
+	hooksecurefunc("HideUIPanel", Moved)
+	hooksecurefunc("UpdateUIPanelPositions", Moved)
 	EventRegistry:RegisterCallback("EditMode.Enter", Enter, Model)
 	EventRegistry:RegisterCallback("EditMode.Exit", function()
 		editing = false
@@ -816,10 +828,6 @@ local function CheckState()
 				if Active() then
 					for _, record in ipairs(records) do
 						Attach(record)
-						-- Native layout may have changed while our hooks were dormant.
-						if record.frame and not record.applied then
-							record.scale, record.points = record.frame:GetScale(), Points(record.frame)
-						end
 					end
 				end
 				RefreshAll()
