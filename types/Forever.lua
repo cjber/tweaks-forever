@@ -48,6 +48,10 @@ function GetUIPanelLayoutAttribute(attribute) end
 -- Localised client strings are not included in Ketho's API annotations.
 ---@type string
 ERR_NOT_IN_COMBAT = ""
+
+-- UIErrorsFrame's hidden message types (Blizzard_UIErrorsFrame), written by its SetMessageTypeEnabled.
+---@type table<integer, boolean>
+BLACK_LISTED_MESSAGE_TYPES = {}
 ---@type string
 SELL_ALL_JUNK_ITEMS_POPUP = ""
 ---@type string

@@ -11,31 +11,43 @@ local ns = {
 		return db[key]
 	end,
 }
-local shown = {}
+local changed
 local env = setmetatable({
 	LE_GAME_ERR_SPELL_COOLDOWN = 1,
 	LE_GAME_ERR_OUT_OF_MANA = 2,
 	LE_GAME_ERR_INV_FULL = 3,
-	UIErrorsFrame = {
-		ShouldDisplayMessageType = function(_, messageType)
-			shown[#shown + 1] = messageType
-			return true
+	-- The client already hides mana errors.
+	BLACK_LISTED_MESSAGE_TYPES = { [2] = true },
+	Settings = {
+		SetOnValueChangedCallback = function(variable, fn)
+			assert(variable == "TweaksForever_quietErrors")
+			changed = fn
 		end,
 	},
 }, { __index = _G })
+env.UIErrorsFrame = {
+	SetMessageTypeEnabled = function(_, messageType, enabled)
+		env.BLACK_LISTED_MESSAGE_TYPES[messageType] = not enabled
+	end,
+	ShouldDisplayMessageType = function()
+		error("the stock check is never replaced or called")
+	end,
+}
 env._G = env
 setfenv(assert(loadfile("Errors.lua")), env)("TweaksForever", ns)
 assert(features.quietErrors.default == true and #initializers == 1)
-initializers[1]()
-
-local frame = env.UIErrorsFrame
+local hidden = env.BLACK_LISTED_MESSAGE_TYPES
 db.quietErrors = true
-assert(not frame:ShouldDisplayMessageType(1, "Spell is not ready yet."))
-assert(not frame:ShouldDisplayMessageType(2, "Not enough mana"))
-assert(frame:ShouldDisplayMessageType(3, "Inventory is full."), "other errors still show")
-assert(#shown == 1 and shown[1] == 3, "quieted types never reach the stock check")
+initializers[1]()
+assert(hidden[1] and hidden[2], "quiet types are hidden")
+assert(not hidden[3], "other errors still show")
 db.quietErrors = false
-assert(frame:ShouldDisplayMessageType(1, "Spell is not ready yet."), "switching off applies at once")
+changed()
+assert(not hidden[1], "switching off applies at once")
+assert(hidden[2], "and leaves the client's own hidden types hidden")
+db.quietErrors = true
+changed()
+assert(hidden[1] and hidden[2] and not hidden[3])
 
 local leatrix = features.quietErrors.conflicts[1].when
 assert(not leatrix())

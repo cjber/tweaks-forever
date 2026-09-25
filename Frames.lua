@@ -83,6 +83,23 @@ function Model.Rename(db, oldKey, newKey)
 	end
 end
 
+-- Layouts renamed between two readings of the list, as { [old key] = new key }: the same number of layouts, with a
+-- different key at the same index. Adding or deleting one shifts the indices after it, and changes the count.
+---@param before string[]
+---@param after string[]
+---@return table<string, string>
+function Model.Renames(before, after)
+	local renames = {}
+	if #before == #after then
+		for index, key in ipairs(after) do
+			if before[index] ~= key then
+				renames[before[index]] = key
+			end
+		end
+	end
+	return renames
+end
+
 ---@param db TFDatabase
 ---@param keys string[]
 ---@param character string
@@ -444,10 +461,13 @@ local function SyncLayouts()
 			end
 		end
 	end
-	layoutKey, layoutKeys = nextKey, keys
 	if Active() then
+		for old, new in pairs(Model.Renames(layoutKeys, keys)) do
+			Model.Rename(ns.db, old, new)
+		end
 		Model.Prune(ns.db, keys, character)
 	end
+	layoutKey, layoutKeys = nextKey, keys
 end
 
 local function RefreshAll()
@@ -769,6 +789,8 @@ local function Install()
 	EventRegistry:RegisterCallback("EditMode.Exit", function()
 		editing = false
 		HideEditor()
+		-- Leaving without saving puts the saved layout back.
+		Moved()
 	end, Model)
 	manager:HookScript("OnHide", HideEditor)
 	manager:HookScript("OnShow", function()
@@ -776,30 +798,13 @@ local function Install()
 			Enter()
 		end
 	end)
-	hooksecurefunc(manager, "SelectSystem", ClearSelection)
-	hooksecurefunc(manager, "ClearSelectedSystem", ClearSelection)
-	hooksecurefunc(manager, "UpdateLayoutInfo", function()
-		if Active() then
-			Schedule()
-		end
-	end)
-	-- Names/types are the API's only durable identity. Indices shift on insertion/deletion.
-	-- Post-hooks run before our deferred refresh, so the old key is still available after a rename.
-	hooksecurefunc(manager, "RenameLayout", function(_, index)
-		local character = UnitGUID("player")
-		if Active() and character then
-			local layout = manager:GetLayouts()[index]
-			Model.Rename(ns.db, layoutKeys[index], Model.LayoutKey(layout, index, character))
-			Schedule()
-		end
-	end)
-	hooksecurefunc(manager, "DeleteLayout", function(_, index)
-		if Active() and ns.db.windowLayouts and #manager:GetLayouts() < #layoutKeys then
-			ns.db.windowLayouts[layoutKeys[index]] = nil
-			SyncLayouts()
-			Schedule()
-		end
-	end)
+	-- Selecting one of Blizzard's own systems, or opening a layout dialog, closes ours. Script hooks on its dialogs and
+	-- events only: the manager's methods run through secure delegates, and hooksecurefunc on them taints Edit Mode.
+	for _, blizzardDialog in ipairs({ EditModeSystemSettingsDialog, EditModeLayoutDialog, EditModeImportLayoutDialog }) do
+		blizzardDialog:HookScript("OnShow", ClearSelection)
+	end
+	-- A renamed or deleted layout is saved, and SyncLayouts carries its windows over to the new name or drops them.
+	ns.On("EDIT_MODE_LAYOUTS_UPDATED", Moved)
 	EventRegistry:RegisterCallback("EditMode.SavedLayouts", function()
 		if Active() then
 			Schedule()

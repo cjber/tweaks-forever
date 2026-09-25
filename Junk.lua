@@ -120,7 +120,21 @@ local function Info(button)
 	return C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
 end
 
--- `icons` records coins we added beyond the game's own, so turning a feature off can take them away again.
+-- Our own coin over each button, where the game draws its junk coin, never the game's JunkIcon itself: its redraw
+-- would undo ours, and redrawing after it takes a hook on the button's methods. `icons` holds them by button.
+---@param button ContainerFrameItemButtonTemplate
+---@return Texture
+local function Coin(button)
+	if not icons[button] then
+		local native = button.JunkIcon
+		local coin = button:CreateTexture(nil, native:GetDrawLayer())
+		coin:SetAtlas(native:GetAtlas())
+		coin:SetAllPoints(native)
+		icons[button] = coin
+	end
+	return icons[button]
+end
+
 ---@param button ContainerFrameItemButtonTemplate
 local function UpdateIcon(button)
 	local greys = ns.Active("greyCoins")
@@ -130,10 +144,7 @@ local function UpdateIcon(button)
 	local info = Info(button)
 	local marked = info and info.quality ~= POOR and Marks()[info.itemID]
 	local grey = info and info.quality == POOR and not info.hasNoValue
-	local merchantGrey = grey and MerchantFrame:IsShown()
-	icons[button] = (marked or grey and greys and not merchantGrey) or nil
-	-- Recompute the native branch too, so unmarking cannot leave an old icon behind.
-	button.JunkIcon:SetShown(not not (marked or merchantGrey or grey and greys))
+	Coin(button):SetShown(not not (marked or grey and greys))
 end
 
 local function RefreshBags()

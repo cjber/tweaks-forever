@@ -169,8 +169,25 @@ function ns.On(event, fn)
 	table.insert(handlers[event], fn)
 end
 
--- Hook every bag slot button, including ones made later, recording each in `hooked`. `update` runs whenever the
--- button redraws its junk coin, and again as a bag opens; `click` runs after a modified click.
+-- Blizzard's rule for a modified click (ContainerFrameItemButtonMixin:OnClick): with the auto-loot toggle held, a
+-- button other than the left one on a lootable item is an ordinary click.
+---@param button ContainerFrameItemButtonTemplate
+---@param mouseButton string
+---@return boolean
+local function IsModifiedBagClick(button, mouseButton)
+	if not IsModifiedClick() then
+		return false
+	end
+	if mouseButton ~= "LeftButton" and IsModifiedClick("AUTOLOOTTOGGLE") then
+		local info = C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
+		return not (info and info.hasLoot)
+	end
+	return true
+end
+
+-- Hook every bag slot button as its bag opens, recording each in `hooked`. `update` runs as a bag opens (callers
+-- also refresh on BAG_UPDATE_DELAYED); `click` runs after a modified click. Script hooks only: hooksecurefunc on a
+-- button's methods, or on ContainerFrameItemButtonMixin, writes into Blizzard's tables and taints its bag code.
 ---@param hooked table<ContainerFrameItemButtonTemplate, boolean>
 ---@param update fun(button: ContainerFrameItemButtonTemplate)
 ---@param click fun(button: ContainerFrameItemButtonTemplate, mouseButton: string)
@@ -181,11 +198,12 @@ function ns.HookBagButtons(hooked, update, click)
 			return
 		end
 		hooked[button] = true
-		hooksecurefunc(button, "UpdateJunkItem", update)
-		-- OnModifiedClick avoids ever running after the ordinary use/equip/sell path.
-		hooksecurefunc(button, "OnModifiedClick", click)
+		button:HookScript("OnClick", function(self, mouseButton)
+			if IsModifiedBagClick(self, mouseButton) then
+				click(self, mouseButton)
+			end
+		end)
 	end
-	hooksecurefunc(ContainerFrameItemButtonMixin, "OnLoad", Hook)
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
 		for _, button in ns.BagItems(container) do
 			Hook(button)
