@@ -152,6 +152,7 @@ read_globals = {
 	"LibQuestieDB",
 	"LibStub",
 	"LootSlot",
+	"MapCanvasDataProviderMixin",
 	"Menu",
 	"MenuResponse",
 	"MenuUtil",
