@@ -76,6 +76,8 @@ The quest features (quests on minimap givers, quest progress on tooltips and nam
 
 Nothing to set up. A few features that act for you are off until you tick them.
 
+Translations are welcome on the [CurseForge localization page](https://legacy.curseforge.com/wow/addons/tweaks-forever/localization); anything not translated yet shows in English.
+
 ## For addon authors
 
 `TweaksForever.API` (`version = 1`) gives the class trainer spells you can learn and each dungeon's own entrance. [docs/features.md](docs/features.md#for-addon-authors) has the details.

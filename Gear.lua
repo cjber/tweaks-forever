@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "gearGroups",
@@ -39,7 +40,7 @@ ns.Feature({
 	parent = "gearGroups",
 })
 
-local BEFORE_FISHING = "Before fishing"
+local BEFORE_FISHING = L["Before fishing"]
 local WHITE = "Interface\\Buttons\\WHITE8X8"
 -- The quality border's own art, so a group border replaces it exactly.
 local ICON_FRAME = "Interface\\Common\\WhiteIconFrame"
@@ -551,7 +552,7 @@ end
 ---@param itemID integer
 local function NewGroup(itemID)
 	StaticPopup_ShowCustomGenericInputBox({
-		text = "New gear group",
+		text = L["New gear group"],
 		maxLetters = 32,
 		callback = function(text)
 			local name = strtrim(text)
@@ -581,7 +582,7 @@ local function OpenMenu(button, itemID)
 				return MenuResponse.CloseAll
 			end)
 		end
-		root:CreateButton("New group…", function()
+		root:CreateButton(L["New group…"], function()
 			NewGroup(itemID)
 		end)
 		-- Each source equips its own way, so a group and a set sharing a name stay distinct.
@@ -589,11 +590,11 @@ local function OpenMenu(button, itemID)
 		if #found > 0 then
 			root:CreateDivider()
 			for _, mark in ipairs(found) do
-				root:CreateButton("Equip " .. mark.name, function()
+				root:CreateButton(L["Equip %s"]:format(mark.name), function()
 					EQUIP[mark.kind](mark.name)
 				end)
 			end
-			local colours = root:CreateButton("Colour")
+			local colours = root:CreateButton(L["Colour"])
 			for _, mark in ipairs(found) do
 				colours:CreateButton(Coloured(mark), function()
 					PickColour(mark)
@@ -645,7 +646,7 @@ local function InitTooltips()
 			names[index] = Coloured(mark)
 		end
 		if #names > 0 then
-			tooltip:AddLine("Gear: " .. table.concat(names, ", "), 1, 0.82, 0, true)
+			tooltip:AddLine(L["Gear: %s"]:format(table.concat(names, ", ")), 1, 0.82, 0, true)
 			tooltip:Show()
 		end
 	end

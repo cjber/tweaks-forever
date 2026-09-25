@@ -156,6 +156,7 @@ local env = setmetatable({
 	},
 	Enum = { TooltipDataType = { MinimapMouseover = 21 } },
 }, { __index = _G })
+assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("QuestGivers.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestGivers
 assert(features.giverTooltips.default == true and #initializers == 1)

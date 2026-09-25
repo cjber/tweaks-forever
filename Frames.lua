@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "moveWindows",
@@ -15,27 +16,27 @@ ns.Feature({
 -- Camelot uses Mainline plus explicit Camelot overrides, NOT the Classic spellbook/talent/auction UI.
 -- LootFrame and Minimap already have Edit Mode systems. ProfessionsBook is a PlayerSpellsFrame tab.
 local windows = {
-	{ "CharacterFrame", "Character" },
-	{ "PlayerSpellsFrame", "Spellbook / Talents", "Blizzard_PlayerSpells" },
-	{ "WorldMapFrame", "Map / Quest log" },
-	{ "QuestLogPopupDetailFrame", "Quest details" },
-	{ "QuestFrame", "Quest interaction" },
-	{ "GossipFrame", "Gossip" },
-	{ "MerchantFrame", "Merchant" },
-	{ "MailFrame", "Mailbox" },
-	{ "BankFrame", "Bank" },
-	{ "ClassTrainerFrame", "Trainer", "Blizzard_TrainerUI" },
-	{ "AuctionHouseFrame", "Auction house", "Blizzard_AuctionHouseUI" },
-	{ "FriendsFrame", "Friends / Social" },
-	{ "CommunitiesFrame", "Guild" },
-	{ "DressUpFrame", "Dressing room" },
-	{ "TaxiFrame", "Flight paths" },
-	{ "FlightMapFrame", "Flight map", "Blizzard_FlightMap" },
-	{ "TradeFrame", "Trade" },
-	{ "ProfessionsFrame", "Professions", "Blizzard_Professions" },
-	{ "GameMenuFrame", "Game menu" },
-	{ "SettingsPanel", "Settings" },
-	{ "AddonList", "Addons" },
+	{ "CharacterFrame", CHARACTER },
+	{ "PlayerSpellsFrame", L["Spellbook / Talents"], "Blizzard_PlayerSpells" },
+	{ "WorldMapFrame", L["Map / Quest log"] },
+	{ "QuestLogPopupDetailFrame", L["Quest details"] },
+	{ "QuestFrame", L["Quest interaction"] },
+	{ "GossipFrame", L["Gossip"] },
+	{ "MerchantFrame", MERCHANT },
+	{ "MailFrame", L["Mailbox"] },
+	{ "BankFrame", BANK },
+	{ "ClassTrainerFrame", L["Trainer"], "Blizzard_TrainerUI" },
+	{ "AuctionHouseFrame", L["Auction house"], "Blizzard_AuctionHouseUI" },
+	{ "FriendsFrame", L["Friends / Social"] },
+	{ "CommunitiesFrame", GUILD },
+	{ "DressUpFrame", L["Dressing room"] },
+	{ "TaxiFrame", L["Flight paths"] },
+	{ "FlightMapFrame", L["Flight map"], "Blizzard_FlightMap" },
+	{ "TradeFrame", TRADE },
+	{ "ProfessionsFrame", PROFESSIONS_BUTTON, "Blizzard_Professions" },
+	{ "GameMenuFrame", L["Game menu"] },
+	{ "SettingsPanel", SETTINGS },
+	{ "AddonList", L["Addons"] },
 }
 
 -- Pure storage/geometry/queue helpers. No frame objects are written to SavedVariables.
@@ -657,7 +658,7 @@ local function BuildEditor()
 	tabs:SetSize(1, 1)
 	tabs:SetFrameStrata("DIALOG")
 	tabs:SetFrameLevel(manager:GetFrameLevel())
-	for id, text in ipairs({ "HUD", "Windows" }) do
+	for id, text in ipairs({ L["HUD"], L["Windows"] }) do
 		local tab = CreateFrame("Button", nil, tabs, "PanelTabButtonTemplate")
 		tab:SetID(id)
 		tab:SetText(text)
@@ -681,7 +682,7 @@ local function BuildEditor()
 	title:SetText(manager.Title:GetText())
 	Label(
 		sheet,
-		"Show a window to move and scale it. Changes save at once for this layout.",
+		L["Show a window to move and scale it. Changes save at once for this layout."],
 		"GameFontHighlight",
 		25,
 		-48
@@ -691,7 +692,7 @@ local function BuildEditor()
 	inset:SetPoint("TOPLEFT", 25, -84)
 	inset:SetPoint("BOTTOMRIGHT", -25, 24)
 	NineSliceUtil.ApplyLayoutByName(inset, "UniqueCornersLayout", "OptionsFrame")
-	Label(inset, "Windows", "GameFontNormalLarge", 10, -8)
+	Label(inset, L["Windows"], "GameFontNormalLarge", 10, -8)
 	local scroll = CreateFrame("ScrollFrame", nil, inset, "ScrollFrameTemplate")
 	scroll:SetPoint("TOPLEFT", 4, -36)
 	scroll:SetPoint("BOTTOMRIGHT", -24, 6)
@@ -713,7 +714,7 @@ local function BuildEditor()
 	dialog = MakePanel(320, 164)
 	dialog:SetPoint("TOPLEFT", manager, "TOPRIGHT", 8, 0)
 	dialog.Title = Label(dialog, "", "GameFontHighlightLarge", 18, -18)
-	Label(dialog, "Scale", "GameFontHighlightMedium", 18, -55)
+	Label(dialog, L["Scale"], "GameFontHighlightMedium", 18, -55)
 	dialog.Slider = (
 		CreateFrame("Frame", nil, dialog, "MinimalSliderWithSteppersTemplate") --[[@as MinimalSliderWithSteppersTemplate]]
 	)
@@ -729,7 +730,7 @@ local function BuildEditor()
 	local reset = CreateFrame("Button", nil, dialog, "EditModeSystemSettingsDialogButtonTemplate")
 	reset:SetSize(284, 24)
 	reset:SetPoint("TOPLEFT", 18, -94)
-	reset:SetText("Reset To Default Position")
+	reset:SetText(HUD_EDIT_MODE_RESET_POSITION)
 	reset:SetScript("OnClick", function()
 		if not selected or not Active() or InCombatLockdown() then
 			return
@@ -742,7 +743,7 @@ local function BuildEditor()
 		RefreshPreview(selected)
 		UpdateSlider()
 	end)
-	Label(dialog, "Reset also restores the original scale.", "GameFontHighlightSmall", 18, -133)
+	Label(dialog, L["Reset also restores the original scale."], "GameFontHighlightSmall", 18, -133)
 	local close = CreateFrame("Button", nil, dialog, "UIPanelCloseButton")
 	close:SetPoint("TOPRIGHT")
 	close:SetScript("OnClick", ClearSelection)

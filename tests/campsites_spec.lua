@@ -45,6 +45,7 @@ local env = setmetatable({
 		end,
 	},
 }, { __index = _G })
+assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Data/CampBenefits.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Campsites.lua")), env)("TweaksForever", ns)
 local Camp = ns.Camp

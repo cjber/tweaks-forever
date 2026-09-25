@@ -50,4 +50,6 @@ Beyond hiding macro names if you ask, it leaves your action bars and unit frames
 
 Everything is under Options → AddOns → Tweaks Forever. `/tweaks`, `/tweaksforever` or the addon compartment on the minimap opens it.
 
+Translations are welcome on the [CurseForge localization page](https://legacy.curseforge.com/wow/addons/tweaks-forever/localization); anything not translated yet shows in English.
+
 Bug reports and ideas are welcome. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).

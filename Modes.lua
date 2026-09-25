@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 -- Click modes: the bag actions without a modifier key, for keyboards or window managers that swallow Alt or Ctrl.
 -- Like the merchant's repair mode, one is picked from a bag's portrait menu, the cursor changes over bag items
@@ -9,7 +10,7 @@ local modes = {}
 ---@type TFClickMode?
 local active
 
--- Declare a mode: { feature, label, tooltip, cursor, Apply(owner, bag, slot) }.
+-- Declare a mode: { feature, label, tooltip, cursor, Apply(owner, bag, slot) }, label and tooltip in English.
 ---@param mode TFClickMode
 function ns.ClickMode(mode)
 	modes[#modes + 1] = mode
@@ -108,7 +109,7 @@ local function AddModes(owner, root)
 				root:CreateDivider()
 				divided = true
 			end
-			local entry = root:CreateCheckbox(mode.label, function()
+			local entry = root:CreateCheckbox(L[mode.label], function()
 				return active == mode
 			end, function()
 				if active == mode then
@@ -119,8 +120,8 @@ local function AddModes(owner, root)
 				return MenuResponse.CloseAll
 			end)
 			entry:SetTooltip(function(tooltip)
-				GameTooltip_SetTitle(tooltip, mode.label)
-				GameTooltip_AddNormalLine(tooltip, mode.tooltip)
+				GameTooltip_SetTitle(tooltip, L[mode.label])
+				GameTooltip_AddNormalLine(tooltip, L[mode.tooltip])
 			end)
 		end
 	end
