@@ -8,7 +8,7 @@ python3 tools/gen_dungeons.py      # Data/DungeonEntrances.lua (stdlib only)
 python3 tools/gen_classspells.py   # Data/ClassSpells.lua (stdlib only)
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
-python3 tools/screenshots.py       # docs/screenshots/*.png (Pillow)
+python3 tools/screenshots.py       # docs/screenshots/*.png and demo.gif (Pillow)
 python3 tools/tooltip_border.py    # media/TooltipBorder{Modern,Retail}.tga (stdlib only)
 python3 -m tools.phrases --write     # Locales/phrases.txt, to paste into CurseForge (stdlib only)
 ```
@@ -81,8 +81,9 @@ own UI art, fonts and item icons from wago.tools, laid out as Blizzard's UI code
 the addon's own modules draw them, using the `wowmock` library from the
 [wow-mock-screenshots](https://github.com/cjber/skills/tree/main/wow-mock-screenshots)
 skill. It looks for the library in `$WOWMOCK`, else
-`~/.claude/skills/wow-mock-screenshots`, and needs Pillow. Two runs give
-byte-identical images.
+`~/.claude/skills/wow-mock-screenshots`, and needs Pillow. `demo.gif` strings the
+dungeon, nameplate and junk scenes together, and the script fails if it passes 3 MB.
+Two runs give byte-identical images.
 
 `tooltip_border.py` draws `media/TooltipBorderModern.tga` and
 `media/TooltipBorderRetail.tga`, the whole tooltip *Modern tooltips* draws in place of

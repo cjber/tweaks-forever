@@ -2,6 +2,10 @@ I got tired of running a pile of small addons for things that feel like they sho
 
 If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or similar, the overlapping option greys out and names the addon that has it, so the two never fight. Anything that acts for you is off until you turn it on.
 
+![Dungeon entrances on the map, then enemy nameplates, then a backpack with a ring marked as junk](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
+
+Dungeon entrances on the map, nameplates, and the junk coin in your bags.
+
 ![The Eastern Kingdoms map with an icon at every dungeon entrance and Blackrock Mountain's tooltip](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png)
 
 Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.
@@ -51,5 +55,7 @@ Beyond hiding macro names if you ask, it leaves your action bars and unit frames
 Everything is under Options → AddOns → Tweaks Forever. `/tweaks`, `/tweaksforever` or the addon compartment on the minimap opens it.
 
 Translations are welcome on the [CurseForge localization page](https://legacy.curseforge.com/wow/addons/tweaks-forever/localization); anything not translated yet shows in English.
+
+Works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
 
 Bug reports and ideas are welcome. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
