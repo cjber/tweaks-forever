@@ -96,6 +96,8 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 
 Addons can use `TweaksForever.API` (`version = 1`). `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned, each spell's next rank only and no weapon skills or riding, as fresh `{spellID, name, level, cost, line, lineID, general}` tables: `line` is the tab's name in the client's language, for display, and `lineID` its SkillLine ID, the same in every language. A spell for the General tab (Dual Wield, Parry, Plate Mail) has `general` set and its own skill line as `lineID`, as that tab has none. `cost` is missing when the fee isn't known. It answers whether or not Future Spells is on. It returns `nil` before login and in combat.
 
+`DungeonEntrance(instanceID)` takes an instance's Map ID (230 for Blackrock Depths) and returns a fresh `{map, x, y}` table: the entrance on its zone map, as a UiMapID and 0–1 coordinates. It's that instance's own door, not the one pin the map draws for Blackrock Mountain or the Gates of Ahn'Qiraj, and it answers with the entrance pins off, before login and in combat. It returns `nil` for an instance with no entrance in the client, such as Naxxramas.
+
 ## Install
 
 Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.

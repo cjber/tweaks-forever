@@ -207,6 +207,7 @@ TweaksForeverCharDB = nil
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels
 ---@field DungeonEntrances table<integer, TFEntrance[]>
+---@field InstanceEntrances table<integer, TFDungeonEntrance> by instance Map.ID, before pin clustering
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
 ---@field QuestGivers TFQuestGivers

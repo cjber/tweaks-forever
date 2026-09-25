@@ -56,15 +56,33 @@ local env = setmetatable({
 		return false
 	end,
 }, { __index = _G })
-for _, file in ipairs({ "Data/ClassSpells.lua", "Spellbook.lua", "API.lua" }) do
+for _, file in ipairs({ "Data/ClassSpells.lua", "Data/DungeonEntrances.lua", "Spellbook.lua", "API.lua" }) do
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
 end
 local API = env.TweaksForever.API
 assert(API.version == 1)
+local entrance = API.DungeonEntrance(230)
+assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "first curated zone, before login")
+assert(not ns.Active("dungeonEntrances") and not ns.Entrances, "works with pins off and no pin feature loaded")
+local another = API.DungeonEntrance(230)
+assert(entrance ~= another and entrance ~= ns.InstanceEntrances[230], "fresh table on every call")
+entrance.map, entrance.x, entrance.y = 1, 0, 0
+assert(another.map == 1427 and another.x == 0.271 and another.y == 0.725, "copies are isolated")
+entrance = API.DungeonEntrance(230)
+assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "callers cannot change the source")
+local cluster = ns.DungeonEntrances[1427][1]
+assert(#cluster.instances == 3 and cluster.x ~= entrance.x and cluster.y ~= entrance.y, "not the merged pin centre")
+cluster.x, cluster.y = 0.1, 0.2
+entrance = API.DungeonEntrance(230)
+assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "pin changes cannot move the destination")
+assert(API.DungeonEntrance(999999) == nil, "unknown instance")
+assert(API.DungeonEntrance(533) == nil, "Naxxramas has no placed entrance")
+assert(API.DungeonEntrance(44) == nil, "unused Monastery has no real entrance")
 assert(API.TrainableSpells() == nil, "before login the spellbook isn't known yet")
 ns.db = {}
 combat = true
 assert(API.TrainableSpells() == nil, "not in combat")
+assert(API.DungeonEntrance(230).map == 1427, "entrance lookup also works in combat")
 combat = false
 
 local function Find(list, id)
