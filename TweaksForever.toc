@@ -45,5 +45,7 @@ MacroNames.lua
 Spellbook.lua
 Fishing.lua
 Reload.lua
+WhatsNew.lua
+Companions.lua
 Settings.lua
 API.lua

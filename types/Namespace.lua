@@ -141,6 +141,7 @@
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
 ---@field savedSounds? table<string, string>
+---@field lastVersion? string the addon version last logged in with
 ---@field windowLayouts? table<string, table<string, TFPosition>>
 ---@field [string] boolean|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>
 
@@ -217,6 +218,9 @@ TweaksForeverCharDB = nil
 ---@field Print fun(message: string)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(): string
+---@field Suggestion fun(addon: string, install: string, enable: string): string?
+---@field WHATS_NEW string
+---@field WhatsNew TFWhatsNew
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
 ---@field ConflictOf fun(key: string): string?

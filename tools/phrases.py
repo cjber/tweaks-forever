@@ -50,6 +50,7 @@ SINKS = {
     "GameTooltip_AddNormalLine": 2,
     "GameTooltip_AddColoredLine": 2,
     "GameTooltip_AddErrorLine": 2,
+    "GameTooltip_AddDisabledLine": 2,
     "GameTooltip_AddInstructionLine": 2,
     "CreateSettingsButtonInitializer": 1,
     "RegisterVerticalLayoutCategory": 1,

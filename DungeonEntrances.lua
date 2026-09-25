@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "dungeonEntrances",
@@ -147,6 +148,21 @@ ns.Init(function()
 
 	function Pin.GetTooltipInstructions()
 		return ns.NavigateHint()
+	end
+
+	-- The game's own tooltip, then a grey line when Shortest Path Forever could walk the player there.
+	function Pin:OnMouseEnter()
+		BaseMapPoiPinMixin.OnMouseEnter(self)
+		local hint = ns.Suggestion(
+			"ShortestPathForever",
+			L["Install Shortest Path Forever for walked routes and boat times."],
+			L["Enable Shortest Path Forever for walked routes and boat times."]
+		)
+		if hint then
+			local tooltip = GetAppropriateTooltip()
+			GameTooltip_AddDisabledLine(tooltip, hint)
+			tooltip:Show()
+		end
 	end
 
 	---@param button string
