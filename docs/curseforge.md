@@ -6,9 +6,9 @@ If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or si
 
 Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.
 
-![Three enemy nameplates: the targeted Defias Pillager outlined in white in retail's bronze-rimmed bar, its name centred above with level 15 in yellow after it and 62% inside the bar, two debuffs above and a Fireball cast in a slim bar below with the spell's icon inside; the other two faded back](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
+![Three enemy nameplates: the targeted Defias Pillager outlined in white in retail's bronze-rimmed bar, its name centred above with level 15 in yellow after it, 62% inside the bar and a gold quest icon to its right, two debuffs above and a Fireball cast in a slim bar below with the spell's icon inside; the other two faded back](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
 
-Nameplates in retail's own frame, with your target outlined and casts in a slim bar.
+Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.
 
 ![Kalimdor on the world map with the cursor on Ashenvale: the label at the top reads Ashenvale (18-30), the range in yellow for a level 22 character](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/zonelevels.png)
 
@@ -51,7 +51,7 @@ Camp tooltips say what sitting nearby gives you.
 - **Nameplates**: a taller bar with the name and level above it, your target outlined in white and your focus in gold, the rest faded back, and casts in a slim bar with the spell inside.
 - **Tooltips**: a thin rounded border over charcoal, retail's navy or the game's own; player names in class colour with race and class on one line; the health bar inside, with numbers or a percentage.
 - **Windows**: move and scale Blizzard windows from a Windows tab in Edit Mode, saved per layout.
-- **Quests and camps**: the quest tracker sorts nearest first, with distances. With QuestieDB installed, pointing at a quest giver on the minimap lists their quests for you. Campsite features say what they give and whether you have it, and the Campfire Nearby buff lists your camp benefits and which way the fire is. Each benefit you gain is named at the top of the screen.
+- **Quests and camps**: the quest tracker sorts nearest first, with distances. With QuestieDB installed, pointing at a quest giver on the minimap lists their quests for you, and a creature you need for a quest shows your progress in its tooltip and a quest icon by its nameplate. Campsite features say what they give and whether you have it, and the Campfire Nearby buff lists your camp benefits and which way the fire is. Each benefit you gain is named at the top of the screen.
 - **Spellbook and bags**: the spellbook shows spells you haven't learned yet, greyed out after your own, as retail does. The reagent bag joins the bottom of the combined bag.
 - **Fishing**: double right-click the world with a pole to cast; with no lure on, the same double-click puts on the best one you can use.
 - **Also**: quiet the errors a spammed macro repeats, and `/rl` reloads.

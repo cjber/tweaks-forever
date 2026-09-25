@@ -19,10 +19,10 @@ When another addon already does one of these jobs, that feature is greyed out an
 <p align="center">Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.</p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates in retail\'s bronze-rimmed bar, the targeted Defias Pillager outlined in white, with debuffs above and a Fireball cast below">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates in retail\'s bronze-rimmed bar, the targeted Defias Pillager outlined in white with a gold quest icon beside it, debuffs above and a Fireball cast below">
 </p>
 
-<p align="center">Nameplates in retail's own frame, with your target outlined and casts in a slim bar.</p>
+<p align="center">Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab: a checkbox for each of 21 Blizzard windows, the Character window's outline selected on the left, and a Character dialog with a Scale slider at 100% and Reset To Default Position">
@@ -56,6 +56,7 @@ Every feature has its own checkbox. The full detail is in [docs/features.md](doc
 - **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
 - **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs QuestieDB.
+- **Quest progress.** A creature you need for a quest shows the quest and your progress in its tooltip, such as "Mangy Wolf slain: 3/10", and a small quest icon beside its nameplate until you have enough. Needs QuestieDB.
 - **Camp benefits.** Camp tooltips say what sitting nearby gives you and how long you have left on it, and each benefit you gain is named at the top of the screen.
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
@@ -76,6 +77,8 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 |---|---|
 | Quests | Leatrix Plus, Questie, AutoTurnIn |
 | Nearest quests first | Questie, while its tracker is on |
+| Quest progress on tooltips | Questie, while its tooltips are on |
+| Quest icons on nameplates | Questie, while its nameplate icons are on |
 | Other automations, repairs, quiet errors | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
 | Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |

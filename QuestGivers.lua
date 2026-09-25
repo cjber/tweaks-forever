@@ -12,7 +12,7 @@ ns.Feature({
 	default = true,
 })
 
--- QuestieDB, read at runtime only: its public API (contract 2) for the Forever flavour.
+-- QuestieDB, read at runtime only: its public API (contract 2) for the Forever flavour. QuestProgress.lua reads it too.
 local ADDON, CONTRACT = "QuestieDB", 2
 -- Yards from you a giver can stand and still be on the minimap, whose widest view is about 233 yards across its radius.
 local RANGE = 250
@@ -61,16 +61,22 @@ local function Table(source)
 	return ok and type(value) == "table" and value or nil
 end
 
--- Use the loaded QuestieDB if it is the Forever build of a contract this file was written against.
+-- The loaded QuestieDB, if it is the Forever build of a contract this addon was written against.
+---@return TFQuestieDB?
+function ns.QuestieDB()
+	local db = LibQuestieDB
+	if type(db) ~= "table" or C_AddOns.GetAddOnMetadata(ADDON, "X-Flavor") ~= "Forever" then
+		return nil
+	end
+	local ok, fits = pcall(db.RequireContract, CONTRACT)
+	return ok and fits and db or nil
+end
+
 ---@return boolean
 function Model.Attach()
 	candidates = {}
-	local db = LibQuestieDB
-	if type(db) ~= "table" or C_AddOns.GetAddOnMetadata(ADDON, "X-Flavor") ~= "Forever" then
-		return false
-	end
-	local ok, fits = pcall(db.RequireContract, CONTRACT)
-	if not (ok and fits) or not (db.Npc and db.Npc.IdsByName and db.Quest and db.Support) then
+	local db = ns.QuestieDB()
+	if not db or not (db.Npc and db.Npc.IdsByName and db.Quest and db.Support) then
 		return false
 	end
 	local zones = db.Support.Get("ZoneDB")

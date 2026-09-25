@@ -6,6 +6,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The entries are prose rather than bare
 Added/Fixed lists. Each version's entry is also its release notes on GitHub, CurseForge and Wago.
 
+## [Unreleased]
+
+- **Quest progress on tooltips.** With QuestieDB installed, pointing at a creature you need for a quest adds the quest and your progress under its tooltip, as the retail game does, such as " - Mangy Wolf slain: 3/10", white until that objective is done and grey after. Creatures that drop an item a quest wants count too. It stays out of the way while Questie's own tooltips are on. Turn it off under Interface.
+- **Quest icons on nameplates.** With QuestieDB installed, a small gold quest icon sits beside the nameplate of each creature you still need for a quest, and goes once you have enough. It stays out of the way while Questie's own nameplate icons are on. Turn it off under Interface.
+
 ## [0.4.1] - 2026-09-25
 
 Updated for Forever build 1.60.1.70009. The build changes none of the map overlays, dungeon entrances, camp benefits, zone levels or trainer spells the addon carries, so nothing looks different.

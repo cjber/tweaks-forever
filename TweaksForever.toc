@@ -30,6 +30,7 @@ Reagents.lua
 Campsites.lua
 QuestDistance.lua
 QuestGivers.lua
+QuestProgress.lua
 Tooltips.lua
 Nameplates.lua
 Exploration.lua
