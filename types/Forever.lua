@@ -167,3 +167,21 @@ COSTS_LABEL = ""
 ---@class StaticPopupTemplate
 ---@field which string?
 ---@field data any
+
+-- Blizzard strings the addon shows as they are, absent from Ketho's annotations.
+---@type string
+BANK = ""
+---@type string
+CHARACTER = ""
+---@type string
+GUILD = ""
+---@type string
+HUD_EDIT_MODE_RESET_POSITION = ""
+---@type string
+MERCHANT = ""
+---@type string
+PROFESSIONS_BUTTON = ""
+---@type string
+SETTINGS = ""
+---@type string
+TRADE = ""

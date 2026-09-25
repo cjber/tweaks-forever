@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "campTooltips",
@@ -89,16 +90,16 @@ local function Listing(remaining)
 	return have
 end
 
--- Which way the campfire lies, relative to where you face, a whole sector a side.
+-- Which way the campfire lies, relative to where you face, a whole sector a side, as whole lines to translate.
 local SIDES = {
-	"ahead",
-	"ahead to your left",
-	"to your left",
-	"behind you to the left",
-	"behind you",
-	"behind you to the right",
-	"to your right",
-	"ahead to your right",
+	L["Campfire: about %d yd ahead"],
+	L["Campfire: about %d yd ahead to your left"],
+	L["Campfire: about %d yd to your left"],
+	L["Campfire: about %d yd behind you to the left"],
+	L["Campfire: about %d yd behind you"],
+	L["Campfire: about %d yd behind you to the right"],
+	L["Campfire: about %d yd to your right"],
+	L["Campfire: about %d yd ahead to your right"],
 }
 
 -- Where a campfire is, as a tooltip line. Bearings run counter-clockwise from north, as GetPlayerFacing's do.
@@ -109,11 +110,11 @@ local SIDES = {
 local function Toward(north, west, facing)
 	local yards = math.sqrt(north ^ 2 + west ^ 2)
 	if yards < HERE_YARDS then
-		return "Campfire: right here"
+		return L["Campfire: right here"]
 	end
 	local turn = (math.atan2(west, north) - facing) % (2 * math.pi)
-	local side = SIDES[math.floor(turn / (math.pi / 4) + 0.5) % 8 + 1]
-	return ("Campfire: about %d yd %s"):format(math.floor(yards / 5 + 0.5) * 5, side)
+	local line = SIDES[math.floor(turn / (math.pi / 4) + 0.5) % 8 + 1]
+	return line:format(math.floor(yards / 5 + 0.5) * 5)
 end
 
 -- A number as the game's descriptions print it.
@@ -170,8 +171,8 @@ end
 ---@param points number[]?
 ---@return string
 local function Announcement(benefit, points)
-	local gives = benefit[1] == TENT and "rested experience" or Effect(benefit, points):gsub("^%u", string.lower)
-	return ("Camp benefit gained: %s (%s)"):format(benefit[2], gives)
+	local gives = benefit[1] == TENT and L["rested experience"] or Effect(benefit, points):gsub("^%u", string.lower)
+	return L["Camp benefit gained: %s (%s)"]:format(benefit[2], gives)
 end
 
 ns.Camp = { Listing = Listing, Toward = Toward, Effect = Effect, Announcement = Announcement }
@@ -208,12 +209,14 @@ local function AddRow(tooltip, row)
 	local effect = Effect(row.benefit, row.points)
 	local text
 	if not row.left then
-		text = feature .. ": " .. effect
+		text = L["%s: %s"]:format(feature, effect)
 	elseif aura == TENT then
-		text = feature .. ": rested" .. (row.left > 0 and ", again in " .. Time(row.left) or "")
+		text = row.left > 0 and L["%s: rested, again in %s"]:format(feature, Time(row.left))
+			or L["%s: rested"]:format(feature)
 	else
 		-- The time goes by the name, where wrapping can't strand it on a line of its own.
-		text = feature .. (row.left > 0 and " (" .. Time(row.left) .. ")" or "") .. ": " .. effect
+		text = row.left > 0 and L["%s (%s): %s"]:format(feature, Time(row.left), effect)
+			or L["%s: %s"]:format(feature, effect)
 	end
 	local color = row.left and GREEN_FONT_COLOR or GRAY_FONT_COLOR
 	tooltip:AddLine(text, color.r, color.g, color.b, true)
@@ -223,7 +226,7 @@ end
 -- has, so it is every benefit there is.
 ---@param tooltip GameTooltip
 local function AddCampList(tooltip)
-	local hint = "Sit or craft near a camp feature for a minute to gain its benefit:"
+	local hint = L["Sit or craft near a camp feature for a minute to gain its benefit:"]
 	tooltip:AddLine(hint, 1, 1, 1, true)
 	for _, row in ipairs(Listing(Remaining)) do
 		AddRow(tooltip, row)
@@ -236,12 +239,12 @@ local function AddStatus(tooltip, aura)
 	local left = Remaining(aura)
 	local text
 	if not left then
-		tooltip:AddLine("You don't have this", GRAY_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
+		tooltip:AddLine(L["You don't have this"], GRAY_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 		return
 	elseif aura == TENT then
-		text = left > 0 and "Rested, again in " .. Time(left) or "Rested"
+		text = left > 0 and L["Rested, again in %s"]:format(Time(left)) or L["Rested"]
 	else
-		text = left > 0 and "Active: " .. Time(left) or "Active"
+		text = left > 0 and L["Active: %s"]:format(Time(left)) or L["Active"]
 	end
 	tooltip:AddLine(text, GREEN_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 end
@@ -257,7 +260,7 @@ local function AddFeature(tooltip, aura)
 	local benefit, secret = byAura[aura], AurasSecret()
 	local info = not secret and C_UnitAuras.GetPlayerAuraBySpellID(aura) or nil
 	local effect, seconds = Effect(benefit, info and info.points), benefit[4]
-	local text = seconds and "Sitting nearby: " .. effect .. " for " .. Time(seconds) or effect
+	local text = seconds and L["Sitting nearby: %s for %s"]:format(effect, Time(seconds)) or effect
 	local r, g, b = GREEN_FONT_COLOR:GetRGB()
 	tooltip:AddLine(text, r, g, b, true)
 	if not secret then
@@ -336,7 +339,7 @@ local function AddMissing(tooltip)
 		return
 	end
 	tooltip:AddLine(" ")
-	tooltip:AddLine("Not yet gained:", GRAY_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
+	tooltip:AddLine(L["Not yet gained:"], GRAY_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 	for _, row in ipairs(missing) do
 		AddRow(tooltip, row)
 	end

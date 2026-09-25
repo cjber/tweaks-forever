@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "trainableSpells",
@@ -475,7 +476,7 @@ local function Render()
 
 	local width = ColumnWidth(grid)
 	if onLast and top.page == extra then
-		header.Text:SetText("Future Spells")
+		header.Text:SetText(L["Future Spells"])
 		header:ClearAllPoints()
 		header:SetPoint("TOPLEFT", paged.ViewFrames[top.view], "TOPLEFT", top.x, -top.y)
 		header:SetWidth(grid.width)

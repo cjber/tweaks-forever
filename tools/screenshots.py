@@ -331,7 +331,10 @@ def camp_benefits():
     """[(aura, feature, effect, seconds or None)] in Data/CampBenefits.lua's order."""
     source = (ROOT / "Data" / "CampBenefits.lua").read_text()
     body = source[source.index("ns.CampBenefits = {") :]
-    entries = re.findall(r'\{\s*(\d+),\s*"([^"]+)",\s*((?:"[^"]*"\s*(?:\.\.\s*)?)+),?\s*(\d+)?,?\s*\}', body)
+    # Each entry may end with its effect's numbers, { 29 }, which the mock does not need.
+    entries = re.findall(
+        r'\{\s*(\d+),\s*"([^"]+)",\s*((?:"[^"]*"\s*(?:\.\.\s*)?)+),?\s*(\d+)?,?\s*(?:\{[^}]*\},?)?\s*\}', body
+    )
     return [(int(a), f, "".join(re.findall(r'"([^"]*)"', e)), int(s) if s else None) for a, f, e, s in entries]
 
 
@@ -383,11 +386,23 @@ CHARACTER_SIZE = (398, 484)  # CHARACTER_FRAME_COLLAPSED_WIDTH x CHARACTER_FRAME
 PANEL_LEFT, PANEL_TOP = 16, 116  # UIPanel layout LEFT_OFFSET, TOP_OFFSET for a "left" area panel
 
 
+# The English of the game's own strings that Frames.lua uses as window labels (GlobalStrings, build 1.60.1.70009).
+GLOBAL_STRINGS = {
+    "BANK": "Bank",
+    "CHARACTER": "Character",
+    "GUILD": "Guild",
+    "MERCHANT": "Merchant",
+    "PROFESSIONS_BUTTON": "Professions",
+    "SETTINGS": "Settings",
+    "TRADE": "Trade",
+}
+
+
 def window_labels():
-    """The Windows tab's labels, in Frames.lua's order."""
+    """The Windows tab's labels, in Frames.lua's order: its own phrases, L["..."], or the game's strings."""
     source = (ROOT / "Frames.lua").read_text()
     block = source[source.index("local windows = {") : source.index("\n}", source.index("local windows = {"))]
-    return re.findall(r'\{ "\w+", "([^"]+)"', block)
+    return [phrase or GLOBAL_STRINGS[name] for phrase, name in re.findall(r'\{ "\w+", (?:L\["([^"]+)"\]|(\w+))', block)]
 
 
 def editmode(ui):
