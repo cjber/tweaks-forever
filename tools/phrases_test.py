@@ -1,9 +1,10 @@
 """What counts as a phrase, and which UI calls with literal text the check rejects."""
 
+import tempfile
 import unittest
 from pathlib import Path
 
-from tools.phrases import encode, render, scan
+from tools.phrases import PACKAGER_KEYWORD, encode, layout, render, scan
 
 PATH = Path("Example.lua")
 
@@ -60,7 +61,19 @@ class PhrasesTest(unittest.TestCase):
 
     def test_render(self):
         self.assertEqual(encode('a "b"\\'), '"a \\"b\\"\\\\"')
-        self.assertEqual(render(["B", "a"]), 'L["B"] = true\nL["a"] = true\n')
+        template = render(["B", "a"])
+        self.assertTrue(template.endswith('local L = ns.L\n\nL["B"] = "B"\nL["a"] = "a"\n'))
+        self.assertIn('if GetLocale() ~= "deDE" then', template)
+
+    def test_layout(self):
+        with tempfile.TemporaryDirectory() as root:
+            keyword = Path(root, "Old.lua")
+            keyword.write_text("--" + PACKAGER_KEYWORD + '(locale="deDE")@\n')
+            tracked = ["Locales/enUS.lua", "Locales/deDE.lua", str(keyword)]
+            messages = [finding.message for finding in layout([Path("Locales/enUS.lua")], tracked)]
+        self.assertEqual(len(messages), 2)
+        self.assertIn("TweaksForever.toc", messages[0])
+        self.assertIn("fails the release", messages[1])
 
 
 if __name__ == "__main__":

@@ -82,7 +82,7 @@ The quest features (quests on minimap givers, quest progress on tooltips and nam
 
 Nothing to set up. A few features that act for you are off until you tick them.
 
-Translations are welcome on the [CurseForge localization page](https://legacy.curseforge.com/wow/addons/tweaks-forever/localization); anything not translated yet shows in English.
+Translations are welcome as a pull request, or pasted into an issue, on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated yet shows in English.
 
 ## For addon authors
 

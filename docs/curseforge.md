@@ -54,7 +54,7 @@ Beyond hiding macro names if you ask, it leaves your action bars and unit frames
 
 Everything is under Options → AddOns → Tweaks Forever. `/tweaks`, `/tweaksforever` or the addon compartment on the minimap opens it.
 
-Translations are welcome on the [CurseForge localization page](https://legacy.curseforge.com/wow/addons/tweaks-forever/localization); anything not translated yet shows in English.
+Translations are welcome as a pull request, or pasted into an issue, on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated yet shows in English.
 
 Works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
 
