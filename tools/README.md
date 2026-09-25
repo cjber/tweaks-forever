@@ -10,7 +10,7 @@ python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/screenshots.py       # docs/screenshots/*.png (Pillow)
 python3 tools/tooltip_border.py    # media/TooltipBorder{Modern,Retail}.tga (stdlib only)
-python3 -m tools.phrases --write     # Locales/phrases.txt, to paste into CurseForge (stdlib only)
+python3 -m tools.phrases --write     # Locales/phrases.txt, the template translators copy (stdlib only)
 ```
 
 `gen_overlays.py` pins a Forever build and writes `Data/Overlays.lua`: the map art
@@ -129,8 +129,9 @@ and missing/malformed reports and checker crashes fail closed.
 `phrases.py` lists every phrase the addon translates: each `L["..."]` in the shipped Lua, plus the category,
 name, tooltip and option labels an `ns.Feature` declares and the label and tooltip of an `ns.ClickMode`, which
 Settings.lua and Modes.lua translate where they show them. The English text is the key. With no argument it prints
-them as the `L["x"] = true` lines CurseForge's Import localization page takes; `--write` saves that to
-`Locales/phrases.txt` for pasting. `--check` (in `tools/typecheck.sh`) fails when that file is stale, when a
-declaration's text is not plain English, or when shipped code hands text with words in it straight to a UI call
-(`SetText`, `AddLine`, `ns.Print`, a menu button and the like) instead of through `L[...]` or a Blizzard string.
-At release the packager fills `Locales/Translations.lua` from the CurseForge project's translations.
+a translation template, a `Locales/<locale>.lua` with an `L["x"] = "x"` line per phrase; `--write` saves that to
+`Locales/phrases.txt` for translators to copy. `--check` (in `tools/typecheck.sh`) fails when that file is stale,
+when a declaration's text is not plain English, when shipped code hands text with words in it straight to a UI call
+(`SetText`, `AddLine`, `ns.Print`, a menu button and the like) instead of through `L[...]` or a Blizzard string,
+when a `Locales/*.lua` translation is missing from the TOC, or when a tracked file carries the packager's
+CurseForge localization keyword, which fails the release now that CurseForge's localization is gone.

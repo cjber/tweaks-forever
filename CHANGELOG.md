@@ -8,7 +8,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
-- **Ready for translation.** Every setting, tooltip line and chat message can be translated on CurseForge, and translations arrive with the next update. Anything not translated yet stays in English.
+- **Ready for translation.** Every setting, tooltip line and chat message can be translated, and anything not translated yet stays in English. Translations are welcome on GitHub.
 
 ## [0.5.0] - 2026-09-25
 

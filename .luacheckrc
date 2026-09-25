@@ -247,5 +247,5 @@ read_globals = {
 	"WorldMapFrame",
 	"YELLOW_FONT_COLOR",
 }
--- Until the packager fills in translations, each locale's branch is empty.
-files["Locales/Translations.lua"] = { ignore = { "542" } }
+-- A translation's lines are as long as its phrases.
+files["Locales/*.lua"] = { max_line_length = false }
