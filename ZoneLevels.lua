@@ -80,11 +80,13 @@ ns.Init(function()
 	end
 
 	-- Blizzard's hover label names the zone under the cursor and adds the client's range, which Forever lacks;
-	-- add ours to the name it drew. Reading the text each frame is cheap and catches every redraw.
+	-- add ours to the name it drew. Reading the text each frame is cheap and catches every redraw. Its OnUpdate
+	-- ends by drawing the label; hooking EvaluateLabels on the frame instead wrote a field onto it, and the map's
+	-- data providers then failed with "attempt to call a nil value".
 	for other in pairs(WorldMapFrame.dataProviders) do
 		if other.OnSetAreaLabel == AreaLabelDataProviderMixin.OnSetAreaLabel then
 			local shown
-			hooksecurefunc(other.Label, "EvaluateLabels", function(label)
+			other.Label:HookScript("OnUpdate", function(label)
 				local text = label.Name:GetText()
 				if text == shown then
 					return

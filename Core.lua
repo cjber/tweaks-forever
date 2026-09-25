@@ -69,6 +69,25 @@ function ns.ForEachBagButton(fn)
 	end
 end
 
+-- Run fn(tooltip, ...) as GameTooltip fills from a C_TooltipInfo getter (GetBagItem for SetBagItem, and so on),
+-- with the arguments it was called with. Never hooksecurefunc(GameTooltip, "SetBagItem"): Blizzard's own calls
+-- to a tooltip method an addon has hooked then fail with "attempt to call a nil value".
+---@param dataType Enum.TooltipDataType
+---@param getters table<string, true>
+---@param fn fun(tooltip: GameTooltip, getter: string, ...: any)
+function ns.OnTooltip(dataType, getters, fn)
+	TooltipDataProcessor.AddTooltipPostCall(dataType, function(tooltip)
+		if tooltip ~= GameTooltip then
+			return
+		end
+		local info = tooltip:GetProcessingTooltipInfo()
+		local args = info and info.getterArgs
+		if info and getters[info.getterName] then
+			fn(GameTooltip, info.getterName, unpack(args or {}, 1, args and args.n or 0))
+		end
+	end)
+end
+
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
 -- addon's own setting }; with no `when`, the addon being loaded is the conflict.
 ---@param feature TFFeature

@@ -346,7 +346,7 @@ ns.Init(function()
 	})
 
 	ns.HookBagButtons(hooked, UpdateIcon, Mark)
-	hooksecurefunc(GameTooltip, "SetBagItem", function(tooltip, bag, slot)
+	ns.OnTooltip(Enum.TooltipDataType.Item, { GetBagItem = true }, function(tooltip, _, bag, slot)
 		local itemID = C_Container.GetContainerItemID(bag, slot)
 		if itemID and Marks()[itemID] then
 			tooltip:AddLine("Marked as junk – Alt+Right-click to unmark", 1, 0.82, 0, true)
