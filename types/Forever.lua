@@ -7,10 +7,10 @@ LeaPlusDB = nil
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
----@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?}?}?}?
+---@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
 Questie = nil
 
--- QuestieDB's public API (contract 2), only the parts QuestGivers.lua reads. Entity reads return packed values.
+-- QuestieDB's public API (contract 2), only the parts QuestGivers.lua and QuestProgress.lua read. Entity reads return packed values.
 ---@class TFQuestieEntity
 ---@field GetAll fun(id: integer, keys: string[]): table?
 ---@field IdsByName fun(name: string): integer[]?
@@ -20,6 +20,8 @@ Questie = nil
 ---@field RequireContract fun(required: integer): boolean, string?
 ---@field Npc TFQuestieEntity
 ---@field Quest TFQuestieEntity
+---@field Item? TFQuestieEntity
+---@field ObjectiveFirst? table<string, table<integer, true>> objective kinds a quest lists first, by hint name
 ---@field Support {Get: fun(name: string): table?}
 
 ---@type TFQuestieDB?
@@ -52,6 +54,9 @@ SELL_ALL_JUNK_ITEMS_POPUP = ""
 FACTION_ALLIANCE = ""
 ---@type string
 FACTION_HORDE = ""
+-- The text the game writes for a kill objective: "%2$d/%3$d %1$s slain" in Forever's enUS strings.
+---@type string
+QUEST_MONSTERS_KILLED = ""
 
 -- Camelot's pane toggle is a mixin method; Retail's generated CharacterFrame omits it.
 ---@class CharacterFrame

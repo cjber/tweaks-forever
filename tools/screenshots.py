@@ -434,11 +434,12 @@ def editmode(ui):
 # Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
 # and a 12 cast bar, name and level 2 above the bar, a 5-unit glow on the target, the others at 0.6 alpha.
 PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP, PLATE_DIMMED = 166, 16, 12, 2, 0.6
+QUEST_ICON, QUEST_GAP = 20, 4
 HOSTILE, ROGUE = (1.0, 0.0, 0.0), (1.0, 0.96, 0.41)
 FAIR, EASY = (1.0, 0.82, 0.0), (0.25, 0.75, 0.25)
 FIREBALL, REND, SUNDER = 135812, 132155, 132363
 # A level 15 warrior in Westfall, targeting a Pillager casting Fireball: (name, level, level colour, health colour,
-# health, target, (spell, icon, progress) or None, [(icon, stacks, remaining)]).
+# health, target, (spell, icon, progress) or None, [(icon, stacks, remaining)], a quest objective you still need).
 PLATES = [
     (
         "Defias Pillager",
@@ -449,9 +450,10 @@ PLATES = [
         True,
         ("Fireball", FIREBALL, 0.55),
         [(REND, None, 0.4), (SUNDER, 3, 0.8)],
+        True,
     ),
-    ("Defias Tide Crawler", 12, EASY, HOSTILE, 1.0, False, None, []),
-    ("Grimtusk", 16, FAIR, ROGUE, 0.45, False, None, []),
+    ("Defias Tide Crawler", 12, EASY, HOSTILE, 1.0, False, None, [], False),
+    ("Grimtusk", 16, FAIR, ROGUE, 0.45, False, None, [], False),
 ]
 PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
 
@@ -464,7 +466,7 @@ def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
     )
 
 
-def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs):
+def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest):
     """One nameplate as Nameplates.lua lays out Blizzard's, with the Health Percent option on."""
     c = ui.canvas(240, 120)
     x, w = 37, PLATE_W
@@ -476,6 +478,11 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
     c.draw(ui.atlas("UI-HUD-CoolDownManager-Bar"), x, y, w * health, PLATE_HEALTH, color=(*colour, 1))
     if target:
         c.draw(ui.atlas("UI-HUD-Nameplates-Selected"), x - 3, y - 4, w + 6, PLATE_HEALTH + 7)
+    if quest:
+        # QuestProgress.lua: the 20-square questobjective atlas 4 right of the health bar, centred on it.
+        c.draw(
+            ui.atlas("questobjective"), x + w + QUEST_GAP, y + (PLATE_HEALTH - QUEST_ICON) / 2, QUEST_ICON, QUEST_ICON
+        )
     c.text(
         x,
         y,

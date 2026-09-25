@@ -107,6 +107,37 @@
 ---@field Names fun(data: TooltipData): string[]
 ---@field TooltipLines fun(names: string[]): [string, number, number, number][]
 
+-- One of a quest's objectives in the log's order: the kind the log gives it and the creatures that count toward it.
+---@class TFQuestTarget
+---@field kind string
+---@field npcs table<integer, true>
+
+-- Which objectives of one quest a creature counts for by QuestieDB's IDs: [position in the log] = the kind there.
+---@alias TFQuestLink table<integer, string>
+
+-- A quest in your log, with its objectives as of the log's last change.
+---@class TFLogQuest
+---@field id integer
+---@field title string
+---@field complete boolean
+---@field objectives QuestObjectiveInfo[]
+
+-- A quest a creature counts for, and the objectives it counts for.
+---@class TFQuestMatch
+---@field quest TFLogQuest
+---@field objectives QuestObjectiveInfo[]
+
+---@class TFQuestProgress
+---@field Attach fun(): boolean
+---@field NpcId fun(guid: any): integer?
+---@field Targets fun(id: integer): TFQuestTarget[]
+---@field Rebuild fun()
+---@field Matches fun(npc: integer?, name: string?): TFQuestMatch[]
+---@field Lines fun(npc: integer?, name: string?): [string, number, number, number][]
+---@field Needed fun(npc: integer?, name: string?): boolean
+---@field Name fun(name: any): string?
+---@field HasQuestLines fun(data: TooltipData): boolean
+
 ---@class TFDatabase
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
@@ -174,6 +205,8 @@ TweaksForeverCharDB = nil
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
 ---@field QuestGivers TFQuestGivers
+---@field QuestProgress TFQuestProgress
+---@field QuestieDB fun(): TFQuestieDB?
 ---@field Print fun(message: string)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(): string
