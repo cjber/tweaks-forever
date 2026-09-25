@@ -149,6 +149,21 @@ ns.Init(function()
 		return ns.NavigateHint()
 	end
 
+	-- The game's own tooltip, then a grey line when Shortest Path Forever could walk the player there.
+	function Pin:OnMouseEnter()
+		BaseMapPoiPinMixin.OnMouseEnter(self)
+		local hint = ns.Suggestion(
+			"ShortestPathForever",
+			"Install Shortest Path Forever for walked routes and boat times.",
+			"Enable Shortest Path Forever for walked routes and boat times."
+		)
+		if hint then
+			local tooltip = GetAppropriateTooltip()
+			GameTooltip_AddDisabledLine(tooltip, hint)
+			tooltip:Show()
+		end
+	end
+
 	---@param button string
 	function Pin:OnMouseClickAction(button)
 		if button == "LeftButton" then
