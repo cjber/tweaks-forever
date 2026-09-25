@@ -8,8 +8,15 @@ ns.Feature({
 	category = "Interface",
 	name = "Quests on minimap givers",
 	tooltip = "Pointing at a quest giver on the minimap lists the quests they have for you, coloured by level, "
-		.. "and the quests in your log they take back, with a gold ? once one is ready to hand in. Needs QuestieDB.",
+		.. "and the quests in your log they take back, with a gold ? once one is ready to hand in. Needs the QuestieDB "
+		.. "addon, which works on its own: Questie itself isn't needed.",
 	default = true,
+	needs = {
+		title = "QuestieDB",
+		check = function()
+			return ns.QuestieDB() ~= nil
+		end,
+	},
 })
 
 -- QuestieDB, read at runtime only: its public API (contract 2) for the Forever flavour. QuestProgress.lua reads it too.

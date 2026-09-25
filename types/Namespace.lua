@@ -132,10 +132,9 @@
 ---@field NpcId fun(guid: any): integer?
 ---@field Targets fun(id: integer): TFQuestTarget[]
 ---@field Rebuild fun()
----@field Matches fun(npc: integer?, name: string?): TFQuestMatch[]
----@field Lines fun(npc: integer?, name: string?): [string, number, number, number][]
----@field Needed fun(npc: integer?, name: string?): boolean
----@field Name fun(name: any): string?
+---@field Matches fun(npc: integer?): TFQuestMatch[]
+---@field Lines fun(npc: integer?): [string, number, number, number][]
+---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
 ---@class TFDatabase
@@ -170,6 +169,12 @@ TweaksForeverCharDB = nil
 ---@field conflicts? TFConflict[]
 ---@field options? [string, string][]
 ---@field parent? string
+---@field needs? TFNeed
+
+-- Another addon a feature can't work without: `check` finds it, and `title` names it while it's missing.
+---@class TFNeed
+---@field title string
+---@field check fun(): any
 
 ---@class TFClickMode
 ---@field feature string
@@ -213,6 +218,7 @@ TweaksForeverCharDB = nil
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
 ---@field ConflictOf fun(key: string): string?
+---@field MissingOf fun(key: string): string?
 ---@field Active fun(key: string): boolean
 ---@field On fun(event: WowEvent, fn: function)
 ---@field Init fun(fn: fun())

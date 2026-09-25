@@ -4,6 +4,8 @@
 -- restricted button in its results (Social's Discord Sign In) is then blocked and blamed on this addon. The
 -- search also reads each row's parent link, so SetParentInitializer from addon code taints it the same way.
 local registered = {}
+-- [key] = the addon a feature needs and can't find.
+local missing = {}
 
 local function Layout()
 	return {
@@ -58,9 +60,11 @@ local env = setmetatable({
 		RegisterAddOnSetting = function(category, variable, key, _, varType)
 			return { category = category, variable = variable, key = key, varType = varType }
 		end,
-		CreateCheckboxInitializer = function(setting)
+		CreateCheckboxInitializer = function(setting, _, tooltip)
 			assert(setting.varType == "boolean")
-			return Initializer("checkbox", setting)
+			local initializer = Initializer("checkbox", setting)
+			initializer.tooltip = tooltip
+			return initializer
 		end,
 		CreateDropdownInitializer = function(setting, options)
 			assert(setting.varType == "string" and options)
@@ -77,6 +81,11 @@ local env = setmetatable({
 		return { kind = "button", name = name }
 	end,
 	SettingsPanel = { HookScript = function() end },
+	RED_FONT_COLOR = {
+		WrapTextInColorCode = function(_, text)
+			return text
+		end,
+	},
 	SlashCmdList = {},
 }, { __index = _G })
 
@@ -84,7 +93,7 @@ local ns
 ns = {
 	db = {},
 	features = {
-		{ key = "repair", category = "Merchants", name = "Repair" },
+		{ key = "repair", category = "Merchants", name = "Repair", tooltip = "Repairs." },
 		{ key = "guildRepair", category = "Merchants", name = "Guild repair", parent = "repair" },
 		{ key = "gearMark", category = "Bags", name = "Mark", options = { { "strip", "Strip" } } },
 	},
@@ -92,6 +101,9 @@ ns = {
 		fn()
 	end,
 	ConflictOf = function() end,
+	MissingOf = function(key)
+		return missing[key]
+	end,
 	Active = function(key)
 		return ns.db[key] ~= false
 	end,
@@ -122,5 +134,10 @@ assert(guildRepair.indented and guildRepair.evaluate == "TweaksForever_repair", 
 assert(Modifiable(guildRepair), "a child row is modifiable while its parent is on")
 ns.db.repair = false
 assert(not Modifiable(guildRepair) and Modifiable(repair), "a child row greys out with its parent off")
+ns.db.repair = nil
+missing.repair = "QuestieDB"
+assert(not Modifiable(repair), "a row missing an addon it needs is greyed out")
+assert(repair.tooltip():find("Needs QuestieDB, which isn't loaded", 1, true), "and says so")
+missing.repair = nil
 assert(registered[4].initializer.setting.variable == "TweaksForever_gearMark")
 print("settings: ok")

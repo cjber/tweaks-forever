@@ -24,6 +24,12 @@ local function Load(saved)
 	ns.Feature({ key = "enabled", default = true })
 	ns.Feature({ key = "disabled", default = false })
 	ns.Feature({ key = "gearMark", default = "strip" })
+	local present = function()
+		return true
+	end
+	ns.Feature({ key = "needsPresent", default = true, needs = { title = "Present", check = present } })
+	ns.Feature({ key = "needsMissing", default = true, needs = { title = "Missing", check = function() end } })
+	ns.Feature({ key = "needsBroken", default = true, needs = { title = "Broken", check = error } })
 	local ran = false
 	ns.Init(function()
 		ran = true
@@ -31,6 +37,11 @@ local function Load(saved)
 		assert(ns.db.junk and ns.db.gearMark)
 		assert(ns.Active("enabled") == (ns.db.enabled == true))
 		assert(ns.Active("disabled") == false)
+		-- A feature missing an addon it needs is off whatever its setting, and names that addon.
+		assert(ns.Active("needsPresent") == (ns.db.needsPresent == true) and not ns.MissingOf("needsPresent"))
+		assert(not ns.Active("needsMissing") and ns.MissingOf("needsMissing") == "Missing")
+		assert(not ns.Active("needsBroken") and ns.MissingOf("needsBroken") == "Broken")
+		assert(not ns.MissingOf("enabled"))
 	end)
 	assert(not ran)
 	frames[2].callback()
