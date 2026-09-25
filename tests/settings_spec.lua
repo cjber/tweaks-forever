@@ -3,6 +3,8 @@
 -- Settings.CreateCheckbox/CreateDropdown, which insert from the caller) taints the settings search, and a
 -- restricted button in its results (Social's Discord Sign In) is then blocked and blamed on this addon.
 local registered = {}
+-- [key] = the addon a feature needs and can't find.
+local missing = {}
 
 local function Layout()
 	return {
@@ -50,9 +52,11 @@ local env = setmetatable({
 		RegisterAddOnSetting = function(category, variable, key, _, varType)
 			return { category = category, variable = variable, key = key, varType = varType }
 		end,
-		CreateCheckboxInitializer = function(setting)
+		CreateCheckboxInitializer = function(setting, _, tooltip)
 			assert(setting.varType == "boolean")
-			return Initializer("checkbox", setting)
+			local initializer = Initializer("checkbox", setting)
+			initializer.tooltip = tooltip
+			return initializer
 		end,
 		CreateDropdownInitializer = function(setting, options)
 			assert(setting.varType == "string" and options)
@@ -69,13 +73,18 @@ local env = setmetatable({
 		return { kind = "button", name = name }
 	end,
 	SettingsPanel = { HookScript = function() end },
+	RED_FONT_COLOR = {
+		WrapTextInColorCode = function(_, text)
+			return text
+		end,
+	},
 	SlashCmdList = {},
 }, { __index = _G })
 
 local ns = {
 	db = {},
 	features = {
-		{ key = "repair", category = "Merchants", name = "Repair" },
+		{ key = "repair", category = "Merchants", name = "Repair", tooltip = "Repairs." },
 		{ key = "guildRepair", category = "Merchants", name = "Guild repair", parent = "repair" },
 		{ key = "gearMark", category = "Bags", name = "Mark", options = { { "strip", "Strip" } } },
 	},
@@ -83,6 +92,9 @@ local ns = {
 		fn()
 	end,
 	ConflictOf = function() end,
+	MissingOf = function(key)
+		return missing[key]
+	end,
 	Active = function()
 		return true
 	end,
@@ -102,5 +114,9 @@ assert(
 local repair, guildRepair = registered[1].initializer, registered[2].initializer
 assert(guildRepair.parent == repair and guildRepair.parentPredicate(), "a child row is tied to its parent")
 assert(repair.modify and repair.modify(), "conflict-free rows stay modifiable")
+missing.repair = "QuestieDB"
+assert(not repair.modify(), "a row missing an addon it needs is greyed out")
+assert(repair.tooltip():find("Needs QuestieDB, which isn't loaded", 1, true), "and says so")
+missing.repair = nil
 assert(registered[4].initializer.setting.variable == "TweaksForever_gearMark")
 print("settings: ok")

@@ -54,9 +54,6 @@ SELL_ALL_JUNK_ITEMS_POPUP = ""
 FACTION_ALLIANCE = ""
 ---@type string
 FACTION_HORDE = ""
--- The text the game writes for a kill objective: "%2$d/%3$d %1$s slain" in Forever's enUS strings.
----@type string
-QUEST_MONSTERS_KILLED = ""
 
 -- Camelot's pane toggle is a mixin method; Retail's generated CharacterFrame omits it.
 ---@class CharacterFrame
