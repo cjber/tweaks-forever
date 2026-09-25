@@ -620,7 +620,6 @@ local function ScanTrainer()
 end
 
 ns.Init(function()
-	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	if type(TweaksForeverCharDB.trainer) == "table" then
 		Model.Migrate(TweaksForeverCharDB.trainer, ns.LineResolver())
 	end

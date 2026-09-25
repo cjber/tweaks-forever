@@ -715,7 +715,6 @@ local function TrackWeapons()
 end
 
 ns.Init(function()
-	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	Char().groups = Char().groups or {}
 	Char().colours = Char().colours or {}
 	Model.Recolour(Char().colours)
