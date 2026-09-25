@@ -12,8 +12,7 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite this line with each release's entry.
-ns.WHATS_NEW =
-	L["Settings and tooltips can now be translated on CurseForge, and dungeon entrances suggest Shortest " .. "Path Forever for the walk."]
+ns.WHATS_NEW = L["Ready for translation, and dungeon entrances suggest Shortest Path Forever for the walk."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@project-version@"
