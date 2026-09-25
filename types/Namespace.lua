@@ -112,20 +112,30 @@
 ---@field kind string
 ---@field npcs table<integer, true>
 
--- A quest in your log that a creature counts for, and which of its objectives, by position and kind.
----@class TFQuestLink
+-- Which objectives of one quest a creature counts for by QuestieDB's IDs: [position in the log] = the kind there.
+---@alias TFQuestLink table<integer, string>
+
+-- A quest in your log, with its objectives as of the log's last change.
+---@class TFLogQuest
 ---@field id integer
 ---@field title string
----@field indices integer[]
----@field kinds string[]
+---@field complete boolean
+---@field objectives QuestObjectiveInfo[]
+
+-- A quest a creature counts for, and the objectives it counts for.
+---@class TFQuestMatch
+---@field quest TFLogQuest
+---@field objectives QuestObjectiveInfo[]
 
 ---@class TFQuestProgress
 ---@field Attach fun(): boolean
 ---@field NpcId fun(guid: any): integer?
 ---@field Targets fun(id: integer): TFQuestTarget[]
 ---@field Rebuild fun()
----@field Lines fun(npc: integer): [string, number, number, number][]
----@field Needed fun(npc: integer): boolean
+---@field Matches fun(npc: integer?, name: string?): TFQuestMatch[]
+---@field Lines fun(npc: integer?, name: string?): [string, number, number, number][]
+---@field Needed fun(npc: integer?, name: string?): boolean
+---@field Name fun(name: any): string?
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
 ---@class TFDatabase

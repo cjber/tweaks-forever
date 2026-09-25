@@ -56,7 +56,7 @@ Every feature has its own checkbox. The full detail is in [docs/features.md](doc
 - **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
 - **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs QuestieDB.
-- **Quest progress.** A creature you need for a quest shows the quest and your progress in its tooltip, such as "Mangy Wolf slain: 3/10", and a small quest icon beside its nameplate until you have enough. Needs QuestieDB.
+- **Quest progress.** A creature you need to kill for a quest shows the quest and your progress in its tooltip, and a small quest icon beside its nameplate until you have enough. With QuestieDB installed, creatures that drop quest items count too.
 - **Camp benefits.** Camp tooltips say what sitting nearby gives you and how long you have left on it, and each benefit you gain is named at the top of the screen.
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.

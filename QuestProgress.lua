@@ -17,9 +17,9 @@ ns.Feature({
 	key = TOOLTIP,
 	category = "Interface",
 	name = "Quest progress on tooltips",
-	tooltip = "Pointing at a creature you need for a quest adds the quest and your progress to its tooltip, such as "
-		.. '"Mangy Wolf slain: 3/10", in white until it is done and grey after. Kills and the items they drop '
-		.. "both count. Needs QuestieDB.",
+	tooltip = "Pointing at a creature you need to kill for a quest adds the quest and your progress to its tooltip, "
+		.. 'such as "Mangy Wolf slain: 3/10", in white until it is done and grey after. With QuestieDB installed, '
+		.. "creatures that drop an item a quest wants count too.",
 	default = true,
 	conflicts = { { addon = "Questie", when = QuestieOption("enableTooltips") } },
 })
@@ -28,16 +28,19 @@ ns.Feature({
 	key = PLATES,
 	category = "Interface",
 	name = "Quest icons on nameplates",
-	tooltip = "A small quest icon sits beside the nameplate of each creature you still need for a quest in your "
-		.. "log, and goes once you have enough. Needs QuestieDB.",
+	tooltip = "A small quest icon sits beside the nameplate of each creature you still need to kill for a quest in "
+		.. "your log, and goes once you have enough. With QuestieDB installed, creatures that drop an item a quest "
+		.. "wants get one too.",
 	default = true,
 	conflicts = { { addon = "Questie", when = QuestieOption("nameplateEnabled") } },
 })
 
--- Which creature counts for which objective is QuestieDB's, by creature and item ID; how far along you are is the
--- quest log's, by quest ID and objective index. QuestieDB lists a quest's objectives by kind, and Questie maps that
--- list onto the log's objectives by position, moving a kind to the front for the quests it marks: the same here.
--- The log names each objective's kind, so a position whose kind disagrees is left out rather than guessed.
+-- Your quests, their objectives and your progress are the quest log's. A kill objective whose text is the one the
+-- game writes for a creature (QUEST_MONSTERS_KILLED with that creature's name) is that creature's. With QuestieDB
+-- installed, its creature and item IDs add what the text can't show: the creatures that drop a quest's items, kill
+-- credit and objectives with text of their own. QuestieDB lists a quest's objectives by kind, and Questie maps that
+-- list onto the log's by position, moving a kind to the front for the quests it marks: the same here. The log names
+-- each objective's kind, so a position whose kind disagrees is left out rather than guessed.
 local QUEST_FIELDS = { "objectives", "triggerEnd" }
 local ITEM_FIELDS = { "npcDrops" }
 -- QuestieDB's objective groups in its order, with the kind the log gives each and its ObjectiveFirst hint.
@@ -63,13 +66,17 @@ local hints = {}
 -- [questID] = its objectives in the log's order, each { kind, npcs = set of creature IDs that count }, read once.
 ---@type table<integer, TFQuestTarget[]>
 local targets = {}
--- [creature ID] = the quests in your log it counts for, in log order.
----@type table<integer, TFQuestLink[]>
+-- [creature ID] = [questID] = which of that quest's objectives it counts for, by QuestieDB's IDs.
+---@type table<integer, table<integer, TFQuestLink>>
 local byNpc = {}
+-- The quests in your log, in its order, with their objectives as of its last change.
+---@type TFLogQuest[]
+local logQuests = {}
 
+-- Read QuestieDB as well, when it is installed.
 ---@return boolean
 function Model.Attach()
-	targets, byNpc = {}, {}
+	targets = {}
 	local db = ns.QuestieDB()
 	if not db or not db.Quest or not db.Item then
 		return false
@@ -161,75 +168,106 @@ function Model.Targets(id)
 	return list
 end
 
--- Index the quests in your log by the creatures that count toward them.
+-- Read your quest log, and index its quests by the creatures QuestieDB says count toward them.
 function Model.Rebuild()
-	byNpc = {}
-	if not quests then
-		return
-	end
+	logQuests, byNpc = {}, {}
 	for index = 1, C_QuestLog.GetNumQuestLogEntries() do
 		local info = C_QuestLog.GetInfo(index)
 		if info and not info.isHeader and not info.isHidden and info.questID and info.questID ~= 0 then
-			---@type table<integer, TFQuestLink>
-			local links = {}
-			for position, target in ipairs(Model.Targets(info.questID)) do
+			local id = info.questID
+			logQuests[#logQuests + 1] = {
+				id = id,
+				title = info.title,
+				complete = C_QuestLog.IsComplete(id),
+				objectives = C_QuestLog.GetQuestObjectives(id) or {},
+			}
+			for position, target in ipairs(quests and Model.Targets(id) or {}) do
 				for npc in pairs(target.npcs) do
-					local link = links[npc]
-					if not link then
-						link = { id = info.questID, title = info.title, indices = {}, kinds = {} }
-						links[npc] = link
-						byNpc[npc] = byNpc[npc] or {}
-						table.insert(byNpc[npc], link)
-					end
-					link.indices[#link.indices + 1] = position
-					link.kinds[#link.kinds + 1] = target.kind
+					byNpc[npc] = byNpc[npc] or {}
+					local link = byNpc[npc][id] or {}
+					byNpc[npc][id] = link
+					link[position] = target.kind
 				end
 			end
 		end
 	end
 end
 
--- The log's objectives of a quest that a creature counts for, where the log agrees on their kind.
----@param link TFQuestLink
----@return QuestObjectiveInfo[]
-local function Objectives(link)
-	local log = C_QuestLog.GetQuestObjectives(link.id) or {}
-	local found = {}
-	for i, position in ipairs(link.indices) do
-		local objective = log[position]
-		if objective and objective.type == link.kinds[i] and objective.text and objective.text ~= "" then
-			found[#found + 1] = objective
+-- The text the game writes for a kill objective with no text of its own, with a creature's name and the counts.
+---@param name string
+---@param objective QuestObjectiveInfo
+---@return string
+local function Slain(name, objective)
+	local values = { name, objective.numFulfilled, objective.numRequired }
+	-- Numbered ("%2$d") in Forever's strings; taken in turn where a locale leaves them unnumbered.
+	local turn = 0
+	local text = QUEST_MONSTERS_KILLED:gsub("%%(%d*)%$?[sd]", function(n)
+		turn = turn + 1
+		return tostring(values[tonumber(n) or turn])
+	end)
+	return text
+end
+
+-- Whether a creature counts for the objective at `position` of a quest: QuestieDB's link, or the game's own text.
+---@param objective QuestObjectiveInfo
+---@param position integer
+---@param link TFQuestLink?
+---@param name string?
+---@return boolean
+local function Counts(objective, position, link, name)
+	if link and link[position] == objective.type then
+		return true
+	end
+	return name ~= nil and objective.type == "monster" and objective.text == Slain(name, objective)
+end
+
+-- The quests in your log a creature counts for, each with the objectives it counts for, in log order. The creature
+-- is known by its ID (for QuestieDB) and its name (for the game's own objective text); either may be missing.
+---@param npc integer?
+---@param name string?
+---@return TFQuestMatch[]
+function Model.Matches(npc, name)
+	local links = npc and byNpc[npc] or {}
+	local matches = {}
+	for _, quest in ipairs(logQuests) do
+		local found = {}
+		for position, objective in ipairs(quest.objectives) do
+			if objective.text and objective.text ~= "" and Counts(objective, position, links[quest.id], name) then
+				found[#found + 1] = objective
+			end
+		end
+		if #found > 0 then
+			matches[#matches + 1] = { quest = quest, objectives = found }
 		end
 	end
-	return found
+	return matches
 end
 
 -- A creature's tooltip lines: each quest's title, then its objectives this creature counts for, white until done.
----@param npc integer
+---@param npc integer?
+---@param name string?
 ---@return [string, number, number, number][]
-function Model.Lines(npc)
+function Model.Lines(npc, name)
 	local lines = {}
-	for _, link in ipairs(byNpc[npc] or {}) do
-		local objectives = Objectives(link)
-		if #objectives > 0 then
-			local title = NORMAL_FONT_COLOR
-			lines[#lines + 1] = { link.title, title.r, title.g, title.b }
-			for _, objective in ipairs(objectives) do
-				local color = objective.finished and GRAY_FONT_COLOR or HIGHLIGHT_FONT_COLOR
-				lines[#lines + 1] = { " - " .. objective.text, color.r, color.g, color.b }
-			end
+	for _, match in ipairs(Model.Matches(npc, name)) do
+		local title = NORMAL_FONT_COLOR
+		lines[#lines + 1] = { match.quest.title, title.r, title.g, title.b }
+		for _, objective in ipairs(match.objectives) do
+			local color = objective.finished and GRAY_FONT_COLOR or HIGHLIGHT_FONT_COLOR
+			lines[#lines + 1] = { " - " .. objective.text, color.r, color.g, color.b }
 		end
 	end
 	return lines
 end
 
--- Whether a creature still counts toward something in your log.
----@param npc integer
+-- Whether a creature still counts toward a quest in your log that isn't complete.
+---@param npc integer?
+---@param name string?
 ---@return boolean
-function Model.Needed(npc)
-	for _, link in ipairs(byNpc[npc] or {}) do
-		if not C_QuestLog.IsComplete(link.id) then
-			for _, objective in ipairs(Objectives(link)) do
+function Model.Needed(npc, name)
+	for _, match in ipairs(Model.Matches(npc, name)) do
+		if not match.quest.complete then
+			for _, objective in ipairs(match.objectives) do
 				if not objective.finished then
 					return true
 				end
@@ -237,6 +275,15 @@ function Model.Needed(npc)
 		end
 	end
 	return false
+end
+
+-- A readable name, or nil for a secret one.
+---@param name any
+---@return string?
+function Model.Name(name)
+	if canaccessvalue(name) and type(name) == "string" and name ~= "" then
+		return name
+	end
 end
 
 -- Whether the game has already put quest lines in a tooltip.
@@ -284,8 +331,7 @@ local function Plates()
 		if not plate then
 			return
 		end
-		local npc = ns.Active(PLATES) and Model.NpcId(UnitGUID(unit))
-		local need = npc and Model.Needed(npc) or false
+		local need = ns.Active(PLATES) and Model.Needed(Model.NpcId(UnitGUID(unit)), Model.Name(UnitName(unit)))
 		if need then
 			Icon(plate):Show()
 		elseif icons[plate] then
@@ -322,9 +368,7 @@ local function Plates()
 end
 
 ns.Init(function()
-	if not Model.Attach() then
-		return
-	end
+	Model.Attach()
 	local UpdatePlates = Plates()
 
 	-- Progress changes arrive as several events in one frame: rebuild once, on the next.
@@ -354,8 +398,8 @@ ns.Init(function()
 		if tooltip ~= GameTooltip or not ns.Active(TOOLTIP) or Model.HasQuestLines(data) then
 			return
 		end
-		local npc = Model.NpcId(data.guid)
-		local lines = npc and Model.Lines(npc) or {}
+		local first = data.lines and data.lines[1]
+		local lines = Model.Lines(Model.NpcId(data.guid), Model.Name(first and first.leftText))
 		for _, line in ipairs(lines) do
 			tooltip:AddLine(line[1], line[2], line[3], line[4])
 		end

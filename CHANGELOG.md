@@ -8,8 +8,8 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
-- **Quest progress on tooltips.** With QuestieDB installed, pointing at a creature you need for a quest adds the quest and your progress under its tooltip, as the retail game does, such as " - Mangy Wolf slain: 3/10", white until that objective is done and grey after. Creatures that drop an item a quest wants count too. It stays out of the way while Questie's own tooltips are on. Turn it off under Interface.
-- **Quest icons on nameplates.** With QuestieDB installed, a small gold quest icon sits beside the nameplate of each creature you still need for a quest, and goes once you have enough. It stays out of the way while Questie's own nameplate icons are on. Turn it off under Interface.
+- **Quest progress on tooltips.** Pointing at a creature you need to kill for a quest adds the quest and your progress under its tooltip, as the retail game does, such as " - Mangy Wolf slain: 3/10", white until that objective is done and grey after. With QuestieDB installed, creatures that drop an item a quest wants count too. It stays out of the way while Questie's own tooltips are on. Turn it off under Interface.
+- **Quest icons on nameplates.** A small gold quest icon sits beside the nameplate of each creature you still need for a quest, and goes once you have enough. It stays out of the way while Questie's own nameplate icons are on. Turn it off under Interface.
 
 ## [0.4.1] - 2026-09-25
 
