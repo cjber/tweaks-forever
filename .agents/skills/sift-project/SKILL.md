@@ -77,6 +77,8 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
   `OnRefresh`/`Settling` (Sections), `ns.Sections` constants and `lift`/`Sectioned` (Reagents).
 - `ns.ClickMode` (Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core.lua) — shared helpers.
 - `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.Overlays` — generated `Data/` tables.
+- `ns.L` (`Locales/enUS.lua`) and the `--@localization(...)@` comments in `Locales/Translations.lua` — the
+  packager replaces those comments at release; `Locales/phrases.txt` is `tools/phrases.py`'s output for CurseForge.
 - `TweaksForeverDungeonEntrancePinMixin` — global named by `DungeonEntrances.xml`'s pin template.
 - `TweaksForeverCharDB.trainer` (Spellbook) — persisted trainer scan.
 - Conflict entries name other addons' folders and read their saved variables (`LeaPlusDB.X == "On"`,

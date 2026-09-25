@@ -23,6 +23,8 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
   order sets the settings subpage order.
 - `Data/` — lookup tables; a generated one names the script that regenerates it in its header.
 - `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.
+- `Locales/` — `ns.L`, keyed by the English text; the packager fills in CurseForge's translations. After changing
+  player-visible text, run `python3 -m tools.phrases --write` and paste `Locales/phrases.txt` into CurseForge.
 
 ## Rules
 
@@ -46,6 +48,8 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
   Never `hooksecurefunc(object, …)`, a replaced method, a field written on a Blizzard table, or a call into
   Blizzard's layout or lazy caches. `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a
   deliberate exception carries a trailing `-- taint-ok: reason`.
+- Player-visible text goes through `L["whole sentence"]` (a whole format string, never joined fragments), or a
+  Blizzard GlobalString that says exactly the same; `ns.Feature`/`ns.ClickMode` text stays plain English.
 - Commits are signed (`git commit -S`) with the personal email.
 - Quality: load `.agents/skills/sift-project/SKILL.md` before cleanup, dead-code or refactoring
   work.

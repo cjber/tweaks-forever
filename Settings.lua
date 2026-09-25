@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 -- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
 -- tall. A feature another addon already handles, or one missing an addon it needs, is greyed out, its tooltip
@@ -8,19 +9,22 @@ local _, ns = ...
 -- Settings.CreateCheckbox/CreateDropdown and layout:AddInitializer insert from our code instead, and the
 -- settings search reads every layout, so that tainted it: a restricted button in the results (Social's
 -- Discord Sign In) was then blocked and blamed on us.
+-- Feature files declare their category, name, tooltip and option labels in English; they are translated here, where
+-- they are shown (tools/phrases.py lists them for CurseForge).
 
 ---@param feature TFFeature
 local function Tooltip(feature)
 	return function()
 		local conflict, missing = ns.ConflictOf(feature.key), ns.MissingOf(feature.key)
+		local tooltip = feature.tooltip and L[feature.tooltip]
 		if not conflict and not missing then
-			return feature.tooltip
+			return tooltip
 		end
 		local note = RED_FONT_COLOR:WrapTextInColorCode(
-			conflict and conflict .. " already does this, so it is off here."
-				or "Needs " .. missing .. ", which isn't loaded, so it is off here."
+			conflict and L["%s already does this, so it is off here."]:format(conflict)
+				or L["Needs %s, which isn't loaded, so it is off here."]:format(missing)
 		)
-		return feature.tooltip and feature.tooltip .. "\n\n" .. note or note
+		return tooltip and tooltip .. "\n\n" .. note or note
 	end
 end
 
@@ -34,7 +38,7 @@ local function AddSetting(category, feature)
 		feature.key,
 		ns.db,
 		options and Settings.VarType.String or Settings.VarType.Boolean,
-		feature.name,
+		L[feature.name],
 		feature.default
 	)
 	local initializer
@@ -42,7 +46,7 @@ local function AddSetting(category, feature)
 		initializer = Settings.CreateDropdownInitializer(setting, function()
 			local container = Settings.CreateControlTextContainer()
 			for _, option in ipairs(options) do
-				container:Add(option[1], option[2])
+				container:Add(option[1], L[option[2]])
 			end
 			return container:GetData()
 		end, Tooltip(feature))
@@ -77,14 +81,14 @@ ns.Init(function()
 		table.insert(bySection[feature.category], feature)
 	end
 	for _, section in ipairs(sections) do
-		local subcategory = Settings.RegisterVerticalLayoutSubcategory(category, section)
+		local subcategory = Settings.RegisterVerticalLayoutSubcategory(category, L[section])
 		for _, feature in ipairs(bySection[section]) do
 			AddSetting(subcategory, feature)
 		end
 		-- The index is buttons that open each subpage; search finds the settings themselves instead.
 		Settings.RegisterInitializer(
 			category,
-			CreateSettingsButtonInitializer(section, "Open", function()
+			CreateSettingsButtonInitializer(L[section], L["Open"], function()
 				Settings.OpenToCategory(subcategory:GetID())
 			end, nil, false)
 		)

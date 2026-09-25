@@ -57,8 +57,8 @@ local env = setmetatable({
 		RegisterVerticalLayoutSubcategory = function(parent, name)
 			return Category(name, parent)
 		end,
-		RegisterAddOnSetting = function(category, variable, key, _, varType)
-			return { category = category, variable = variable, key = key, varType = varType }
+		RegisterAddOnSetting = function(category, variable, key, _, varType, name)
+			return { category = category, variable = variable, key = key, varType = varType, name = name }
 		end,
 		CreateCheckboxInitializer = function(setting, _, tooltip)
 			assert(setting.varType == "boolean")
@@ -108,6 +108,9 @@ ns = {
 		return ns.db[key] ~= false
 	end,
 }
+assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
+-- A packaged German client: features declare English, and the settings show the translation where there is one.
+ns.L["Bags"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
 setfenv(assert(loadfile("Settings.lua")), env)("TweaksForever", ns)
 
 -- Rows per page, in order: each subpage's settings, then the index's button to it.
@@ -117,10 +120,12 @@ for index, entry in ipairs(registered) do
 end
 assert(
 	table.concat(kinds, " ")
-		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Bags button@Tweaks Forever",
+		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever",
 	table.concat(kinds, " ")
 )
 local repair, guildRepair = registered[1].initializer, registered[2].initializer
+assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
+assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")
 local function Modifiable(initializer)
 	for _, predicate in ipairs(initializer.modify) do
 		if not predicate() then

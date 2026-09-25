@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 -- Stacks sold per merchant visit, so everything sold is still in the buyback tab.
 local BATCH_SIZE = 12
@@ -26,8 +27,9 @@ ns.Feature({
 	key = "sellJunk",
 	category = "Vendors",
 	name = "Sell junk automatically",
-	tooltip = ("Sell up to %d grey or marked stacks per merchant visit."):format(BATCH_SIZE)
-		.. " With Leatrix Plus auto-selling, only marked non-grey items are sold here.",
+	tooltip = L["Sell up to %d grey or marked stacks per merchant visit."]:format(BATCH_SIZE)
+		.. " "
+		.. L["With Leatrix Plus auto-selling, only marked non-grey items are sold here."],
 	default = true,
 	-- Leatrix owns only greys; disabling this feature entirely would strand our marks.
 	conflicts = conflicts,
@@ -251,7 +253,7 @@ local function Finish(run)
 		run.sold, run.money = run.sold + 1, run.money + waiting.value
 	end
 	if run.sold > 0 then
-		ns.Print(("Sold %d junk stacks for %s."):format(run.sold, C_CurrencyInfo.GetCoinTextureString(run.money)))
+		ns.Print(L["Sold %d junk stacks for %s."]:format(run.sold, C_CurrencyInfo.GetCoinTextureString(run.money)))
 	end
 	UpdateMerchantButton()
 	if run.manualPending and merchant == run.merchant then
@@ -361,7 +363,7 @@ ns.Init(function()
 	ns.OnTooltip(Enum.TooltipDataType.Item, { GetBagItem = true }, function(tooltip, _, bag, slot)
 		local itemID = C_Container.GetContainerItemID(bag, slot)
 		if itemID and Marks()[itemID] then
-			tooltip:AddLine("Marked as junk – Alt+Right-click to unmark", 1, 0.82, 0, true)
+			tooltip:AddLine(L["Marked as junk – Alt+Right-click to unmark"], 1, 0.82, 0, true)
 			tooltip:Show()
 		end
 	end)
@@ -371,7 +373,7 @@ ns.Init(function()
 	end)
 	MerchantSellAllJunkButton:HookScript("OnEnter", function()
 		if ManualEnabled() then
-			GameTooltip:AddLine(("Also sells up to %d marked non-grey stacks."):format(BATCH_SIZE), 1, 0.82, 0, true)
+			GameTooltip:AddLine(L["Also sells up to %d marked non-grey stacks."]:format(BATCH_SIZE), 1, 0.82, 0, true)
 			GameTooltip:Show()
 		end
 	end)

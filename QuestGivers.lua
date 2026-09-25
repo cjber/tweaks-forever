@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 local KEY = "giverTooltips"
 
@@ -311,7 +312,7 @@ function Model.Lines(npc)
 		local text = OFFER .. ("[%d] %s"):format(quest.level, quest.title)
 		if quest.soon then
 			local grey = GRAY_FONT_COLOR
-			lines[#lines + 1] = { text .. (" (level %d)"):format(quest.min), grey.r, grey.g, grey.b }
+			lines[#lines + 1] = { L["%s (level %d)"]:format(text, quest.min), grey.r, grey.g, grey.b }
 		else
 			local color = GetQuestDifficultyColor(quest.level)
 			lines[#lines + 1] = { text, color.r, color.g, color.b }

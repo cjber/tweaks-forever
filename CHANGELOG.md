@@ -8,6 +8,8 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+- **Ready for translation.** Every setting, tooltip line and chat message can be translated on CurseForge, and translations arrive with the next update. Anything not translated yet stays in English.
+
 ## [0.5.0] - 2026-09-25
 
 - **`/tweaksforever` opens the settings too.** It does the same as `/tweaks`, for when you can't remember which short name an addon uses.

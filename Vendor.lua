@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "repair",
@@ -44,11 +45,11 @@ ns.On("MERCHANT_SHOW", function()
 	end
 	if GuildCovers(cost) then
 		RepairAllItems(true)
-		ns.Print(string.format("repaired for %s from guild funds.", C_CurrencyInfo.GetCoinTextureString(cost)))
+		ns.Print(L["repaired for %s from guild funds."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
 	elseif GetMoney() >= cost then
 		RepairAllItems()
-		ns.Print(string.format("repaired for %s.", C_CurrencyInfo.GetCoinTextureString(cost)))
+		ns.Print(L["repaired for %s."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
 	else
-		ns.Print(string.format("not enough money to repair (%s).", C_CurrencyInfo.GetCoinTextureString(cost)))
+		ns.Print(L["not enough money to repair (%s)."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
 	end
 end)

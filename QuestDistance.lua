@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "questDistance",
@@ -28,9 +29,9 @@ local GAP = 4
 ---@return string
 local function Format(yards)
 	if yards < 1000 then
-		return ("%d yd"):format(yards)
+		return L["%d yd"]:format(yards)
 	end
-	return ("%.1fk yd"):format(yards / 1000)
+	return L["%.1fk yd"]:format(yards / 1000)
 end
 
 local function CreateAreaProbe()
@@ -122,7 +123,7 @@ local function CreateDecorations(inside, Each)
 			d.label:SetPoint("TOP", block.HeaderText, "TOP")
 			d.label:SetPoint("RIGHT", block, "RIGHT", column, 0)
 		end
-		d.label:SetText(here and "here" or Format(math.sqrt(distanceSq)))
+		d.label:SetText(here and L["here"] or Format(math.sqrt(distanceSq)))
 		if here then
 			d.label:SetTextColor(GREEN_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 		else

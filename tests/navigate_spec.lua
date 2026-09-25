@@ -42,6 +42,7 @@ local function Install(version)
 	}
 end
 
+assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Navigate.lua")), env)("TweaksForever", ns)
 
 -- Shortest Path present and accepting: it alone guides, with the entrance's own map, place and name.
