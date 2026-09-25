@@ -1,4 +1,4 @@
-"""Reject accidental select() expansion in Lua 5.1 calls, tables and returns."""
+"""Reject accidental select() and multi-return call expansion in Lua 5.1 calls, tables and returns."""
 
 import re
 import sys
@@ -99,6 +99,18 @@ BINARY = {
     "%": (6, 7),
     "^": (8, 8),
 }
+# Client functions and widget methods that return several values, called bare, through a namespace
+# (C_Item.GetItemInfo) or as a method. As a final argument their extra values fill the callee's next
+# parameters: CreateTexture(nil, region:GetDrawLayer()) passes the sublevel as the template name.
+MULTI_RETURN = set(
+    """
+    GetBackdropBorderColor GetBackdropColor GetBuildInfo GetCenter GetClampRectInsets GetCursorPosition
+    GetDrawLayer GetFont GetHitRectInsets GetInstanceInfo GetItemInfo GetMinMaxValues GetNetStats GetPoint
+    GetPointByName GetRGB GetRGBA GetRect GetScaledRect GetShadowColor GetShadowOffset GetSize
+    GetStatusBarColor GetTexCoord GetTextColor GetTextInsets GetVertexColor GetXY UnitClass UnitFactionGroup
+    UnitFullName UnitName UnitPosition UnitRace
+    """.split()
+)
 BLOCK_END = {"end", "else", "elseif", "until", "<eof>"}
 
 
@@ -132,13 +144,13 @@ class Parser:
             raise LuaSyntaxError(f"{self.current.line}: expected a name")
         return self.take()
 
-    def flag(self, select: Token | None, context: str) -> None:
-        if select is None:
+    def flag(self, call: Token | None, context: str) -> None:
+        if call is None:
             return
         end_line = self.tokens[self.index - 1].line
         if re.fullmatch(r"multi-value:\s*\S.*", self.comments.get(end_line, "")):
             return
-        self.findings.append((select.line, f"multi-value-select: parenthesise select() in the last {context}"))
+        self.findings.append((call.line, f"multi-value: parenthesise {call.text}() in the last {context}"))
 
     def expressions(self) -> Token | None:
         last = self.expression()
@@ -146,11 +158,13 @@ class Parser:
             last = self.expression()
         return last
 
-    def arguments(self) -> None:
+    def arguments(self, spread: bool = False) -> None:
+        # select(n, f()) exists to pick from f's values, so its own final argument expands by design.
         if self.accept("("):
             last = None if self.current.text == ")" else self.expressions()
             self.take(")")
-            self.flag(last, "call argument")
+            if not spread:
+                self.flag(last, "call argument")
         elif self.current.text == "{":
             self.table()
         elif self.current.kind == "string":
@@ -208,24 +222,28 @@ class Parser:
             self.take(")")
         elif token.kind in {"name", "string", "number"} or token.text in {"nil", "true", "false", "..."}:
             self.take()
-            if token.kind == "name":
+            if token.text == "select" or token.text in MULTI_RETURN:
                 bare_name = token
         else:
             raise LuaSyntaxError(f"{token.line}: expected expression, got {token.text!r}")
-        result = None
+        result, callee = None, bare_name
         while True:
             if self.accept("."):
-                self.name()
+                callee = self.name()
             elif self.accept("["):
                 self.expression()
                 self.take("]")
+                callee = None
             elif self.accept(":"):
-                self.name()
+                method = self.name()
                 self.arguments()
+                result = method if method.text in MULTI_RETURN else None
+                bare_name = callee = None
+                continue
             elif self.current.text in {"(", "{"} or self.current.kind == "string":
-                self.arguments()
-                result = bare_name if bare_name and bare_name.text == "select" else None
-                bare_name = None
+                self.arguments(spread=bool(bare_name and bare_name.text == "select"))
+                result = bare_name or (callee if callee and callee.text in MULTI_RETURN else None)
+                bare_name = callee = None
                 continue
             else:
                 break

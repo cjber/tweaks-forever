@@ -127,7 +127,8 @@ end
 local function Coin(button)
 	if not icons[button] then
 		local native = button.JunkIcon
-		local coin = button:CreateTexture(nil, native:GetDrawLayer())
+		local layer, sublevel = native:GetDrawLayer()
+		local coin = button:CreateTexture(nil, layer, nil, sublevel)
 		coin:SetAtlas(native:GetAtlas())
 		coin:SetAllPoints(native)
 		icons[button] = coin

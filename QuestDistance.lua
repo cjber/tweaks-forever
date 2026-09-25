@@ -124,7 +124,7 @@ local function CreateDecorations(inside, Each)
 		end
 		d.label:SetText(here and "here" or Format(math.sqrt(distanceSq)))
 		if here then
-			d.label:SetTextColor(GREEN_FONT_COLOR:GetRGB())
+			d.label:SetTextColor(GREEN_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 		else
 			d.label:SetTextColor(0.6, 0.6, 0.6)
 		end

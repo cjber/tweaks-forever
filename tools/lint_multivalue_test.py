@@ -18,6 +18,11 @@ class MultivalueTest(unittest.TestCase):
             "return {f(select(2, g()))}",
             "f(\n select(2,\n g())\n)",
             "f(select(2, g())) -- multi-value:",
+            "button:CreateTexture(nil, icon:GetDrawLayer())",
+            "f(x, UnitClass(u))",
+            "f(C_Item.GetItemInfo(link))",
+            "return frame:GetPoint(1)",
+            "local t = {frame:GetSize()}",
         ]
         for source in cases:
             with self.subTest(source=source):
@@ -53,6 +58,14 @@ class MultivalueTest(unittest.TestCase):
             "for i = 1, 2 do if i == 1 then f() elseif i == 2 then f() else f() end end",
             "for k, v in pairs(t) do repeat f() until v end",
             "function t:f(...) while true do break end; return ... end",
+            "local layer, sublevel = icon:GetDrawLayer()",
+            "f(icon:GetDrawLayer(), x)",
+            "f((icon:GetDrawLayer()))",
+            "f((select(3, UnitRace(u))))",
+            "local price = select(11, C_Item.GetItemInfo(link))",
+            "f(t[1]:GetFont()) -- multi-value: font, size, flags",
+            "f(frame:GetWidth())",
+            "f(GetDrawLayer.x)",
         ]
         for source in cases:
             with self.subTest(source=source):

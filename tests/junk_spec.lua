@@ -52,4 +52,57 @@ assert(not Model.SameStack(original, locked))
 local changed = item(2)
 changed.hyperlink = "item:100:different-enchant"
 assert(not Model.SameStack(original, changed), "same item ID does not guarantee the same item variant")
+-- The coin drawn over a bag button takes the game's junk coin's layer and sublevel, each in its own slot.
+local update
+ns.Active = function()
+	return true
+end
+ns.ClickMode, ns.OnTooltip, ns.On, ns.ForEachBagButton = function() end, function() end, function() end, function() end
+ns.HookBagButtons = function(_, fn)
+	update = fn
+end
+_G.Enum = { TooltipDataType = { Item = 0 } }
+_G.hooksecurefunc = function() end
+_G.MerchantSellAllJunkButton = { HookScript = function() end }
+_G.TweaksForeverDB = { junk = { [100] = true } }
+_G.C_Container = {
+	GetContainerItemInfo = function()
+		return item(2)
+	end,
+}
+initializers[1]()
+local drawn
+local button = {
+	JunkIcon = {
+		GetDrawLayer = function()
+			return "OVERLAY", 5
+		end,
+		GetAtlas = function()
+			return "bags-junkcoin"
+		end,
+	},
+	GetBagID = function()
+		return 0
+	end,
+	GetID = function()
+		return 1
+	end,
+	CreateTexture = function(_, name, layer, inherits, sublevel)
+		assert(
+			inherits == nil or type(inherits) == "string",
+			('Couldn\'t find inherited node "%s"'):format(tostring(inherits))
+		)
+		assert(name == nil and layer == "OVERLAY" and sublevel == 5, "the coin keeps the junk coin's draw layer")
+		drawn = {
+			SetAtlas = function() end,
+			SetAllPoints = function() end,
+			SetShown = function(_, shown)
+				drawn.shown = shown
+			end,
+		}
+		return drawn
+	end,
+}
+update(button)
+assert(drawn and drawn.shown, "a marked item shows the coin")
 print("junk_spec: ok")

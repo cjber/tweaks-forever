@@ -236,14 +236,14 @@ local function AddStatus(tooltip, aura)
 	local left = Remaining(aura)
 	local text
 	if not left then
-		tooltip:AddLine("You don't have this", GRAY_FONT_COLOR:GetRGB())
+		tooltip:AddLine("You don't have this", GRAY_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 		return
 	elseif aura == TENT then
 		text = left > 0 and "Rested, again in " .. Time(left) or "Rested"
 	else
 		text = left > 0 and "Active: " .. Time(left) or "Active"
 	end
-	tooltip:AddLine(text, GREEN_FONT_COLOR:GetRGB())
+	tooltip:AddLine(text, GREEN_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 end
 
 local byAura = {}
@@ -315,7 +315,7 @@ local function AddNearby(tooltip)
 	end
 	tooltip:AddLine(" ")
 	if direction then
-		tooltip:AddLine(direction, HIGHLIGHT_FONT_COLOR:GetRGB())
+		tooltip:AddLine(direction, HIGHLIGHT_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 	end
 	for _, row in ipairs(active) do
 		AddRow(tooltip, row)
@@ -336,7 +336,7 @@ local function AddMissing(tooltip)
 		return
 	end
 	tooltip:AddLine(" ")
-	tooltip:AddLine("Not yet gained:", GRAY_FONT_COLOR:GetRGB())
+	tooltip:AddLine("Not yet gained:", GRAY_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 	for _, row in ipairs(missing) do
 		AddRow(tooltip, row)
 	end
@@ -462,7 +462,7 @@ local function AnnounceBenefits()
 			if aura then
 				now[benefit[1]] = true
 				if had and not had[benefit[1]] and announce and ns.Active("campAlerts") then
-					UIErrorsFrame:AddMessage(Announcement(benefit, aura.points), YELLOW_FONT_COLOR:GetRGB())
+					UIErrorsFrame:AddMessage(Announcement(benefit, aura.points), YELLOW_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 				end
 			end
 		end

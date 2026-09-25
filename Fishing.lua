@@ -107,7 +107,7 @@ end
 
 local function WarnNoLure()
 	if ns.Active("lureWarning") and HasPole() and not HasLure() then
-		UIErrorsFrame:AddMessage("Your fishing pole has no lure.", YELLOW_FONT_COLOR:GetRGB())
+		UIErrorsFrame:AddMessage("Your fishing pole has no lure.", YELLOW_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 	end
 end
 
