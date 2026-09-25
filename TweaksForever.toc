@@ -40,6 +40,7 @@ DungeonEntrances.lua
 DungeonEntrances.xml
 Frames.lua
 Errors.lua
+MacroNames.lua
 Spellbook.lua
 Fishing.lua
 Reload.lua
