@@ -158,6 +158,12 @@ function Model.Room(height, top, pagerTop)
 	return height
 end
 
+---@param grid TFGrid
+---@return number
+local function ColumnWidth(grid)
+	return (grid.width - grid.gap * (grid.columns - 1)) / grid.columns
+end
+
 -- Places a header and count entries after the spellbook's own, with its column-first grid rules: a spacer before a
 -- group on a view already holding one, a header only with room for a row under it, and each view's rows balanced
 -- over the columns. Page 0 is the spellbook's last page; views past it are ours.
@@ -184,7 +190,7 @@ function Model.Layout(count, view, used, grid)
 	end
 	local header = { page = page, view = view, x = 0, y = y }
 	y = y + grid.header + grid.pad
-	local width = (grid.width - grid.gap * (grid.columns - 1)) / grid.columns
+	local width = ColumnWidth(grid)
 	local slots = {}
 	while #slots < count do
 		local rows = math.floor((grid.height - y) / row)
@@ -467,7 +473,7 @@ local function Render()
 		extra = 0
 	end
 
-	local width = (grid.width - grid.gap * (grid.columns - 1)) / grid.columns
+	local width = ColumnWidth(grid)
 	if onLast and top.page == extra then
 		header.Text:SetText("Future Spells")
 		header:ClearAllPoints()
