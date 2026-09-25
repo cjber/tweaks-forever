@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "dungeonEntrances",
@@ -154,8 +155,8 @@ ns.Init(function()
 		BaseMapPoiPinMixin.OnMouseEnter(self)
 		local hint = ns.Suggestion(
 			"ShortestPathForever",
-			"Install Shortest Path Forever for walked routes and boat times.",
-			"Enable Shortest Path Forever for walked routes and boat times."
+			L["Install Shortest Path Forever for walked routes and boat times."],
+			L["Enable Shortest Path Forever for walked routes and boat times."]
 		)
 		if hint then
 			local tooltip = GetAppropriateTooltip()

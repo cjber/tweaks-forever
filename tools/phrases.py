@@ -1,0 +1,228 @@
+"""List the addon's translatable phrases for CurseForge, and reject player-visible text that skips them.
+
+Every phrase is its English text: `L["..."]` in the shipped Lua, plus the category, name, tooltip and option
+labels an `ns.Feature` declares and the label and tooltip an `ns.ClickMode` declares, which Settings.lua and
+Modes.lua translate where they show them. With no argument this prints the phrases as the `L["x"] = true` lines
+CurseForge's Import localization page takes; `--write` saves them to Locales/phrases.txt, and `--check` fails when
+that file is stale or when shipped code hands a literal with words in it straight to a UI call.
+"""
+
+import re
+import sys
+from dataclasses import dataclass
+from pathlib import Path
+
+from tools.lint_multivalue import LuaSyntaxError, Token, toc_paths, tokenize
+
+PHRASES = Path("Locales/phrases.txt")
+# Declarations whose English text is translated where it is shown, and the fields that hold it.
+DECLARATIONS = {"Feature": {"category", "name", "tooltip"}, "ClickMode": {"label", "tooltip"}}
+# UI calls and the argument (from 1) that is shown to the player.
+SINKS = {
+    "SetText": 1,
+    "SetFormattedText": 1,
+    "SetLabelText": 1,
+    "AddLine": 1,
+    "AddDoubleLine": 1,
+    "AddMessage": 1,
+    "Print": 1,
+    "CreateButton": 1,
+    "CreateCheckbox": 1,
+    "CreateTitle": 1,
+    "GameTooltip_SetTitle": 2,
+    "GameTooltip_AddNormalLine": 2,
+    "GameTooltip_AddColoredLine": 2,
+    "GameTooltip_AddErrorLine": 2,
+    "GameTooltip_AddDisabledLine": 2,
+    "GameTooltip_AddInstructionLine": 2,
+    "CreateSettingsButtonInitializer": 1,
+    "RegisterVerticalLayoutCategory": 1,
+    "RegisterVerticalLayoutSubcategory": 2,
+    # Frames.lua's font string helper: Label(parent, text, font, x, y).
+    "Label": 2,
+}
+# Escape codes, format specifiers and markup that carry no words of their own.
+MARKUP = re.compile(r"\|c[0-9a-fA-F]{8}|\|r|\|T.*?\|t|\|A.*?\|a|%%|%[-+ #0]*\d*(?:\.\d+)?[a-zA-Z]")
+ESCAPES = {"n": "\n", "t": "\t", "\\": "\\", '"': '"', "'": "'"}
+# The addon's own name, shown as it is in every language.
+NAMES = {"Tweaks Forever"}
+
+
+@dataclass(frozen=True)
+class Finding:
+    path: Path
+    line: int
+    message: str
+
+
+def decode(token: Token) -> str:
+    text = token.text
+    if text.startswith("["):
+        return text[text.index("[", 1) + 1 : text.rindex("]", 0, -1)].removeprefix("\n")
+    out, index = [], 1
+    while index < len(text) - 1:
+        char = text[index]
+        if char == "\\":
+            nxt = text[index + 1]
+            digits = re.match(r"\d{1,3}", text[index + 1 :])
+            if digits:
+                out.append(chr(int(digits[0])))
+                index += 1 + len(digits[0])
+                continue
+            out.append(ESCAPES.get(nxt, nxt))
+            index += 2
+            continue
+        out.append(char)
+        index += 1
+    return "".join(out)
+
+
+def encode(phrase: str) -> str:
+    return '"' + phrase.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n") + '"'
+
+
+def literal(tokens: list[Token], index: int) -> tuple[str | None, int]:
+    """A string literal, or several joined by `..`, at index: its text and the index after it."""
+    parts = []
+    while tokens[index].kind == "string":
+        parts.append(decode(tokens[index]))
+        if tokens[index + 1].text != ".." or tokens[index + 2].kind != "string":
+            return "".join(parts), index + 1
+        index += 2
+    return None, index
+
+
+def closing(tokens: list[Token], index: int) -> int:
+    """The index of the bracket closing the one at index."""
+    depth = 0
+    for position in range(index, len(tokens)):
+        text = tokens[position].text
+        if text in "([{" and tokens[position].kind == "symbol":
+            depth += 1
+        elif text in ")]}" and tokens[position].kind == "symbol":
+            depth -= 1
+            if depth == 0:
+                return position
+    raise LuaSyntaxError(f"{tokens[index].line}: unclosed {tokens[index].text}")
+
+
+def arguments(tokens: list[Token], open_index: int) -> list[tuple[int, int]]:
+    """Each argument of the call whose `(` is at open_index, as a [start, end) token range."""
+    end, depth = closing(tokens, open_index), 0
+    ranges, start = [], open_index + 1
+    for position in range(open_index + 1, end):
+        token = tokens[position]
+        if token.kind == "symbol" and token.text in "([{":
+            depth += 1
+        elif token.kind == "symbol" and token.text in ")]}":
+            depth -= 1
+        elif token.text == "," and depth == 0:
+            ranges.append((start, position))
+            start = position + 1
+    if start < end:
+        ranges.append((start, end))
+    return ranges
+
+
+def declared(path: Path, tokens: list[Token], table: int, fields: set[str]) -> tuple[set[str], list[Finding]]:
+    """The phrases in a declaration's table at `{` index table; a field holding anything but literals is a finding."""
+    phrases, findings = set(), []
+    end, depth, position = closing(tokens, table), 0, table + 1
+    while position < end:
+        token = tokens[position]
+        if token.kind == "symbol" and token.text in "([{":
+            depth += 1
+        elif token.kind == "symbol" and token.text in ")]}":
+            depth -= 1
+        elif (
+            depth == 0
+            and token.text in fields
+            and tokens[position + 1].text == "="
+            and tokens[position + 2].text != "L"
+        ):
+            # A value built from L[...] is translated already, and its phrases are listed as L[...] ones.
+            text, after = literal(tokens, position + 2)
+            if text is None or tokens[after].text not in {",", "}"}:
+                findings.append(Finding(path, token.line, f"{token.text} must be English text, translated where shown"))
+            else:
+                phrases.add(text)
+        elif depth == 0 and token.text == "options" and tokens[position + 1].text == "=":
+            # { { value, label }, ... }: each label.
+            for index in range(position + 2, closing(tokens, position + 2)):
+                if tokens[index].text == "{" and tokens[index + 2].text == "," and tokens[index + 3].kind == "string":
+                    phrases.add(decode(tokens[index + 3]))
+        position += 1
+    return phrases, findings
+
+
+def worded(text: str) -> bool:
+    return text not in NAMES and bool(re.search(r"[A-Za-z]", MARKUP.sub("", text)))
+
+
+def scan(path: Path, source: str) -> tuple[set[str], list[Finding]]:
+    tokens, _ = tokenize(source)
+    phrases, findings, translated = set(), [], set()
+    for index, token in enumerate(tokens):
+        if token.text == "L" and tokens[index + 1].text == "[":
+            text, after = literal(tokens, index + 2)
+            if text is not None and tokens[after].text == "]":
+                phrases.add(text)
+                translated.update(range(index + 2, after))
+    for index, token in enumerate(tokens):
+        if (
+            token.text in DECLARATIONS
+            and tokens[index - 1].text == "."
+            and tokens[index - 2].text == "ns"
+            and tokens[index + 1].text == "("
+            and tokens[index + 2].text == "{"
+        ):
+            found, bad = declared(path, tokens, index + 2, DECLARATIONS[token.text])
+            phrases |= found
+            findings += bad
+        elif token.text in SINKS and token.kind == "name" and tokens[index + 1].text == "(":
+            args = arguments(tokens, index + 1)
+            if len(args) < SINKS[token.text]:
+                continue
+            start, end = args[SINKS[token.text] - 1]
+            for position in range(start, end):
+                inner = tokens[position]
+                # A table field's value or a comparison's operand is data, not text.
+                data = tokens[position - 1].text in {"=", "==", "~="} or tokens[position + 1].text in {"==", "~="}
+                if inner.kind == "string" and position not in translated and not data and worded(decode(inner)):
+                    message = f"{token.text} shows {inner.text} untranslated; use L[...] or a Blizzard string"
+                    findings.append(Finding(path, inner.line, message))
+    return phrases, findings
+
+
+def collect(paths: list[Path]) -> tuple[list[str], list[Finding]]:
+    phrases, findings = set(), []
+    for path in paths:
+        if path.parts[0] in {"Locales", "Data"}:
+            continue
+        found, bad = scan(path, path.read_text())
+        phrases |= found
+        findings += bad
+    return sorted(phrases), findings
+
+
+def render(phrases: list[str]) -> str:
+    return "".join(f"L[{encode(phrase)}] = true\n" for phrase in phrases)
+
+
+def main() -> int:
+    phrases, findings = collect(toc_paths())
+    text = render(phrases)
+    if "--write" in sys.argv:
+        PHRASES.write_text(text)
+    elif "--check" in sys.argv:
+        if not PHRASES.exists() or PHRASES.read_text() != text:
+            findings.append(Finding(PHRASES, 1, "stale: run python3 -m tools.phrases --write"))
+    else:
+        sys.stdout.write(text)
+    for finding in findings:
+        print(f"{finding.path}:{finding.line}: {finding.message}", file=sys.stderr)
+    return 1 if findings else 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

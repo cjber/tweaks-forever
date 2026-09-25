@@ -27,6 +27,7 @@ local function Login(saved, version, on)
 		end,
 	}, { __index = _G })
 	local ns = {}
+	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 	setfenv(assert(loadfile("Core.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("WhatsNew.lua")), env)("TweaksForever", ns)
 	if on == false then

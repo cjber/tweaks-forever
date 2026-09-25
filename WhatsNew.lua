@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local addonName, ns = ...
+local L = ns.L
 
 ns.Feature({
 	key = "whatsNew",
@@ -11,7 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite this line with each release's entry.
-ns.WHATS_NEW = "After each update, a line like this says what changed; turn it off under Interface."
+ns.WHATS_NEW =
+	L["Settings and tooltips can now be translated on CurseForge, and dungeon entrances suggest Shortest " .. "Path Forever for the walk."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@project-version@"
@@ -26,7 +28,7 @@ ns.WhatsNew = Model
 ---@return string?
 function Model.Message(seen, version)
 	if seen and seen ~= version then
-		return ("updated to %s. %s"):format(version, ns.WHATS_NEW)
+		return L["updated to %s. %s"]:format(version, ns.WHATS_NEW)
 	end
 end
 
