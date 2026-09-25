@@ -1,7 +1,8 @@
 -- Settings rows must reach their layouts only through Settings.RegisterInitializer, which inserts them from
 -- Blizzard's secure attribute delegate. A row inserted from addon code (layout:AddInitializer, or
 -- Settings.CreateCheckbox/CreateDropdown, which insert from the caller) taints the settings search, and a
--- restricted button in its results (Social's Discord Sign In) is then blocked and blamed on this addon.
+-- restricted button in its results (Social's Discord Sign In) is then blocked and blamed on this addon. The
+-- search also reads each row's parent link, so SetParentInitializer from addon code taints it the same way.
 local registered = {}
 -- [key] = the addon a feature needs and can't find.
 local missing = {}
@@ -18,11 +19,18 @@ local function Initializer(kind, setting)
 	return {
 		kind = kind,
 		setting = setting,
+		modify = {},
 		AddModifyPredicate = function(self, predicate)
-			self.modify = predicate
+			table.insert(self.modify, predicate)
 		end,
-		SetParentInitializer = function(self, parent, predicate)
-			self.parent, self.parentPredicate = assert(parent), predicate
+		Indent = function(self)
+			self.indented = true
+		end,
+		AddEvaluateStateCVar = function(self, variable)
+			self.evaluate = variable
+		end,
+		SetParentInitializer = function()
+			error("addon code linked a row to its parent; the settings search reads that link")
 		end,
 	}
 end
@@ -81,7 +89,8 @@ local env = setmetatable({
 	SlashCmdList = {},
 }, { __index = _G })
 
-local ns = {
+local ns
+ns = {
 	db = {},
 	features = {
 		{ key = "repair", category = "Merchants", name = "Repair", tooltip = "Repairs." },
@@ -95,8 +104,8 @@ local ns = {
 	MissingOf = function(key)
 		return missing[key]
 	end,
-	Active = function()
-		return true
+	Active = function(key)
+		return ns.db[key] ~= false
 	end,
 }
 setfenv(assert(loadfile("Settings.lua")), env)("TweaksForever", ns)
@@ -112,10 +121,22 @@ assert(
 	table.concat(kinds, " ")
 )
 local repair, guildRepair = registered[1].initializer, registered[2].initializer
-assert(guildRepair.parent == repair and guildRepair.parentPredicate(), "a child row is tied to its parent")
-assert(repair.modify and repair.modify(), "conflict-free rows stay modifiable")
+local function Modifiable(initializer)
+	for _, predicate in ipairs(initializer.modify) do
+		if not predicate() then
+			return false
+		end
+	end
+	return true
+end
+assert(Modifiable(repair) and not repair.indented, "conflict-free rows stay modifiable")
+assert(guildRepair.indented and guildRepair.evaluate == "TweaksForever_repair", "a child row sits under its parent")
+assert(Modifiable(guildRepair), "a child row is modifiable while its parent is on")
+ns.db.repair = false
+assert(not Modifiable(guildRepair) and Modifiable(repair), "a child row greys out with its parent off")
+ns.db.repair = nil
 missing.repair = "QuestieDB"
-assert(not repair.modify(), "a row missing an addon it needs is greyed out")
+assert(not Modifiable(repair), "a row missing an addon it needs is greyed out")
 assert(repair.tooltip():find("Needs QuestieDB, which isn't loaded", 1, true), "and says so")
 missing.repair = nil
 assert(registered[4].initializer.setting.variable == "TweaksForever_gearMark")

@@ -62,7 +62,8 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
   `TweaksForeverCharDB` (`groups`, `colours`, `beforeFishing`) — persisted formats; keys are data.
 - Feature `key`s are persisted and also form the setting variable `"TweaksForever_" .. key`, looked up by
   string in `Settings.SetOnValueChangedCallback` calls (Fishing, Gear, Frames).
-- `ns.On("<EVENT>")` and `hooksecurefunc(obj, "<method>")` name Blizzard events and methods as strings.
+- `ns.On("<EVENT>")`, `hooksecurefunc("<Function>")` and `HookScript("<Script>")` name Blizzard events, functions
+  and scripts as strings.
 - `Errors.lua` builds `_G["LE_GAME_ERR_" .. name]`; `Frames.lua` resolves `_G[record.name]` and loads the
   listed load-on-demand addons.
 - Slash commands: `SLASH_TWEAKSFOREVER1`, `SLASH_TWEAKSFOREVER_RELOAD1` with `SlashCmdList` entries.

@@ -28,6 +28,7 @@ fi
 
 python3 -m unittest discover -s tools -p '*_test.py'
 python3 tools/lint_multivalue.py
+python3 -m tools.lint_taint
 # A fresh output path prevents a crashed checker from reusing an earlier green report.
 report=$(mktemp -d "${TMPDIR:-/tmp}/tweaks-typecheck.XXXXXX")
 trap 'rm -rf "$report"' EXIT HUP INT TERM

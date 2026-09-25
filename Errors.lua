@@ -53,20 +53,26 @@ local NAMES = {
 	"OUT_OF_SOUL_SHARDS",
 }
 
+-- Through the frame's own blacklist, never by replacing UIErrorsFrame.ShouldDisplayMessageType: an addon method
+-- there runs inside every error the client shows. The frame plays the error's voice line only when the type is
+-- allowed, so one switch silences text and sound. Types the client already hides stay hidden when this is off.
+local function Apply(stock)
+	local quiet = ns.Active("quietErrors")
+	for messageType, hidden in pairs(stock) do
+		UIErrorsFrame:SetMessageTypeEnabled(messageType, not (quiet or hidden))
+	end
+end
+
 ns.Init(function()
-	local quiet = {}
+	local stock = {}
 	for _, name in ipairs(NAMES) do
 		local messageType = _G["LE_GAME_ERR_" .. name]
 		if messageType then
-			quiet[messageType] = true
+			stock[messageType] = not not BLACK_LISTED_MESSAGE_TYPES[messageType]
 		end
 	end
-	-- The frame plays the error's voice line only when this passes, so one check silences text and sound.
-	local ShouldDisplay = UIErrorsFrame.ShouldDisplayMessageType
-	function UIErrorsFrame.ShouldDisplayMessageType(frame, messageType, message)
-		if quiet[messageType] and ns.Active("quietErrors") then
-			return false
-		end
-		return ShouldDisplay(frame, messageType, message)
-	end
+	Apply(stock)
+	Settings.SetOnValueChangedCallback("TweaksForever_quietErrors", function()
+		Apply(stock)
+	end)
 end)

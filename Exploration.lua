@@ -150,63 +150,78 @@ local function Areas(art, layer)
 end
 
 ns.Init(function()
-	local hooked = {}
-	local function Attach()
-		if not WorldMapFrame then
+	local map = WorldMapFrame
+	-- Drawn on Blizzard's exploration pin, below its explored textures, so overlapping edges retain Blizzard's
+	-- normal artwork. Everything else is ours: a data provider of our own redraws them, and the map's mask is
+	-- applied here. Hooking the pin's methods or listing textures in the map's tables made Blizzard's own map code
+	-- fail with "attempt to call a nil value".
+	local pool, poolPin
+	-- [texture] = whether it carries the map's mask.
+	local masked = {}
+
+	---@return Frame?
+	local function ExplorationPin()
+		for pin in map:EnumeratePinsByTemplate("MapExplorationPinTemplate") do -- luacheck: ignore 512 (first only)
+			return pin
+		end
+	end
+
+	local function Draw()
+		if pool then
+			pool:ReleaseAll()
+		end
+		if not ns.Active("exploration") then
 			return
 		end
-		for pin in WorldMapFrame:EnumeratePinsByTemplate("MapExplorationPinTemplate") do
-			if not hooked[pin] then
-				hooked[pin] = true
-				-- Below explored textures, so overlapping edges retain Blizzard's normal artwork.
-				local pool = CreateTexturePool(pin, "ARTWORK", -1)
-				hooksecurefunc(pin, "RemoveAllData", function()
-					pool:ReleaseAll()
-				end)
-				hooksecurefunc(pin, "RefreshOverlays", function(_, fullUpdate)
-					pool:ReleaseAll()
-					if not ns.Active("exploration") then
-						return
+		local pin = ExplorationPin()
+		local mapID = map:GetMapID()
+		local info = mapID and C_Map.GetMapInfo(mapID)
+		if not pin or not info or info.mapType ~= Enum.UIMapType.Zone then
+			return
+		end
+		if poolPin ~= pin then
+			pool, poolPin = CreateTexturePool(pin, "ARTWORK", -1), pin
+		end
+		local art = C_Map.GetMapArtID(mapID)
+		local index = map:GetCanvasContainer():GetCurrentLayerIndex()
+		local layers = C_Map.GetMapArtLayers(mapID)
+		local layer = layers and layers[index]
+		if not art or not layer then
+			return
+		end
+		local mask = map:GetMaskTexture()
+		local useMask = mask and map:GetUseMaskTexture() or false
+		local explored = C_MapExplorationInfo.GetExploredMapTextures(mapID)
+		for _, area in ipairs(Model.Unexplored(Areas(art, index), explored)) do
+			for i, tile in ipairs(Model.OverlayTiles(area.width, area.height, layer.tileWidth, layer.tileHeight)) do
+				local texture = pool:Acquire()
+				if mask and masked[texture] ~= useMask then
+					if useMask then
+						texture:AddMaskTexture(mask)
+					else
+						texture:RemoveMaskTexture(mask)
 					end
-					local map = pin:GetMap()
-					local mapID = map:GetMapID()
-					local info = mapID and C_Map.GetMapInfo(mapID)
-					if not info or info.mapType ~= Enum.UIMapType.Zone then
-						return
-					end
-					local art = C_Map.GetMapArtID(mapID)
-					local index = map:GetCanvasContainer():GetCurrentLayerIndex()
-					local layers = C_Map.GetMapArtLayers(mapID)
-					local layer = layers and layers[index]
-					if not art or not layer then
-						return
-					end
-					local explored = C_MapExplorationInfo.GetExploredMapTextures(mapID)
-					for _, area in ipairs(Model.Unexplored(Areas(art, index), explored)) do
-						for i, tile in
-							ipairs(Model.OverlayTiles(area.width, area.height, layer.tileWidth, layer.tileHeight))
-						do
-							local texture = pool:Acquire()
-							map:AddMaskableTexture(texture)
-							texture:SetTexture(area.files[i], nil, nil, "TRILINEAR")
-							texture:SetSize(tile.width, tile.height)
-							texture:SetTexCoord(0, tile.u, 0, tile.v)
-							texture:ClearAllPoints()
-							texture:SetPoint("TOPLEFT", area.x + tile.x, -(area.y + tile.y))
-							texture:SetVertexColor(0.55, 0.65, 0.85, 0.8)
-							texture:Show()
-							if fullUpdate then
-								pin.textureLoadGroup:AddTexture(texture)
-							end
-						end
-					end
-				end)
-				if WorldMapFrame:IsShown() then
-					pin:RefreshOverlays(true)
+					masked[texture] = useMask
 				end
+				texture:SetTexture(area.files[i], nil, nil, "TRILINEAR")
+				texture:SetSize(tile.width, tile.height)
+				texture:SetTexCoord(0, tile.u, 0, tile.v)
+				texture:ClearAllPoints()
+				texture:SetPoint("TOPLEFT", area.x + tile.x, -(area.y + tile.y))
+				texture:SetVertexColor(0.55, 0.65, 0.85, 0.8)
+				texture:Show()
 			end
 		end
 	end
-	ns.On("ADDON_LOADED", Attach)
-	Attach()
+
+	-- The base provider redraws on every map change as well; a zoom can change the art layer.
+	local Provider = CreateFromMixins(MapCanvasDataProviderMixin)
+	function Provider.RemoveAllData()
+		if pool then
+			pool:ReleaseAll()
+		end
+	end
+	Provider.RefreshAllData = Draw
+	Provider.OnCanvasScaleChanged = Draw
+	map:AddDataProvider(Provider)
 end)

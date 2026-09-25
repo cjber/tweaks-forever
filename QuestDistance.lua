@@ -151,7 +151,7 @@ local function CreateDecorations(inside, Each)
 		Each(Relayout)
 	end
 
-	return Hide, Update, Layout
+	return Hide, Layout
 end
 
 ns.Init(function()
@@ -164,21 +164,30 @@ ns.Init(function()
 	end
 
 	local CheckAreas, inside = CreateAreaProbe()
-	local Hide, Update, Layout = CreateDecorations(inside, Each)
+	local Hide, Layout = CreateDecorations(inside, Each)
 
-	for _, module in ipairs(modules) do
-		hooksecurefunc(module, "EndLayout", function()
-			if ns.Active("questDistance") then
-				CheckAreas()
-				Layout()
-			else
-				Each(Hide)
-			end
-		end)
-		hooksecurefunc(module, "OnFreeBlock", function(_, block)
-			Hide(block)
-		end)
+	local function Refresh()
+		if ns.Active("questDistance") then
+			CheckAreas()
+			Layout()
+		else
+			Each(Hide)
+		end
 	end
+	-- The tracker lays its blocks out on the frame after it is marked dirty (DirtiableMixin, from RunNextFrame), so
+	-- the labels follow once its dirty flag clears. Watched from a frame of our own: hooksecurefunc on the modules'
+	-- EndLayout or OnFreeBlock writes into Blizzard's tracker and taints its layout. A freed block hides its labels
+	-- with it, as they are its children.
+	local pending = false
+	CreateFrame("Frame"):SetScript("OnUpdate", function()
+		local container = QuestObjectiveTracker.parentContainer
+		if container and container.dirty then
+			pending = true
+		elseif pending then
+			pending = false
+			Refresh()
+		end
+	end)
 
 	---@param last {x: number?, y: number?}
 	---@param x number
@@ -208,6 +217,7 @@ ns.Init(function()
 			sorted.x, sorted.y = x, y
 			C_QuestLog.SortQuestWatches()
 		end
-		Each(Update)
+		-- Also catches a tracker update that ran without marking it dirty (collapsing it, say).
+		Layout()
 	end)
 end)

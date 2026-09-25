@@ -26,8 +26,7 @@ end
 
 ---@param category SettingsCategoryMixin
 ---@param feature TFFeature
----@param initializers table<string, SettingsListElementInitializer>
-local function AddSetting(category, feature, initializers)
+local function AddSetting(category, feature)
 	local options = feature.options
 	local setting = Settings.RegisterAddOnSetting(
 		category,
@@ -54,11 +53,15 @@ local function AddSetting(category, feature, initializers)
 		return not ns.ConflictOf(feature.key) and not ns.MissingOf(feature.key)
 	end)
 	if feature.parent then
-		initializer:SetParentInitializer(initializers[feature.parent], function()
+		-- Not SetParentInitializer: the settings search reads that link from every row, so ours tainted it and
+		-- Social's Discord Sign In in the results was blocked. An indent, a predicate and a re-check on the
+		-- parent's value give the same greyed, nested row.
+		initializer:Indent()
+		initializer:AddModifyPredicate(function()
 			return ns.Active(feature.parent)
 		end)
+		initializer:AddEvaluateStateCVar("TweaksForever_" .. feature.parent)
 	end
-	initializers[feature.key] = initializer
 	Settings.RegisterInitializer(category, initializer)
 end
 
@@ -73,11 +76,10 @@ ns.Init(function()
 		end
 		table.insert(bySection[feature.category], feature)
 	end
-	local initializers = {}
 	for _, section in ipairs(sections) do
 		local subcategory = Settings.RegisterVerticalLayoutSubcategory(category, section)
 		for _, feature in ipairs(bySection[section]) do
-			AddSetting(subcategory, feature, initializers)
+			AddSetting(subcategory, feature)
 		end
 		-- The index is buttons that open each subpage; search finds the settings themselves instead.
 		Settings.RegisterInitializer(

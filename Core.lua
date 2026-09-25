@@ -26,16 +26,70 @@ function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
 end
 
+-- The bag frames, read straight from the container. ContainerFrameUtil_EnumerateContainerFrames builds Blizzard's
+-- cached list on its first call, so calling it first from here left that list tainted and the bank blocked.
+---@return fun(): ContainerFrameTemplate|ContainerFrameCombinedBags?
+function ns.ContainerFrames()
+	local frames, index = ContainerFrameContainer.ContainerFrames, -1
+	return function()
+		index = index + 1
+		if index == 0 then
+			return ContainerFrameCombinedBags
+		end
+		return frames[index]
+	end
+end
+
+-- A bag frame's slot count, never through GetBagSize: that caches self.size on first call, and caching it from
+-- here would leave Blizzard's bag code reading a value this addon wrote.
+---@param container ContainerFrameTemplate|ContainerFrameCombinedBags
+---@return integer
+function ns.BagSize(container)
+	return container.size or C_Container.GetContainerNumSlots(container:GetID())
+end
+
+-- A bag frame's item buttons that hold a slot, as EnumerateValidItems but read-only.
+---@param container ContainerFrameTemplate|ContainerFrameCombinedBags
+---@return fun(): integer?, ContainerFrameItemButtonTemplate?
+function ns.BagItems(container)
+	local size, index = container.size or 0, 0
+	return function()
+		index = index + 1
+		if index <= size then
+			return index, container.Items[index]
+		end
+	end
+end
+
 -- Every item button in an open bag. A button of a bag frame not in use can still report IsShown with no slot.
 ---@param fn fun(button: ContainerFrameItemButtonTemplate)
 function ns.ForEachBagButton(fn)
-	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
+	for container in ns.ContainerFrames() do
 		if container:IsShown() then
-			for _, button in container:EnumerateValidItems() do
+			for _, button in ns.BagItems(container) do
 				fn(button)
 			end
 		end
 	end
+end
+
+-- Run fn(tooltip, ...) as GameTooltip fills from a C_TooltipInfo getter (GetBagItem for SetBagItem, and so on),
+-- with the arguments it was called with. Never hooksecurefunc(GameTooltip, "SetBagItem"): Blizzard's own calls
+-- to a tooltip method an addon has hooked then fail with "attempt to call a nil value".
+---@param dataType Enum.TooltipDataType
+---@param getters table<string, true>
+---@param fn fun(tooltip: GameTooltip, getter: string, ...: any)
+function ns.OnTooltip(dataType, getters, fn)
+	TooltipDataProcessor.AddTooltipPostCall(dataType, function(tooltip)
+		if tooltip ~= GameTooltip then
+			return
+		end
+		local info = tooltip:GetProcessingTooltipInfo()
+		local args = info and info.getterArgs
+		if info and getters[info.getterName] then
+			fn(GameTooltip, info.getterName, unpack(args or {}, 1, args and args.n or 0))
+		end
+	end)
 end
 
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
@@ -115,8 +169,25 @@ function ns.On(event, fn)
 	table.insert(handlers[event], fn)
 end
 
--- Hook every bag slot button, including ones made later, recording each in `hooked`. `update` runs whenever the
--- button redraws its junk coin, and again as a bag opens; `click` runs after a modified click.
+-- Blizzard's rule for a modified click (ContainerFrameItemButtonMixin:OnClick): with the auto-loot toggle held, a
+-- button other than the left one on a lootable item is an ordinary click.
+---@param button ContainerFrameItemButtonTemplate
+---@param mouseButton string
+---@return boolean
+local function IsModifiedBagClick(button, mouseButton)
+	if not IsModifiedClick() then
+		return false
+	end
+	if mouseButton ~= "LeftButton" and IsModifiedClick("AUTOLOOTTOGGLE") then
+		local info = C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
+		return not (info and info.hasLoot)
+	end
+	return true
+end
+
+-- Hook every bag slot button as its bag opens, recording each in `hooked`. `update` runs as a bag opens (callers
+-- also refresh on BAG_UPDATE_DELAYED); `click` runs after a modified click. Script hooks only: hooksecurefunc on a
+-- button's methods, or on ContainerFrameItemButtonMixin, writes into Blizzard's tables and taints its bag code.
 ---@param hooked table<ContainerFrameItemButtonTemplate, boolean>
 ---@param update fun(button: ContainerFrameItemButtonTemplate)
 ---@param click fun(button: ContainerFrameItemButtonTemplate, mouseButton: string)
@@ -127,19 +198,20 @@ function ns.HookBagButtons(hooked, update, click)
 			return
 		end
 		hooked[button] = true
-		hooksecurefunc(button, "UpdateJunkItem", update)
-		-- OnModifiedClick avoids ever running after the ordinary use/equip/sell path.
-		hooksecurefunc(button, "OnModifiedClick", click)
+		button:HookScript("OnClick", function(self, mouseButton)
+			if IsModifiedBagClick(self, mouseButton) then
+				click(self, mouseButton)
+			end
+		end)
 	end
-	hooksecurefunc(ContainerFrameItemButtonMixin, "OnLoad", Hook)
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
-		for _, button in container:EnumerateValidItems() do
+		for _, button in ns.BagItems(container) do
 			Hook(button)
 			update(button)
 		end
 	end)
-	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
-		for _, button in container:EnumerateValidItems() do
+	for container in ns.ContainerFrames() do
+		for _, button in ns.BagItems(container) do
 			Hook(button)
 		end
 	end

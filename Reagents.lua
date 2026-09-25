@@ -55,7 +55,7 @@ end
 -- Taint: the reagent bag keeps Blizzard's own window and item buttons, opened and closed only by Blizzard's code, so
 -- a click on a reagent runs the same untouched path as in its own window. This file never writes a Blizzard table
 -- field or calls a Blizzard function that opens, closes or fills a bag; it moves, reparents, fades and hides frames,
--- which are engine calls, not Lua state, from hooksecurefunc hooks and an EventRegistry callback.
+-- which are engine calls, not Lua state, from the combined bag's layout (Sections.lua) and an EventRegistry callback.
 ---@type ContainerFrameCombinedBags, ContainerFrameTemplate
 local bag, reagents
 ---@type Texture
@@ -66,6 +66,8 @@ local backgrounds = {}
 local chrome
 -- Where the reagent window came from, to put it back as it was.
 local home, strata, level, mouse
+-- The window's point and scale, and each of its buttons' points, as Blizzard last set them.
+local window, points = nil, {}
 local folded = false
 
 local function Wanted()
@@ -124,8 +126,18 @@ local function Fold()
 	end
 end
 
+-- A point Blizzard set, as { point, relativeTo, relativePoint, x, y }, or nil if it is one this file set: those are
+-- all relative to the combined bag's money frame.
+---@param region Region
+---@return table?
+local function Blizzards(region)
+	local point, relative, relativePoint, x, y = region:GetPoint()
+	if point and relative ~= bag.MoneyFrame then
+		return { point, relative, relativePoint, x, y }
+	end
+end
+
 local function Unfold()
-	Sections.lift = 0
 	if not folded then
 		return
 	end
@@ -144,37 +156,45 @@ local function Unfold()
 	for _, background in pairs(backgrounds) do
 		background:Hide()
 	end
-	-- Still open, as when the setting is turned off: back to its own grid. UpdateContainerFrameAnchors, which
-	-- always follows, stands the window beside the bag again at the bags' scale.
-	if reagents:IsShown() then
-		reagents:UpdateItemLayout()
+	-- Still open, as when the setting is turned off: back to its own grid and beside the bag, where Blizzard put them.
+	for button, point in pairs(points) do
+		button:ClearAllPoints()
+		button:SetPoint(unpack(point, 1, 5))
+	end
+	if window then
+		reagents:SetScale(window.scale)
+		reagents:ClearAllPoints()
+		reagents:SetPoint(unpack(window, 1, 5))
 	end
 end
 
--- Blizzard sizes the bag before laying it out, so this decides whether the reagent bag is in it: not when the
--- taller bag would run off the screen even at the smallest scale, as its top rows could not be reached.
----@param container ContainerFrameCombinedBags
-local function Grow(container)
+-- Whether the reagent bag goes in, and how far its rows lift the rest: not when the taller bag would run off the
+-- screen even at the smallest scale, as its top rows could not be reached.
+---@param base number
+---@param columns integer
+---@return number
+local function Reserve(base, columns)
 	if Wanted() then
-		local lift = Model.Lift(reagents:GetBagSize(), container:GetColumns())
-		local height = container:GetHeight() + lift
-		if height * Sections.MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
+		local lift = Model.Lift(ns.BagSize(reagents), columns)
+		if (base + lift) * Sections.MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
 			Fold()
-			Sections.lift = lift
-			container:SetHeight(height)
-			NineSliceUtil.UpdateCornerCropping(container, height)
-			return
+			return lift
 		end
 	end
 	Unfold()
+	return 0
 end
 
-local function Place()
+-- The reagent rows along the bottom of the bag, and the window they belong to over them, as the bag's own. Blizzard
+-- stands the window beside the bags at their scale each time it anchors them.
+---@param columns integer
+local function Placed(columns)
 	if not folded then
 		return
 	end
-	local columns, slots, money = bag:GetColumns(), reagents:GetBagSize(), bag.MoneyFrame
-	for _, button in reagents:EnumerateValidItems() do
+	local slots, money = ns.BagSize(reagents), bag.MoneyFrame
+	for _, button in ns.BagItems(reagents) do
+		points[button] = Blizzards(button) or points[button]
 		local column, y = Model.Place(button:GetID(), slots, columns)
 		button:ClearAllPoints()
 		button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -column * Sections.STEP, y)
@@ -185,36 +205,14 @@ local function Place()
 	rule:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * Sections.STEP - Sections.ITEM, y)
 	rule:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", 0, y)
 	rule:Show()
-end
-
--- Blizzard's grid starts on the money frame, where the reagent rows now sit, so it moves up above them. The gear
--- sections, when on, lay the bag out themselves from Sections.lift.
-local function Lift()
-	if not folded or Sections.Sectioned() then
-		return
+	local point = Blizzards(reagents)
+	if point then
+		point.scale = reagents:GetScale()
+		window = point
 	end
-	for _, button in bag:EnumerateValidItems() do
-		local point, relative, relativePoint, x, y = button:GetPoint()
-		button:ClearAllPoints()
-		button:SetPoint(point, relative, relativePoint, x, y + Sections.lift)
-	end
-end
-
--- UpdateContainerFrameAnchors scales the window like a bag of its own and stands it beside the others.
-local function Anchor()
-	if folded then
-		reagents:SetScale(1)
-		reagents:ClearAllPoints()
-		reagents:SetPoint("BOTTOMRIGHT", bag.MoneyFrame, "TOPRIGHT")
-	end
-end
-
-local function Relayout()
-	if bag:IsShown() then
-		bag:UpdateFrameSize()
-		bag:UpdateItemLayout()
-		UpdateContainerFrameAnchors()
-	end
+	reagents:SetScale(1)
+	reagents:ClearAllPoints()
+	reagents:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT")
 end
 
 local function Close()
@@ -228,7 +226,7 @@ local function Close()
 	end
 	if not reagents:IsShown() then
 		Unfold()
-		Relayout()
+		Sections.Relayout()
 	end
 end
 
@@ -267,19 +265,9 @@ ns.Init(function()
 	rule:Hide()
 	local binder, Bind = InitBackpackBinding()
 
-	hooksecurefunc(bag, "UpdateFrameSize", Grow)
-	hooksecurefunc(bag, "UpdateItemLayout", function()
-		Lift()
-		Place()
-	end)
-	hooksecurefunc(reagents, "UpdateItemLayout", Place)
-	hooksecurefunc("UpdateContainerFrameAnchors", Anchor)
-	-- Opened while the combined bag is open, it moves in; a different bag in the slot can change its size.
-	hooksecurefunc("ContainerFrame_GenerateFrame", function(frame)
-		if frame == reagents then
-			Relayout()
-		end
-	end)
+	-- Opened while the combined bag is open, Blizzard lays it out and anchors the bags, and the bag's layout
+	-- (Sections.lua) folds it in.
+	Sections.Reserve, Sections.Placed = Reserve, Placed
 	EventRegistry:RegisterCallback("ContainerFrame.CloseBag", function(_, frame)
 		if frame ~= reagents or not folded then
 			return
@@ -294,6 +282,6 @@ ns.Init(function()
 	end, binder)
 	Settings.SetOnValueChangedCallback("TweaksForever_combinedReagents", function()
 		Bind()
-		Relayout()
+		Sections.Relayout()
 	end)
 end)

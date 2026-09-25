@@ -120,7 +120,21 @@ local function Info(button)
 	return C_Container.GetContainerItemInfo(button:GetBagID(), button:GetID())
 end
 
--- `icons` records coins we added beyond the game's own, so turning a feature off can take them away again.
+-- Our own coin over each button, where the game draws its junk coin, never the game's JunkIcon itself: its redraw
+-- would undo ours, and redrawing after it takes a hook on the button's methods. `icons` holds them by button.
+---@param button ContainerFrameItemButtonTemplate
+---@return Texture
+local function Coin(button)
+	if not icons[button] then
+		local native = button.JunkIcon
+		local coin = button:CreateTexture(nil, native:GetDrawLayer())
+		coin:SetAtlas(native:GetAtlas())
+		coin:SetAllPoints(native)
+		icons[button] = coin
+	end
+	return icons[button]
+end
+
 ---@param button ContainerFrameItemButtonTemplate
 local function UpdateIcon(button)
 	local greys = ns.Active("greyCoins")
@@ -130,10 +144,7 @@ local function UpdateIcon(button)
 	local info = Info(button)
 	local marked = info and info.quality ~= POOR and Marks()[info.itemID]
 	local grey = info and info.quality == POOR and not info.hasNoValue
-	local merchantGrey = grey and MerchantFrame:IsShown()
-	icons[button] = (marked or grey and greys and not merchantGrey) or nil
-	-- Recompute the native branch too, so unmarking cannot leave an old icon behind.
-	button.JunkIcon:SetShown(not not (marked or merchantGrey or grey and greys))
+	Coin(button):SetShown(not not (marked or grey and greys))
 end
 
 local function RefreshBags()
@@ -346,7 +357,7 @@ ns.Init(function()
 	})
 
 	ns.HookBagButtons(hooked, UpdateIcon, Mark)
-	hooksecurefunc(GameTooltip, "SetBagItem", function(tooltip, bag, slot)
+	ns.OnTooltip(Enum.TooltipDataType.Item, { GetBagItem = true }, function(tooltip, _, bag, slot)
 		local itemID = C_Container.GetContainerItemID(bag, slot)
 		if itemID and Marks()[itemID] then
 			tooltip:AddLine("Marked as junk – Alt+Right-click to unmark", 1, 0.82, 0, true)
@@ -363,13 +374,27 @@ ns.Init(function()
 			GameTooltip:Show()
 		end
 	end)
-	-- The native popup captures its callback; a post-accept hook preserves confirmation and grey sales.
-	hooksecurefunc(StaticPopupDialogs.GENERIC_CONFIRMATION, "OnAccept", function(_, data)
-		if data.text == SELL_ALL_JUNK_ITEMS_POPUP and confirmationVisit == merchant and ManualEnabled() then
-			confirmationVisit = nil
-			Start(true)
-		end
-	end)
+	-- The native popup captures its callback, so its accept button tells us the sale was confirmed, after Blizzard
+	-- has sold the greys. Not a hook on the GENERIC_CONFIRMATION dialog: that put addon code in the accept of every
+	-- confirmation Blizzard shows. Enter does not accept this dialog, so the button is the only way.
+	local index = 1
+	while _G["StaticPopup" .. index] do
+		local dialog = _G["StaticPopup" .. index] --[[@as StaticPopupTemplate]]
+		dialog:GetButton1():HookScript("OnClick", function()
+			local data = dialog.data
+			if
+				dialog.which == "GENERIC_CONFIRMATION"
+				and type(data) == "table"
+				and data.text == SELL_ALL_JUNK_ITEMS_POPUP
+				and confirmationVisit == merchant
+				and ManualEnabled()
+			then
+				confirmationVisit = nil
+				Start(true)
+			end
+		end)
+		index = index + 1
+	end
 	ns.On("MERCHANT_SHOW", function()
 		merchant = { remaining = BATCH_SIZE }
 		local visit = merchant

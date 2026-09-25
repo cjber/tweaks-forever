@@ -647,14 +647,17 @@ local function InitTooltips()
 			tooltip:Show()
 		end
 	end
-	hooksecurefunc(GameTooltip, "SetBagItem", function(tooltip, bag, slot)
-		AddTooltipLine(tooltip, C_Container.GetContainerItemID(bag, slot))
-	end)
-	hooksecurefunc(GameTooltip, "SetInventoryItem", function(tooltip, unit, slot)
-		if unit == "player" then
-			AddTooltipLine(tooltip, GetInventoryItemID(unit, slot))
+	ns.OnTooltip(
+		Enum.TooltipDataType.Item,
+		{ GetBagItem = true, GetInventoryItem = true },
+		function(tooltip, getter, a, b)
+			if getter == "GetBagItem" then
+				AddTooltipLine(tooltip, C_Container.GetContainerItemID(a, b))
+			elseif a == "player" then
+				AddTooltipLine(tooltip, GetInventoryItemID(a, b))
+			end
 		end
-	end)
+	)
 end
 
 local function TrackWeapons()

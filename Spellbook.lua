@@ -559,11 +559,12 @@ local function Create()
 	prev = Arrow(controls.PrevPageButton, "PagingControlsPrevPageButtonTemplate", -1)
 	nextPage = Arrow(controls.NextPageButton, "PagingControlsNextPageButtonTemplate", 1)
 
-	-- Every page, tab or filter change redraws Blizzard's views; ours follow, starting again on its page.
-	hooksecurefunc(paged, "DisplayViewsForCurrentPage", function()
+	-- Every page, tab or filter change redraws Blizzard's views; ours follow, starting again on its page. Its own
+	-- callback, not hooksecurefunc on the method, which would write into Blizzard's frame.
+	paged:RegisterCallback(PagedContentFrameBaseMixin.Event.OnUpdate, function()
 		extra, lastDisplay = 0, GetTime()
 		Render()
-	end)
+	end, layer)
 	-- Scrolling on past the spellbook's last page carries on into ours.
 	paged:HookScript("OnMouseWheel", function(_, delta)
 		if delta < 0 and lastDisplay ~= GetTime() and controls:GetCurrentPage() == controls:GetMaxPages() then

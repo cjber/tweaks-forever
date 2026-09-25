@@ -22,7 +22,7 @@ ns.Feature({
 	},
 })
 
--- Restyles Blizzard's own nameplate unit frames after Blizzard lays them out, from hooksecurefunc hooks, with engine
+-- Restyles Blizzard's own nameplate unit frames after Blizzard lays them out, from script hooks and events, with engine
 -- calls only (anchors, sizes, fonts, colours, alpha). Nothing is written into Blizzard's tables and no Blizzard
 -- method is called, so its nameplate code, which handles secret health and cast values, never runs tainted.
 -- Forbidden nameplates (friendly units in instances) are never handed to addon code and keep Blizzard's look.
@@ -31,13 +31,14 @@ ns.Feature({
 local HEALTH, CAST, GAP, NAME_GAP, HEALTH_TEXT = 16, 12, 2, 4, 11
 local DIMMED = 0.6
 
--- Unit frames already hooked. They are pooled, so each is hooked once and reused for many units.
+-- Unit frames already hooked. They are pooled, so each is hooked once and reused for many units. Script hooks only:
+-- hooksecurefunc on a unit frame's methods writes into Blizzard's frame, and its own calls then run tainted.
 ---@type table<NamePlateUnitFrame, true>
 local styled = setmetatable({}, { __mode = "k" })
 
 -- Retail's selection outline, which Blizzard switches off for the Classic style, white round the target and gold round
--- the focus, and the other plates faded back while you have a target. Asks the game rather than the frame's cached
--- isTarget: the frame's own PLAYER_TARGET_CHANGED handler may run after this addon's. In dungeons and raids
+-- the focus, and the other plates faded back while you have a target. Asks the game rather than reading the frame's
+-- cached isTarget. In dungeons and raids
 -- UnitIsUnit answers with a secret boolean that addon code cannot test, so there the engine's FromBoolean setters
 -- take it as it is and the focus goes unmarked.
 ---@param frame NamePlateUnitFrame
@@ -156,14 +157,23 @@ local function Layout(frame)
 	Highlight(frame)
 end
 
+-- After the frame's own handler: it redraws the outline for a new target or focus, and lays the plate out again
+-- when the unit's faction changes (a player's plate can switch to name only).
+---@param frame NamePlateUnitFrame
+---@param event string
+local function OnFrameEvent(frame, event)
+	if event == "PLAYER_TARGET_CHANGED" or event == "PLAYER_FOCUS_CHANGED" then
+		Highlight(frame)
+	elseif event == "UNIT_FACTION" then
+		Layout(frame)
+	end
+end
+
 ---@param frame NamePlateUnitFrame
 local function Style(frame)
 	if not styled[frame] then
 		styled[frame] = true
-		hooksecurefunc(frame, "UpdateAnchors", Layout)
-		hooksecurefunc(frame.HealthBarsContainer.healthBar, "UpdateSelectionBorder", function()
-			Highlight(frame)
-		end)
+		frame:HookScript("OnEvent", OnFrameEvent)
 	end
 	Layout(frame)
 end
@@ -172,6 +182,13 @@ end
 local function Refresh(frame)
 	if styled[frame] then
 		Highlight(frame)
+	end
+end
+
+---@param frame NamePlateUnitFrame
+local function Relayout(frame)
+	if styled[frame] then
+		Layout(frame)
 	end
 end
 
@@ -188,19 +205,25 @@ ns.Init(function()
 	if not ns.Active(KEY) then
 		return
 	end
-	hooksecurefunc(NamePlateDriverFrame, "OnNamePlateAdded", function(_, token)
-		local plate = C_NamePlate.GetNamePlateForUnit(token)
-		if plate and plate.UnitFrame then
-			Style(plate.UnitFrame)
+	-- After the driver's handler, which gives the plate its unit and lays it out, or lays every plate out again.
+	NamePlateDriverFrame:HookScript("OnEvent", function(_, event, token)
+		if event == "NAME_PLATE_UNIT_ADDED" then
+			local plate = C_NamePlate.GetNamePlateForUnit(token)
+			if plate and plate.UnitFrame then
+				Style(plate.UnitFrame)
+			end
+		elseif event == "DISPLAY_SIZE_CHANGED" then
+			ForEachPlate(Relayout)
 		end
+	end)
+	-- Nameplate CVars reach the plates through callbacks run from another frame's handler, in no set order with
+	-- this addon's, so lay them out once those have run.
+	ns.On("CVAR_UPDATE", function()
+		C_Timer.After(0, function()
+			ForEachPlate(Relayout)
+		end)
 	end)
 	-- Blizzard resets a unit frame's alpha here; nameplates never fade for range, so it always sets 1.
 	hooksecurefunc("CompactUnitFrame_UpdateCenterStatusIcon", Refresh)
-	ns.On("PLAYER_TARGET_CHANGED", function()
-		ForEachPlate(Refresh)
-	end)
-	ns.On("PLAYER_FOCUS_CHANGED", function()
-		ForEachPlate(Refresh)
-	end)
 	ForEachPlate(Style)
 end)

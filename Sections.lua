@@ -13,6 +13,9 @@ ns.Feature({
 })
 
 ---@class TFSections
+-- Set by Reagents.lua: Reserve folds the reagent bag in when it fits and returns its lift; Placed lays its rows out.
+---@field Reserve fun(base: number, columns: integer): number?
+---@field Placed fun(columns: integer)?
 local Model = {}
 ns.Sections = Model
 
@@ -27,7 +30,7 @@ local FISHING_ICON = "|TInterface\\Icons\\Trade_Fishing:0|t "
 local MIN_SCALE = 0.75
 -- Shared with the reagent bag's section (Reagents.lua), so the two line up.
 Model.ITEM, Model.STEP, Model.ORIGIN_Y, Model.GAP, Model.MIN_SCALE = ITEM, STEP, ORIGIN_Y, GAP, MIN_SCALE
--- How far the reagent bag's rows at the bottom lift the rest of the bag; Reagents.lua sets it before each layout.
+-- How far the reagent bag's rows at the bottom lift the rest of the bag, from Model.Reserve on each layout.
 Model.lift = 0
 
 -- Where each item and heading goes, bottom-up from the money frame as Blizzard's grid is. `items` is in
@@ -71,8 +74,11 @@ end
 
 ---@type ContainerFrameCombinedBags
 local bag
--- Whether the bag is laid out in sections now, so switching them off lays it out once more to undo them.
-local headings, sectioned = {}, false
+local headings = {}
+-- The bag's height and scale as Blizzard last set them, and the height this addon then gave it.
+local base, scale, grown
+-- Whether the bag is laid out differently from Blizzard's grid now, so switching both features off undoes it once.
+local changed = false
 
 local function Active()
 	return ns.Active("gearGroups") and ns.Active("gearSections") and not InputUtil.IsGamepadUIEnabled()
@@ -81,7 +87,7 @@ end
 -- Each item's section (its first list) and the sections in name order, with the list each one shows.
 local function Plan()
 	local items, firsts, sections = {}, {}, {}
-	for _, button in bag:EnumerateValidItems() do
+	for _, button in ns.BagItems(bag) do
 		local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
 		local mark = itemID and ns.Gear.MarksOf(itemID)[1]
 		local key = mark and mark.kind .. ":" .. mark.name
@@ -100,17 +106,21 @@ local function Plan()
 	return items, sections, firsts
 end
 
--- Blizzard's own order, read back from the grid it has just laid out: bottom row first, right to left.
+-- Blizzard's order for the combined bag (ContainerFrame.lua's SortItemsByExtendedStateBottomRight): the backpack's
+-- extended slots last, and otherwise the last bag's last slot first, at the bottom right.
 ---@param a TFSectionItem
 ---@param b TFSectionItem
 ---@return boolean
 local function BlizzardOrder(a, b)
-	local _, _, _, ax, ay = a.button:GetPoint()
-	local _, _, _, bx, by = b.button:GetPoint()
-	if ay ~= by then
-		return ay < by
+	local extendedA, extendedB = a.button:IsExtended(), b.button:IsExtended()
+	if extendedA ~= extendedB then
+		return not extendedA
 	end
-	return ax > bx
+	local bagA, bagB = a.button:GetBagID(), b.button:GetBagID()
+	if bagA ~= bagB then
+		return bagA > bagB
+	end
+	return a.button:GetID() > b.button:GetID()
 end
 
 ---@param index integer
@@ -122,72 +132,98 @@ local function Heading(index)
 	return headings[index]
 end
 
--- Blizzard sizes the bag before laying it out, so this decides for both whether the bag has sections: not when
--- the taller bag would run off the screen even at the smallest scale, as its top rows could not be reached.
----@param container ContainerFrameCombinedBags
-local function Grow(container)
-	sectioned = false
-	if not Active() then
-		return
+-- Blizzard chose the bags' scale for the bag's own height. Shrink it, never below Blizzard's smallest, so a taller bag
+-- stays on screen, with its corner where Blizzard anchored it.
+---@param height number
+local function Fit(height)
+	local want = math.max(MIN_SCALE, math.min(scale, (GetScreenHeight() - CONTAINER_OFFSET_Y) / height))
+	local now = bag:GetScale()
+	if want ~= now then
+		local point, relative, relativePoint, x, y = bag:GetPoint()
+		bag:SetScale(want)
+		bag:SetPoint(point, relative, relativePoint, x * now / want, y * now / want)
 	end
-	local items, sections = Plan()
-	local _, _, height = Model.Layout(items, sections, container:GetColumns())
-	local total = container:GetHeight() + height - container:GetRows() * STEP
-	if total * MIN_SCALE + CONTAINER_OFFSET_Y > GetScreenHeight() then
-		return
-	end
-	sectioned = true
-	container:SetHeight(total)
-	NineSliceUtil.UpdateCornerCropping(container, total)
 end
 
----@param container ContainerFrameCombinedBags
-local function Arrange(container)
-	for _, heading in ipairs(headings) do
-		heading:Hide()
+-- Lays the whole combined bag out again with engine calls only (points, height, scale): after Blizzard's own
+-- layout, which always ends in UpdateContainerFrameAnchors, and whenever its contents or these settings change.
+-- Never by calling Blizzard's UpdateFrameSize, UpdateItemLayout or UpdateContainerFrameAnchors: run from addon code
+-- they build the bags' cached item and open-bag lists tainted, and Blizzard's bank code is then blocked.
+-- Sections go in only when the taller bag fits on screen at the smallest scale, as its top rows could not be
+-- reached otherwise.
+local function Layout()
+	if not bag:IsShown() then
+		return
 	end
-	if not sectioned then
+	local height = bag:GetHeight()
+	if height ~= grown then
+		base = height
+	end
+	scale = scale or bag:GetScale()
+	local columns = bag:GetColumns()
+	local lift = Model.Reserve and Model.Reserve(base, columns) or 0
+	Model.lift = lift
+	if lift == 0 and not Active() and not changed then
 		return
 	end
 	local items, sections, firsts = Plan()
 	table.sort(items, BlizzardOrder)
-	local columns = container:GetColumns()
+	local rows = math.ceil(#items / columns)
+	local total = base + lift
+	if Active() then
+		local _, _, sectionsHeight = Model.Layout(items, sections, columns)
+		local tall = total + sectionsHeight - rows * STEP
+		if tall * MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
+			total = tall
+		else
+			sections = {}
+		end
+	else
+		sections = {}
+	end
+
 	local places, heads = Model.Layout(items, sections, columns)
-	local money, base = container.MoneyFrame, ORIGIN_Y + Model.lift
+	local money, origin = bag.MoneyFrame, ORIGIN_Y + lift
 	for index, item in ipairs(items) do
 		local place = places[index]
 		item.button:ClearAllPoints()
-		item.button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -place.column * STEP, base + place.y)
+		item.button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -place.column * STEP, origin + place.y)
+	end
+	for _, heading in ipairs(headings) do
+		heading:Hide()
 	end
 	for index, head in ipairs(heads) do
 		local mark, text = firsts[head.section], Heading(index)
 		text:SetText(mark.kind == "fishing" and FISHING_ICON .. mark.name or mark.name)
 		text:SetTextColor(unpack(ns.Gear.ColourOf(mark)))
 		text:ClearAllPoints()
-		text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, base + head.y + 2)
+		text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, origin + head.y + 2)
 		text:Show()
+	end
+
+	grown, changed = total, total ~= base
+	bag:SetHeight(total)
+	NineSliceUtil.UpdateCornerCropping(bag, total)
+	Fit(total)
+	if Model.Placed then
+		Model.Placed(columns)
 	end
 end
 
--- Blizzard lays the bag out only when it opens, so a change of contents or groups redoes it the same way. While
--- equipped weapons are settling, the refresh that ends it lays the bag out, so the moved weapons do not show
+-- While equipped weapons are settling, the refresh that ends it lays the bag out, so the moved weapons do not show
 -- under another section first.
-local function Relayout()
-	if bag:IsShown() and (sectioned or Active()) and not ns.Gear.Settling() then
-		bag:UpdateFrameSize()
-		bag:UpdateItemLayout()
-		UpdateContainerFrameAnchors()
+function Model.Relayout()
+	if not ns.Gear.Settling() then
+		Layout()
 	end
 end
 
 ns.Init(function()
 	bag = ContainerFrameCombinedBags
-	function Model.Sectioned()
-		return sectioned
-	end
-
-	hooksecurefunc(bag, "UpdateFrameSize", Grow)
-	hooksecurefunc(bag, "UpdateItemLayout", Arrange)
-	ns.Gear.OnRefresh(Relayout)
-	Settings.SetOnValueChangedCallback("TweaksForever_gearSections", Relayout)
+	hooksecurefunc("UpdateContainerFrameAnchors", function()
+		scale = bag:GetScale()
+		Layout()
+	end)
+	ns.Gear.OnRefresh(Model.Relayout)
+	Settings.SetOnValueChangedCallback("TweaksForever_gearSections", Model.Relayout)
 end)

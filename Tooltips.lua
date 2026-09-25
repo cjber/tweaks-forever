@@ -247,11 +247,8 @@ local function HealthBar()
 		Fit()
 	end
 
-	hooksecurefunc(tooltip, "SetUnit", function(_, token)
-		Watch(token)
-	end)
-	hooksecurefunc(tooltip, "SetWorldCursor", function()
-		Watch("mouseover")
+	ns.OnTooltip(Enum.TooltipDataType.Unit, { GetUnit = true, GetWorldCursor = true }, function(_, getter, token)
+		Watch(getter == "GetUnit" and token or "mouseover")
 	end)
 	-- Blizzard colours the bar green on every change.
 	bar:HookScript("OnValueChanged", Update)

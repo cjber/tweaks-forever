@@ -29,7 +29,8 @@ local MARKERS = {
 	"ShortestPathForeverFlightPinTemplate",
 	"ShortestPathForeverPortalPinTemplate",
 }
-local IS_MARKER = tInvert(MARKERS)
+-- Seconds between re-checks of which entrances a marker covers while the map is open.
+local SETTLE_INTERVAL = 0.25
 -- Half the solid part of the 32-unit icon, in UI units: a marker nearer than this covers the entrance.
 local COVER = 10
 
@@ -174,26 +175,14 @@ ns.Init(function()
 
 	map:AddDataProvider(Provider)
 
-	-- Markers come and go with their own providers, before or after ours. Placing one hides what it covers;
-	-- removing any settles every entrance again. Both happen only as providers refresh.
-	hooksecurefunc(map, "SetPinPosition", function(_, marker, mx, my)
-		if IS_MARKER[marker.pinTemplate] then
-			local halfX, halfY = HalfExtents()
-			for pin in map:EnumeratePinsByTemplate(TEMPLATE) do
-				local x, y = pin:GetPosition()
-				if Model.Covers(x, y, mx, my, halfX, halfY) then
-					pin:Hide()
-				end
-			end
-		end
-	end)
-	hooksecurefunc(map, "RemoveAllPinsByTemplate", function(_, template)
-		if IS_MARKER[template] then
-			Settle()
-		end
-	end)
-	hooksecurefunc(map, "RemovePin", function(_, marker)
-		if IS_MARKER[marker.pinTemplate] then
+	-- Markers come and go with their own providers, before or after ours, so the entrances settle a few times a
+	-- second while the map is open. Not by hooking the map's pin methods: Blizzard's providers then failed calling
+	-- them with "attempt to call a nil value".
+	local elapsed = 0
+	map:HookScript("OnUpdate", function(_, delta)
+		elapsed = elapsed + delta
+		if elapsed >= SETTLE_INTERVAL then
+			elapsed = 0
 			Settle()
 		end
 	end)
