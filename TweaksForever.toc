@@ -15,7 +15,6 @@
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
 Locales\enUS.lua
-Locales\Translations.lua
 Data\Overlays.lua
 Data\CampBenefits.lua
 Data\ZoneLevels.lua

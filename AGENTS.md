@@ -23,8 +23,9 @@ The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and
   order sets the settings subpage order.
 - `Data/` — lookup tables; a generated one names the script that regenerates it in its header.
 - `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.
-- `Locales/` — `ns.L`, keyed by the English text; the packager fills in CurseForge's translations. After changing
-  player-visible text, run `python3 -m tools.phrases --write` and paste `Locales/phrases.txt` into CurseForge.
+- `Locales/` — `ns.L` (enUS.lua), keyed by the English text, and one `<locale>.lua` per translation, each in the
+  TOC. After changing player-visible text, run `python3 -m tools.phrases --write` (translators copy `Locales/phrases.txt`).
+  CurseForge's localization is gone and its packager keyword fails the release, so none may appear in the tree.
 
 ## Rules
 

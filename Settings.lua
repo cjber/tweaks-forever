@@ -10,7 +10,7 @@ local L = ns.L
 -- settings search reads every layout, so that tainted it: a restricted button in the results (Social's
 -- Discord Sign In) was then blocked and blamed on us.
 -- Feature files declare their category, name, tooltip and option labels in English; they are translated here, where
--- they are shown (tools/phrases.py lists them for CurseForge).
+-- they are shown (tools/phrases.py lists them for translators).
 
 ---@param feature TFFeature
 local function Tooltip(feature)
