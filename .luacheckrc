@@ -66,7 +66,7 @@ read_globals = {
 	"ContainerFrameCombinedBags",
 	"ContainerFrameItemButtonMixin",
 	"ContainerFrameSettingsManager",
-	"ContainerFrameUtil_EnumerateContainerFrames",
+	"ContainerFrameContainer",
 	"COSTS_LABEL",
 	"CreateAtlasMarkup",
 	"CreateColor",

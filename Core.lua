@@ -22,10 +22,24 @@ function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
 end
 
+-- The bag frames, read straight from the container. ContainerFrameUtil_EnumerateContainerFrames builds Blizzard's
+-- cached list on its first call, so calling it first from here left that list tainted and the bank blocked.
+---@return fun(): ContainerFrameTemplate|ContainerFrameCombinedBags?
+function ns.ContainerFrames()
+	local frames, index = ContainerFrameContainer.ContainerFrames, -1
+	return function()
+		index = index + 1
+		if index == 0 then
+			return ContainerFrameCombinedBags
+		end
+		return frames[index]
+	end
+end
+
 -- Every item button in an open bag. A button of a bag frame not in use can still report IsShown with no slot.
 ---@param fn fun(button: ContainerFrameItemButtonTemplate)
 function ns.ForEachBagButton(fn)
-	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
+	for container in ns.ContainerFrames() do
 		if container:IsShown() then
 			for _, button in container:EnumerateValidItems() do
 				fn(button)
@@ -120,7 +134,7 @@ function ns.HookBagButtons(hooked, update, click)
 			update(button)
 		end
 	end)
-	for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
+	for container in ns.ContainerFrames() do
 		for _, button in container:EnumerateValidItems() do
 			Hook(button)
 		end

@@ -138,7 +138,7 @@ ns.Init(function()
 		if not active then
 			return
 		end
-		for _, container in ContainerFrameUtil_EnumerateContainerFrames() do
+		for container in ns.ContainerFrames() do
 			if container:IsShown() then
 				return
 			end

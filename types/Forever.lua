@@ -157,3 +157,7 @@ GENERAL = ""
 PAGE_NUMBER_WITH_MAX = ""
 ---@type string
 COSTS_LABEL = ""
+
+-- ContainerFrameTemplate frames sit in this parentArray (ContainerFrame.xml); the upstream class omits it.
+---@class ContainerFrameContainer
+---@field ContainerFrames ContainerFrameTemplate[]
