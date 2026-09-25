@@ -49,8 +49,9 @@ empty without the journal's tables that Forever's client lacks. The entrance is
 `Map.Corpse_0/1` on `CorpseMapID`, the point a ghost walks back in from, projected
 through `UiMapAssignment` exactly as Legacy Forever places its instance pins. Which zone
 map shows an entrance is curated in the script (zone rectangles overlap); continents
-take every entrance on them. Entrances whose icons would overlap on the minimized
-map at its smallest zoom merge into one pin at their centre, and the curated
+take every entrance on them. `ns.InstanceEntrances` preserves each instance's first
+curated zone projection for the public API before clustering. Entrances whose icons
+would overlap on the minimized map at its smallest zoom merge into one pin at their centre, and the curated
 complexes (Blackrock Mountain, the Gates of Ahn'Qiraj) always do, named by their
 area. An instance with an entrance but no curated zone fails the run; instances
 with no entrance at all are listed. Same cache and flags as `gen_overlays.py`.

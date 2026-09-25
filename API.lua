@@ -32,5 +32,15 @@ function API.TrainableSpells()
 	return trainable
 end
 
+-- An instance's own door, never a merged pin's centre: Blackrock Mountain draws one pin for four doors, and a caller
+-- routing to Blackwing Lair wants its own. Baked, so it answers with pins off or suppressed, before login and in
+-- combat.
+function API.DungeonEntrance(instanceID)
+	local entrance = ns.InstanceEntrances[instanceID]
+	if entrance then
+		return { map = entrance.map, x = entrance.x, y = entrance.y }
+	end
+end
+
 TweaksForever = TweaksForever or {}
 TweaksForever.API = API

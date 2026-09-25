@@ -2,6 +2,34 @@
 -- Dungeon and raid entrances by UiMap ID, from Map.Corpse (build 1.60.1.70009). A pin lists its instances
 -- (Map IDs); one with an area is a complex of several, named by that AreaTable ID.
 local _, ns = ...
+-- Unclustered entrances by instance Map ID, on the first curated zone map.
+ns.InstanceEntrances = {
+	[33] = { map = 1421, x = 0.447, y = 0.678 }, -- Shadowfang Keep
+	[34] = { map = 1453, x = 0.504, y = 0.662 }, -- Stormwind Stockade
+	[36] = { map = 1436, x = 0.382, y = 0.775 }, -- Deadmines
+	[43] = { map = 1413, x = 0.477, y = 0.35 }, -- Wailing Caverns
+	[47] = { map = 1413, x = 0.423, y = 0.899 }, -- Razorfen Kraul
+	[48] = { map = 1440, x = 0.165, y = 0.11 }, -- Blackfathom Deeps
+	[70] = { map = 1418, x = 0.352, y = 0.103 }, -- Uldaman
+	[90] = { map = 1426, x = 0.177, y = 0.392 }, -- Gnomeregan
+	[109] = { map = 1435, x = 0.773, y = 0.359 }, -- Sunken Temple
+	[129] = { map = 1413, x = 0.509, y = 0.929 }, -- Razorfen Downs
+	[189] = { map = 1420, x = 0.851, y = 0.314 }, -- Scarlet Monastery
+	[209] = { map = 1446, x = 0.387, y = 0.199 }, -- Zul'Farrak
+	[229] = { map = 1427, x = 0.408, y = 0.956 }, -- Blackrock Spire
+	[230] = { map = 1427, x = 0.271, y = 0.725 }, -- Blackrock Depths
+	[249] = { map = 1445, x = 0.529, y = 0.777 }, -- Onyxia's Lair
+	[289] = { map = 1422, x = 0.691, y = 0.73 }, -- Scholomance
+	[309] = { map = 1434, x = 0.54, y = 0.176 }, -- Zul'Gurub
+	[329] = { map = 1423, x = 0.261, y = 0.104 }, -- Stratholme
+	[349] = { map = 1443, x = 0.291, y = 0.629 }, -- Maraudon
+	[389] = { map = 1454, x = 0.53, y = 0.489 }, -- Ragefire Chasm
+	[409] = { map = 1427, x = 0.32, y = 0.948 }, -- Molten Core
+	[429] = { map = 1444, x = 0.62, y = 0.333 }, -- Dire Maul
+	[469] = { map = 1428, x = 0.325, y = 0.324 }, -- Blackwing Lair
+	[509] = { map = 1451, x = 0.29, y = 0.928 }, -- Ruins of Ahn'Qiraj
+	[531] = { map = 1451, x = 0.29, y = 0.927 }, -- Ahn'Qiraj Temple
+}
 ns.DungeonEntrances = {
 	[1413] = { -- The Barrens
 		{ x = 0.477, y = 0.35, instances = { 43 } }, -- Wailing Caverns
