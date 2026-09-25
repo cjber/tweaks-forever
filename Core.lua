@@ -36,12 +36,33 @@ function ns.ContainerFrames()
 	end
 end
 
+-- A bag frame's slot count, never through GetBagSize: that caches self.size on first call, and caching it from
+-- here would leave Blizzard's bag code reading a value this addon wrote.
+---@param container ContainerFrameTemplate|ContainerFrameCombinedBags
+---@return integer
+function ns.BagSize(container)
+	return container.size or C_Container.GetContainerNumSlots(container:GetID())
+end
+
+-- A bag frame's item buttons that hold a slot, as EnumerateValidItems but read-only.
+---@param container ContainerFrameTemplate|ContainerFrameCombinedBags
+---@return fun(): integer?, ContainerFrameItemButtonTemplate?
+function ns.BagItems(container)
+	local size, index = container.size or 0, 0
+	return function()
+		index = index + 1
+		if index <= size then
+			return index, container.Items[index]
+		end
+	end
+end
+
 -- Every item button in an open bag. A button of a bag frame not in use can still report IsShown with no slot.
 ---@param fn fun(button: ContainerFrameItemButtonTemplate)
 function ns.ForEachBagButton(fn)
 	for container in ns.ContainerFrames() do
 		if container:IsShown() then
-			for _, button in container:EnumerateValidItems() do
+			for _, button in ns.BagItems(container) do
 				fn(button)
 			end
 		end
@@ -129,13 +150,13 @@ function ns.HookBagButtons(hooked, update, click)
 	end
 	hooksecurefunc(ContainerFrameItemButtonMixin, "OnLoad", Hook)
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
-		for _, button in container:EnumerateValidItems() do
+		for _, button in ns.BagItems(container) do
 			Hook(button)
 			update(button)
 		end
 	end)
 	for container in ns.ContainerFrames() do
-		for _, button in container:EnumerateValidItems() do
+		for _, button in ns.BagItems(container) do
 			Hook(button)
 		end
 	end

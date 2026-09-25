@@ -129,7 +129,7 @@ end
 ns.Init(function()
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
 		if active then
-			for _, button in container:EnumerateValidItems() do
+			for _, button in ns.BagItems(container) do
 				Cover(button)
 			end
 		end

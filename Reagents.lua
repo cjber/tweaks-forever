@@ -156,7 +156,7 @@ end
 ---@param container ContainerFrameCombinedBags
 local function Grow(container)
 	if Wanted() then
-		local lift = Model.Lift(reagents:GetBagSize(), container:GetColumns())
+		local lift = Model.Lift(ns.BagSize(reagents), container:GetColumns())
 		local height = container:GetHeight() + lift
 		if height * Sections.MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
 			Fold()
@@ -173,8 +173,8 @@ local function Place()
 	if not folded then
 		return
 	end
-	local columns, slots, money = bag:GetColumns(), reagents:GetBagSize(), bag.MoneyFrame
-	for _, button in reagents:EnumerateValidItems() do
+	local columns, slots, money = bag:GetColumns(), ns.BagSize(reagents), bag.MoneyFrame
+	for _, button in ns.BagItems(reagents) do
 		local column, y = Model.Place(button:GetID(), slots, columns)
 		button:ClearAllPoints()
 		button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -column * Sections.STEP, y)
@@ -193,7 +193,7 @@ local function Lift()
 	if not folded or Sections.Sectioned() then
 		return
 	end
-	for _, button in bag:EnumerateValidItems() do
+	for _, button in ns.BagItems(bag) do
 		local point, relative, relativePoint, x, y = button:GetPoint()
 		button:ClearAllPoints()
 		button:SetPoint(point, relative, relativePoint, x, y + Sections.lift)

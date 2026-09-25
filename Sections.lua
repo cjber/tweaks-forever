@@ -81,7 +81,7 @@ end
 -- Each item's section (its first list) and the sections in name order, with the list each one shows.
 local function Plan()
 	local items, firsts, sections = {}, {}, {}
-	for _, button in bag:EnumerateValidItems() do
+	for _, button in ns.BagItems(bag) do
 		local itemID = C_Container.GetContainerItemID(button:GetBagID(), button:GetID())
 		local mark = itemID and ns.Gear.MarksOf(itemID)[1]
 		local key = mark and mark.kind .. ":" .. mark.name
