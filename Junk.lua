@@ -363,13 +363,27 @@ ns.Init(function()
 			GameTooltip:Show()
 		end
 	end)
-	-- The native popup captures its callback; a post-accept hook preserves confirmation and grey sales.
-	hooksecurefunc(StaticPopupDialogs.GENERIC_CONFIRMATION, "OnAccept", function(_, data)
-		if data.text == SELL_ALL_JUNK_ITEMS_POPUP and confirmationVisit == merchant and ManualEnabled() then
-			confirmationVisit = nil
-			Start(true)
-		end
-	end)
+	-- The native popup captures its callback, so its accept button tells us the sale was confirmed, after Blizzard
+	-- has sold the greys. Not a hook on the GENERIC_CONFIRMATION dialog: that put addon code in the accept of every
+	-- confirmation Blizzard shows. Enter does not accept this dialog, so the button is the only way.
+	local index = 1
+	while _G["StaticPopup" .. index] do
+		local dialog = _G["StaticPopup" .. index] --[[@as StaticPopupTemplate]]
+		dialog:GetButton1():HookScript("OnClick", function()
+			local data = dialog.data
+			if
+				dialog.which == "GENERIC_CONFIRMATION"
+				and type(data) == "table"
+				and data.text == SELL_ALL_JUNK_ITEMS_POPUP
+				and confirmationVisit == merchant
+				and ManualEnabled()
+			then
+				confirmationVisit = nil
+				Start(true)
+			end
+		end)
+		index = index + 1
+	end
 	ns.On("MERCHANT_SHOW", function()
 		merchant = { remaining = BATCH_SIZE }
 		local visit = merchant

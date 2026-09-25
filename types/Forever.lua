@@ -161,3 +161,8 @@ COSTS_LABEL = ""
 -- ContainerFrameTemplate frames sit in this parentArray (ContainerFrame.xml); the upstream class omits it.
 ---@class ContainerFrameContainer
 ---@field ContainerFrames ContainerFrameTemplate[]
+
+-- StaticPopup_Show sets these on the dialog it fills (StaticPopup.lua); the upstream class omits them.
+---@class StaticPopupTemplate
+---@field which string?
+---@field data any
