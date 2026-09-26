@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Nearest quests first sorts again.** The tracker now really lists your quests nearest first as you move. The game's own sort leaves quests you tracked yourself where they are, so it never moved them; quests on another continent stay below the rest.
+
 - **Quest features name Questie.** The quest giver and quest progress settings now say they need Questie, or its QuestieDB addon on its own, since most players get QuestieDB with Questie.
 
 - **The combined bag is the right height again.** With gear sections and the reagent bag both in it, the bag could open a section's height too tall, leaving an empty band above the first heading.
