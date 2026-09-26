@@ -8,6 +8,8 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [Unreleased]
 
+- **The combined bag is the right height again.** With gear sections and the reagent bag both in it, the bag could open a section's height too tall, leaving an empty band above the first heading.
+
 ## [0.6.0] - 2026-09-25
 
 - **Ready for translation.** Every setting, tooltip line and chat message can be translated, and anything not translated yet stays in English. Translations are welcome on GitHub.
