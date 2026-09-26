@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Quest features name Questie.** The quest giver and quest progress settings now say they need Questie, or its QuestieDB addon on its own, since most players get QuestieDB with Questie.
+
 - **The combined bag is the right height again.** With gear sections and the reagent bag both in it, the bag could open a section's height too tall, leaving an empty band above the first heading.
 
 ## [0.6.0] - 2026-09-25

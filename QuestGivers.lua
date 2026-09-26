@@ -9,8 +9,8 @@ ns.Feature({
 	category = "Interface",
 	name = "Quests on minimap givers",
 	tooltip = "Pointing at a quest giver on the minimap lists the quests they have for you, coloured by level, "
-		.. "and the quests in your log they take back, with a gold ? once one is ready to hand in. Needs the QuestieDB "
-		.. "addon, which works on its own: Questie itself isn't needed.",
+		.. "and the quests in your log they take back, with a gold ? once one is ready to hand in. Needs Questie, or "
+		.. "its QuestieDB addon on its own.",
 	default = true,
 	needs = {
 		title = "QuestieDB",

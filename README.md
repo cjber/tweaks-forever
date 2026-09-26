@@ -37,8 +37,8 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 - **Nameplates.** A taller bar in retail's own frame, with name and level above, your target outlined and cast bars with the spell's icon.
 - **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
-- **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs [QuestieDB](https://github.com/Questie/QuestieDB).
-- **Quest progress.** A creature you still need for a quest shows your progress in its tooltip and a quest icon beside its nameplate. Needs [QuestieDB](https://github.com/Questie/QuestieDB).
+- **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
+- **Quest progress.** A creature you still need for a quest shows your progress in its tooltip and a quest icon beside its nameplate. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
 - **Camp benefits.** Camp tooltips say what sitting nearby gives you and for how long, and each benefit you gain is named on screen.
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
@@ -73,7 +73,7 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 
 Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.
 
-The quest features (quests on minimap givers, quest progress on tooltips and nameplates) read [QuestieDB](https://github.com/Questie/QuestieDB)'s quest data and are greyed out without it. The QuestieDB addon on its own is enough; you don't need Questie itself.
+The quest features (quests on minimap givers, quest progress on tooltips and nameplates) read Questie's quest database and are greyed out without it. Most players get it with [Questie](https://www.curseforge.com/wow/addons/questie); if you'd rather not run Questie, its [QuestieDB](https://github.com/Questie/QuestieDB/releases) addon on its own is enough. While Questie's own tooltips or nameplate icons are on, the matching feature here steps aside.
 
 ## Usage
 
