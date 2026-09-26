@@ -224,6 +224,9 @@ assert(turnIns[2].id == 201 and turnIns[2].ready)
 -- Lines: turn-ins first with their state's icon, then offers in level colour or grey with the level they open at.
 local lines = Model.Lines(bo)
 assert(lines[1][1]:find("SideInProgressquesticon", 1, true) and lines[1][1]:find("[13] Half Way", 1, true))
+-- Never stretched: the 16 by 18 atlas keeps its shape within 2% (the escape takes the height first).
+local markupHeight, markupWidth = lines[1][1]:match("|A:SideInProgressquesticon:(%d+):(%d+)|a")
+assert(math.abs(tonumber(markupWidth) / tonumber(markupHeight) / (16 / 18) - 1) <= 0.02)
 assert(lines[2][1]:find("ActiveQuestIcon", 1, true) and lines[2][2] == 14)
 ada.starts = { 101, 104 }
 lines = Model.Lines(ada)
