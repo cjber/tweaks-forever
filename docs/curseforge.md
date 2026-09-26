@@ -43,7 +43,7 @@ Camp tooltips say what sitting nearby gives you.
 - **Nameplates**: a taller bar with name and level above, your target outlined, and casts in a slim bar.
 - **Tooltips**: a thin rounded border over charcoal, class-coloured player names, and the health bar inside.
 - **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
-- **Quests and camps**: the quest tracker sorts nearest first. With [QuestieDB](https://github.com/Questie/QuestieDB) (on its own is enough), a creature you need shows your progress in its tooltip and a quest icon by its nameplate. Camp features say what they give and whether you have it.
+- **Quests and camps**: the quest tracker sorts nearest first. With [Questie](https://www.curseforge.com/wow/addons/questie) installed (or just its QuestieDB addon), a creature you need shows your progress in its tooltip and a quest icon by its nameplate. Camp features say what they give and whether you have it.
 - **Spellbook and bags**: the spellbook shows spells you haven't learned yet, as retail does. The reagent bag joins the combined bag.
 - **Fishing**: double right-click with a pole to cast, or to put on your best lure.
 - **Also**: quiet the errors a spammed macro repeats, hide macro names, and `/rl` reloads.
