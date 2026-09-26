@@ -155,8 +155,10 @@ local function Layout()
 	if not bag:IsShown() then
 		return
 	end
+	-- The engine hands a height back a little off what it was given (481 as 481.00003), so the bag counts as grown
+	-- by this addon when it is within a pixel of that; only a height Blizzard set is a new base.
 	local height = bag:GetHeight()
-	if height ~= grown then
+	if not grown or math.abs(height - grown) > 0.5 then
 		base = height
 	end
 	scale = scale or bag:GetScale()

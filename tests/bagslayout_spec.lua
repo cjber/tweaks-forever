@@ -30,7 +30,7 @@ local function Region(props)
 		self.height = h
 	end
 	function r:GetHeight()
-		return self.height
+		return self.height + (self.drift or 0)
 	end
 	function r:SetScale(s)
 		self.scale = s
@@ -233,6 +233,12 @@ assert(grown > 300 + lift, "bag grows for reagents and sections: " .. grown)
 -- Anchoring again without a new size keeps Blizzard's base, not the grown height.
 Anchors()
 assert(bag:GetHeight() == grown, "no double growth: " .. bag:GetHeight())
+-- The engine rounds a height it is given, so the grown height comes back a hair off; still not a new base.
+bag.drift = 3e-5
+Anchors()
+Anchors()
+assert(math.abs(bag:GetHeight() - grown) < 0.01, "no double growth from rounding: " .. bag:GetHeight())
+bag.drift = nil
 -- Sections off: only the reagent lift remains.
 db.gearSections = false
 settings.TweaksForever_gearSections()
