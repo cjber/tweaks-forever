@@ -4,7 +4,10 @@ What changed in each release, in the terms a player would notice. Dates are UTC.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the versions follow
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html). The entries are prose rather than bare
-Added/Fixed lists. Each version's entry is also its release notes on GitHub, CurseForge and Wago.
+Added/Fixed lists.
+
+Each version's entry is also its release notes on GitHub, CurseForge and Wago. Older entries are kept
+verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
@@ -26,7 +29,7 @@ Added/Fixed lists. Each version's entry is also its release notes on GitHub, Cur
 
 ## [0.4.1] - 2026-09-25
 
-Updated for Forever build 1.60.1.70009. The build changes none of the map overlays, dungeon entrances, camp benefits, zone levels or trainer spells the addon carries, so nothing looks different.
+- **Updated for Forever build 1.60.1.70009.** The build changes none of the map overlays, dungeon entrances, camp benefits, zone levels or trainer spells the addon carries, so nothing looks different.
 
 ## [0.4.0] - 2026-09-25
 
@@ -47,13 +50,13 @@ Updated for Forever build 1.60.1.70009. The build changes none of the map overla
 
 ## [0.3.0] - 2026-09-23
 
-Campsites explain themselves. Hovering a camp feature, such as a Camp Tent, Mana Well or Anvil, shows what sitting nearby gives you and whether you have it, with the time left; hovering a campfire shows how long your camp benefits last. Upgrades such as the Master Forge name the benefit of the feature they replace. Turn it off under Interface.
+- **Campsites explain themselves.** Hovering a camp feature, such as a Camp Tent, Mana Well or Anvil, shows what sitting nearby gives you and whether you have it, with the time left; hovering a campfire shows how long your camp benefits last. Upgrades such as the Master Forge name the benefit of the feature they replace. Turn it off under Interface.
 
 ## [0.2.1] - 2026-09-23
 
-- **A softer palette for gear groups:** rose, teal, lavender and pink, still well clear of every item quality colour. Groups on an earlier default colour take one of the new ones; colours you picked yourself stay.
-- **The Before fishing section has the fishing icon** on its heading.
-- **Fixed** equipping a fishing pole briefly showing its weapons under their gear set's section before moving them to Before fishing.
+- **Gear groups have a softer palette.** The defaults are now rose, teal, lavender and pink, still well clear of every item quality colour. Groups on an earlier default colour take one of the new ones; colours you picked yourself stay.
+- **The Before fishing section has the fishing icon on its heading.**
+- **Weapons go straight to Before fishing when you equip a pole.** They used to show briefly under their gear set's section before moving.
 
 ## [0.2.0] - 2026-09-23
 
@@ -61,7 +64,7 @@ Campsites explain themselves. Hovering a camp feature, such as a Camp Tent, Mana
 
 ## [0.1.3] - 2026-09-23
 
-- **The grouped-gear border glows** in the group's colour, the way the bags light up a new item.
+- **The grouped-gear border glows.** It lights up in the group's colour, the way the bags light up a new item.
 - **Group colours no longer look like item quality.** The old defaults were close to Legendary orange and Rare blue; the new ones (crimson, aquamarine, chartreuse, pink and indigo) are chosen to stand apart from every quality colour. Groups still on an old default colour move to the new ones; colours you picked yourself stay.
 
 ## [0.1.2] - 2026-09-23
@@ -70,24 +73,24 @@ Campsites explain themselves. Hovering a camp feature, such as a Camp Tent, Mana
 
 ## [0.1.1] - 2026-09-23
 
-- **A coloured border for grouped gear.** Mark grouped gear with a ring inside the bag slot, one ring per group, as well as the strip or dots.
-- **Clearer click-mode cursors:** a coin while marking junk and a cog while grouping gear.
-- **Fixed** a Lua error when marking junk or changing how grouped gear is marked while the game kept an unused bag frame around.
+- **Grouped gear can have a coloured border.** Mark grouped gear with a ring inside the bag slot, one ring per group, as well as the strip or dots.
+- **Click modes have clearer cursors.** A coin while marking junk and a cog while grouping gear.
+- **Marking junk no longer throws a Lua error.** It happened when marking junk, or changing how grouped gear is marked, while the game kept an unused bag frame around.
 
 ## [0.1.0] - 2026-09-23
 
 First release: quality-of-life automations that sit inside the game's own settings.
 
-- **Settings in the game's own style**, under Options → AddOns with a page per section, with `/tweaks` and the minimap's addon compartment as shortcuts. Features another addon already handles are greyed out with that addon named, and this is rechecked each time the settings open.
-- **Quest, gossip, summon, resurrection, battleground release and duel automations**, all off until you turn them on. Hold Shift to skip quest and gossip automation for one conversation.
-- **Faster auto loot** takes everything as the loot window opens.
-- **Automatic repairs**, using guild funds when the guild covers the cost, with the amount in chat.
-- **Mark any item as junk** with Alt+Right-click in your bags. It gets the game's junk coin while a merchant is open, a tooltip line, and Sell All Junk sells it along with your greys.
-- **Automatic junk selling**, twelve stacks per visit so the buyback tab can still undo it.
-- **Unexplored areas on zone maps**, tinted blue so you can see what you haven't found yet.
-- **Move and scale windows in Edit Mode.** A Windows tab on the Edit Mode panel shows the character sheet, quest log, vendors, bank, mailbox, trainers, auction house and other Blizzard windows so you can drag, snap and scale them like the rest of the UI. A window you haven't opened yet is previewed where the game will put it. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
-- **Quieter combat.** The errors a spammed macro repeats, such as not ready yet, out of range, not enough mana or no target, no longer flash red text or speak. Full bags and other errors still show.
-- **Easier fishing.** With a pole equipped, double right-click the world to cast. A pole without a lure gets the best one in your bags that your skill allows, and you're warned when you log in, equip a pole or cast without one. Optionally, sound effects go to full and music and ambience go quiet while you fish, so the splash is easy to hear, and your volumes come back afterwards.
-- **`/rl` reloads the interface.**
-- **Gear groups.** Ctrl+Right-click a bag item to put it in a named group such as Healing or DPS, and equip a whole group from the same menu. Each group has its own colour, shown as a strip along the bottom of the bag slot and in the tooltip, for Equipment Manager sets too, and the weapons a fishing pole replaces are remembered so you can put them back on.
-- **Click modes instead of modifier keys.** Pick Mark junk or Group gear from a bag's portrait menu, then click bag items to mark them or open their gear menu, the way the merchant's repair mode works. Handy when your keyboard or window manager swallows Alt or Ctrl.
+- **Settings live in the game's own Options.** They sit under Options → AddOns with a page per section, with `/tweaks` and the minimap's addon compartment as shortcuts. Features another addon already handles are greyed out with that addon named, and this is rechecked each time the settings open.
+- **Quests, gossip, summons, resurrections, battleground release and duels can be automated.** Each is off until you turn it on. Hold Shift to skip quest and gossip automation for one conversation.
+- **Auto loot is faster.** It takes everything as the loot window opens.
+- **Gear repairs itself at a merchant.** It uses guild funds when the guild covers the cost, and says the amount in chat.
+- **Any item can be marked as junk.** Alt+Right-click it in your bags. It gets the game's junk coin while a merchant is open, a tooltip line, and Sell All Junk sells it along with your greys.
+- **Junk sells itself at a merchant.** Twelve stacks per visit, so the buyback tab can still undo it.
+- **Zone maps show unexplored areas.** They are tinted blue so you can see what you haven't found yet.
+- **Windows move and scale in Edit Mode.** A Windows tab on the Edit Mode panel shows the character sheet, quest log, vendors, bank, mailbox, trainers, auction house and other Blizzard windows so you can drag, snap and scale them like the rest of the UI. A window you haven't opened yet is previewed where the game will put it. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
+- **Combat is quieter.** The errors a spammed macro repeats, such as not ready yet, out of range, not enough mana or no target, no longer flash red text or speak. Full bags and other errors still show.
+- **Fishing is easier.** With a pole equipped, double right-click the world to cast. A pole without a lure gets the best one in your bags that your skill allows, and you're warned when you log in, equip a pole or cast without one. Optionally, sound effects go to full and music and ambience go quiet while you fish, so the splash is easy to hear, and your volumes come back afterwards.
+- **`/rl` reloads the interface.** One word instead of `/reload`.
+- **Gear can be grouped.** Ctrl+Right-click a bag item to put it in a named group such as Healing or DPS, and equip a whole group from the same menu. Each group has its own colour, shown as a strip along the bottom of the bag slot and in the tooltip, for Equipment Manager sets too, and the weapons a fishing pole replaces are remembered so you can put them back on.
+- **Bags have click modes as well as modifier keys.** Pick Mark junk or Group gear from a bag's portrait menu, then click bag items to mark them or open their gear menu, the way the merchant's repair mode works. Handy when your keyboard or window manager swallows Alt or Ctrl.

@@ -12,10 +12,13 @@ tools/typecheck.sh
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 ruff check tools && ruff format --check tools
 uvx ty@0.0.83 check tools
+python3 tools/changelog.py --check
 python3 .sift/gate.py --base origin/main && python3 .sift/agents.py check
 ```
 
 The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and history.
+Every version needs a `CHANGELOG.md` entry (prose, bold-lead bullets) before its `v*` tag: the release
+publishes that entry as its notes.
 
 ## Layout
 
