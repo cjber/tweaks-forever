@@ -43,7 +43,9 @@ local QUEST_FIELDS = {
 local NPC_FIELDS = { "spawns", "questStarts", "questEnds" }
 local OFFER = "|TInterface\\GossipFrame\\AvailableQuestIcon:0|t "
 local READY = "|TInterface\\GossipFrame\\ActiveQuestIcon:0|t "
-local UNREADY = "|A:SideInProgressquesticon:14:14|a "
+-- The in-progress "?" is 16 by 18 (UiTextureAtlasMember, 1.60.1.70009), never squared: 14 wide by 16 tall keeps its
+-- shape in whole pixels. The escape takes the height first.
+local UNREADY = "|A:SideInProgressquesticon:16:14|a "
 
 ---@class TFQuestGivers
 local Model = {}
