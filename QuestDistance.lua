@@ -20,6 +20,10 @@ ns.Feature({
 	},
 })
 
+---@class TFQuestDistance
+local Model = {}
+ns.QuestDistance = Model
+
 -- Yards you move before your position is checked against quest areas again, and before the list is re-sorted.
 local RECHECK, RESORT = 5, 25
 -- Space between the distance column and the item buttons.
@@ -32,6 +36,64 @@ local function Format(yards)
 		return L["%d yd"]:format(yards)
 	end
 	return L["%.1fk yd"]:format(yards / 1000)
+end
+
+-- The watched quests nearest first: those with a distance by it, the rest (on another continent) after them in the
+-- order they had. Ties keep their order. Returns nil when the order is already right.
+---@param ids integer[] the watched quests in the tracker's order
+---@param distances table<integer, number> squared distance by quest, for those on this continent
+---@return integer[]?
+function Model.Nearest(ids, distances)
+	local order = {}
+	for index, id in ipairs(ids) do
+		order[index] = { id = id, index = index, distance = distances[id] }
+	end
+	table.sort(order, function(a, b)
+		if (a.distance ~= nil) ~= (b.distance ~= nil) then
+			return a.distance ~= nil
+		end
+		if a.distance and a.distance ~= b.distance then
+			return a.distance < b.distance
+		end
+		return a.index < b.index
+	end)
+	local changed = false
+	for index, entry in ipairs(order) do
+		order[index] = entry.id
+		changed = changed or entry.id ~= ids[index]
+	end
+	return changed and order or nil
+end
+
+-- The client's SortQuestWatches leaves manual watches where they are, and every watch here is manual, so the order is
+-- set by hand: AddQuestWatch puts a quest first (as a manual watch, all Forever's AddQuestWatch makes), so the quests
+-- with a distance are watched again farthest first and the super-tracked quest stays super-tracked. The rest keep
+-- their places after them.
+local function SortNearest()
+	local ids, distances = {}, {}
+	for i = 1, C_QuestLog.GetNumQuestWatches() do
+		local id = C_QuestLog.GetQuestIDForQuestWatchIndex(i)
+		if id then
+			ids[#ids + 1] = id
+			local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(id)
+			distances[id] = onContinent and distanceSq or nil
+		end
+	end
+	local order = Model.Nearest(ids, distances)
+	if not order then
+		return
+	end
+	local super = C_SuperTrack and C_SuperTrack.GetSuperTrackedQuestID()
+	for index = #order, 1, -1 do
+		local id = order[index]
+		if distances[id] then
+			C_QuestLog.RemoveQuestWatch(id)
+			C_QuestLog.AddQuestWatch(id)
+		end
+	end
+	if super and super ~= 0 and C_SuperTrack.GetSuperTrackedQuestID() ~= super then
+		C_SuperTrack.SetSuperTrackedQuestID(super)
+	end
 end
 
 local function CreateAreaProbe()
@@ -216,7 +278,7 @@ ns.Init(function()
 		end
 		if x and not InCombatLockdown() and Moved(sorted, x, y, RESORT) then
 			sorted.x, sorted.y = x, y
-			C_QuestLog.SortQuestWatches()
+			SortNearest()
 		end
 		-- Also catches a tracker update that ran without marking it dirty (collapsing it, say).
 		Layout()
