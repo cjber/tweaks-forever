@@ -11,9 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
-- **What's new names this version's changes.** After updating to 0.6.1 the chat line still gave 0.6.0's news. It now says what 0.6.1 changed, and every later release has to update it.
+## [0.6.2] - 2026-09-27
 
 - **Quests on minimap givers stay off when QuestieDB's map data can't be read.** If QuestieDB's zone tables fail to load, the option is greyed out as if QuestieDB were missing, instead of placing givers from partial data, where one on a map QuestieDB leaves out could be picked.
+- **The chat line after an update names this version's changes.** After updating to 0.6.1 it still gave 0.6.0's news.
 
 ## [0.6.1] - 2026-09-26
 
