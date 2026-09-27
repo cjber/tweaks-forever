@@ -234,6 +234,6 @@ TweaksForeverCharDB = nil
 ---@field OnTooltip fun(dataType: Enum.TooltipDataType, getters: table<string, true>, fn: fun(tooltip: GameTooltip, getter: string, ...: any))
 ---@field ContainerFrames fun(): (fun(): ContainerFrameTemplate|ContainerFrameCombinedBags?)
 ---@field ForEachBagButton fun(fn: fun(button: ContainerFrameItemButtonTemplate))
----@field HookBagButtons fun(hooked: table<ContainerFrameItemButtonTemplate, boolean>, update: fun(button: ContainerFrameItemButtonTemplate), click: fun(button: ContainerFrameItemButtonTemplate, mouseButton: string))
+---@field HookBagButtons fun(update: fun(button: ContainerFrameItemButtonTemplate), click: fun(button: ContainerFrameItemButtonTemplate, mouseButton: string))
 ---@field IsBagActionClick fun(): boolean
 ---@field ClickMode fun(mode: TFClickMode)

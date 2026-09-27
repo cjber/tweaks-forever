@@ -59,7 +59,7 @@ ns.Active = function()
 	return true
 end
 ns.ClickMode, ns.OnTooltip, ns.On, ns.ForEachBagButton = function() end, function() end, function() end, function() end
-ns.HookBagButtons = function(_, fn)
+ns.HookBagButtons = function(fn)
 	update = fn
 end
 _G.Enum = { TooltipDataType = { Item = 0 } }

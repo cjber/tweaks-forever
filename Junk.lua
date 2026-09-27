@@ -112,7 +112,7 @@ local function LeatrixSellsGreys()
 	return C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On"
 end
 
-local hooked, icons = {}, {}
+local icons = {}
 local merchant, batch, confirmationVisit
 local UpdateMerchantButton, Start
 local extendedButton = false
@@ -359,7 +359,7 @@ ns.Init(function()
 		end,
 	})
 
-	ns.HookBagButtons(hooked, UpdateIcon, Mark)
+	ns.HookBagButtons(UpdateIcon, Mark)
 	ns.OnTooltip(Enum.TooltipDataType.Item, { GetBagItem = true }, function(tooltip, _, bag, slot)
 		local itemID = C_Container.GetContainerItemID(bag, slot)
 		if itemID and Marks()[itemID] then
