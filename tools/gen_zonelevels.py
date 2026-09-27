@@ -128,7 +128,9 @@ def exploration_range(ui_map, assignments, areas, children):
     levels = []
     while stack:
         area = stack.pop()
-        level = int(areas[area]["ExplorationLevel"]) if area in areas else 0
+        if area not in areas:
+            raise ValueError(f"UiMapAssignment names area {area}, which AreaTable does not have")
+        level = int(areas[area]["ExplorationLevel"])
         if level > 0:
             levels.append(level)
         stack.extend(children.get(area, ()))
