@@ -14,6 +14,10 @@ Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists a
 
 Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.
 
+![An enemy's tooltip with a red health bar at 72% and a Horde shaman's with a blue bar at 412 / 520](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png)
+
+Unit tooltips with the health bar inside, in the retail game's own bar and frame.
+
 ![Kalimdor with the Ashenvale label reading Ashenvale (18-30)](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/zonelevels.png)
 
 Zone level ranges on the world map, coloured like quest levels.

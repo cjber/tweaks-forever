@@ -52,6 +52,12 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 <p align="center">Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.</p>
 
 <p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png" width="394" alt="An enemy's tooltip with a red health bar at 72% and a Horde shaman's with a blue bar at 412 / 520">
+</p>
+
+<p align="center">Unit tooltips with the health bar inside, in the retail game's own bar and frame.</p>
+
+<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab and the Character window's Scale slider">
 </p>
 
