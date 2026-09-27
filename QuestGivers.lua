@@ -15,7 +15,7 @@ ns.Feature({
 	needs = {
 		title = "QuestieDB",
 		check = function()
-			return ns.QuestieDB() ~= nil
+			return ns.QuestGivers.Library() ~= nil
 		end,
 	},
 })
@@ -54,21 +54,24 @@ ns.QuestGivers = Model
 local lib ---@type TFQuestieDB
 -- QuestieDB's area-to-map tables, read from its ZoneDB support source.
 local areaMap, areaOverride, parentZone
+-- [library] = its three zone tables, or false when any can't be read; read once per library.
+local zonesOf = setmetatable({}, { __mode = "k" })
 -- [name] = the quest NPCs of that name with their spawns in world yards.
 ---@type table<string, TFGiverCandidate[]>
 local candidates = {}
 
--- One of ZoneDB's tables, which QuestieDB keeps as Lua source returning a table literal: run with no globals.
+-- One of ZoneDB's tables, which QuestieDB keeps as Lua source returning a table literal: run with no globals. Nil when
+-- it is missing, doesn't parse, errors or returns something else, which leaves the feature off (Model.Library).
 ---@param source any
 ---@return table?
 local function Table(source)
 	local chunk = type(source) == "string" and loadstring(source)
-	if not chunk then
-		return nil
+	if chunk then
+		local ok, value = pcall(setfenv(chunk, {}))
+		if ok and type(value) == "table" then
+			return value
+		end
 	end
-	setfenv(chunk, {})
-	local ok, value = pcall(chunk)
-	return ok and type(value) == "table" and value or nil
 end
 
 -- The loaded QuestieDB, if it is the Forever build of a contract this addon was written against.
@@ -82,24 +85,41 @@ function ns.QuestieDB()
 	return ok and fits and db or nil
 end
 
+-- The loaded QuestieDB with everything this file reads, and its zone tables; nil when any of it is missing or its zone
+-- tables can't be read, so a giver is never placed from partial data.
+---@return TFQuestieDB?, table?, table?, table?
+function Model.Library()
+	local db = ns.QuestieDB()
+	if not db or not (db.Npc and db.Npc.IdsByName and db.Quest and db.Support) then
+		return nil
+	end
+	local zones = zonesOf[db]
+	if zones == nil then
+		local source = db.Support.Get("ZoneDB")
+		local private = type(source) == "table" and source.private
+		zones = false
+		if type(private) == "table" then
+			local map, override, parent =
+				Table(private.areaIdToUiMapId),
+				Table(private.areaIdToUiMapIdOverride),
+				Table(private.subZoneToParentZone)
+			zones = map and override and parent and { map, override, parent } or false
+		end
+		zonesOf[db] = zones
+	end
+	if zones then
+		return db, zones[1], zones[2], zones[3]
+	end
+end
+
 ---@return boolean
 function Model.Attach()
 	candidates = {}
-	local db = ns.QuestieDB()
-	if not db or not (db.Npc and db.Npc.IdsByName and db.Quest and db.Support) then
+	local db, map, override, parent = Model.Library()
+	if not db then
 		return false
 	end
-	local zones = db.Support.Get("ZoneDB")
-	local private = type(zones) == "table" and zones.private
-	if type(private) ~= "table" then
-		return false
-	end
-	areaMap, areaOverride, parentZone =
-		Table(private.areaIdToUiMapId), Table(private.areaIdToUiMapIdOverride) or {}, Table(private.subZoneToParentZone)
-	if not areaMap or not parentZone then
-		return false
-	end
-	lib = db
+	lib, areaMap, areaOverride, parentZone = db, map, override, parent
 	return true
 end
 

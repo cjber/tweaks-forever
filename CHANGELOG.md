@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **What's new names this version's changes.** After updating to 0.6.1 the chat line still gave 0.6.0's news. It now says what 0.6.1 changed, and every later release has to update it.
+
+- **Quests on minimap givers stay off when QuestieDB's map data can't be read.** If QuestieDB's zone tables fail to load, the option is greyed out as if QuestieDB were missing, instead of placing givers from partial data, where one on a map QuestieDB leaves out could be picked.
+
 ## [0.6.1] - 2026-09-26
 
 - **Nearest quests first sorts again.** The tracker now really lists your quests nearest first as you move. The game's own sort leaves quests you tracked yourself where they are, so it never moved them; quests on another continent stay below the rest.
