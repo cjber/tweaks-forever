@@ -1,6 +1,6 @@
 I got tired of running a pile of small addons for things that feel like they should be in the default settings, so I put them in one. Everything is made to look like it came with the game: the options are a page in Options → AddOns, moving windows is a tab in Edit Mode, and the map uses retail's own dungeon icons.
 
-If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or similar, the overlapping option greys out and names the addon that has it, so the two never fight. Anything that acts for you is off until you turn it on.
+If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or similar, the overlapping option greys out and names the addon that has it, so the two never fight. Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you turn it on.
 
 ![Dungeon entrances on the map, then enemy nameplates, then a backpack with a ring marked as junk](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 

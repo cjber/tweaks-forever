@@ -363,7 +363,7 @@ ns.Init(function()
 	ns.OnTooltip(Enum.TooltipDataType.Item, { GetBagItem = true }, function(tooltip, _, bag, slot)
 		local itemID = C_Container.GetContainerItemID(bag, slot)
 		if itemID and Marks()[itemID] then
-			tooltip:AddLine(L["Marked as junk – Alt+Right-click to unmark"], 1, 0.82, 0, true)
+			tooltip:AddLine(L["Marked as junk. Alt+Right-click to unmark."], 1, 0.82, 0, true)
 			tooltip:Show()
 		end
 	end)
