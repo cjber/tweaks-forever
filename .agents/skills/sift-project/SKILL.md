@@ -58,25 +58,35 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - `TweaksForever.toc` — the file list and load order. `Core.lua` defines `ns.Feature`/`ns.On`/`ns.Init`
   before any feature file runs; declaration order sets the settings subpage order and the order `ns.Init`
   callbacks run at login. Never reorder.
-- SavedVariables `TweaksForeverDB` (feature keys, `junk`, `windowLayouts`, `savedSounds`) and
+- SavedVariables `TweaksForeverDB` (feature keys, `junk`, `windowLayouts`, `savedSounds`, `lastVersion`) and
   `TweaksForeverCharDB` (`groups`, `colours`, `beforeFishing`) — persisted formats; keys are data.
 - Feature `key`s are persisted and also form the setting variable `"TweaksForever_" .. key`, looked up by
-  string in `Settings.SetOnValueChangedCallback` calls (Fishing, Gear, Frames).
+  string in `Settings.SetOnValueChangedCallback` calls (Errors, Fishing, Frames, Gear,
+  MacroNames, QuestProgress, Reagents, Sections, Spellbook, Tooltips).
 - `ns.On("<EVENT>")`, `hooksecurefunc("<Function>")` and `HookScript("<Script>")` name Blizzard events, functions
   and scripts as strings.
 - `Errors.lua` builds `_G["LE_GAME_ERR_" .. name]`; `Frames.lua` resolves `_G[record.name]` and loads the
   listed load-on-demand addons.
 - Slash commands: `SLASH_TWEAKSFOREVER1`, `SLASH_TWEAKSFOREVER_RELOAD1` with `SlashCmdList` entries.
 - Global frame `TweaksForeverFishingButton` — the binding clicks it by name.
+- `TweaksForever.API` (API.lua, typed in `types/API.lua`) — the public addon-to-addon interface other addons
+  (Adventure Guide Forever) call; every field is public surface. `TweaksForever_OnAddonCompartmentClick` is named
+  by the TOC's `AddonCompartmentFunc`.
+- `ShortestPathForever.API` (Navigate.lua) and QuestieDB (`ns.QuestieDB`, QuestGivers/QuestProgress) — other addons'
+  APIs read at runtime, the TOC's `OptionalDeps`.
 - `ns.HookBagButtons` and `ns.IsBagActionClick` (Core.lua) — the one home for bag-slot button hooks and
   the remappable-click guard, used by Junk.lua and Gear.lua. The specs never run `ns.Init`, so a change here
   needs a stubbed load of Core + the feature file (hook-registration trace) to show behaviour is unchanged.
 - `ns.Junk`, `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration`, `ns.Sections`, `ns.Reagents`, `ns.Camp`,
   `ns.ZoneLevels`, `ns.Entrances`, `ns.FutureSpells` — pure `Model` tables exported for the specs, each named
   once in production. Some are also cross-file APIs: `ns.Fishing.IsPole` (Gear), `ns.Gear.MarksOf`/`ColourOf`/
-  `OnRefresh`/`Settling` (Sections), `ns.Sections` constants and `lift`/`Sectioned` (Reagents).
-- `ns.ClickMode` (Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core.lua) — shared helpers.
-- `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.Overlays` — generated `Data/` tables.
+  `OnRefresh`/`Settling` (Sections), `ns.Sections` constants, `lift` and `Relayout` (Reagents).
+- `ns.ClickMode` (Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core.lua), `ns.Suggestion`
+  (Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
+  `ns.LineName`, `ns.GeneralName` (also read by API.lua) — shared helpers.
+- `ns.QuestDistance`, `ns.QuestGivers`, `ns.QuestProgress`, `ns.WhatsNew` — more `Model` tables exported for the specs.
+- `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.InstanceEntrances`, `ns.RaidInstances`,
+  `ns.Overlays`, `ns.ClassSpells` — generated `Data/` tables.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;
   `Locales/phrases.txt` is `tools/phrases.py`'s template for translators.
 - `TweaksForeverDungeonEntrancePinMixin` — global named by `DungeonEntrances.xml`'s pin template.
@@ -89,7 +99,10 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
   (like `ruff.toml`) must be added there. The pinned packager prunes every dot-path itself (release.sh:1828 at
   v2.6.1), so dot-files are never listed.
 
-## Dismissed candidates
+## Settled
+
+Shapes that look like defects here but are not. Reviewers and verifiers read this before raising a
+finding.
 
 - stringly-typed on `Frames.lua` `Model.LayoutKey`/`Model.Prune` (`"account"`, `"preset"`, character GUID):
   these strings are the persisted `windowLayouts` key format; changing them changes saved data.
@@ -98,7 +111,7 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - Model fields named once in production (`ns.Junk`, `ns.Camp`, …) and `types/` classes referenced once
   (`NamePlateFrame`, `SpellBookFrameTemplate_PagedSpellsFrame`, `SpellBookSingleSkillLineCategoryMixin`,
   `TFEntrancePin`): spec exports and annotations of external or XML-made objects, not dead code.
-- `Sections.lua`/`Reagents.lua` `Grow`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
+- `Sections.lua` `Layout`/`Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
   and `MIN_SCALE` is already one constant; each owns its own state.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
 - `Sections.lua`/`Reagents.lua` `Relayout`: a three-line schedule idiom, not a shared implementation.
@@ -107,6 +120,19 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
   Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
 - Gear's `Char()` short alias, Frames' repeated `if Active() then Schedule() end`, and Tooltips'
   single-caller `HealthBarStyle` (kept under the function-length limit).
+- Small nil-safe reads of a saved variable or a Questie profile option (`Automation.lua`, `QuestDistance.lua`):
+  each site reads a different option for a different predicate, not one implementation.
+- Junk's and Gear's click and mark guards: Gear needs `gearGroups` and Ctrl, Junk `markJunk` and Alt; Junk's icons
+  show saved marks while selling blocks unknown quality for Leatrix, as `junk_spec` asserts.
+- `API.lua`'s `TweaksForever = TweaksForever or {}`: the shared global is a trust boundary; attach, never replace.
+- The Sections/Reagents quotient-and-remainder grid placement: a small idiom over different contracts.
+- `Spellbook.lua`'s size: one Future Spells feature whose scan, selection and drawing share ClassData and Tabs.
+- The README middle-dot footer and the `Options → …` arrow paths: the owner's house style across the docs.
+
+## Anti-patterns
+
+Shapes this codebase has produced more than once and a reviewer confirmed. Check new code against them.
+
 
 ## Zones
 
@@ -121,6 +147,9 @@ Unlisted paths are `production`.
 | `.github/`, `.gitattributes`, `.pkgmeta`, `.luacheckrc`, `.luarc.json`, `stylua.toml`, `ruff.toml` | config | |
 | `README.md`, `CHANGELOG.md`, `AGENTS.md`, `tools/README.md` | docs | CHANGELOG entries are release notes; history by design |
 | `docs/curseforge.md` | docs | the store page, pasted by hand; its facts must match the README |
+| `docs/features.md`, `Locales/README.md` | docs | |
+| `Locales/phrases.txt` | generated | written by `python3 -m tools.phrases --write`; never edit or review |
+| `.sift/gate.py`, `.sift/agents.py`, `.sift/LICENSE` | vendor | copied byte for byte from sift; changed only by `sift update` |
 | `media/`, `docs/screenshots/` | asset | not reviewed |
 | `.agents/`, `.sift/` | docs | this profile and audit reports |
 
@@ -131,7 +160,8 @@ Unlisted paths are `production`.
 - Pure logic goes in a local `Model` table exported on `ns` so specs can load the file headlessly.
 - PascalCase local functions, UPPER_CASE constants, tabs, 120 columns. British spelling in UI text.
 - Comments are short and state why: client quirks ("Camelot", "Forever"), taint and combat restrictions.
-- No error handling beyond `xpcall` in Core's dispatcher; host-API guards (`X and X()`) cover functions
+- No error handling beyond `xpcall` in Core's dispatcher and `pcall` around other addons' code (conflict and
+  `needs` checks in `ns.RefreshConflicts`, QuestieDB in `ns.QuestieDB`); host-API guards (`X and X()`) cover functions
   absent on this client.
 
 ## Risk order
@@ -140,14 +170,17 @@ Audit slices from lowest to highest risk:
 
 1. `tools/`, `README.md`, `.github/` — no player-facing effect.
 2. `tests/` — specs only.
-3. `Reload.lua`, `Errors.lua`, `Vendor.lua`, `Settings.lua`, `Core.lua` — small; Core is shared by all.
+3. `Reload.lua`, `Errors.lua`, `Vendor.lua`, `Settings.lua`, `WhatsNew.lua`, `Companions.lua`, `Navigate.lua`,
+   `MacroNames.lua`, `API.lua`, `Core.lua` — small; Core is shared by all, API is public surface.
 4. `Automation.lua`, `Exploration.lua`, `Fishing.lua`, `Modes.lua`, `Campsites.lua`, `QuestDistance.lua`,
-   `ZoneLevels.lua`, `DungeonEntrances.lua`/`.xml`, `Spellbook.lua` — event handlers, map pins, one secure button.
+   `QuestGivers.lua`, `QuestProgress.lua`, `ZoneLevels.lua`, `DungeonEntrances.lua`/`.xml`, `Spellbook.lua` — event
+   handlers, map pins, the tracker, one secure button.
 5. `Tooltips.lua`, `Nameplates.lua`, `Sections.lua`, `Reagents.lua` — restyle Blizzard frames; in-game only.
 6. `Junk.lua`, `Gear.lua` — bag hooks, selling items and equipping gear.
 7. `Frames.lua` — hooks Edit Mode and panel positioning; taint-sensitive.
 
 ## Project rules and lenses
 
-- Rules: none yet.
+- Rules: `unused-luacheck-global` (`.sift/scripts/unused-luacheck-global.py`): a `.luacheckrc` global that no
+  tracked Lua, XML or `Locales/phrases.txt` names.
 - Lenses: none yet.

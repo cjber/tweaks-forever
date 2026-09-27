@@ -37,7 +37,7 @@ local function InOrder(a, b)
 end
 
 -- A tab's unlearned spells, or every tab's with no line: the lowest unlearned rank of each, those your trainer
--- teaches now first, then by level. A row on no skill line of the class (weapons, riding) is never listed.
+-- teaches now first, then by level. A row with no skill line ID (weapons, riding) is never listed.
 ---@param spells table<integer, TFTrainerSpell>
 ---@param lineID integer? the tab's SkillLine ID, or GENERAL
 ---@param level number
@@ -63,6 +63,14 @@ function Model.Choose(spells, lineID, level, Skip)
 	end
 	table.sort(chosen, InOrder)
 	return chosen
+end
+
+-- A spell on a line that is none of the class's lines goes on the General tab.
+---@param lines integer[]
+---@param lineID integer
+---@return true?
+function Model.OnGeneral(lines, lineID)
+	return not tContains(lines, lineID) or nil
 end
 
 ---@param ids integer[]?
@@ -103,7 +111,7 @@ function Model.Spells(baked, live, race, Describe, Known)
 				level = row[2],
 				cost = row[3],
 				lineID = row[4],
-				general = not tContains(lines, row[4]) or nil,
+				general = Model.OnGeneral(lines, row[4]),
 			}
 		end
 	end
@@ -276,12 +284,12 @@ function ns.GeneralName()
 	return info and info.name or GENERAL
 end
 
--- Whether a trainer row's line puts it on the General tab: it is none of the class's lines.
+-- Whether a trainer row's line puts it on the General tab, from the class's lines.
 ---@param lineID integer
 ---@return true?
 function ns.OnGeneral(lineID)
 	local data = ClassData()
-	return not (data and tContains(data.lines, lineID)) or nil
+	return Model.OnGeneral(data and data.lines or {}, lineID)
 end
 
 -- Finds a spell's skill line ID: the baked row's (a General tab row's own line), else the class tab the trainer

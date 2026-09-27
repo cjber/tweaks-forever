@@ -23,8 +23,8 @@ ns.Feature({
 })
 
 -- Restyles Blizzard's own nameplate unit frames after Blizzard lays them out, from script hooks and events, with engine
--- calls only (anchors, sizes, fonts, colours, alpha). Nothing is written into Blizzard's tables and no Blizzard
--- method is called, so its nameplate code, which handles secret health and cast values, never runs tainted.
+-- setters (anchors, sizes, fonts, colours, alpha) and Blizzard's read-only getters. Nothing is written into Blizzard's
+-- tables, so its nameplate code, which handles secret health and cast values, never runs tainted.
 -- Forbidden nameplates (friendly units in instances) are never handed to addon code and keep Blizzard's look.
 -- Blizzard reserves each plate's height from its own style's sizes; this layout is no taller than Forever's
 -- default Thin style, 1 unit shorter, so plates stack as before. Sizes are at Medium and scale with the setting.

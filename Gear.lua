@@ -387,7 +387,6 @@ local function Coloured(mark)
 	)
 end
 
-local hooked = {}
 -- [button] = { [style] = textures }, made on first use.
 ---@type table<ContainerFrameItemButtonTemplate, table<string, Texture[]>>
 local marks = {}
@@ -733,7 +732,7 @@ ns.Init(function()
 		Apply = OpenItemMenu,
 	})
 
-	ns.HookBagButtons(hooked, UpdateMarks, Click)
+	ns.HookBagButtons(UpdateMarks, Click)
 
 	InitTooltips()
 	TrackWeapons()

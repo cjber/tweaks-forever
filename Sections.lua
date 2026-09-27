@@ -145,7 +145,7 @@ local function Fit(height)
 	end
 end
 
--- Lays the whole combined bag out again with engine calls only (points, height, scale): after Blizzard's own
+-- Lays the whole combined bag out again (points, height, scale, corner cropping): after Blizzard's own
 -- layout, which always ends in UpdateContainerFrameAnchors, and whenever its contents or these settings change.
 -- Never by calling Blizzard's UpdateFrameSize, UpdateItemLayout or UpdateContainerFrameAnchors: run from addon code
 -- they build the bags' cached item and open-bag lists tainted, and Blizzard's bank code is then blocked.

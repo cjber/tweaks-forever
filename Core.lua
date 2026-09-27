@@ -185,13 +185,13 @@ local function IsModifiedBagClick(button, mouseButton)
 	return true
 end
 
--- Hook every bag slot button as its bag opens, recording each in `hooked`. `update` runs as a bag opens (callers
+-- Hook every bag slot button once, as its bag opens. `update` runs as a bag opens (callers
 -- also refresh on BAG_UPDATE_DELAYED); `click` runs after a modified click. Script hooks only: hooksecurefunc on a
 -- button's methods, or on ContainerFrameItemButtonMixin, writes into Blizzard's tables and taints its bag code.
----@param hooked table<ContainerFrameItemButtonTemplate, boolean>
 ---@param update fun(button: ContainerFrameItemButtonTemplate)
 ---@param click fun(button: ContainerFrameItemButtonTemplate, mouseButton: string)
-function ns.HookBagButtons(hooked, update, click)
+function ns.HookBagButtons(update, click)
+	local hooked = {}
 	-- A bag reports its size before its buttons exist, so a slot can have no button yet.
 	local function Hook(button)
 		if not button or hooked[button] then
