@@ -134,11 +134,6 @@ local env = setmetatable({
 	UnitGUID = function(unit)
 		return guids[unit]
 	end,
-	Settings = {
-		SetOnValueChangedCallback = function(name, fn)
-			changed[name] = fn
-		end,
-	},
 	TooltipDataProcessor = {
 		AddTooltipPostCall = function(kind, fn)
 			postCalls[kind] = fn
@@ -228,6 +223,9 @@ ns.db = { questTooltips = true, questPlates = true }
 ns.Active = function(key)
 	return ns.db[key]
 end
+ns.OnSettingChanged = function(key, fn)
+	changed[key] = fn
+end
 ns.On = function(event, fn)
 	events[event] = fn
 end
@@ -271,10 +269,10 @@ assert(not icons[1].shown, "no longer needed")
 objectives[1][1] = Kill("Mangy Wolf", 3, 10)
 Model.Rebuild()
 ns.db.questPlates = false
-changed.TweaksForever_questPlates()
+changed.questPlates()
 assert(not icons[1].shown, "switched off")
 ns.db.questPlates = true
-changed.TweaksForever_questPlates()
+changed.questPlates()
 assert(#icons == 1 and icons[1].shown, "one icon per plate, reused")
 events.NAME_PLATE_UNIT_REMOVED("nameplate1")
 assert(not icons[1].shown)

@@ -50,7 +50,7 @@ On-demand tools for audits. Output is candidates, never verdicts.
 String-named entrypoints (always pass a path: `rg` with no path reads stdin when it is not a terminal):
 
 ```sh
-rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|SlashCmdList|_G\[' -g '*.lua' .
+rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdList|_G\[' -g '*.lua' .
 ```
 
 ## Live roots
@@ -60,9 +60,8 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
   callbacks run at login. Never reorder.
 - SavedVariables `TweaksForeverDB` (feature keys, `junk`, `windowLayouts`, `savedSounds`, `lastVersion`) and
   `TweaksForeverCharDB` (`groups`, `colours`, `beforeFishing`) — persisted formats; keys are data.
-- Feature `key`s are persisted and also form the setting variable `"TweaksForever_" .. key`, looked up by
-  string in `Settings.SetOnValueChangedCallback` calls (Errors, Fishing, Frames, Gear,
-  MacroNames, QuestProgress, Reagents, Sections, Spellbook, Tooltips).
+- Feature `key`s are persisted and also form the setting variable `"TweaksForever_" .. key`, built only by
+  Core's `ns.SettingVariable`; feature files take setting changes through `ns.OnSettingChanged(key, fn)`.
 - `ns.On("<EVENT>")`, `hooksecurefunc("<Function>")` and `HookScript("<Script>")` name Blizzard events, functions
   and scripts as strings.
 - `Errors.lua` builds `_G["LE_GAME_ERR_" .. name]`; `Frames.lua` resolves `_G[record.name]` and loads the
@@ -183,4 +182,6 @@ Audit slices from lowest to highest risk:
 
 - Rules: `unused-luacheck-global` (`.sift/scripts/unused-luacheck-global.py`): a `.luacheckrc` global that no
   tracked Lua, XML or `Locales/phrases.txt` names.
+- Rules: `setting-callback-outside-core` (`.sift/scripts/setting-callback-outside-core.py`): a
+  `SetOnValueChangedCallback` call outside Core.lua; use `ns.OnSettingChanged`.
 - Lenses: none yet.

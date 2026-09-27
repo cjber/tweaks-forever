@@ -34,7 +34,7 @@ local function AddSetting(category, feature)
 	local options = feature.options
 	local setting = Settings.RegisterAddOnSetting(
 		category,
-		"TweaksForever_" .. feature.key,
+		ns.SettingVariable(feature.key),
 		feature.key,
 		ns.db,
 		options and Settings.VarType.String or Settings.VarType.Boolean,
@@ -64,7 +64,7 @@ local function AddSetting(category, feature)
 		initializer:AddModifyPredicate(function()
 			return ns.Active(feature.parent)
 		end)
-		initializer:AddEvaluateStateCVar("TweaksForever_" .. feature.parent)
+		initializer:AddEvaluateStateCVar(ns.SettingVariable(feature.parent))
 	end
 	Settings.RegisterInitializer(category, initializer)
 end

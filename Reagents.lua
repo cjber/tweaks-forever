@@ -280,7 +280,7 @@ ns.Init(function()
 			Close()
 		end
 	end, binder)
-	Settings.SetOnValueChangedCallback("TweaksForever_combinedReagents", function()
+	ns.OnSettingChanged("combinedReagents", function()
 		Bind()
 		Sections.Relayout()
 	end)

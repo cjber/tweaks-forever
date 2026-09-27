@@ -429,8 +429,8 @@ ns.Init(function()
 			style()
 		end
 	end
-	Settings.SetOnValueChangedCallback("TweaksForever_" .. KEY, Style)
-	Settings.SetOnValueChangedCallback("TweaksForever_" .. STYLE, function()
+	ns.OnSettingChanged(KEY, Style)
+	ns.OnSettingChanged(STYLE, function()
 		Repaint(tooltips)
 	end)
 	Style()

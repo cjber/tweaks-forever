@@ -713,9 +713,9 @@ local function TrackWeapons()
 		stockSets = nil
 		RefreshBags()
 	end)
-	Settings.SetOnValueChangedCallback("TweaksForever_gearGroups", RefreshBags)
-	Settings.SetOnValueChangedCallback("TweaksForever_beforeFishing", RefreshBags)
-	Settings.SetOnValueChangedCallback("TweaksForever_gearMark", RefreshBags)
+	ns.OnSettingChanged("gearGroups", RefreshBags)
+	ns.OnSettingChanged("beforeFishing", RefreshBags)
+	ns.OnSettingChanged("gearMark", RefreshBags)
 	Settle()
 end
 

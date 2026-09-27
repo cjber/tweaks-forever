@@ -14,17 +14,15 @@ local ns = {
 	On = function(event, fn)
 		handlers[event] = fn
 	end,
+	OnSettingChanged = function(key, fn)
+		changes[key] = fn
+	end,
 }
 
 local cvars = { Sound_SFXVolume = "0.4", Sound_MusicVolume = "0.3", Sound_AmbienceVolume = "0.6" }
 local mainHand, messages = nil, {}
 local env = setmetatable({
 	INVSLOT_MAINHAND = 16,
-	Settings = {
-		SetOnValueChangedCallback = function(variable, fn)
-			changes[variable:gsub("^TweaksForever_", "")] = fn
-		end,
-	},
 	Enum = { ItemClass = { Weapon = 2 }, ItemWeaponSubclass = { Fishingpole = 20 } },
 	C_Spell = {
 		GetSpellName = function()
