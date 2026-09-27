@@ -449,10 +449,11 @@
       "what": "BUG: ZoneDB source parse/evaluation failures become nil; Attach substitutes empty overrides or silently abandons initialization.",
       "why": "Table discards both loadstring and pcall errors. Attach replaces an unreadable areaIdToUiMapIdOverride with {}, so MapOf falls back to base maps even where an override should exclude or remap an area. Reproduced without writing fixtures: appended an in-memory probe to tests/questgivers_spec.lua, replaced only the support source with 'return { [12] = 0', then observed Attach() and needs.check() both true and Resolve('Di', 0, 1490, 500) returning NPC 5; the intact fixture returns nil because area 12 is excluded. With areaIdToUiMapId changed to 'return {', Attach() returned false and the initializer installed no tooltip callback, but needs.check() stayed true. The needs check only validates ns.QuestieDB(), so Core.RefreshConflicts/Settings cannot expose these failures. Repository-wide searches found no other caller that surfaces the parse error or attachment failure. Preserve the sandbox and third-party validation, but distinguish absent optional data from failed parsing and report the failure or reflect it in feature availability. These were synthetic fault probes, not observations of an installed QuestieDB failure.",
       "confidence": "high",
-      "status": "bug",
-      "reason": "QuestGivers.lua ns.QuestieDB pcall-wrapped ZoneDB source parse and evaluation failures return nil silently; other-model verifier's in-memory fault probes showed invalid overrides admit an excluded NPC and invalid required tables skip callback registration while needs.check stays true.",
+      "status": "fixed",
+      "reason": "Zone tables read once per library via Model.Library; any unreadable table (override included) makes Attach and needs.check fail, greying the option as QuestieDB missing.",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: no sift rule; tests/questgivers_spec.lua covers invalid, missing, erroring and non-table zone sources"
     },
     {
       "id": "8bcb249497",
@@ -608,10 +609,11 @@
       "what": "BUG: the what's-new headline is still 0.6.0's entry, though v0.6.1 is tagged and released; the comment above says to rewrite this line with each release's entry",
       "why": "git tag shows v0.6.1 (commit 7114847 chore(release): 0.6.1); git log -- WhatsNew.lua last touched in 5c54e82 (#72, the 0.6.0 feature). CHANGELOG.md [0.6.1] headlines are nearest-quests sorting, Questie naming and the combined bag height. A player updating 0.6.0 -> 0.6.1 is told in chat 'updated to 0.6.1. Ready for translation, and dungeon entrances suggest...'. Player-visible string: owner decides the new wording (e.g. the 0.6.1 headline); nothing in tools/changelog.py or CI checks this line against the changelog, so a release check would stop the drift.",
       "confidence": "high",
-      "status": "bug",
-      "reason": "WhatsNew.lua ns.WHATS_NEW still holds 0.6.0's headline; unchanged since #72 though v0.6.1 shipped, so players updating to 0.6.1 see 0.6.0 news. Fix: write the 0.6.1 headline and add a release check that the line changed since the previous tag.",
+      "status": "fixed",
+      "reason": "0.6.1 headline written; ns.WHATS_NEW_VERSION added and checked against CHANGELOG.md's newest release.",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: no sift rule; tests/whatsnew_spec.lua fails when CHANGELOG.md's newest release differs from ns.WHATS_NEW_VERSION"
     },
     {
       "id": "3fcf33af22",

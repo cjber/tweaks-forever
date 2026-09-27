@@ -169,6 +169,31 @@ assert(not Model.Attach() and not needs.check())
 flavour = "Forever"
 env.LibQuestieDB = nil
 assert(not Model.Attach() and not needs.check())
+-- Zone tables that can't be read or run leave it off, never partly on: a lost override would place a spawn on a map
+-- the data switches off. Each case is a separate library, since the tables are read once per library.
+for _, broken in ipairs({
+	{ areaIdToUiMapIdOverride = "return {" },
+	{ areaIdToUiMapIdOverride = false },
+	{ areaIdToUiMapId = "error('corrupt')" },
+	{ subZoneToParentZone = "return 1" },
+}) do
+	local private = {
+		areaIdToUiMapId = "return { [10] = 100, [12] = 200 }",
+		areaIdToUiMapIdOverride = "return { [12] = 0 }",
+		subZoneToParentZone = "return { [11] = 10 }",
+	}
+	for field, source in pairs(broken) do
+		private[field] = source or nil
+	end
+	env.LibQuestieDB = setmetatable({
+		Support = {
+			Get = function()
+				return { private = private }
+			end,
+		},
+	}, { __index = library })
+	assert(not Model.Attach() and not needs.check(), next(broken))
+end
 env.LibQuestieDB = library
 assert(Model.Attach() and needs.check())
 

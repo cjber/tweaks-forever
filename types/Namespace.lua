@@ -221,6 +221,7 @@ TweaksForeverCharDB = nil
 ---@field NavigateHint fun(): string
 ---@field Suggestion fun(addon: string, install: string, enable: string): string?
 ---@field WHATS_NEW string
+---@field WHATS_NEW_VERSION string
 ---@field WhatsNew TFWhatsNew
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()

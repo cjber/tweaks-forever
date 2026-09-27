@@ -62,4 +62,15 @@ assert(#printed == 0 and db.lastVersion == "0.6.0")
 printed, db = Login({ lastVersion = "0.5.0" }, "@project-version@")
 assert(#printed == 0 and db.lastVersion == "0.5.0")
 
+-- The headline is the newest release's: a release that adds a CHANGELOG entry without rewriting it fails here.
+local changelog = assert(io.open("CHANGELOG.md")):read("*a")
+local newest = changelog:match("\n## %[(%d+%.%d+%.%d+)%]")
+assert(
+	newest and ns.WHATS_NEW_VERSION == newest,
+	("WhatsNew.lua is %s's headline, CHANGELOG.md's newest release is %s"):format(
+		tostring(ns.WHATS_NEW_VERSION),
+		tostring(newest)
+	)
+)
+
 print("whatsnew: ok")
