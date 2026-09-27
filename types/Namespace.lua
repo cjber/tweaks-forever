@@ -228,6 +228,8 @@ TweaksForeverCharDB = nil
 ---@field ConflictOf fun(key: string): string?
 ---@field MissingOf fun(key: string): string?
 ---@field Active fun(key: string): boolean
+---@field SettingVariable fun(key: string): string
+---@field OnSettingChanged fun(key: string, fn: function)
 ---@field On fun(event: WowEvent, fn: function)
 ---@field Init fun(fn: fun())
 ---@field BagSize fun(container: ContainerFrameTemplate|ContainerFrameCombinedBags): integer

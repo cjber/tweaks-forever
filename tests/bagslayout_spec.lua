@@ -130,6 +130,9 @@ local ns = {
 	Active = function(key)
 		return db[key]
 	end,
+	OnSettingChanged = function(key, fn)
+		settings[key] = fn
+	end,
 	BagSize = function(c)
 		return c.size
 	end,
@@ -175,11 +178,6 @@ local env = setmetatable({
 		assert(type(name) == "string", "global hooks only")
 		hooks[name] = fn
 	end,
-	Settings = {
-		SetOnValueChangedCallback = function(v, fn)
-			settings[v] = fn
-		end,
-	},
 	EventRegistry = {
 		RegisterCallback = function(_, name, fn)
 			hooks[name] = fn
@@ -238,11 +236,11 @@ assert(math.abs(bag:GetHeight() - grown) < 0.01, "no double growth from rounding
 bag.drift = nil
 -- Sections off: only the reagent lift remains.
 db.gearSections = false
-settings.TweaksForever_gearSections()
+settings.gearSections()
 assert(bag:GetHeight() == 300 + lift, "sections undone: " .. bag:GetHeight())
 -- Reagents off: back to Blizzard's height, window and buttons where Blizzard put them.
 db.combinedReagents = false
-settings.TweaksForever_combinedReagents()
+settings.combinedReagents()
 assert(bag:GetHeight() == 300, "back to Blizzard's height: " .. bag:GetHeight())
 assert(select(2, reagents:GetPoint()) == bag, "window back beside the bag")
 assert(select(2, reagents.Items[1]:GetPoint()) == reagents, "buttons back in their window")

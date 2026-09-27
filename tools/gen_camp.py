@@ -9,6 +9,8 @@ import argparse
 import csv
 import io
 import re
+import sys
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -184,12 +186,16 @@ def render(rows):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--refresh", action="store_true", help="download the exports again")
-    parser.add_argument("--offline", action="store_true", help="require the cached exports")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument("--refresh", action="store_true", help="Download the pinned CSVs again")
+    group.add_argument("--offline", action="store_true", help="Require cached CSVs")
     args = parser.parse_args()
     OUTPUT.write_text(render(benefits(Spells(args.refresh, args.offline))), encoding="utf-8")
     print(f"wrote {OUTPUT.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (ValueError, KeyError, OSError, csv.Error, urllib.error.URLError) as error:
+        sys.exit(f"gen_camp: {error}")

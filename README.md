@@ -80,7 +80,7 @@ The quest features (quests on minimap givers, quest progress on tooltips and nam
 - `/tweaks` or `/tweaksforever` opens the settings, also under **Options → AddOns → Tweaks Forever** or from the addon compartment on the minimap.
 - `/rl` reloads the interface.
 
-Nothing to set up. A few features that act for you are off until you tick them.
+Nothing to set up. Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you tick it.
 
 Translations are welcome as a pull request, or pasted into an issue, on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated yet shows in English.
 

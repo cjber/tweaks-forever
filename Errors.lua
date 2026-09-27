@@ -72,7 +72,7 @@ ns.Init(function()
 		end
 	end
 	Apply(stock)
-	Settings.SetOnValueChangedCallback("TweaksForever_quietErrors", function()
+	ns.OnSettingChanged("quietErrors", function()
 		Apply(stock)
 	end)
 end)

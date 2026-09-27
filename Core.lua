@@ -148,6 +148,21 @@ function ns.Active(key)
 	return not not ns.db[key] and not conflicted[key] and not missing[key]
 end
 
+-- The Settings variable a feature's setting is registered under.
+---@param key string
+---@return string
+function ns.SettingVariable(key)
+	assert(byKey[key], "unknown feature " .. key)
+	return "TweaksForever_" .. key
+end
+
+-- Run fn whenever the player changes a feature's setting.
+---@param key string
+---@param fn function
+function ns.OnSettingChanged(key, fn)
+	Settings.SetOnValueChangedCallback(ns.SettingVariable(key), fn)
+end
+
 local handlers = {}
 local events = CreateFrame("Frame")
 events:SetScript("OnEvent", function(_, event, ...)

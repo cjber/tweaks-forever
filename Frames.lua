@@ -844,7 +844,7 @@ end
 ns.Init(function()
 	-- These are checks only until enabled and conflict-free; no Blizzard frames are hooked while off.
 	hooksecurefunc(ns, "RefreshConflicts", CheckState)
-	Settings.SetOnValueChangedCallback("TweaksForever_moveWindows", CheckState)
+	ns.OnSettingChanged("moveWindows", CheckState)
 	ns.On("ADDON_LOADED", function()
 		ns.RefreshConflicts()
 		if Active() then

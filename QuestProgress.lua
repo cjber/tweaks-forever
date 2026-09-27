@@ -362,7 +362,7 @@ ns.Init(function()
 			Changed()
 		end
 	end)
-	Settings.SetOnValueChangedCallback("TweaksForever_" .. PLATES, UpdatePlates)
+	ns.OnSettingChanged(PLATES, UpdatePlates)
 	Model.Rebuild()
 	UpdatePlates()
 

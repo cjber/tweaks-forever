@@ -11,6 +11,9 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **The Before fishing setting says how to get your weapons back.** Its tooltip now says to Ctrl+Right-click one of them and pick Equip Before fishing, since the click only opens the group menu.
+- **Nearest quests first does no work while it is off.** With the setting off, or the quest tracker hidden, it stops checking the tracker every frame.
+
 ## [0.6.2] - 2026-09-27
 
 - **Quests on minimap givers stay off when QuestieDB's map data can't be read.** If QuestieDB's zone tables fail to load, the option is greyed out as if QuestieDB were missing, instead of placing givers from partial data, where one on a map QuestieDB leaves out could be picked.

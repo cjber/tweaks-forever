@@ -12,18 +12,16 @@ local ns = {
 	end,
 }
 local changed
+ns.OnSettingChanged = function(key, fn)
+	assert(key == "quietErrors")
+	changed = fn
+end
 local env = setmetatable({
 	LE_GAME_ERR_SPELL_COOLDOWN = 1,
 	LE_GAME_ERR_OUT_OF_MANA = 2,
 	LE_GAME_ERR_INV_FULL = 3,
 	-- The client already hides mana errors.
 	BLACK_LISTED_MESSAGE_TYPES = { [2] = true },
-	Settings = {
-		SetOnValueChangedCallback = function(variable, fn)
-			assert(variable == "TweaksForever_quietErrors")
-			changed = fn
-		end,
-	},
 }, { __index = _G })
 env.UIErrorsFrame = {
 	SetMessageTypeEnabled = function(_, messageType, enabled)

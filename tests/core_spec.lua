@@ -1,8 +1,13 @@
 -- Defaults and the shared namespace must be ready before any feature initializer runs.
 local function Load(saved)
-	local frames, errors = {}, {}
+	local frames, errors, callbacks = {}, {}, {}
 	local env = setmetatable({
 		TweaksForeverDB = saved,
+		Settings = {
+			SetOnValueChangedCallback = function(variable, fn)
+				callbacks[variable] = fn
+			end,
+		},
 		C_AddOns = { IsAddOnLoaded = function() end },
 		CreateFrame = function()
 			local frame = {}
@@ -30,6 +35,11 @@ local function Load(saved)
 	ns.Feature({ key = "needsPresent", default = true, needs = { title = "Present", check = present } })
 	ns.Feature({ key = "needsMissing", default = true, needs = { title = "Missing", check = function() end } })
 	ns.Feature({ key = "needsBroken", default = true, needs = { title = "Broken", check = error } })
+	-- A setting callback names the variable Settings.lua registers, and only for a declared feature.
+	local changed = function() end
+	ns.OnSettingChanged("gearMark", changed)
+	assert(callbacks.TweaksForever_gearMark == changed and ns.SettingVariable("gearMark") == "TweaksForever_gearMark")
+	assert(not pcall(ns.OnSettingChanged, "gearMarks", changed), "a misspelt key fails loudly")
 	local ran = false
 	ns.Init(function()
 		ran = true

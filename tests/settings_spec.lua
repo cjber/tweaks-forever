@@ -101,6 +101,9 @@ ns = {
 		fn()
 	end,
 	ConflictOf = function() end,
+	SettingVariable = function(key)
+		return "TweaksForever_" .. key
+	end,
 	MissingOf = function(key)
 		return missing[key]
 	end,

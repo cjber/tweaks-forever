@@ -208,6 +208,6 @@ ns.Init(function()
 	end)
 	-- SavedVariables are written after this, so the restored volumes stay restored if the game closes.
 	ns.On("PLAYER_LOGOUT", RestoreSounds)
-	Settings.SetOnValueChangedCallback("TweaksForever_fishingSounds", UpdateSounds)
+	ns.OnSettingChanged("fishingSounds", UpdateSounds)
 	UpdateSounds()
 end)

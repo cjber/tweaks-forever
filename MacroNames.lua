@@ -41,5 +41,5 @@ ns.Init(function()
 	-- Never hooksecurefunc on the events frame's RegisterFrame: that writes into the action bars' secure code.
 	ns.On("ADDON_LOADED", ApplyAll)
 	ApplyAll()
-	Settings.SetOnValueChangedCallback("TweaksForever_hideMacroNames", ApplyAll)
+	ns.OnSettingChanged("hideMacroNames", ApplyAll)
 end)

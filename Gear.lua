@@ -18,7 +18,7 @@ ns.Feature({
 	category = "Gear",
 	name = "Remember the weapons a fishing pole replaces",
 	tooltip = "Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your "
-		.. "bags. Ctrl+Right-click one of them to put them back on.",
+		.. "bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on.",
 	default = true,
 	parent = "gearGroups",
 })
@@ -581,7 +581,7 @@ local function OpenMenu(button, itemID)
 				return MenuResponse.CloseAll
 			end)
 		end
-		root:CreateButton(L["New group…"], function()
+		root:CreateButton(L["New group..."], function()
 			NewGroup(itemID)
 		end)
 		-- Each source equips its own way, so a group and a set sharing a name stay distinct.
@@ -713,9 +713,9 @@ local function TrackWeapons()
 		stockSets = nil
 		RefreshBags()
 	end)
-	Settings.SetOnValueChangedCallback("TweaksForever_gearGroups", RefreshBags)
-	Settings.SetOnValueChangedCallback("TweaksForever_beforeFishing", RefreshBags)
-	Settings.SetOnValueChangedCallback("TweaksForever_gearMark", RefreshBags)
+	ns.OnSettingChanged("gearGroups", RefreshBags)
+	ns.OnSettingChanged("beforeFishing", RefreshBags)
+	ns.OnSettingChanged("gearMark", RefreshBags)
 	Settle()
 end
 

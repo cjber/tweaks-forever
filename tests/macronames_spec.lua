@@ -36,17 +36,15 @@ function registry:ForEachFrame(fn)
 end
 
 local changed
+ns.OnSettingChanged = function(key, fn)
+	assert(key == "hideMacroNames")
+	changed = fn
+end
 local env = setmetatable({
 	ActionBarButtonEventsFrame = registry,
 	hooksecurefunc = function()
 		error("the action bars' events frame is never hooked")
 	end,
-	Settings = {
-		SetOnValueChangedCallback = function(variable, fn)
-			assert(variable == "TweaksForever_hideMacroNames")
-			changed = fn
-		end,
-	},
 }, { __index = _G })
 env._G = env
 setfenv(assert(loadfile("MacroNames.lua")), env)("TweaksForever", ns)

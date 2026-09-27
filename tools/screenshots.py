@@ -125,7 +125,7 @@ def menu(ui):
     item_id, _, groups = BAG[HOVERED]
     entries = [MenuTitle(ui.item(item_id).name)]
     entries += [MenuCheckbox(colored(name, GROUPS[name]), name in groups) for name in sorted(GROUPS)]
-    entries += [MenuButton("New group…"), MenuDivider()]
+    entries += [MenuButton("New group..."), MenuDivider()]
     entries += [MenuButton("Equip " + name) for name in groups]
     entries += [MenuButton("Colour", submenu=True, hover=True)]
     panel, menu_rects = context_menu(ui, entries)
@@ -314,7 +314,7 @@ JUNK_BAG = [
     (None, None, False),
 ]
 JUNK_HOVERED = 1
-JUNK_LINE = "Marked as junk \u2013 Alt+Right-click to unmark"
+JUNK_LINE = "Marked as junk. Alt+Right-click to unmark."
 
 
 def junk(ui):
