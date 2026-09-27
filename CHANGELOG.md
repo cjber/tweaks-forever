@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.6.5] - 2026-09-28
+
+- **The Abandon quests button responds to clicks.** It now sits above the quest list's scroll area, which previously intercepted clicks before they reached the selection window.
+
 ## [0.6.4] - 2026-09-27
 
 - **Stronger release checks.** Releases require the complete checks to pass on the exact published commit, including native UI hook and Lua coverage checks.
