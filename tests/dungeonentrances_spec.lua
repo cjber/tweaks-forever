@@ -19,13 +19,6 @@ local env = setmetatable({
 	CreateAtlasMarkup = function(atlas)
 		return "|A:" .. atlas .. "|a"
 	end,
-	tInvert = function(list)
-		local inverted = {}
-		for i, value in ipairs(list) do
-			inverted[value] = i
-		end
-		return inverted
-	end,
 }, { __index = _G })
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("DungeonEntrances.lua")), env)("TweaksForever", ns)

@@ -20,9 +20,6 @@ local function Region(props)
 	function r:Hide()
 		self.shown = false
 	end
-	function r:SetShown(v)
-		self.shown = not not v
-	end
 	function r:IsShown()
 		return self.shown
 	end
