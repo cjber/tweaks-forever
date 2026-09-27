@@ -14,6 +14,12 @@ globals = {
 	"TweaksForeverDungeonEntrancePinMixin",
 }
 read_globals = {
+	"GetQuestID",
+	"QuestScrollFrame",
+	"QuestMapFrame",
+	"QuestLogPopupDetailFrame",
+	"QuestFrameDetailPanel",
+	"QuestFrame",
 	"AcceptQuest",
 	"AcceptResurrect",
 	"ActionBarButtonEventsFrame",
@@ -187,6 +193,7 @@ read_globals = {
 	"PlaySound",
 	"PROFESSIONS_BUTTON",
 	"Questie",
+	"QuestieLoader",
 	"QuestObjectiveTracker",
 	"RED_FONT_COLOR",
 	"RepairAllItems",

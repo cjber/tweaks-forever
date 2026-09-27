@@ -185,6 +185,9 @@ TweaksForeverCharDB = nil
 ---@field Apply fun(owner: Button, bag: integer, slot: integer)
 
 ---@class TFNamespace
+---@field ForeverQuests table<integer, true>
+---@field QuestLog TFQuestLog
+---@field QuestTitle fun(id: integer, title: string): string
 ---@field L table<string, string> English phrase to this locale's text; a missing one is the phrase itself
 ---@field db TFDatabase
 ---@field features TFFeature[]

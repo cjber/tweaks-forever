@@ -67,3 +67,13 @@ All off until you turn them on, except faster auto loot.
 
 - `TrainableSpells()` returns the class trainer spells your level allows that you haven't learned (next rank only, no weapon skills or riding) as fresh `{spellID, name, level, cost, line, lineID, general}` tables. `line` is the tab's localised name, `lineID` its SkillLine ID. A General tab spell (Dual Wield, Parry, Plate Mail) has `general` set and its own skill line as `lineID`. `cost` is missing when the fee isn't known. It returns `nil` before login and in combat.
 - `DungeonEntrance(instanceID)` takes an instance's Map ID (230 for Blackrock Depths) and returns a fresh `{map, x, y}`: its own entrance as a UiMapID and 0–1 coordinates, not the shared pin for Blackrock Mountain or the Gates of Ahn'Qiraj. It works before login and in combat, and returns `nil` for an instance with no entrance in the client, such as Naxxramas.
+
+## Quest log
+
+**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
+
+**Highlight new Forever quests** marks quests added since Classic Era with a soft gold background in the log and quest text.
+
+**Abandon multiple quests** adds an Abandon quests button to the quest log. Select individual quests or Select all, then click Abandon selected and Confirm abandon. Progress and associated quest items are lost. Hidden and non-abandonable quests are excluded; combat prevents abandoning.
+
+**Native quest map icons** replaces Questie’s quest-marker artwork with stock pickup, turn-in and objective symbols at readable map/minimap sizes. It keeps Questie’s full marker coverage and tooltips, and leaves its saved settings untouched. Off restores its appearance. QuestieDB is read automatically when installed; the database alone does not draw these markers.

@@ -1,5 +1,8 @@
 local features, initializers = {}, {}
 local ns = {
+	QuestTitle = function(_, title)
+		return title
+	end,
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,

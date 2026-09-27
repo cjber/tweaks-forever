@@ -231,7 +231,7 @@ function Model.Lines(npc)
 	local lines = {}
 	for _, match in ipairs(Model.Matches(npc)) do
 		local title = NORMAL_FONT_COLOR
-		lines[#lines + 1] = { match.quest.title, title.r, title.g, title.b }
+		lines[#lines + 1] = { ns.QuestTitle(match.quest.id, match.quest.title), title.r, title.g, title.b }
 		for _, objective in ipairs(match.objectives) do
 			local color = objective.finished and GRAY_FONT_COLOR or HIGHLIGHT_FONT_COLOR
 			lines[#lines + 1] = { " - " .. objective.text, color.r, color.g, color.b }

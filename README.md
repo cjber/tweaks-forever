@@ -8,7 +8,7 @@ Small quality-of-life tweaks for WoW: Forever that look like they came with the 
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-I wanted the handful of little addons I always install in one place, looking like they came with the game. Tweaks Forever is quest and gossip automation, repairs, junk selling, gear groups, map extras, movable windows, nameplates and fishing, as checkboxes in the game's own settings. Moving windows is a tab in Edit Mode, and the map uses retail's own dungeon icons. Nothing opens a window of its own.
+I wanted the handful of little addons I always install in one place, looking like they came with the game. Tweaks Forever is quest and gossip automation, repairs, junk selling, gear groups, map extras, movable windows, nameplates and fishing, as checkboxes in the game's own settings. Moving windows is a tab in Edit Mode, and the map uses retail's own dungeon icons.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
@@ -26,8 +26,14 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 ## Features
 
+Quest levels appear across the quest UI. Forever-only quests get a subtle gold background, and **Abandon quests** opens a checklist with one confirmation for the selected batch.
+
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/quests.png" width="442" alt="Abandon quests checklist with three quests selected and a confirmation warning">
+
 Every feature has its own checkbox; [docs/features.md](docs/features.md) has the detail.
 
+- **Quest levels and new stories.** Show quest levels on native map tooltips and the tracker. A soft gold tint identifies quests added in Forever.
+- **Abandon quests together.** Select quests in the quest log, then confirm the batch once.
 - **Quest and gossip automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map at a flight master, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells greys in batches that stay in the buyback tab. **Alt+Right-click** marks any item as junk, with the game's junk coin.
