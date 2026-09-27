@@ -110,8 +110,8 @@ LuaLS checks runtime Lua and `types/`, including TOC-loaded generated data; the 
 
 `python3 tools/lint_multivalue.py` checks every TOC entry, or the file paths supplied as arguments.
 Lua expands an unparenthesised final call in an argument list, array-style table field or return.
-This covers `select()` and the client's multi-return calls listed in `MULTI_RETURN` (`GetDrawLayer`,
-`GetPoint`, `GetRGB`, `UnitClass`, …), bare, namespaced or as methods: `CreateTexture(nil, icon:GetDrawLayer())`
+This covers `select()` and the client's multi-return calls listed in `MULTI_RETURN` (such as `GetDrawLayer`,
+`GetPoint`, `GetRGB` and `UnitClass`), bare, namespaced or as methods: `CreateTexture(nil, icon:GetDrawLayer())`
 passes the sublevel as the template name. Add a multi-return API there when the addon starts calling it.
 `select()`'s own final argument expands by design. Use `f((select(2, UnitClass(unit))))` or a local for a
 single value. Intentional expansion requires

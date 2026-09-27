@@ -61,7 +61,8 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - SavedVariables `TweaksForeverDB` (feature keys, `junk`, `windowLayouts`, `savedSounds`, `lastVersion`) and
   `TweaksForeverCharDB` (`groups`, `colours`, `beforeFishing`) — persisted formats; keys are data.
 - Feature `key`s are persisted and also form the setting variable `"TweaksForever_" .. key`, looked up by
-  string in `Settings.SetOnValueChangedCallback` calls (Fishing, Gear, Frames).
+  string in `Settings.SetOnValueChangedCallback` calls (Errors, Fishing, Frames, Gear,
+  MacroNames, QuestProgress, Reagents, Sections, Spellbook, Tooltips).
 - `ns.On("<EVENT>")`, `hooksecurefunc("<Function>")` and `HookScript("<Script>")` name Blizzard events, functions
   and scripts as strings.
 - `Errors.lua` builds `_G["LE_GAME_ERR_" .. name]`; `Frames.lua` resolves `_G[record.name]` and loads the
@@ -79,7 +80,7 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|SetOnValueChangedCallback|SLASH_|S
 - `ns.Junk`, `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration`, `ns.Sections`, `ns.Reagents`, `ns.Camp`,
   `ns.ZoneLevels`, `ns.Entrances`, `ns.FutureSpells` — pure `Model` tables exported for the specs, each named
   once in production. Some are also cross-file APIs: `ns.Fishing.IsPole` (Gear), `ns.Gear.MarksOf`/`ColourOf`/
-  `OnRefresh`/`Settling` (Sections), `ns.Sections` constants and `lift`/`Sectioned` (Reagents).
+  `OnRefresh`/`Settling` (Sections), `ns.Sections` constants, `lift` and `Relayout` (Reagents).
 - `ns.ClickMode` (Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core.lua), `ns.Suggestion`
   (Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
   `ns.LineName`, `ns.GeneralName` (also read by API.lua) — shared helpers.
@@ -110,7 +111,7 @@ finding.
 - Model fields named once in production (`ns.Junk`, `ns.Camp`, …) and `types/` classes referenced once
   (`NamePlateFrame`, `SpellBookFrameTemplate_PagedSpellsFrame`, `SpellBookSingleSkillLineCategoryMixin`,
   `TFEntrancePin`): spec exports and annotations of external or XML-made objects, not dead code.
-- `Sections.lua`/`Reagents.lua` `Grow`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
+- `Sections.lua` `Layout`/`Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
   and `MIN_SCALE` is already one constant; each owns its own state.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
 - `Sections.lua`/`Reagents.lua` `Relayout`: a three-line schedule idiom, not a shared implementation.
@@ -151,7 +152,8 @@ Unlisted paths are `production`.
 - Pure logic goes in a local `Model` table exported on `ns` so specs can load the file headlessly.
 - PascalCase local functions, UPPER_CASE constants, tabs, 120 columns. British spelling in UI text.
 - Comments are short and state why: client quirks ("Camelot", "Forever"), taint and combat restrictions.
-- No error handling beyond `xpcall` in Core's dispatcher; host-API guards (`X and X()`) cover functions
+- No error handling beyond `xpcall` in Core's dispatcher and `pcall` around other addons' code (conflict and
+  `needs` checks in `ns.RefreshConflicts`, QuestieDB in `ns.QuestieDB`); host-API guards (`X and X()`) cover functions
   absent on this client.
 
 ## Risk order
