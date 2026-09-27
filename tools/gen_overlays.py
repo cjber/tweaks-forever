@@ -127,15 +127,8 @@ def generate(tables):
         "ns.Overlays = {",
     ]
     for art, records in sorted(packed.items()):
-        chunks, chunk = [], ""
-        for record in records:
-            for character in record:
-                if len(chunk) == 100:
-                    chunks.append(chunk)
-                    chunk = ""
-                chunk += character
-        if chunk:
-            chunks.append(chunk)
+        text = "".join(records)
+        chunks = [text[i : i + 100] for i in range(0, len(text), 100)]
         lines.append(f"\t[{art}] = " + f'"{chunks[0]}"' + ("," if len(chunks) == 1 else ""))
         lines.extend(
             f'\t\t.. "{chunk}"' + ("," if i == len(chunks) - 1 else "") for i, chunk in enumerate(chunks[1:], 1)

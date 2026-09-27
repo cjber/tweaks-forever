@@ -7,9 +7,8 @@ Blizzard's own calls, blamed on this addon. See AGENTS.md for the ways to hook t
 
 import re
 import sys
-from pathlib import Path
 
-from tools.lint_multivalue import LuaSyntaxError, Token, toc_paths, tokenize
+from tools.lint_multivalue import Token, run, tokenize
 
 # Globals this addon owns. Every other global root is Blizzard's (or another addon's).
 OWN = re.compile(r"TweaksForever\w*|SLASH_\w+|SlashCmdList")
@@ -68,7 +67,7 @@ def locals_of(tokens: list[Token]) -> tuple[set[str], set[str]]:
 
 
 def chain_end(tokens: list[Token], index: int) -> int:
-    """Index just past `root(.name|[expr])*` starting at the root name at `index`, and whether it has segments."""
+    """Index just past `root(.name|[expr])*` starting at the root name at `index`."""
     cursor = index + 1
     while True:
         if tokens[cursor].text == "." and tokens[cursor + 1].kind == "name":
@@ -123,21 +122,7 @@ def check(source: str) -> list[tuple[int, str]]:
 
 
 def main() -> int:
-    paths = [Path(arg) for arg in sys.argv[1:]] or toc_paths()
-    failed = False
-    for path in paths:
-        if path.parts[0] == "Data":
-            continue
-        try:
-            findings = check(path.read_text())
-        except (LuaSyntaxError, OSError) as error:
-            print(f"{path}:{error}", file=sys.stderr)
-            failed = True
-            continue
-        for line, message in findings:
-            print(f"{path}:{line}: {message}")
-            failed = True
-    return int(failed)
+    return run(check, skip=lambda path: path.parts[0] == "Data")
 
 
 if __name__ == "__main__":

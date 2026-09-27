@@ -327,7 +327,7 @@ def junk_layers(ui):
     slots = [(item, count) for item, count, _ in JUNK_BAG]
     bag, rects = container_frame(ui, "Backpack", 133633, slots, MONEY, hover=JUNK_HOVERED, junk=marked)
     item = ui.item(JUNK_BAG[JUNK_HOVERED][0])
-    # Junk.lua's SetBagItem post-hook: AddLine(text, 1, 0.82, 0, true).
+    # Junk.lua's bag-item tooltip callback (ns.OnTooltip): AddLine(text, 1, 0.82, 0, true).
     tip = tooltip(ui, item_tooltip_lines(ui, item, PLAYER_LEVEL) + [TooltipLine(JUNK_LINE, (1, 0.82, 0))])
     slot_x, slot_y, _, _ = rects["slots"][JUNK_HOVERED]
     idle, _ = container_frame(ui, "Backpack", 133633, slots, MONEY, junk=marked)
@@ -476,7 +476,7 @@ def editmode(ui):
 
 
 # Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
-# and a 12 cast bar, name and level 2 above the bar, a 5-unit glow on the target, the others at 0.6 alpha.
+# and a 12 cast bar, name and level 4 above the bar, the selection outline on the target, the others at 0.6 alpha.
 PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP, PLATE_DIMMED = 166, 16, 12, 2, 0.6
 QUEST_ICON, QUEST_GAP = 20, 4
 HOSTILE, ROGUE = (1.0, 0.0, 0.0), (1.0, 0.96, 0.41)

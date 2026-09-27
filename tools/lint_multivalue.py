@@ -2,6 +2,7 @@
 
 import re
 import sys
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -337,12 +338,15 @@ def toc_paths() -> list[Path]:
     ]
 
 
-def main() -> int:
+def run(check: Callable[[str], list[tuple[int, str]]], skip: Callable[[Path], bool] = lambda path: False) -> int:
+    """Lint the paths given, or every Lua file the TOC loads, printing `path:line: message` per finding."""
     paths = [Path(arg) for arg in sys.argv[1:]] or toc_paths()
     failed = False
     for path in paths:
+        if skip(path):
+            continue
         try:
-            findings = Parser(path.read_text()).check()
+            findings = check(path.read_text())
         except (LuaSyntaxError, OSError) as error:
             print(f"{path}:{error}", file=sys.stderr)
             failed = True
@@ -351,6 +355,10 @@ def main() -> int:
             print(f"{path}:{line}: {message}")
             failed = True
     return int(failed)
+
+
+def main() -> int:
+    return run(lambda source: Parser(source).check())
 
 
 if __name__ == "__main__":
