@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.6.4] - 2026-09-27
+
+- **Stronger release checks.** Releases require the complete checks to pass on the exact published commit, including native UI hook and Lua coverage checks.
+
 - **Questie markers match the game.** Map and minimap pins use stock quest symbols at readable sizes, preserving all locations, objectives and tooltips. Turn off Native quest map icons to restore Questie’s appearance.
 
 - **Quest levels stay visible.** Native map quest tooltips and the tracker show levels, as do quest progress tooltips. Minimap giver tooltips include later quests with their required level.

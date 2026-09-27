@@ -8,6 +8,9 @@ from tools.lint_taint import check
 class TaintTest(unittest.TestCase):
     def test_flagged(self):
         cases = {
+            'hooksecurefunc(ns.frame, "SetUnit", f)': "taint-method-hook",
+            'local frame = ProfessionsFrame; hooksecurefunc(frame, "RefreshRightTabs", f)': "taint-method-hook",
+            'hooksecurefunc(ProfessionsFrame, \n"RightTabSelected", f)': "taint-method-hook",
             'hooksecurefunc(GameTooltip, "SetUnit", f)': "taint-method-hook",
             'local function F(frame) hooksecurefunc(frame, "UpdateAnchors", f) end': "taint-method-hook",
             'hooksecurefunc(ContainerFrameItemButtonMixin, "OnLoad", f)': "taint-method-hook",
