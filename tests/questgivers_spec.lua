@@ -221,7 +221,8 @@ assert(#Model.Resolve("Ada", 0, 500, 500).points == 1)
 local ada = Model.Resolve("Ada", 0, 500, 500)
 local offers, turnIns = Model.Quests(ada)
 assert(#turnIns == 0)
-assert(#offers == 2, "done, other race, unmet prerequisite, too high and unknowable skill are left out")
+assert(#offers == 3, "future quests retain their level; done, race, prerequisites and unknown skill stay filtered")
+assert(offers[3].id == 105 and offers[3].soon and offers[3].min == 18, "future giver quest shows unlock level")
 assert(offers[1].id == 101 and offers[1].level == 15 and not offers[1].soon)
 assert(offers[2].id == 104 and offers[2].soon and offers[2].min == 14, "a prerequisite done, two levels up")
 player.level = 20
@@ -287,8 +288,8 @@ local tooltip = {
 }
 env.GameTooltip = tooltip
 postCalls[21](tooltip, { lines = { { leftText = "Ada" } } })
-assert(#added == 2 and shown)
+assert(#added == 3 and shown)
 ns.db.giverTooltips = false
 postCalls[21](tooltip, { lines = { { leftText = "Ada" } } })
-assert(#added == 2, "switched off")
+assert(#added == 3, "switched off")
 print("questgivers: ok")

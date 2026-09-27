@@ -7,7 +7,7 @@ LeaPlusDB = nil
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
----@type {db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
+---@type {usedIcons: table<integer, string>?, db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
 Questie = nil
 
 -- QuestieDB's public API (contract 2), only the parts QuestGivers.lua and QuestProgress.lua read. Entity reads return packed values.
@@ -185,3 +185,22 @@ PROFESSIONS_BUTTON = ""
 SETTINGS = ""
 ---@type string
 TRADE = ""
+
+-- QuestMapFrame.xml places its quest text inside this scroll child.
+---@class QuestMapDetailsScrollFrame
+---@field Contents Frame
+
+---@class TFQuestiePin : Frame
+---@field data? {Icon: integer}
+---@field texture Texture
+---@field isManualIcon? boolean
+---@field miniMapIcon? boolean
+---@field UpdateTexture fun(self: TFQuestiePin, texture: string?)
+
+---@class TFQuestieMap
+---@field questIdFrames table<integer, table<string, string>>
+---@field GetScaleValue fun(): number
+---@field utils {SetDrawOrder: fun(frame: TFQuestiePin), RescaleIcon: fun(frame: TFQuestiePin|string, scale?: number)}
+
+---@type {ImportModule: fun(self: table, name: string): TFQuestieMap}?
+QuestieLoader = nil

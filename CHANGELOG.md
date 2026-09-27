@@ -11,6 +11,12 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Questie markers match the game.** Map and minimap pins use stock quest symbols at readable sizes, preserving all locations, objectives and tooltips. Turn off Native quest map icons to restore Questie’s appearance.
+
+- **Quest levels stay visible.** Native map quest tooltips and the tracker show levels, as do quest progress tooltips. Minimap giver tooltips include later quests with their required level.
+- **Forever quests have a soft gold background.** Quests added since Classic Era are marked in the quest log and quest text.
+- **Abandon several quests at once.** The quest log has a selection window with Select all, individual checkboxes and one confirmation for the batch.
+
 ## [0.6.3] - 2026-09-27
 
 - **The tooltip health bar uses the game's own art.** Under Modern tooltips, the bar inside a unit's tooltip now has the retail game's bar texture on a darker track of the same colour, framed by Blizzard's own tooltip bar border, in place of the flat bar and thin grey outline.

@@ -25,6 +25,7 @@ from wowmock import (  # ty: ignore[unresolved-import]
     ARIALN,
     FONTS,
     FRIZQT,
+    INSET_FRAME_LAYOUT,
     NORMAL,
     TOOLTIP_LINE_GAP,
     TOOLTIP_PADDING,
@@ -54,6 +55,7 @@ from wowmock import (  # ty: ignore[unresolved-import]
     minimal_slider,
     panel_tabs,
     scene,
+    tiled,
     tooltip,
     ui_panel_button,
     unique_corners_layout,
@@ -728,8 +730,69 @@ def tooltips(ui):
     scene(ui, [(npc, 0, 0), (tip, npc.width + 24, 0)], MARGIN).save(OUT / "tooltips.png")
 
 
+def quest_abandon(ui):
+    # BasicFrameTemplateWithInset: Blizzard_UIPanelTemplates/Mainline/UIPanelTemplates.xml:558–704.
+    canvas = ui.canvas(392, 468)
+    x, y, w, h = 6, 1, 380, 460
+    rock = ui.texture("interface/framegeneral/ui-background-rock.blp")
+    marble = ui.texture("interface/framegeneral/ui-background-marble.blp")
+    tiled(canvas, rock, x + 2, y + 21, w - 4, h - 23, rock.width / ui.scale, rock.height / ui.scale)
+    tiled(canvas, marble, x + 4, y + 24, w - 10, h - 28, marble.width / ui.scale, marble.height / ui.scale)
+    draw_nine_slice(canvas, INSET_FRAME_LAYOUT, x + 4, y + 24, w - 10, h - 28)
+    layout = {
+        "TopLeftCorner": {"atlas": "UI-Frame-TopLeftCorner", "x": -6, "y": 1},
+        "TopRightCorner": {"atlas": "UI-Frame-TopCornerRight", "y": 1},
+        "BottomLeftCorner": {"atlas": "UI-Frame-BotCornerLeft", "x": -6, "y": -5},
+        "BottomRightCorner": {"atlas": "UI-Frame-BotCornerRight", "y": -5},
+        "TopEdge": {"atlas": "_UI-Frame-TitleTile"},
+        "BottomEdge": {"atlas": "_UI-Frame-Bot"},
+        "LeftEdge": {"atlas": "!UI-Frame-LeftTile"},
+        "RightEdge": {"atlas": "!UI-Frame-RightTile"},
+    }
+    canvas.draw(ui.atlas("_UI-Frame-TitleTileBg"), x + 2, y + 1, w - 27, 20)
+    draw_nine_slice(canvas, layout, x, y, w, h)
+    close_button(canvas, x + w, y)
+    canvas.text(x, y + 7, "Abandon quests", FONTS["GameFontNormal"], NORMAL, justify="CENTER", width=w)
+    for label, bx, by, bw in [
+        ("Select all", 16, 34, 110),
+        ("Clear selection", 132, 34, 130),
+        ("Previous", 16, 334, 110),
+        ("Next", 252, 334, 110),
+        ("Confirm abandon (3)", 16, 420, 210),
+        ("Cancel", 242, 420, 120),
+    ]:
+        ui_panel_button(canvas, x + bx, y + by, bw, 24, label)
+    quests = [
+        "[17] Assessing the Threat",
+        "[17] Show of Force",
+        "[18] The Price of Shoes",
+        "[21] Blackrock Blockade",
+        "[21] Blackrock Menace",
+        "[21] Selling Fish",
+        "[23] Solomon's Law",
+        "[25+] WANTED: Gath'Ilzogg",
+    ]
+    for index, title in enumerate(quests):
+        cy = y + 64 + index * 26
+        canvas.draw(ui.texture("interface/buttons/ui-checkbox-up.blp"), x + 16, cy, 26, 26)
+        if index in (3, 4, 5):
+            canvas.draw(ui.texture("interface/buttons/ui-checkbox-check.blp"), x + 16, cy, 26, 26)
+        canvas.text(x + 44, cy + 7, title, FONTS["GameFontHighlightSmall"])
+    canvas.text(x, y + 340, "Page 1 of 1", FONTS["GameFontHighlightSmall"], justify="CENTER", width=w)
+    lines = wrap_text(
+        canvas,
+        "Abandon these quests? Their progress and associated quest items will be lost.",
+        FONTS["GameFontHighlightSmall"],
+        344,
+    )
+    for index, line in enumerate(lines):
+        canvas.text(x + 18, y + 368 + index * 12, line, FONTS["GameFontHighlightSmall"])
+    scene(ui, [(canvas, 0, 0)], MARGIN).image.save(OUT / "quests.png")
+
+
 def main():
     ui = Ui(scale=2)
+    quest_abandon(ui)
     gear(ui)
     menu(ui)
     exploration(ui)

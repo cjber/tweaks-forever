@@ -24,8 +24,6 @@ ns.Feature({
 local ADDON, CONTRACT = "QuestieDB", 2
 -- Yards from you a giver can stand and still be on the minimap, whose widest view is about 233 yards across its radius.
 local RANGE = 250
--- Quests this many levels above you still show, greyed, with the level they open at.
-local SOON = 3
 local QUEST_FIELDS = {
 	"name",
 	"questLevel",
@@ -264,7 +262,7 @@ local function ByLevel(a, b)
 	return a.title < b.title
 end
 
--- What an NPC has for you: quests you can take now, then the next few levels' (`soon`), and the quests in your log it
+-- What an NPC has for you: quests you can take now, then level-locked quests (`soon`), and the quests in your log it
 -- takes back (`turnIn`, with `ready` once complete).
 ---@param npc TFGiverCandidate
 ---@return TFGiverQuest[] offers
@@ -289,7 +287,7 @@ function Model.Quests(npc)
 				open = open and not C_QuestLog.IsQuestFlaggedCompleted(other) and not C_QuestLog.IsOnQuest(other)
 			end
 			local min = tonumber(v.requiredLevel) or 0
-			if open and min <= level + SOON then
+			if open then
 				local questLevel = tonumber(v.questLevel) or 0
 				offers[#offers + 1] = {
 					id = id,
