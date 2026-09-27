@@ -177,6 +177,7 @@ read_globals = {
 	"NineSliceUtil",
 	"NORMAL_FONT_COLOR",
 	"NUM_TOTAL_EQUIPPED_BAG_SLOTS",
+	"ObjectiveTrackerFrame",
 	"PAGE_NUMBER_WITH_MAX",
 	"PagedContentFrameBaseMixin",
 	"PanelTemplates_SetNumTabs",

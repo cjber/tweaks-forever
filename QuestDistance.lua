@@ -242,7 +242,9 @@ ns.Init(function()
 	-- EndLayout or OnFreeBlock writes into Blizzard's tracker and taints its layout. A freed block hides its labels
 	-- with it, as they are its children.
 	local pending = false
-	CreateFrame("Frame"):SetScript("OnUpdate", function()
+	local watcher = CreateFrame("Frame")
+	watcher:Hide()
+	watcher:SetScript("OnUpdate", function()
 		local container = QuestObjectiveTracker.parentContainer
 		if container and container.dirty then
 			pending = true
@@ -250,6 +252,17 @@ ns.Init(function()
 			pending = false
 			Refresh()
 		end
+	end)
+	-- Shown, so polling every frame, only while the feature is on and the tracker is on screen.
+	local function Watch()
+		watcher:SetShown(ns.Active("questDistance") and ObjectiveTrackerFrame:IsShown())
+	end
+	Watch()
+	ObjectiveTrackerFrame:HookScript("OnShow", Watch)
+	ObjectiveTrackerFrame:HookScript("OnHide", Watch)
+	ns.OnSettingChanged("questDistance", function()
+		Watch()
+		Refresh()
 	end)
 
 	---@param last {x: number?, y: number?}
@@ -264,6 +277,8 @@ ns.Init(function()
 	-- Re-sort only after real movement and never in combat, when the tracker's item buttons can't be moved.
 	local sorted, checked = {}, {}
 	C_Timer.NewTicker(1, function()
+		-- Questie's tracker option can turn on or off at any time, and sets no flag we can watch.
+		Watch()
 		if not ns.Active("questDistance") then
 			if checked.x then
 				sorted.x, checked.x = nil, nil
