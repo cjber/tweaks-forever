@@ -170,7 +170,7 @@ local function CreateDecorations(inside, Each)
 	-- the column stays straight instead of stepping in beside each button.
 	local column = 0
 
-	-- A quest with no area on this continent shows nothing. Anchors only move when the tracker lays out again.
+	-- A quest with no area on this continent shows nothing.
 	---@param block TFQuestBlock
 	---@param relayout? boolean
 	local function Update(block, relayout)

@@ -362,15 +362,13 @@ local function RefreshPreview(record)
 			local x = GetUIPanelLayoutAttribute("LEFT_OFFSET") + (panel.xoffset or 0)
 			preview:SetPoint("TOPLEFT", UIParent, "TOPLEFT", x / preview:GetScale(), y)
 		end
-	elseif frame and frame:GetCenter() then
-		local current = Serialize(frame, 1)
+	else
+		local current = frame and Serialize(frame, 1)
 		if current then
 			Place(preview, current)
 		else
 			preview:SetPoint("CENTER", UIParent, "CENTER")
 		end
-	else
-		preview:SetPoint("CENTER", UIParent, "CENTER")
 	end
 end
 
@@ -549,13 +547,11 @@ local function Label(parent, text, font, x, y)
 	return label
 end
 
----@param width number
----@param height number
 ---@return TFScaleDialog
-local function MakePanel(width, height)
+local function MakePanel()
 	local panel = CreateFrame("Frame", nil, UIParent) --[[@as TFScaleDialog]]
 	panel:Hide()
-	panel:SetSize(width, height)
+	panel:SetSize(320, 164)
 	panel:SetFrameStrata("DIALOG")
 	panel:SetFrameLevel(210)
 	panel:SetClampedToScreen(true)
@@ -711,7 +707,7 @@ local function BuildEditor()
 	end
 	manager:HookScript("OnSizeChanged", FitSheet)
 
-	dialog = MakePanel(320, 164)
+	dialog = MakePanel()
 	dialog:SetPoint("TOPLEFT", manager, "TOPRIGHT", 8, 0)
 	dialog.Title = Label(dialog, "", "GameFontHighlightLarge", 18, -18)
 	Label(dialog, L["Scale"], "GameFontHighlightMedium", 18, -55)
