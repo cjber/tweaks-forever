@@ -7,6 +7,7 @@ are fetched from wago.tools once and cached under ~/.cache/wowmock/<build>/.
 """
 
 import io
+import math
 import os
 import re
 import sys
@@ -25,6 +26,8 @@ from wowmock import (  # ty: ignore[unresolved-import]
     FONTS,
     FRIZQT,
     NORMAL,
+    TOOLTIP_LINE_GAP,
+    TOOLTIP_PADDING,
     Font,
     MenuButton,
     MenuCheckbox,
@@ -639,6 +642,92 @@ def demo(ui):
     return len(frames), len(data)
 
 
+# Tooltips.lua under Modern tooltips: the nine pieces cut from media/TooltipBorderModern.tga (PIECES, in sixteenths),
+# with room under the last line for the health bar (EDGE, BOTTOM, HEIGHT, GAP, PADDING), whose track is its colour at
+# TRACK and whose border is Tooltips\UI-StatusBar-Border as three pieces, 8-texel ends at native size.
+TIP_PIECES = {
+    "TopLeftCorner": (0, 7, 0, 7),
+    "TopRightCorner": (9, 16, 0, 7),
+    "BottomLeftCorner": (0, 7, 9, 16),
+    "BottomRightCorner": (9, 16, 9, 16),
+    "TopEdge": (7, 9, 0, 7),
+    "BottomEdge": (7, 9, 9, 16),
+    "LeftEdge": (0, 7, 7, 9),
+    "RightEdge": (9, 16, 7, 9),
+    "Center": (7, 9, 7, 9),
+}
+TIP_CORNER = 7
+BAR_EDGE, BAR_BOTTOM, BAR_HEIGHT, BAR_GAP = 10, 11, 12, 10
+BAR_PADDING = BAR_BOTTOM + BAR_HEIGHT + BAR_GAP - 10
+BAR_TRACK = 0.3
+BAR_FILL = "interface/targetingframe/ui-statusbar.blp"
+BAR_FRAME = "interface/tooltips/ui-statusbar-border.blp"
+BAR_FRAME_CAP, BAR_FRAME_OUT = 8, 2
+BAR_TEXT = Font(ARIALN, 12, (1, 1, 1), None, outline=True)  # Number12FontOutline
+GUILD = (0.6, 0.6, 0.6)
+HORDE = (0.90, 0.05, 0.07)  # PLAYER_FACTION_COLORS[0]
+SHAMAN = (0 / 255, 112 / 255, 221 / 255)  # ChrClasses SHAMAN ClassColor
+
+
+def unit_tooltip(ui, lines, colour, health, text):
+    """GameTooltip as Tooltips.lua's Paint and HealthBar draw it, with `health` of the bar filled."""
+    border = Image.open(ROOT / "media" / "TooltipBorderModern.tga").convert("RGBA")
+    measure = ui.canvas(1, 1)
+    fonts = [FONTS["GameTooltipHeaderText"]] + [FONTS["GameTooltipText"]] * (len(lines) - 1)
+    width = math.ceil(max(measure.text_width(line.left, font) for line, font in zip(lines, fonts, strict=True)))
+    width += 2 * TOOLTIP_PADDING
+    inner = sum(font.height for font in fonts) + TOOLTIP_LINE_GAP * (len(lines) - 1)
+    height = inner + 2 * TOOLTIP_PADDING + BAR_PADDING
+    c = ui.canvas(width, height)
+    k = TIP_CORNER
+    rects = {
+        "TopLeftCorner": (0, 0, k, k),
+        "TopRightCorner": (width - k, 0, k, k),
+        "BottomLeftCorner": (0, height - k, k, k),
+        "BottomRightCorner": (width - k, height - k, k, k),
+        "TopEdge": (k, 0, width - 2 * k, k),
+        "BottomEdge": (k, height - k, width - 2 * k, k),
+        "LeftEdge": (0, k, k, height - 2 * k),
+        "RightEdge": (width - k, k, k, height - 2 * k),
+        "Center": (k, k, width - 2 * k, height - 2 * k),
+    }
+    texel = border.width / 16
+    for name, (left, right, top, bottom) in TIP_PIECES.items():
+        piece = border.crop((round(left * texel), round(top * texel), round(right * texel), round(bottom * texel)))
+        c.draw(piece, *rects[name])
+    y = TOOLTIP_PADDING
+    for line, font in zip(lines, fonts, strict=True):
+        c.text(TOOLTIP_PADDING, y, line.left, font, line.color)
+        y += font.height + TOOLTIP_LINE_GAP
+    x, w, y = BAR_EDGE, width - 2 * BAR_EDGE, height - BAR_BOTTOM - BAR_HEIGHT
+    fill = ui.texture(BAR_FILL)
+    c.draw(fill, x, y, w, BAR_HEIGHT, color=(*(v * BAR_TRACK for v in colour), 1))
+    # A StatusBar crops its texture to the value rather than squeezing it.
+    shown = fill.crop((0, 0, max(1, round(fill.width * health)), fill.height))
+    c.draw(shown, x, y, w * health, BAR_HEIGHT, color=(*colour, 1))
+    frame = ui.texture(BAR_FRAME)
+    cap, fx, fy = BAR_FRAME_CAP, x - BAR_FRAME_OUT, y - BAR_FRAME_OUT
+    fw, fh = w + 2 * BAR_FRAME_OUT, BAR_HEIGHT + 2 * BAR_FRAME_OUT
+    c.draw(frame.crop((0, 0, cap, frame.height)), fx, fy, cap, fh)
+    c.draw(frame.crop((cap, 0, frame.width - cap, frame.height)), fx + cap, fy, fw - 2 * cap, fh)
+    c.draw(frame.crop((frame.width - cap, 0, frame.width, frame.height)), fx + fw - cap, fy, cap, fh)
+    c.text(x, y, text, BAR_TEXT, justify="CENTER", width=w, box_height=BAR_HEIGHT)
+    return c
+
+
+def tooltips(ui):
+    red = ui.global_color("FACTION_RED_COLOR")[:3]
+    npc = unit_tooltip(ui, [TooltipLine("Defias Pillager", red), TooltipLine("Level 14 Humanoid")], red, 0.72, "72%")
+    player = [
+        TooltipLine("Durin", SHAMAN),
+        TooltipLine("<Forever Friends>", GUILD),
+        TooltipLine("Level 20 Orc Shaman (Player)"),
+        TooltipLine("Horde", HORDE),
+    ]
+    tip = unit_tooltip(ui, player, SHAMAN, 412 / 520, "412 / 520")
+    scene(ui, [(npc, 0, 0), (tip, npc.width + 24, 0)], MARGIN).save(OUT / "tooltips.png")
+
+
 def main():
     ui = Ui(scale=2)
     gear(ui)
@@ -651,6 +740,7 @@ def main():
     campfire_buff(ui)
     editmode(ui)
     nameplates(ui)
+    tooltips(ui)
     frames, size = demo(ui)
     print(f"demo.gif: {frames} frames, {size} bytes")
 

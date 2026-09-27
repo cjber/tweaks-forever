@@ -59,10 +59,10 @@ local LAYOUTS = { TooltipDefaultLayout = true, TooltipDefaultDarkLayout = true }
 local GUILD = { 0.6, 0.6, 0.6 }
 
 -- The health bar's fill: this far in from the tooltip's sides and bottom, this tall, and this far below the
--- last line. The tooltip's own margin under its lines is 10. A dark ring and a lighter outline sit around it.
+-- last line. The tooltip's own margin under its lines is 10. The track under the fill is its colour at this shade.
 local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 12, 10
 local PADDING = BOTTOM + HEIGHT + GAP - 10
-local OUTLINE = { 0.38, 0.4, 0.44 }
+local TRACK = 0.3
 local OBJECT = { 0, 0.6, 0.1 }
 -- Room at the top of a comparison tooltip for its "Equipped" header.
 local HEADER = 16
@@ -119,33 +119,40 @@ local function Repaint(tooltips)
 	end
 end
 
--- A 1-pixel line of the outline, from one point of the bar to another.
-local function Line(bar, a, b)
-	local line = bar:CreateTexture(nil, "BACKGROUND", nil, -8)
-	line:SetColorTexture(OUTLINE[1], OUTLINE[2], OUTLINE[3])
-	line:SetPoint(a[1], bar, a[2], a[3], a[4])
-	line:SetPoint(b[1], bar, b[2], b[3], b[4])
-	return line
+-- The retail game's tooltip status bar: TargetingFrame's bar texture, on a track of the same texture in a darker
+-- shade, framed by Blizzard's own tooltip bar border as TooltipStatusBarTemplate places it, 2 out on every side.
+local FILL = "Interface\\TargetingFrame\\UI-StatusBar"
+local FRAME = "Interface\\Tooltips\\UI-StatusBar-Border"
+-- The border file is 128x16 and drawn 16 tall, so a texel is a unit. Its 8-texel ends stay at native size and
+-- only the flat middle stretches along the bar.
+local FRAME_SIZE, FRAME_CAP, FRAME_OUT = 128, 8, 2
+
+-- One piece of the border, cut from texel `from` to `to` of the file.
+local function FramePiece(bar, from, to)
+	local piece = bar:CreateTexture(nil, "OVERLAY", nil, -1)
+	piece:SetTexture(FRAME)
+	piece:SetTexCoord(from / FRAME_SIZE, to / FRAME_SIZE, 0, 1)
+	piece:SetHeight(HEIGHT + 2 * FRAME_OUT)
+	return piece
 end
 
 local function HealthBarArt(bar)
-	-- The outline leaves its corner pixels out, which rounds it.
-	local art = {
-		Line(bar, { "BOTTOMLEFT", "TOPLEFT", -1, 1 }, { "TOPRIGHT", "TOPRIGHT", 1, 2 }),
-		Line(bar, { "TOPLEFT", "BOTTOMLEFT", -1, -1 }, { "BOTTOMRIGHT", "BOTTOMRIGHT", 1, -2 }),
-		Line(bar, { "TOPRIGHT", "TOPLEFT", -1, 1 }, { "BOTTOMLEFT", "BOTTOMLEFT", -2, -1 }),
-		Line(bar, { "TOPLEFT", "TOPRIGHT", 1, 1 }, { "BOTTOMRIGHT", "BOTTOMRIGHT", 2, -1 }),
-	}
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
-	track:SetColorTexture(0.03, 0.035, 0.06)
-	track:SetPoint("TOPLEFT", -1, 1)
-	track:SetPoint("BOTTOMRIGHT", 1, -1)
-	art[#art + 1] = track
+	track:SetTexture(FILL)
+	track:SetAllPoints()
+	local left = FramePiece(bar, 0, FRAME_CAP)
+	left:SetWidth(FRAME_CAP)
+	left:SetPoint("TOPLEFT", -FRAME_OUT, FRAME_OUT)
+	local right = FramePiece(bar, FRAME_SIZE - FRAME_CAP, FRAME_SIZE)
+	right:SetWidth(FRAME_CAP)
+	right:SetPoint("TOPRIGHT", FRAME_OUT, FRAME_OUT)
+	local middle = FramePiece(bar, FRAME_CAP, FRAME_SIZE - FRAME_CAP)
+	middle:SetPoint("TOPLEFT", left, "TOPRIGHT")
+	middle:SetPoint("TOPRIGHT", right, "TOPLEFT")
 	-- The Arial Narrow outline Blizzard puts on its own bars' numbers (the profession rank bar, retail's damage meter).
 	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
 	text:SetPoint("CENTER")
-	art[#art + 1] = text
-	return art, text
+	return { track, left, middle, right, text }, track, text
 end
 
 local function HealthBarStyle(tooltip, bar, art, Update, Fit)
@@ -156,7 +163,7 @@ local function HealthBarStyle(tooltip, bar, art, Update, Fit)
 			bar:SetPoint("BOTTOMLEFT", EDGE, BOTTOM)
 			bar:SetPoint("BOTTOMRIGHT", -EDGE, BOTTOM)
 			bar:SetHeight(HEIGHT)
-			bar:SetStatusBarTexture("Interface\\Buttons\\WHITE8X8")
+			bar:SetStatusBarTexture(FILL)
 		else
 			-- GameTooltip.xml's own placement and art.
 			bar:SetPoint("TOPLEFT", tooltip, "BOTTOMLEFT", 2, -1)
@@ -177,11 +184,11 @@ end
 
 -- The unit health bar Blizzard hangs under GameTooltip, moved inside it. Blizzard still watches the unit and sets the
 -- bar's value, which can be secret; this file never reads it. It only anchors, sizes, textures and colours the bar
--- (engine calls) and adds an outline and text of its own.
+-- (engine calls) and adds a track, border and text of its own.
 local function HealthBar()
 	local tooltip = GameTooltip
 	local bar = tooltip.StatusBar
-	local art, text = HealthBarArt(bar)
+	local art, track, text = HealthBarArt(bar)
 	-- The unit shown, as the token the tooltip was given, whether it is a player, and the bar's colour.
 	local unit, player
 	local r, g, b = OBJECT[1], OBJECT[2], OBJECT[3]
@@ -191,6 +198,7 @@ local function HealthBar()
 			return
 		end
 		bar:SetStatusBarColor(r, g, b)
+		track:SetVertexColor(r * TRACK, g * TRACK, b * TRACK)
 		-- UnitHealth may always return a secret, UnitHealthMax does for units that aren't player-controlled, and
 		-- UnitHealthPercent does whenever its inputs are. Each goes straight to an API documented to take secrets
 		-- (BreakUpLargeNumbers, SetFormattedText): no arithmetic or comparison on any of them. The percentage is

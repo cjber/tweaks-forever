@@ -601,10 +601,11 @@
       "what": "WFA-4: the in-tooltip health bar is a flat white fill with an addon-drawn outline and track in hand-picked colours",
       "why": "WFA-4 requires stock art and palette. With the feature on, the bar swaps GameTooltip.xml's UI-TargetingFrame-BarFill for WHITE8X8 and adds Line()/track textures coloured OUTLINE {0.38,0.4,0.44} and {0.03,0.035,0.06}, which match no Blizzard atlas. Fix: keep a stock bar-fill texture or atlas (as the non-active branch does) and take the outline from an existing status-bar border atlas if one exists in the Forever build.",
       "confidence": "low",
-      "status": "decide",
-      "reason": "WFA-4: the restyled health bar uses WHITE8X8 with hand-picked outline/track colours; switch to stock bar art, or waive?",
+      "status": "fixed",
+      "reason": "owner chose stock bar art (variant C) 2026-09-27",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: WFA-4 standards review; no rule can tell stock bar art from hand-picked"
     },
     {
       "id": "9efd105719",
