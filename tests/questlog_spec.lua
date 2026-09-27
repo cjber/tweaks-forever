@@ -99,3 +99,114 @@ assert(selected == 102, "previous quest selection restored")
 model.Abandon(ids)
 assert(#abandoned == 2, "stale confirmed IDs never abandon a different quest")
 print("questlog: stable batch selection and native quest levels verified")
+
+local frames = {}
+local methods = {}
+for _, name in ipairs({
+	"SetSize",
+	"SetPoint",
+	"SetFrameStrata",
+	"SetJustifyH",
+	"SetWidth",
+	"SetHitRectInsets",
+	"SetFontString",
+	"HookScript",
+}) do
+	methods[name] = function() end
+end
+function methods:SetText(value)
+	self.text = value
+end
+function methods:SetScript(event, fn)
+	self.scripts[event] = fn
+end
+function methods:SetShown(shown)
+	if self.shown ~= shown then
+		self.shown = shown
+		local fn = self.scripts[shown and "OnShow" or "OnHide"]
+		if fn then
+			fn(self)
+		end
+	end
+end
+function methods:Hide()
+	self:SetShown(false)
+end
+function methods:IsShown()
+	return self.shown
+end
+function methods:SetEnabled(enabled)
+	self.enabled = enabled
+end
+function methods:SetChecked(checked)
+	self.checked = checked
+end
+function methods:GetChecked()
+	return self.checked
+end
+function methods:SetFrameLevel(level)
+	self.level = level
+end
+function methods:GetFrameLevel()
+	return self.level
+end
+local function Frame(parent)
+	local frame = setmetatable(
+		{ parent = parent, scripts = {}, shown = true, level = parent and parent.level + 1 or 1 },
+		{
+			__index = methods,
+		}
+	)
+	frames[#frames + 1] = frame
+	return frame
+end
+function methods:CreateFontString()
+	return Frame(self)
+end
+local quests = Frame()
+quests.level = 3
+local scroll = Frame(quests)
+scroll.level = 5
+local function Button(text)
+	for _, frame in ipairs(frames) do
+		if frame.text == text and frame.scripts.OnClick then
+			return frame
+		end
+	end
+	error("Missing button: " .. text)
+end
+local function Click(button)
+	assert(button.enabled ~= false and button.shown, "button must be usable")
+	button.scripts.OnClick(button)
+end
+env.CreateFrame = function(_, _, parent)
+	return Frame(parent)
+end
+env.UIParent = Frame()
+env.QuestMapFrame = { QuestsFrame = quests, DetailsFrame = { ScrollFrame = {} } }
+env.QuestScrollFrame = scroll
+env.QuestLogPopupDetailFrame = Frame()
+env.QuestFrameDetailPanel = Frame()
+env.QuestFrame = Frame()
+env.QuestFrame:Hide()
+env.hooksecurefunc = function() end
+env.PAGE_NUMBER_WITH_MAX = "%d / %d"
+ns.On = function() end
+log = { { title = "First", questID = 101 }, { title = "Last", questID = 104 } }
+init[2]()
+local open = Button("Abandon quests")
+-- The native scroll area's background receives clicks across the button's bounds.
+local receiver = open.level > scroll.level and open or scroll
+assert(receiver.scripts.OnClick, "the native scroll area must not intercept Abandon quests")
+Click(receiver)
+local selectAll = Button("Select all")
+local panel = selectAll.parent
+assert(panel.shown, "click opens the checklist")
+Click(selectAll)
+Click(Button("Abandon selected (2)"))
+assert(Button("Confirm abandon (2)") and #abandoned == 2, "first click only requests confirmation")
+Click(Button("Cancel"))
+assert(not panel.shown and #abandoned == 2, "cancel never abandons quests")
+Click(open)
+assert(Button("Abandon selected (0)").enabled == false, "reopening clears the selection and pending confirmation")
+print("questlog: native scroll overlap and selection/confirmation/cancel verified")
