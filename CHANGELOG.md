@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-09-27
+
 - **The tooltip health bar uses the game's own art.** Under Modern tooltips, the bar inside a unit's tooltip now has the retail game's bar texture on a darker track of the same colour, framed by Blizzard's own tooltip bar border, in place of the flat bar and thin grey outline.
 - **The Before fishing setting says how to get your weapons back.** Its tooltip now says to Ctrl+Right-click one of them and pick Equip Before fishing, since the click only opens the group menu.
 - **Nearest quests first does no work while it is off.** With the setting off, or the quest tracker hidden, it stops checking the tracker every frame.
