@@ -54,5 +54,8 @@
     "unused": "Information",
     "redefined": "Information"
   },
-  "type.checkTableShape": true
+  "type.checkTableShape": true,
+  "workspace.useGitIgnore": false,
+  "workspace.preloadFileSize": 2000,
+  "workspace.maxPreload": 10000
 }

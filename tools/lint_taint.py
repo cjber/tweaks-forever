@@ -7,11 +7,15 @@ Blizzard's own calls, blamed on this addon. See AGENTS.md for the ways to hook t
 
 import re
 import sys
+from pathlib import Path
 
-from tools.lint_multivalue import Token, run, tokenize
+from tools.lint_multivalue import LuaSyntaxError, Token, tokenize
+from tools.typecheck_coverage import runtime_files
 
 # Globals this addon owns. Every other global root is Blizzard's (or another addon's).
-OWN = re.compile(r"TweaksForever\w*|SLASH_\w+|SlashCmdList")
+OWN = re.compile(
+    r"(?:Tweaks|SkillUp|Legacy|ShortestPath|AdventureGuide|WorkOrders)Forever\w*|WOF_\w+|SLASH_\w+|SlashCmdList"
+)
 
 # Blizzard functions that must only run from Blizzard's code: layout that writes its frames' state, lazy caches
 # built on first call, and links other Blizzard code reads.
@@ -110,7 +114,7 @@ def check(source: str) -> list[tuple[int, str]]:
             continue
         if token.text == "hooksecurefunc" and tokens[index + 1].text == "(":
             first = tokens[index + 2]
-            if first.kind != "string" and first.text not in tables:
+            if first.kind != "string" and not (first.text in tables and tokens[index + 3].text == ","):
                 report(token.line, "taint-method-hook: hooksecurefunc on an object; hook a script or an event")
         elif token.text in CALLS and tokens[index + 1].text == "(" and previous != "function":
             report(token.line, f"taint-blizzard-call: {token.text} ({CALLS[token.text]})")
@@ -122,7 +126,19 @@ def check(source: str) -> list[tuple[int, str]]:
 
 
 def main() -> int:
-    return run(check, skip=lambda path: path.parts[0] == "Data")
+    paths = [Path(arg) for arg in sys.argv[1:]] or runtime_files(Path.cwd().resolve())
+    failed = False
+    for path in paths:
+        try:
+            findings = check(path.read_text())
+        except (LuaSyntaxError, OSError) as error:
+            print(f"{path}: {error}", file=sys.stderr)
+            failed = True
+            continue
+        for line, message in findings:
+            print(f"{path}:{line}: {message}")
+            failed = True
+    return int(failed)
 
 
 if __name__ == "__main__":
