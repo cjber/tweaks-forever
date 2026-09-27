@@ -9,8 +9,8 @@
       "what": "The project profile repeatedly uses em dashes to separate names from descriptions.",
       "why": "The Live roots list repeatedly uses U+2014 after paths and symbols (including lines 58, 62, 70, 71, 74 and 76), and the Risk order list repeats it. These are prose separators, with no documented house-style exception. Replace the separators with colons while retaining the liveness evidence and risk descriptions.",
       "confidence": "high",
-      "status": "decide",
-      "reason": "Replace the em dash separators in AGENTS.md and the sift project profile with colons? The audit corrects only facts in these instruction files, never their wording; the voice rules ban em dashes in store copy but these files follow the owner's template across every addon repo.",
+      "status": "dismissed",
+      "reason": "owner-delegated 2026-09-27: wontfix; agent-only docs keep em-dash separators",
       "first_seen": "2026-09-27",
       "updated": "2026-09-27"
     },
@@ -106,8 +106,8 @@
       "what": "The layout list uses em-dash punctuation, a standalone copy-slop tell.",
       "why": "AGENTS.md uses U+2014 between paths and descriptions at lines 25, 27, 28 and 29, and between the standards name and URL at line 69. These are repository-authored prose rather than code or quoted third-party material. Use colons after the paths and standards name; keep the concrete descriptions.",
       "confidence": "high",
-      "status": "decide",
-      "reason": "Replace the em dash separators in AGENTS.md and the sift project profile with colons? The audit corrects only facts in these instruction files, never their wording; the voice rules ban em dashes in store copy but these files follow the owner's template across every addon repo.",
+      "status": "dismissed",
+      "reason": "owner-delegated 2026-09-27: wontfix; agent-only docs keep em-dash separators",
       "first_seen": "2026-09-27",
       "updated": "2026-09-27"
     },
@@ -158,10 +158,11 @@
       "what": "The setting-variable name format \"TweaksForever_\" .. key is built in Settings.lua:37 (registration) and Settings.lua:67, then restated by hand at every read site: as a full literal in Errors.lua:75, MacroNames.lua:44, Reagents.lua:283, Gear.lua:717-719, Spellbook.lua:648, Frames.lua:851, Fishing.lua:211, Sections.lua:230, and as \"TweaksForever_\" .. CONST in Tooltips.lua:432-433 and QuestProgress.lua:365. Canonical home: one Core/Settings helper (e.g. ns.SettingName(key) or ns.OnSettingChanged(key, fn)) that asserts byKey[key] like ns.Active does and builds the name once.",
       "why": "The feature key set is closed and ns.Active(key) already fails loudly on an unknown key (Core.lua:147), but these callbacks bypass that check: a typo in any literal (e.g. \"TweaksForever_gearMak\") registers a callback on a variable that never fires, so the toggle silently stops applying until /reload, and no linter or test catches it. The copies do not differ in behaviour (all mean \"TweaksForever_\" .. feature.key); the literal and CONST-concatenation variants are just drift in spelling the same contract. The persisted part is feature.key in TweaksForeverDB (unchanged by a helper); the prefix is an in-process registry name, so centralising it changes no saved data.",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "Add ns.OnSettingChanged(key, fn) in Core that asserts the key like ns.Active and builds TweaksForever_ once, then route the 14 SetOnValueChangedCallback sites (Errors, MacroNames, Sections, Reagents, Gear x3, Spellbook, Frames, Fishing, Tooltips x2, QuestProgress) through it? The assert is new failure behaviour and most sites run only in game, so it needs your call and a /reload pass; a rule banning SetOnValueChangedCallback outside Core would then guard it.",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: ns.OnSettingChanged in Core builds the variable once and asserts the key",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "rule: setting-callback-outside-core"
     },
     {
       "id": "b17ecccdc0",
@@ -171,8 +172,8 @@
       "what": "WFA-2: Reveal unexplored areas is off by default though it only draws map textures",
       "why": "WFA-2 allows off-by-default only for features that act for the player; this one draws tinted overlay textures through its own map data provider. If the reason is spoilers, record that waiver in AGENTS.md; otherwise default it on.",
       "confidence": "low",
-      "status": "decide",
-      "reason": "WFA-2: Reveal unexplored areas only draws map art but is off by default; default it on, or record a spoiler waiver in AGENTS.md?",
+      "status": "dismissed",
+      "reason": "owner decision 2026-09-27: WFA-2 exception; Reveal unexplored areas stays off by default because unexplored areas are a spoiler for players who like to explore",
       "first_seen": "2026-09-27",
       "updated": "2026-09-27"
     },
@@ -238,10 +239,11 @@
       "what": "Ellipsis character (U+2026) in a player-visible menu label and locale key",
       "why": "Only U+2026 in production Lua; a translator copying the key from phrases.txt must reproduce the exact character or the lookup falls back to English. Owner decides between \"New group...\" and keeping the menu-style ellipsis.",
       "confidence": "low",
-      "status": "decide",
-      "reason": "Replace the ellipsis character in the New group menu label and its locale key with three dots? Player-visible text and a translation key.",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: label and key use three dots",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: copy-slop lens reads player-visible strings"
     },
     {
       "id": "4d200de465",
@@ -278,10 +280,11 @@
       "what": "Player-visible beforeFishing tooltip says Ctrl+Right-click puts the weapons back on; it only opens the group menu, where the player must then pick \"Equip Before fishing\"",
       "why": "Click (Gear.lua:619-635) calls OpenItemMenu -> OpenMenu, which lists groups plus L[\"Equip %s\"] buttons (Gear.lua:592-595); nothing equips on the click itself. Same claim in docs/features.md:29. Player-visible text: report for the owner, e.g. \"Ctrl+Right-click one of them and pick Equip Before fishing to put them back on.\"",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "Reword the Before fishing tooltip (Gear.lua) and docs/features.md: Ctrl+Right-click only opens the group menu, where Equip Before fishing puts the weapons back? Player-visible text.",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: tooltip and features.md say the click opens the group menu and Equip Before fishing puts them back",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: whether a tooltip describes what a click does needs a reader"
     },
     {
       "id": "768c39613a",
@@ -317,10 +320,11 @@
       "what": "En dash (U+2013) used as a dash in a player-visible tooltip line (and translation key)",
       "why": "A dash is a tell on its own; it is the only U+2013 in production Lua. Player-visible and a locale key, so the owner decides (e.g. \"Marked as junk. Alt+Right-click to unmark.\"), then regenerate Locales/phrases.txt.",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "Replace the en dash in the player-visible junk tooltip and its locale key (Marked as junk \u2013 Alt+Right-click to unmark) with a colon or full stop? Changes player text and every translation key.",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: en dash replaced by a full stop, key updated",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: copy-slop lens reads player-visible strings"
     },
     {
       "id": "44a9d8435e",
@@ -330,8 +334,8 @@
       "what": "WFA-2: Hide macro names is off by default though it never acts for the player",
       "why": "WFA-2: 'Anything off by default is off because it acts for the player.' Hiding the macro name only fades a font string (SetAlpha); README and store copy say 'Off until you turn it on'. Either default it on or record in AGENTS.md why this cosmetic opt-in is waived.",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "WFA-2: Hide macro names is cosmetic but off by default; default it on, or record the waiver in AGENTS.md?",
+      "status": "dismissed",
+      "reason": "owner decision 2026-09-27: WFA-2 exception; Hide macro names stays off by default because it changes action bars players set up themselves",
       "first_seen": "2026-09-27",
       "updated": "2026-09-27"
     },
@@ -397,8 +401,8 @@
       "what": "WFA-13: a 1-second ticker that never stops, running with the feature off and calling Layout() every second while the player stands still",
       "why": "WFA-13 bans idle timers. The ticker keeps firing when questDistance is off (it just returns) and, when on, re-runs Layout() over every tracker block each second even when the position and tracker have not changed. The fix is to cancel the ticker when the feature goes inactive and restart it from the setting callback, and skip Layout() when nothing moved (the dirty watcher already handles relayouts).",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "WFA-13: the 1s ticker never stops and it is the only catch for Questie toggles and collapses that set no dirty flag; replace it with events/hooks, or waive WFA-13 for it?",
+      "status": "dismissed",
+      "reason": "owner-delegated 2026-09-27: waived; WFA-13 exception in AGENTS.md: the 1 s ticker is the only catch for Questie toggles and collapses that set no dirty flag, and it is cheap",
       "first_seen": "2026-09-27",
       "updated": "2026-09-27"
     },
@@ -436,10 +440,11 @@
       "what": "WFA-13: an OnUpdate that runs every frame for the whole session, even with Nearest quests first off, a conflict active or the tracker hidden",
       "why": "WFA-13 says 'no idle OnUpdate or timers'. This frame is never hidden, so it polls QuestObjectiveTracker.parentContainer.dirty every frame forever; ns.Active is only checked inside Refresh. The fix is to Show the watcher frame only while ns.Active(\"questDistance\") and the tracker is shown (hide it from the settings callback and when the tracker hides), so OnUpdate stops when there is nothing to watch.",
       "confidence": "high",
-      "status": "decide",
-      "reason": "WFA-13: the tracker watcher's OnUpdate runs every frame all session; hide it while questDistance is inactive or the tracker hidden? (behaviour change, needs /reload test)",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: watcher shown only while questDistance is active and the tracker is shown",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: questdistance_spec asserts the watcher hides; idle polling elsewhere needs review under WFA-13"
     },
     {
       "id": "664647b047",
@@ -583,8 +588,8 @@
       "what": "WFA-4: the default tooltip style is an addon-invented neutral charcoal, not the retail palette",
       "why": "WFA-4: 'Never custom-styled frames, fonts or colours; addon-drawn art only where no atlas exists, in the atlas's palette.' The border file is justified (Forever resolves Tooltip-NineSlice to beige), but the Modern style is by its own description 'a neutral charcoal' that is not retail's; the Retail option copies retail's navy. Fix: default to \"retail\" (and decide whether Modern stays as an option), with README/store copy ('A thin rounded border over charcoal') updated to match. Published copy change is a decide item.",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "WFA-4: tooltipStyle defaults to the addon's own charcoal 'modern'; default to 'retail' (and keep Modern as an option?) with README/store copy updated, or waive?",
+      "status": "dismissed",
+      "reason": "owner decision 2026-09-27: WFA-4 exception; tooltips default to the charcoal Modern style, a headline feature pictured on the store page",
       "first_seen": "2026-09-27",
       "updated": "2026-09-27"
     },
@@ -623,10 +628,11 @@
       "what": "The store promises that everything acting for the player is disabled by default, but automatic repair and junk selling start enabled.",
       "why": "Vendor.lua declares repair and repairGuild with default = true and repairs in MERCHANT_SHOW; Junk.lua declares sellJunk with default = true. Core.lua copies feature.default into missing saved settings at PLAYER_LOGIN. Automation.lua also enables fastLoot by default, which this store page itself acknowledges under Features. Narrow the promise to the opt-in quest/gossip/summon/resurrection/release/duel automations and state the vendor defaults. Published copy: owner decision.",
       "confidence": "high",
-      "status": "decide",
-      "reason": "Store page says anything that acts for you is off until turned on, but repair, sell junk and fast loot default on (Vendor, Junk, Automation). Reword the pasted store copy, or change those defaults to match AGENTS.md's off-by-default rule?",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: store page and README name repair, junk selling and faster auto loot as starting on",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: store copy is read against the feature defaults before every paste (WFA-23/24)"
     },
     {
       "id": "ff6a088e54",
@@ -731,10 +737,11 @@
       "what": "The generator CLI (mutually exclusive --refresh/--offline group, then `except (ValueError, KeyError, OSError, csv.Error, urllib.error.URLError)` -> sys.exit(\"gen_x: ...\")) is repeated in gen_overlays.py:148-163, gen_zonelevels.py:177-194, gen_dungeons.py:222-242, gen_classspells.py:281-303; gen_camp.py:186-195 has drifted from it. Canonical home: the shared generator module proposed for db2.",
       "why": "gen_camp's flags are not a mutually exclusive group (so `--refresh --offline` is accepted and then raises 'Missing cached source' even with a cache present) and its __main__ has no error wrapper, so a failed download prints a traceback instead of the one-line 'gen_camp: ...' the others give. tools/README.md claims gen_camp has 'Same cache and flags as gen_overlays.py'. Both differences look accidental; nothing states a reason.",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "Give gen_camp the mutually exclusive --refresh/--offline group and the sys.exit error wrapper the other four generators have? It changes its CLI error behaviour, which the audit may not; tools/README.md already claims the flags match.",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: gen_camp has the exclusive group and sys.exit wrapper",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: generator CLIs are compared by review until they share a module (ba6c83cad5)"
     },
     {
       "id": "73cee16ed4",
@@ -744,10 +751,11 @@
       "what": "Two Lua string-literal encoders: gen_camp.py:141-142 lua_string and phrases.py:97-98 encode. Canonical: phrases.encode's behaviour (it escapes newlines too), in a shared tools helper.",
       "why": "Difference: encode also escapes \\n; lua_string does not, so a spell description carrying a newline (wrap() keeps whitespace inside a chunk via `\\S+\\s*`) would be written as a raw newline inside a double-quoted Lua string, a syntax error in Data/CampBenefits.lua. Current output has none, so this is latent drift, not a live bug.",
       "confidence": "medium",
-      "status": "decide",
-      "reason": "Have gen_camp reuse phrases.encode (which also escapes newlines)? phrases runs as a tools package module while gen_camp runs as a script, so sharing needs the same import-mode choice as the db2 module.",
+      "status": "confirmed",
+      "reason": "owner-delegated 2026-09-27: deferred; do together when the generators next change (needs the tools import-mode choice)",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: deferred until the generators next change; needs the tools import-mode choice"
     },
     {
       "id": "76dde0a037",
@@ -770,10 +778,11 @@
       "what": "The wago.tools DB2 fetch-and-cache (pinned BUILD, CACHE path, --offline/--refresh, User-Agent, HTML-response check, cache write) is written five times: gen_dungeons.py:78-94, gen_zonelevels.py:96-112 (byte-identical to gen_dungeons), gen_classspells.py:62-78, gen_camp.py:33-54, gen_overlays.py:29-67; the pin `BUILD = \"1.60.1.70009\"` is restated in all five (refresh-data.yml:38 seds it into each file). Canonical home: one shared tools module holding BUILD, CACHE and the download/cache step with gen_overlays' atomic write, each generator keeping only its own row parsing.",
       "why": "Differences: (1) cache write is atomic in gen_overlays (write_atomic) and in gen_classspells' classicdb(), but a plain path.write_bytes in the other four copies: accidental drift, since an interrupted write leaves a truncated CSV that the next run reads from cache, and zonelevels/dungeons/classspells only check that a first row with an ID column exists, so a truncated table passes. (2) timeouts 60 / 300 / 600: drift. (3) validation: overlays checks every schema column, int-parses and rejects duplicate IDs; the rest check only ID: drift. (4) return shape (int-parsed dict, raw row list, rows grouped by a key) and gen_classspells' build parameter: intentional, per generator. tools/README.md says each generator has 'Same cache and flags as gen_overlays.py', so the docs already treat it as one mechanism. Generators run as `python3 tools/gen_x.py` while the *_test.py files import `tools.gen_*`, so the shared module needs phrases.py's `from tools.x import` pattern (and `-m` in refresh-data.yml:40) or equivalent.",
       "confidence": "high",
-      "status": "decide",
-      "reason": "Move the five wago.tools db2 fetch-and-cache copies and BUILD into one tools module? Generators run as scripts (tools/ on sys.path) but specs import them as tools.gen_*, so it needs an import-mode choice, the refresh-data.yml sed pointed at one file, and a byte-identical regeneration at the pinned build.",
+      "status": "confirmed",
+      "reason": "owner-delegated 2026-09-27: deferred; do together when the generators next change (needs the tools import-mode choice)",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: deferred until the generators next change; needs the tools import-mode choice"
     },
     {
       "id": "a70b76b74d",
@@ -797,10 +806,11 @@
       "what": "a UiMapAssignment AreaID missing from AreaTable is silently treated as 'no exploration level' (0)",
       "why": "Children come from AreaTable itself, so only a dangling UiMapAssignment.AreaID can miss; that is a broken export or schema change, which the sibling generators fail on (gen_overlays 'Orphan tile', gen_dungeons KeyError). Here it silently narrows a derived range or drops the zone into the 'no range' printout, surfacing as a wrong Data/ZoneLevels.lua range. Raise ValueError on an unknown area instead. Low: the effect is bounded to derived (non-published) zones.",
       "confidence": "low",
-      "status": "decide",
-      "reason": "Make gen_zonelevels fail on a UiMapAssignment AreaID missing from AreaTable (index areas directly, as gen_dungeons does) instead of treating it as level 0? No dangling ids at the pinned build, but it changes the script's failure behaviour, which the audit may not.",
+      "status": "fixed",
+      "reason": "owner-delegated 2026-09-27: an unknown UiMapAssignment area raises ValueError",
       "first_seen": "2026-09-27",
-      "updated": "2026-09-27"
+      "updated": "2026-09-27",
+      "guard": "lens-only: silent-fallbacks lens; tools/gen_zonelevels_test.py covers this one"
     },
     {
       "id": "f2eae677e9",

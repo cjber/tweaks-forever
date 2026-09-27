@@ -64,7 +64,18 @@ publishes that entry as its notes.
 - Store copy, README and posts pitch the addon as looking like it came with the game, in cjber's
   own voice, never AI marketing: `wow-forever-addon` WFA-23/24, checked before every store paste.
 
+## Waivers
+
+Owner-approved exceptions to `wow-forever-addon`:
+
+- WFA-2: Reveal unexplored areas is off by default: unexplored areas are a spoiler for players who like to explore.
+- WFA-2: Hide macro names is off by default: it changes action bars players set up themselves.
+- WFA-4: tooltips default to the charcoal Modern style, a headline feature pictured on the store page.
+- WFA-13: `QuestDistance.lua`'s 1 s ticker keeps running: it is the only catch for Questie tracker toggles and
+  tracker collapses, which set no dirty flag, and it is cheap.
+
 ## Standards
 
 - `wow-forever-addon` — https://github.com/cjber/skills/tree/c587d4c74fcc27c97f73f2f7cb3d70cccebeb34e/wow-forever-addon (UI look,
   icon, README and store page, CI and release requirements shared by every WoW: Forever addon)
+
