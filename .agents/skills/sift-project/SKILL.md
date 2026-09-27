@@ -120,6 +120,14 @@ finding.
   Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
 - Gear's `Char()` short alias, Frames' repeated `if Active() then Schedule() end`, and Tooltips'
   single-caller `HealthBarStyle` (kept under the function-length limit).
+- Small nil-safe reads of a saved variable or a Questie profile option (`Automation.lua`, `QuestDistance.lua`):
+  each site reads a different option for a different predicate, not one implementation.
+- Junk's and Gear's click and mark guards: Gear needs `gearGroups` and Ctrl, Junk `markJunk` and Alt; Junk's icons
+  show saved marks while selling blocks unknown quality for Leatrix, as `junk_spec` asserts.
+- `API.lua`'s `TweaksForever = TweaksForever or {}`: the shared global is a trust boundary; attach, never replace.
+- The Sections/Reagents quotient-and-remainder grid placement: a small idiom over different contracts.
+- `Spellbook.lua`'s size: one Future Spells feature whose scan, selection and drawing share ClassData and Tabs.
+- The README middle-dot footer and the `Options → …` arrow paths: the owner's house style across the docs.
 
 ## Anti-patterns
 
@@ -173,5 +181,6 @@ Audit slices from lowest to highest risk:
 
 ## Project rules and lenses
 
-- Rules: none yet.
+- Rules: `unused-luacheck-global` (`.sift/scripts/unused-luacheck-global.py`): a `.luacheckrc` global that no
+  tracked Lua, XML or `Locales/phrases.txt` names.
 - Lenses: none yet.
