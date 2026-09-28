@@ -9,9 +9,11 @@ Added/Fixed lists.
 Each version's entry is also its release notes on GitHub, CurseForge and Wago. Older entries are kept
 verbatim rather than rewritten as the addon moves.
 
-## [Unreleased]
+## [0.7.1] - 2026-09-28
 
 - **Dungeon entrance pins wait for combat to end.** Map refreshes and overlap settling now avoid the protected pin manager during combat, then rebuild once combat ends.
+
+## [Unreleased]
 
 ## [0.7.0] - 2026-09-28
 
