@@ -122,7 +122,6 @@ local env = setmetatable({
 	L = {},
 }, { __index = _G })
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
-assert(loadfile("DungeonEntrances.lua"), "DungeonEntrances.lua")
 setfenv(assert(loadfile("DungeonEntrances.lua")), env)("TweaksForever", ns)
 
 -- A refresh in combat neither removes old pins nor acquires fresh ones.
@@ -137,5 +136,12 @@ assert(removed == 0 and acquired == 0, "repeated combat refresh touched pin mana
 combat = false
 onEvent(eventFrame, "PLAYER_REGEN_ENABLED")
 assert(removed == 1, "regen did not remove stale pins")
-assert(not eventFrame.registered, "regen left the deferred event registered")
+-- A later combat must still receive its regen event.
+combat = true
+provider:RefreshAllData()
+combat = false
+if eventFrame.registered then
+	onEvent(eventFrame, "PLAYER_REGEN_ENABLED")
+end
+assert(removed == 2, "second combat never rebuilt deferred pins")
 print("dungeonentrances_combat: protected MapCanvas refresh contract passed")

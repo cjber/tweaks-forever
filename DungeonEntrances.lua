@@ -209,7 +209,6 @@ ns.Init(function()
 	local events = CreateFrame("Frame")
 	events:RegisterEvent("PLAYER_REGEN_ENABLED")
 	events:SetScript("OnEvent", function()
-		events:UnregisterEvent("PLAYER_REGEN_ENABLED")
 		if refreshPending and map:IsShown() then
 			Provider:RefreshAllData()
 		end
