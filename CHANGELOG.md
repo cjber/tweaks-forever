@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Dungeon entrance pins wait for combat to end.** Map refreshes and overlap settling now avoid the protected pin manager during combat, then rebuild once combat ends.
+
 ## [0.7.0] - 2026-09-28
 
 - **Move Adventure Guide in Edit Mode.** The Windows tab can preview, move, scale and reset Adventure Guide, including before you first open it. Placement follows your current layout and waits until combat ends. The guide keeps its normal-window or floating behavior.
