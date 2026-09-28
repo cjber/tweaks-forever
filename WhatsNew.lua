@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.7.0"
-ns.WHATS_NEW = L["Move Adventure Guide in Edit Mode."]
+ns.WHATS_NEW_VERSION = "0.7.1"
+ns.WHATS_NEW = L["Dungeon entrance pins wait for combat to end."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@project-version@"
