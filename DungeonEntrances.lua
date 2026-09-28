@@ -109,6 +109,9 @@ ns.Init(function()
 	end
 
 	local function Settle()
+		if InCombatLockdown() then
+			return
+		end
 		local halfX, halfY = HalfExtents()
 		for pin in map:EnumeratePinsByTemplate(TEMPLATE) do
 			pin:SetShown(not Covered(pin, halfX, halfY))
@@ -174,12 +177,25 @@ ns.Init(function()
 
 	local Provider = CreateFromMixins(CVarMapCanvasDataProviderMixin)
 	Provider:Init("showDungeonEntrancesOnMap")
+	local refreshPending = false
+
+	local function HidePins()
+		for pin in map:EnumeratePinsByTemplate(TEMPLATE) do
+			pin:SetShown(false)
+		end
+	end
 
 	function Provider:RemoveAllData()
 		self:GetMap():RemoveAllPinsByTemplate(TEMPLATE)
 	end
 
 	function Provider:RefreshAllData()
+		if InCombatLockdown() then
+			refreshPending = true
+			HidePins()
+			return
+		end
+		refreshPending = false
 		self:RemoveAllData()
 		if not (ns.Active("dungeonEntrances") and self:IsCVarSet()) then
 			return
@@ -190,6 +206,14 @@ ns.Init(function()
 	end
 
 	map:AddDataProvider(Provider)
+	local events = CreateFrame("Frame")
+	events:RegisterEvent("PLAYER_REGEN_ENABLED")
+	events:SetScript("OnEvent", function()
+		events:UnregisterEvent("PLAYER_REGEN_ENABLED")
+		if refreshPending and map:IsShown() then
+			Provider:RefreshAllData()
+		end
+	end)
 
 	-- Markers come and go with their own providers, before or after ours, so the entrances settle a few times a
 	-- second while the map is open. Not by hooking the map's pin methods: Blizzard's providers then failed calling
