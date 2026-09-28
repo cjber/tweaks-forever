@@ -11,6 +11,11 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.6.6] - 2026-09-28
+
+- **Auctionator compatibility survives updates.** The bundled Auction House tab library uses native panel visibility events instead of hooking Blizzard’s display-mode method. Auctionator loads it before its embedded copy.
+- **Native tracker registration fails CI.** The shared taint check rejects the integration that exposed addon callbacks to Edit Mode layout.
+
 ## [0.6.5] - 2026-09-28
 
 - **The Abandon quests button responds to clicks.** It now sits above the quest list's scroll area, which previously intercepted clicks before they reached the selection window.
