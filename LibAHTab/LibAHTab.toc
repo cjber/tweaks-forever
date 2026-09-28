@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: Tweaks Forever: Auction House compatibility
+## Notes: Keeps Auctionator tabs compatible with native auction house panels.
+## Author: plusmouse, cjber
+## Version: @project-version@
+## IconTexture: Interface\AddOns\TweaksForever\media\Icon
+## OptionalDeps: LibStub
+
+LibStub\LibStub.lua
+LibAHTab.lua
