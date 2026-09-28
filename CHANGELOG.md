@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-09-28
+
+- **Move Adventure Guide in Edit Mode.** The Windows tab can preview, move, scale and reset Adventure Guide, including before you first open it. Placement follows your current layout and waits until combat ends. The guide keeps its normal-window or floating behavior.
+
 ## [0.6.6] - 2026-09-28
 
 - **Auctionator compatibility survives updates.** The bundled Auction House tab library uses native panel visibility events instead of hooking Blizzard’s display-mode method. Auctionator loads it before its embedded copy.

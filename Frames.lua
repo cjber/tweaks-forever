@@ -6,8 +6,8 @@ ns.Feature({
 	key = "moveWindows",
 	category = "Interface",
 	name = "Move and scale windows in Edit Mode",
-	tooltip = "Use the Windows tab in Edit Mode to preview, move and scale Blizzard windows. "
-		.. "Changes save immediately for the current layout. Reset returns a window to Blizzard's placement.",
+	tooltip = "Use the Windows tab in Edit Mode to preview, move and scale game windows and Adventure Guide. "
+		.. "Changes save immediately for the current layout. Reset returns a window to its default placement.",
 	default = true,
 	conflicts = { { addon = "BlizzMove" }, { addon = "MoveAnything" } },
 })
@@ -37,6 +37,7 @@ local windows = {
 	{ "GameMenuFrame", L["Game menu"] },
 	{ "SettingsPanel", SETTINGS },
 	{ "AddonList", L["Addons"] },
+	{ "AdventureGuideForeverWindow", L["Adventure Guide"], "AdventureGuideForever" },
 }
 
 -- Pure storage/geometry/queue helpers. No frame objects are written to SavedVariables.
@@ -347,6 +348,9 @@ local function RefreshPreview(record)
 	preview:SetScale(scale * (position and position.scale or 1))
 	preview:ClearAllPoints()
 	local panel = UIPanelWindows[record.name]
+	if record.name == "AdventureGuideForeverWindow" and frame and frame:GetAttribute("UIPanelLayout-area") then
+		panel = { area = frame:GetAttribute("UIPanelLayout-area") }
+	end
 	if panel and panel.centerFrameSkipAnchoring then
 		panel = nil -- The game menu centres itself.
 	end
@@ -634,6 +638,9 @@ local function ShowPreview(record, shown)
 	end
 	if shown and record.addon and not record.frame then
 		C_AddOns.LoadAddOn(record.addon)
+		if record.name == "AdventureGuideForeverWindow" then
+			EventRegistry:TriggerEvent("AdventureGuideForever.EnsureWindow")
+		end
 		Attach(record)
 	end
 	if shown and not record.preview then
@@ -768,9 +775,11 @@ local function Install()
 	end
 	installed, manager = true, EditModeManagerFrame
 	for _, window in ipairs(windows) do
-		local record = { name = window[1], label = window[2], addon = window[3], scale = 1, points = {} }
-		records[#records + 1] = record
-		Attach(record)
+		if window[3] ~= "AdventureGuideForever" or C_AddOns.DoesAddOnExist(window[3]) then
+			local record = { name = window[1], label = window[2], addon = window[3], scale = 1, points = {} }
+			records[#records + 1] = record
+			Attach(record)
+		end
 	end
 	SyncLayouts()
 	-- The panel manager moves open windows as others open and close; put ours back after it.
@@ -859,6 +868,21 @@ ns.Init(function()
 			end)
 		end
 	end)
+	local function GuideChanged()
+		if Active() then
+			queue:Run("guide", function()
+				Install()
+				for _, record in ipairs(records) do
+					if record.name == "AdventureGuideForeverWindow" then
+						Attach(record)
+					end
+				end
+				Schedule()
+			end)
+		end
+	end
+	EventRegistry:RegisterCallback("AdventureGuideForever.WindowCreated", GuideChanged, Model)
+	EventRegistry:RegisterCallback("AdventureGuideForever.WindowLayoutChanged", GuideChanged, Model)
 	ns.On("PLAYER_REGEN_DISABLED", HideEditor)
 	ns.On("PLAYER_REGEN_ENABLED", function()
 		queue:Flush()
