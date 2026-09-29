@@ -6,8 +6,11 @@ local _, ns = ...
 -- hide the visit. Trainer rows are recorded only while the feature is on, so with it off the answer is the baked
 -- list's. As with Shortest Path Forever's API, nil means ask again later: before login the spellbook isn't known
 -- yet, so every rank would look unlearned, and in combat the work waits.
+--
+-- v2 adds Trainers(), the class trainers to visit and where they stand, which is baked so it answers before login
+-- and in combat. v1's members keep their behavior, so a caller that checks version still gets both.
 ---@class TFPublicAPI
-local API = { version = 1 }
+local API = { version = 2 }
 
 function API.TrainableSpells()
 	if not ns.db or InCombatLockdown() then
@@ -30,6 +33,27 @@ function API.TrainableSpells()
 		end
 	end
 	return trainable
+end
+
+-- The class trainers to visit and where one of each stands, for the player's class. Baked from the class
+-- trainer data, so it answers before login, in combat and with the spellbook's Future Spells off. An unknown or
+-- unplayable class has none; a trainer the dump places nowhere keeps its npc and name and no map.
+---@return TFClassTrainer[]
+function API.Trainers()
+	local _, class = UnitClass("player")
+	local baked = ns.ClassSpells[class]
+	local trainers = {}
+	if not baked then
+		return trainers
+	end
+	for _, row in ipairs(baked.trainers or {}) do
+		local trainer = { npc = row[1], name = row[2] }
+		if row[3] then
+			trainer.map, trainer.x, trainer.y = row[3], row[4], row[5]
+		end
+		trainers[#trainers + 1] = trainer
+	end
+	return trainers
 end
 
 -- An instance's own door, never a merged pin's centre: Blackrock Mountain draws one pin for four doors, and a caller

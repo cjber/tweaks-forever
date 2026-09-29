@@ -60,7 +60,7 @@ for _, file in ipairs({ "Data/ClassSpells.lua", "Data/DungeonEntrances.lua", "Sp
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
 end
 local API = env.TweaksForever.API
-assert(API.version == 1)
+assert(API.version == 2, "v2 adds Trainers")
 local entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "first curated zone, before login")
 assert(not ns.Active("dungeonEntrances") and not ns.Entrances, "works with pins off and no pin feature loaded")
@@ -70,6 +70,34 @@ entrance.map, entrance.x, entrance.y = 1, 0, 0
 assert(another.map == 1427 and another.x == 0.271 and another.y == 0.725, "copies are isolated")
 entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "callers cannot change the source")
+local trainers = API.Trainers()
+assert(#trainers > 5, "a Shaman's class trainers, before login")
+local function Trainer(npc)
+	for _, row in ipairs(trainers) do
+		if row.npc == npc then
+			return row
+		end
+	end
+end
+local siln = Trainer(3030)
+assert(siln.name == "Siln Skychaser", "the trainer's own name")
+assert(siln.map == 1456 and siln.x == 0.228 and siln.y == 0.211, "and where the dump places one of them")
+assert(Trainer(373).map == nil and Trainer(373).name == "Murak Winterborn", "unplaced keeps its id and name")
+for _, row in ipairs(API.Trainers()) do
+	assert(row.npc and row.name, "every trainer names its NPC")
+	assert((row.map == nil) == (row.x == nil), "a place brings its map and both fractions")
+end
+local again = API.Trainers()
+assert(again[1] ~= trainers[1] and again ~= trainers, "a fresh table and rows on every call")
+again[1].name = "Changed by caller"
+assert(API.Trainers()[1].name == "Murak Winterborn", "callers cannot change the source")
+local deathknight = class
+class = "DEATHKNIGHT"
+assert(#API.Trainers() == 0, "a class with no trainer list")
+class = ""
+assert(#API.Trainers() == 0, "and a class the client doesn't know")
+class = deathknight
+
 local cluster = ns.DungeonEntrances[1427][1]
 assert(#cluster.instances == 3 and cluster.x ~= entrance.x and cluster.y ~= entrance.y, "not the merged pin centre")
 cluster.x, cluster.y = 0.1, 0.2
