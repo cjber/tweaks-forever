@@ -1,6 +1,6 @@
 -- Logs in with Core and WhatsNew loaded, the saved table and the addon's version given, and returns what went to
 -- chat and the saved table after.
-local function Login(saved, version, on)
+local function Login(saved, version, on, packaged)
 	local printed, frames = {}, {}
 	local env = setmetatable({
 		TweaksForeverDB = saved,
@@ -29,7 +29,11 @@ local function Login(saved, version, on)
 	local ns = {}
 	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
-	setfenv(assert(loadfile("UI/WhatsNew.lua")), env)("TweaksForever", ns)
+	local source = assert(io.open("UI/WhatsNew.lua")):read("*a")
+	if packaged then
+		source = source:gsub("@project%-version@", version)
+	end
+	setfenv(assert(loadstring(source)), env)("TweaksForever", ns)
 	if on == false then
 		env.TweaksForeverDB = env.TweaksForeverDB or {}
 		env.TweaksForeverDB.whatsNew = false
@@ -61,6 +65,10 @@ assert(#printed == 0 and db.lastVersion == "0.6.0")
 -- A dev checkout's unsubstituted version: silent and not saved.
 printed, db = Login({ lastVersion = "0.5.0" }, "@project-version@")
 assert(#printed == 0 and db.lastVersion == "0.5.0")
+
+-- The packager replaces its keywords in Lua too; a release must still announce and save its version.
+printed, db = Login({ lastVersion = "v0.7.3" }, "v0.7.4", true, true)
+assert(#printed == 1 and db.lastVersion == "v0.7.4", "packaged release still announces its update")
 
 -- The headline is the newest release's: a release that adds a CHANGELOG entry without rewriting it fails here.
 local changelog = assert(io.open("CHANGELOG.md")):read("*a")
