@@ -25,23 +25,18 @@ from wowmock import (  # ty: ignore[unresolved-import]
     ARIALN,
     FONTS,
     FRIZQT,
-    INSET_FRAME_LAYOUT,
     NORMAL,
     TOOLTIP_LINE_GAP,
     TOOLTIP_PADDING,
     Font,
-    MenuButton,
-    MenuCheckbox,
-    MenuDivider,
-    MenuTitle,
     TooltipLine,
     Ui,
     atlas_markup,
     backdrop,
+    basic_panel,
     close_button,
     colored,
     container_frame,
-    context_menu,
     dialog_border,
     draw_nine_slice,
     draw_overlay,
@@ -55,7 +50,6 @@ from wowmock import (  # ty: ignore[unresolved-import]
     minimal_slider,
     panel_tabs,
     scene,
-    tiled,
     tooltip,
     ui_panel_button,
     unique_corners_layout,
@@ -128,18 +122,23 @@ def gear(ui):
 
 def menu(ui):
     item_id, _, groups = BAG[HOVERED]
-    entries = [MenuTitle(ui.item(item_id).name)]
-    entries += [MenuCheckbox(colored(name, GROUPS[name]), name in groups) for name in sorted(GROUPS)]
-    entries += [MenuButton("New group..."), MenuDivider()]
-    entries += [MenuButton("Equip " + name) for name in groups]
-    entries += [MenuButton("Colour", submenu=True, hover=True)]
-    panel, menu_rects = context_menu(ui, entries)
+    panel, x, y = basic_panel(ui, "Gear groups", 380, 520)
+    panel.text(x, y + 38, ui.item(item_id).name, FONTS["GameFontNormal"], NORMAL, justify="CENTER", width=380)
+    row_y = y + 68
+    for name in sorted(GROUPS):
+        panel.draw(ui.texture("interface/buttons/ui-checkbox-up.blp"), x + 24, row_y, 24, 24)
+        if name in groups:
+            panel.draw(ui.texture("interface/buttons/ui-checkbox-check.blp"), x + 24, row_y, 24, 24)
+        panel.text(x + 51, row_y + 6, colored(name, GROUPS[name]), FONTS["GameFontHighlight"])
+        row_y += 28
+    labels = ["New group..."] + ["Equip " + name for name in groups]
+    labels += ["Colour: " + colored(name, GROUPS[name]) for name in groups]
+    for label in labels:
+        ui_panel_button(panel, x + 24, row_y, 300, 24, label)
+        row_y += 28
     bag, rects = backpack(ui)
-    slot_x, slot_y, slot_w, slot_h = rects["slots"][HOVERED]
-    # A context menu opens with its top-left at the cursor, here over the middle of the slot.
-    menu_x, menu_y, _, _ = menu_rects["menu"]
-    cursor = (slot_x + slot_w / 2 - menu_x, slot_y + slot_h / 2 - menu_y)
-    scene(ui, [(bag, 0, 0), (panel, *cursor)], MARGIN).save(OUT / "menu.png")
+    slot_x, slot_y, _, slot_h = rects["slots"][HOVERED]
+    scene(ui, [(bag, 0, 0), (panel, slot_x - x, slot_y + slot_h + 4 - y)], MARGIN).save(OUT / "menu.png")
 
 
 REDRIDGE = 1433
@@ -731,28 +730,8 @@ def tooltips(ui):
 
 
 def quest_abandon(ui):
-    # BasicFrameTemplateWithInset: Blizzard_UIPanelTemplates/Mainline/UIPanelTemplates.xml:558–704.
-    canvas = ui.canvas(392, 468)
-    x, y, w, h = 6, 1, 380, 460
-    rock = ui.texture("interface/framegeneral/ui-background-rock.blp")
-    marble = ui.texture("interface/framegeneral/ui-background-marble.blp")
-    tiled(canvas, rock, x + 2, y + 21, w - 4, h - 23, rock.width / ui.scale, rock.height / ui.scale)
-    tiled(canvas, marble, x + 4, y + 24, w - 10, h - 28, marble.width / ui.scale, marble.height / ui.scale)
-    draw_nine_slice(canvas, INSET_FRAME_LAYOUT, x + 4, y + 24, w - 10, h - 28)
-    layout = {
-        "TopLeftCorner": {"atlas": "UI-Frame-TopLeftCorner", "x": -6, "y": 1},
-        "TopRightCorner": {"atlas": "UI-Frame-TopCornerRight", "y": 1},
-        "BottomLeftCorner": {"atlas": "UI-Frame-BotCornerLeft", "x": -6, "y": -5},
-        "BottomRightCorner": {"atlas": "UI-Frame-BotCornerRight", "y": -5},
-        "TopEdge": {"atlas": "_UI-Frame-TitleTile"},
-        "BottomEdge": {"atlas": "_UI-Frame-Bot"},
-        "LeftEdge": {"atlas": "!UI-Frame-LeftTile"},
-        "RightEdge": {"atlas": "!UI-Frame-RightTile"},
-    }
-    canvas.draw(ui.atlas("_UI-Frame-TitleTileBg"), x + 2, y + 1, w - 27, 20)
-    draw_nine_slice(canvas, layout, x, y, w, h)
-    close_button(canvas, x + w, y)
-    canvas.text(x, y + 7, "Abandon quests", FONTS["GameFontNormal"], NORMAL, justify="CENTER", width=w)
+    canvas, x, y = basic_panel(ui, "Abandon quests", 380, 460)
+    w = 380
     for label, bx, by, bw in [
         ("Select all", 16, 34, 110),
         ("Clear selection", 132, 34, 130),

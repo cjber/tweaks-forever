@@ -215,7 +215,6 @@ TweaksForeverCharDB = nil
 ---@field TrainerSpells fun(): table<integer, TFTrainerSpell>
 ---@field LineName fun(lineID: integer, fallback: string?): string
 ---@field GeneralName fun(): string
----@field OnGeneral fun(lineID: integer): true?
 ---@field LineResolver fun(): fun(id: integer, name: string?): integer?
 ---@field KnownSpell fun(id: integer): boolean
 ---@field ZoneRanges table<integer, [number, number]>

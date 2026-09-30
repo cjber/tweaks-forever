@@ -149,7 +149,7 @@ end
 function Model.GroupsOf(itemID, lists)
 	local found = {}
 	for _, kind in ipairs(KINDS) do
-		for name, items in pairs(lists[kind] or {}) do
+		for name, items in pairs(lists[kind]) do
 			if items[itemID] then
 				found[#found + 1] = { kind = kind, name = name }
 			end
@@ -549,7 +549,7 @@ local function PickColour(mark)
 end
 
 ---@param itemID integer
-local function NewGroup(itemID)
+local function NewGroup(itemID, onCreated)
 	StaticPopup_ShowCustomGenericInputBox({
 		text = L["New gear group"],
 		maxLetters = 32,
@@ -557,50 +557,114 @@ local function NewGroup(itemID)
 			local name = strtrim(text)
 			if name ~= "" and name ~= BEFORE_FISHING then
 				ToggleGroup(name, itemID)
+				onCreated()
 			end
 		end,
 	})
 end
 
+local gearPanel, gearScroll, gearContent, gearRows, gearTitle
+
+local function GearRow(kind, index)
+	local row = gearRows[kind][index]
+	if row then
+		return row
+	end
+	if kind == "check" then
+		row = CreateFrame("CheckButton", nil, gearContent, "UICheckButtonTemplate")
+		row:SetSize(24, 24)
+		row.Text:SetWidth(272)
+	else
+		row = CreateFrame("Button", nil, gearContent, "UIPanelButtonTemplate")
+		row:SetSize(300, 24)
+	end
+	gearRows[kind][index] = row
+	return row
+end
+
 ---@param button Button
 ---@param itemID integer
 local function OpenMenu(button, itemID)
-	MenuUtil.CreateContextMenu(button, function(_, root)
-		root:CreateTitle(C_Item.GetItemNameByID(itemID) or "")
-		local names = {}
-		for name in pairs(Char().groups) do
-			names[#names + 1] = name
-		end
-		table.sort(names)
-		for _, name in ipairs(names) do
-			root:CreateCheckbox(Coloured({ kind = "group", name = name }), function()
-				return Char().groups[name] and Char().groups[name][itemID]
-			end, function()
-				ToggleGroup(name, itemID)
-				-- A refresh cannot add or drop the Equip and Colour entries below, so reopen for fresh ones.
-				return MenuResponse.CloseAll
-			end)
-		end
-		root:CreateButton(L["New group..."], function()
-			NewGroup(itemID)
+	if not gearPanel then
+		gearPanel = CreateFrame("Frame", "TweaksForeverGearPanel", UIParent, "BasicFrameTemplateWithInset")
+		gearPanel:SetSize(380, 520)
+		gearPanel:SetFrameStrata("DIALOG")
+		gearPanel:SetClampedToScreen(true)
+		gearPanel.TitleText:SetText(L["Gear groups"])
+		gearTitle = gearPanel:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+		gearTitle:SetPoint("TOP", 0, -38)
+		gearPanel:SetScript("OnKeyDown", function(self, key)
+			self:SetPropagateKeyboardInput(key ~= "ESCAPE")
+			if key == "ESCAPE" then
+				self:Hide()
+			end
 		end)
-		-- Each source equips its own way, so a group and a set sharing a name stay distinct.
-		local found = Model.GroupsOf(itemID, Lists())
-		if #found > 0 then
-			root:CreateDivider()
-			for _, mark in ipairs(found) do
-				root:CreateButton(L["Equip %s"]:format(mark.name), function()
-					EQUIP[mark.kind](mark.name)
-				end)
-			end
-			local colours = root:CreateButton(L["Colour"])
-			for _, mark in ipairs(found) do
-				colours:CreateButton(Coloured(mark), function()
-					PickColour(mark)
-				end)
-			end
+		gearPanel:EnableKeyboard(true)
+		gearScroll = CreateFrame("ScrollFrame", nil, gearPanel, "ScrollFrameTemplate")
+		gearScroll:SetPoint("TOPLEFT", 24, -64)
+		gearScroll:SetPoint("BOTTOMRIGHT", -36, 18)
+		gearContent = CreateFrame("Frame", nil, gearScroll)
+		gearContent:SetWidth(300)
+		gearScroll:SetScrollChild(gearContent)
+		gearRows = { check = {}, button = {} }
+	end
+	gearTitle:SetText(C_Item.GetItemNameByID(itemID) or "")
+	gearPanel:ClearAllPoints()
+	gearPanel:SetPoint("TOPLEFT", button, "BOTTOMLEFT", 0, -4)
+	for _, pool in pairs(gearRows) do
+		for _, row in ipairs(pool) do
+			row:Hide()
 		end
+	end
+	local y, count = -4, { check = 0, button = 0 }
+	local function Add(kind, text, callback, checked)
+		count[kind] = count[kind] + 1
+		local row = GearRow(kind, count[kind])
+		row:ClearAllPoints()
+		row:SetPoint("TOPLEFT", 0, y)
+		if kind == "check" then
+			row.Text:SetText(text)
+			row:SetChecked(checked)
+		else
+			row:SetText(text)
+		end
+		row:SetScript("OnClick", callback)
+		row:Show()
+		y = y - 28
+	end
+	local names = {}
+	for name in pairs(Char().groups) do
+		names[#names + 1] = name
+	end
+	table.sort(names)
+	for _, name in ipairs(names) do
+		Add("check", Coloured({ kind = "group", name = name }), function()
+			ToggleGroup(name, itemID)
+			OpenMenu(button, itemID)
+		end, Char().groups[name][itemID] == true)
+	end
+	Add("button", L["New group..."], function()
+		gearPanel:Hide()
+		NewGroup(itemID, function()
+			OpenMenu(button, itemID)
+		end)
 	end)
+	local found = Model.GroupsOf(itemID, Lists())
+	for _, mark in ipairs(found) do
+		Add("button", L["Equip %s"]:format(mark.name), function()
+			EQUIP[mark.kind](mark.name)
+			gearPanel:Hide()
+		end)
+	end
+	for _, mark in ipairs(found) do
+		Add("button", L["Colour: %s"]:format(Coloured(mark)), function()
+			gearPanel:Hide()
+			PickColour(mark)
+		end)
+	end
+	gearContent:SetHeight(math.max(1, -y + 8))
+	gearScroll:SetVerticalScroll(0)
+	gearPanel:Show()
 end
 
 ---@param owner Button

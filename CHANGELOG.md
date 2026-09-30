@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.7.3] - 2026-09-30
+
+- **Open gear groups without the client menu crash.** Ctrl+Right-click opens a stock panel owned by Tweaks, keeping group checks, equipment actions and colours outside the native menu path that asserted in Forever. Long lists scroll, and the panel reuses its controls.
+
 ## [0.7.2] - 2026-09-29
 
 - **Other addons can ask where your class trainer is.** `TweaksForever.API` is now version 2: alongside the trainer spells you can learn and each dungeon's own entrance, `Trainers()` returns your class's trainers as `{npc, name, map, x, y}` — the NPC to visit and where it stands on the world map. It is baked from the game's own data, so it answers before login and in combat. Version 1's calls keep working for addons that check the version.

@@ -284,14 +284,6 @@ function ns.GeneralName()
 	return info and info.name or GENERAL
 end
 
--- Whether a trainer row's line puts it on the General tab, from the class's lines.
----@param lineID integer
----@return true?
-function ns.OnGeneral(lineID)
-	local data = ClassData()
-	return Model.OnGeneral(data and data.lines or {}, lineID)
-end
-
 -- Finds a spell's skill line ID: the baked row's (a General tab row's own line), else the class tab the trainer
 -- names. The trainer names it in the client's language, as the tab does, so the two match in every locale; weapon
 -- and riding lines don't.
@@ -607,6 +599,7 @@ local function ScanTrainer()
 		end
 	end
 	local spells = TweaksForeverCharDB.trainer or {}
+	local classData = ClassData()
 	local Resolve = ns.LineResolver()
 	for i = 1, GetNumTrainerServices() do
 		local name, kind, icon, level, rank = GetTrainerServiceInfo(i)
@@ -620,7 +613,7 @@ local function ScanTrainer()
 				level = level or 1,
 				icon = icon,
 				lineID = lineID,
-				general = ns.OnGeneral(lineID),
+				general = Model.OnGeneral(classData and classData.lines or {}, lineID),
 				line = line,
 				cost = GetTrainerServiceCost(i),
 			}

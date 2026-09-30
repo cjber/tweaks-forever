@@ -254,6 +254,7 @@ db.gearSections, db.combinedReagents = true, true
 bag.height = 700
 Anchors()
 local fits = bag:GetHeight() * bag:GetScale() + 70 <= 1000 + 1e-6
+assert(bag:GetScale() >= 0.75, "never below the native minimum scale: " .. bag:GetScale())
 assert(fits or bag:GetScale() == 0.75, "fits on screen: " .. bag:GetHeight() .. " x " .. bag:GetScale())
 -- Closing the reagent bag while folded.
 assert(reagents:GetParent() == bag)

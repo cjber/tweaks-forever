@@ -179,7 +179,6 @@ read_globals = {
 	"MapCanvasDataProviderMixin",
 	"Menu",
 	"MenuResponse",
-	"MenuUtil",
 	"MERCHANT",
 	"MerchantFrame",
 	"MerchantSellAllJunkButton",
