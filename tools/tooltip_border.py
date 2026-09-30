@@ -4,7 +4,7 @@
 
 A 16x16-unit rounded rectangle at 2 texels per unit: a one-unit grey line 2.5 units in from the edge with a
 3.5-unit corner radius, lit brighter along the top as the retail tooltip's is, and the tooltip's background
-filling everything inside it. Tooltips.lua cuts all nine NineSlice pieces from this one file, the Center
+filling everything inside it. UI/Tooltips.lua cuts all nine NineSlice pieces from this one file, the Center
 included: the 7-unit corners are the corner pieces and the 2-unit middle row, column and square are the
 edges and the Center, which it stretches. The line and the background are one image, so no edge between two
 separately placed textures runs along the line for a stray sub-pixel to open. Everything outside the line is

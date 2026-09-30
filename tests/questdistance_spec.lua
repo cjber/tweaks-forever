@@ -8,7 +8,7 @@ local ns = {
 		end,
 	}),
 }
-setfenv(assert(loadfile("QuestDistance.lua")), setmetatable({}, { __index = _G }))("TweaksForever", ns)
+setfenv(assert(loadfile("Quests/QuestDistance.lua")), setmetatable({}, { __index = _G }))("TweaksForever", ns)
 local Nearest = ns.QuestDistance.Nearest
 
 local function same(a, b)
@@ -78,7 +78,7 @@ local live = {
 	L = ns.L,
 }
 setfenv(
-	assert(loadfile("QuestDistance.lua")),
+	assert(loadfile("Quests/QuestDistance.lua")),
 	setmetatable({
 		UIParent = {},
 		CreateFrame = function()

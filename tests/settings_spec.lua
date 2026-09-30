@@ -114,7 +114,7 @@ ns = {
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 -- A packaged German client: features declare English, and the settings show the translation where there is one.
 ns.L["Bags"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
-setfenv(assert(loadfile("Settings.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 
 -- Rows per page, in order: each subpage's settings, then the index's button to it.
 local kinds = {}

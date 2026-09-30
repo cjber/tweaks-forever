@@ -153,7 +153,7 @@ local env = setmetatable({
 ns.QuestieDB = function()
 	return env.LibQuestieDB
 end
-setfenv(assert(loadfile("QuestProgress.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Quests/QuestProgress.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestProgress
 assert(features.questTooltips.default == true and features.questPlates.default == true)
 assert(#initializers == 1)

@@ -47,7 +47,7 @@ local env = setmetatable({
 }, { __index = _G })
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Data/CampBenefits.lua")), env)("TweaksForever", ns)
-setfenv(assert(loadfile("Campsites.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Map/Campsites.lua")), env)("TweaksForever", ns)
 local Camp = ns.Camp
 
 -- The list: benefits you have first, then the rest, each in the game's order.

@@ -180,7 +180,7 @@ local ns = {
 	db = { gearMark = "none" },
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("Gear.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Bags/Gear.lua")), env)("TweaksForever", ns)
 for _, fn in ipairs(initializers) do
 	fn()
 end

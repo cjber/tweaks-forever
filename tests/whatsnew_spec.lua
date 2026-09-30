@@ -28,8 +28,8 @@ local function Login(saved, version, on)
 	}, { __index = _G })
 	local ns = {}
 	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-	setfenv(assert(loadfile("Core.lua")), env)("TweaksForever", ns)
-	setfenv(assert(loadfile("WhatsNew.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("UI/WhatsNew.lua")), env)("TweaksForever", ns)
 	if on == false then
 		env.TweaksForeverDB = env.TweaksForeverDB or {}
 		env.TweaksForeverDB.whatsNew = false
@@ -67,7 +67,7 @@ local changelog = assert(io.open("CHANGELOG.md")):read("*a")
 local newest = changelog:match("\n## %[(%d+%.%d+%.%d+)%]")
 assert(
 	newest and ns.WHATS_NEW_VERSION == newest,
-	("WhatsNew.lua is %s's headline, CHANGELOG.md's newest release is %s"):format(
+	("UI/WhatsNew.lua is %s's headline, CHANGELOG.md's newest release is %s"):format(
 		tostring(ns.WHATS_NEW_VERSION),
 		tostring(newest)
 	)

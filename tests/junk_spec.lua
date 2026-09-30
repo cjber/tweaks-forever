@@ -8,7 +8,7 @@ local ns = {
 	end,
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-assert(loadfile("Junk.lua"))("TweaksForever", ns)
+assert(loadfile("Bags/Junk.lua"))("TweaksForever", ns)
 local Model = ns.Junk
 assert(features.markJunk.default == false and features.sellJunk.default == true)
 assert(#initializers == 1)

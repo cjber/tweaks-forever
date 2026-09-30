@@ -122,7 +122,7 @@ local env = setmetatable({
 	L = {},
 }, { __index = _G })
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("DungeonEntrances.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Map/DungeonEntrances.lua")), env)("TweaksForever", ns)
 
 -- A refresh in combat neither removes old pins nor acquires fresh ones.
 combat = true

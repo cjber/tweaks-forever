@@ -1,8 +1,9 @@
 """List the addon's translatable phrases as a template for translators, and reject text that skips them.
 
 Every phrase is its English text: `L["..."]` in the shipped Lua, plus the category, name, tooltip and option
-labels an `ns.Feature` declares and the label and tooltip an `ns.ClickMode` declares, which Settings.lua and
-Modes.lua translate where they show them. With no argument this prints a translation template: a Locales/<locale>.lua
+labels an `ns.Feature` declares and the label and tooltip an `ns.ClickMode` declares, which UI/Settings.lua and
+Core/Modes.lua translate where they show them. With no argument this prints a translation template:
+a Locales/<locale>.lua
 with an `L["x"] = "x"` line per phrase. `--write` saves it to Locales/phrases.txt, and `--check` fails when that file
 is stale, when shipped code hands a literal with words in it straight to a UI call, when a translation is missing
 from the TOC, or when a tracked file carries the packager's CurseForge localization keyword.
@@ -55,7 +56,7 @@ SINKS = {
     "CreateSettingsButtonInitializer": 1,
     "RegisterVerticalLayoutCategory": 1,
     "RegisterVerticalLayoutSubcategory": 2,
-    # Frames.lua's font string helper: Label(parent, text, font, x, y).
+    # UI/Frames.lua's font string helper: Label(parent, text, font, x, y).
     "Label": 2,
 }
 # Escape codes, format specifiers and markup that carry no words of their own.

@@ -1,4 +1,4 @@
--- The combined bag's layout pass (Sections.lua, Reagents.lua) runs only after Blizzard's own and never calls Blizzard's
+-- Bags/Sections.lua layout: bank tabs, reagent bags and sidebar widths.
 -- layout: folds the reagent bag in, adds sections, undoes each exactly, and leaves the bag alone when both are off.
 -- luacheck: ignore 212/self (stub methods mirror the frame API)
 local function Region(props)
@@ -208,7 +208,7 @@ local env = setmetatable({
 		return false
 	end,
 }, { __index = _G })
-for _, file in ipairs({ "Sections.lua", "Reagents.lua" }) do
+for _, file in ipairs({ "Bags/Sections.lua", "Bags/Reagents.lua" }) do
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
 end
 for _, fn in ipairs(inits) do

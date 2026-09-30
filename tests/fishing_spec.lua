@@ -64,7 +64,7 @@ local env = setmetatable({
 	},
 }, { __index = _G })
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("Fishing.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Features/Fishing.lua")), env)("TweaksForever", ns)
 assert(features.applyLure.parent == "easyCast" and features.fishingSounds.default == false)
 local Model = ns.Fishing
 

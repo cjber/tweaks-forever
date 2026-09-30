@@ -56,7 +56,7 @@ local env = setmetatable({
 		return false
 	end,
 }, { __index = _G })
-for _, file in ipairs({ "Data/ClassSpells.lua", "Data/DungeonEntrances.lua", "Spellbook.lua", "API.lua" }) do
+for _, file in ipairs({ "Data/ClassSpells.lua", "Data/DungeonEntrances.lua", "UI/Spellbook.lua", "Core/API.lua" }) do
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
 end
 local API = env.TweaksForever.API

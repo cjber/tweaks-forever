@@ -52,7 +52,7 @@ local env = setmetatable({
 	},
 }, { __index = _G })
 env._G = env
-setfenv(assert(loadfile("Automation.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Features/Automation.lua")), env)("TweaksForever", ns)
 assert(features.gossip.default == false)
 
 local function option(orderIndex, icon, flagged, status)

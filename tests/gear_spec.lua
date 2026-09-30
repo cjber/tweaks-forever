@@ -8,7 +8,7 @@ local ns = {
 	end,
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-assert(loadfile("Gear.lua"))("TweaksForever", ns)
+assert(loadfile("Bags/Gear.lua"))("TweaksForever", ns)
 local Model = ns.Gear
 assert(features.beforeFishing.parent == "gearGroups")
 
