@@ -8,7 +8,7 @@ local ns = {
 	end,
 }
 local env = setmetatable({}, { __index = _G })
-setfenv(assert(loadfile("Spellbook.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("UI/Spellbook.lua")), env)("TweaksForever", ns)
 local Model = ns.FutureSpells
 assert(features.trainableSpells.default and #initializers == 1)
 

@@ -62,7 +62,7 @@ OUT = ROOT / "docs" / "screenshots"
 PLAYER_LEVEL = 22
 MARGIN = 28
 
-# Gear.lua PALETTE, taken in turn as the groups were created.
+# Bags/Gear.lua PALETTE, taken in turn as the groups were created.
 GROUPS = {
     "DPS": (243 / 255, 139 / 255, 168 / 255),
     "Levelling": (148 / 255, 226 / 255, 213 / 255),
@@ -92,7 +92,7 @@ MONEY = 3 * 10000 + 47 * 100 + 12
 
 
 def strip(canvas, x, y, index):
-    """Gear.lua's Strip: a dark backing and one segment per group, along the slot's bottom edge."""
+    """Bags/Gear.lua's Strip: a dark backing and one segment per group, along the slot's bottom edge."""
     groups = BAG[index][2]
     if not groups:
         return
@@ -144,12 +144,12 @@ def menu(ui):
 REDRIDGE = 1433
 # A level 22 character who has walked in from Lakeshire but not yet ridden east past Alther's Mill.
 EXPLORED = {"Three Corners", "Lakeridge Highway", "Lake Everstill", "Lakeshire", "Redridge Canyons", "Alther's Mill"}
-# Exploration.lua: the unexplored overlays' vertex colour.
+# Map/Exploration.lua: the unexplored overlays' vertex colour.
 REVEAL_TINT = (0.55, 0.65, 0.85, 0.8)
 
 
 def addon_overlays(art):
-    """Exploration.lua's areas for one map art, decoded from the addon's own Data/Overlays.lua (layer 1 only)."""
+    """Map/Exploration.lua's areas for one map art, decoded from the addon's own Data/Overlays.lua (layer 1 only)."""
     source = (ROOT / "Data" / "Overlays.lua").read_text()
     entry = re.search(rf"\[{art}\] = ((?:\"[^\"]*\"\s*(?:\.\.\s*)?)+)", source)
     if not entry:
@@ -212,7 +212,7 @@ def zone_ranges():
 
 
 def difficulty(level, low, high):
-    """ZoneLevels.lua's colour: Model.ChallengeLevel fed to GetRelativeDifficultyColor."""
+    """Map/ZoneLevels.lua's colour: Model.ChallengeLevel fed to GetRelativeDifficultyColor."""
     challenge = low if level < low else high - 2 if level > high else level
     diff = challenge - level
     if diff >= 5:
@@ -297,7 +297,7 @@ def dungeon_layers(ui):
     return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
 
 
-# Junk.lua marks (account-wide): things this character sells rather than uses. Greys would only show their coin
+# Bags/Junk.lua marks (account-wide): things this character sells rather than uses. Greys would only show their coin
 # at a merchant, so the bag has none, and every coin here is the addon's.
 JUNK_BAG = [
     (6948, None, False),  # Hearthstone
@@ -331,7 +331,7 @@ def junk_layers(ui):
     slots = [(item, count) for item, count, _ in JUNK_BAG]
     bag, rects = container_frame(ui, "Backpack", 133633, slots, MONEY, hover=JUNK_HOVERED, junk=marked)
     item = ui.item(JUNK_BAG[JUNK_HOVERED][0])
-    # Junk.lua's bag-item tooltip callback (ns.OnTooltip): AddLine(text, 1, 0.82, 0, true).
+    # Bags/Junk.lua's bag-item tooltip callback (ns.OnTooltip): AddLine(text, 1, 0.82, 0, true).
     tip = tooltip(ui, item_tooltip_lines(ui, item, PLAYER_LEVEL) + [TooltipLine(JUNK_LINE, (1, 0.82, 0))])
     slot_x, slot_y, _, _ = rects["slots"][JUNK_HOVERED]
     idle, _ = container_frame(ui, "Backpack", 133633, slots, MONEY, junk=marked)
@@ -349,7 +349,7 @@ def framed(ui, layers, before):
     return shown, earlier
 
 
-# Campsites.lua's texts, from Data/CampBenefits.lua. Wrapped tooltip lines stop at about spell-tooltip width
+# Map/Campsites.lua's texts, from Data/CampBenefits.lua. Wrapped tooltip lines stop at about spell-tooltip width
 # (wowmock NOTES); the client leaves no gap between the lines of one wrapped string, the mock leaves 2 units.
 TOOLTIP_WRAP = 250
 # The Campfire Nearby aura (1283391) as the game describes it, and the way to the campfire in the scene.
@@ -411,7 +411,7 @@ def campfire_buff(ui):
     scene(ui, [(tooltip(ui, lines), 0, 0)], MARGIN).save(OUT / "camp.png")
 
 
-# Frames.lua's Edit Mode editor on a 1366x768 UIParent, the Character window picked on the Windows tab.
+# UI/Frames.lua's Edit Mode editor on a 1366x768 UIParent, the Character window picked on the Windows tab.
 UI_WIDTH = 1366
 MANAGER_WIDTH, MANAGER_TOP = 510, 100  # EditModeManagerFrame: fixedWidth, anchored TOP (0, -100)
 SHEET_HEIGHT = 420  # SHEET_MIN_HEIGHT, which the manager's own height does not exceed at this size
@@ -419,7 +419,7 @@ CHARACTER_SIZE = (398, 484)  # CHARACTER_FRAME_COLLAPSED_WIDTH x CHARACTER_FRAME
 PANEL_LEFT, PANEL_TOP = 16, 116  # UIPanel layout LEFT_OFFSET, TOP_OFFSET for a "left" area panel
 
 
-# The English of the game's own strings that Frames.lua uses as window labels (GlobalStrings, build 1.60.1.70009).
+# The English of the game's own strings that UI/Frames.lua uses as window labels (GlobalStrings, build 1.60.1.70009).
 GLOBAL_STRINGS = {
     "BANK": "Bank",
     "CHARACTER": "Character",
@@ -432,8 +432,8 @@ GLOBAL_STRINGS = {
 
 
 def window_labels():
-    """The Windows tab's labels, in Frames.lua's order: its own phrases, L["..."], or the game's strings."""
-    source = (ROOT / "Frames.lua").read_text()
+    """The Windows tab's labels, in UI/Frames.lua's order: its own phrases, L["..."], or the game's strings."""
+    source = (ROOT / "UI/Frames.lua").read_text()
     block = source[source.index("local windows = {") : source.index("\n}", source.index("local windows = {"))]
     return [phrase or GLOBAL_STRINGS[name] for phrase, name in re.findall(r'\{ "\w+", (?:L\["([^"]+)"\]|(\w+))', block)]
 
@@ -479,7 +479,7 @@ def editmode(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).save(OUT / "editmode.png")
 
 
-# Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
+# UI/Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
 # and a 12 cast bar, name and level 4 above the bar, the selection outline on the target, the others at 0.6 alpha.
 PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP, PLATE_DIMMED = 166, 16, 12, 2, 0.6
 QUEST_ICON, QUEST_GAP = 20, 4
@@ -515,7 +515,7 @@ def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
 
 
 def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest):
-    """One nameplate as Nameplates.lua lays out Blizzard's, with the Health Percent option on."""
+    """One nameplate as UI/Nameplates.lua lays out Blizzard's, with the Health Percent option on."""
     c = ui.canvas(240, 120)
     x, w = 37, PLATE_W
     cast_y = 110 - PLATE_CAST
@@ -527,7 +527,7 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
     if target:
         c.draw(ui.atlas("UI-HUD-Nameplates-Selected"), x - 3, y - 4, w + 6, PLATE_HEALTH + 7)
     if quest:
-        # QuestProgress.lua: the 20-square questobjective atlas 4 right of the health bar, centred on it.
+        # Quests/QuestProgress.lua: the 20-square questobjective atlas 4 right of the health bar, centred on it.
         c.draw(
             ui.atlas("questobjective"), x + w + QUEST_GAP, y + (PLATE_HEALTH - QUEST_ICON) / 2, QUEST_ICON, QUEST_ICON
         )
@@ -643,7 +643,7 @@ def demo(ui):
     return len(frames), len(data)
 
 
-# Tooltips.lua under Modern tooltips: the nine pieces cut from media/TooltipBorderModern.tga (PIECES, in sixteenths),
+# UI/Tooltips.lua under Modern tooltips: the nine pieces cut from media/TooltipBorderModern.tga (PIECES, in sixteenths),
 # with room under the last line for the health bar (EDGE, BOTTOM, HEIGHT, GAP, PADDING), whose track is its colour at
 # TRACK and whose border is Tooltips\UI-StatusBar-Border as three pieces, 8-texel ends at native size.
 TIP_PIECES = {
@@ -671,7 +671,7 @@ SHAMAN = (0 / 255, 112 / 255, 221 / 255)  # ChrClasses SHAMAN ClassColor
 
 
 def unit_tooltip(ui, lines, colour, health, text):
-    """GameTooltip as Tooltips.lua's Paint and HealthBar draw it, with `health` of the bar filled."""
+    """GameTooltip as UI/Tooltips.lua's Paint and HealthBar draw it, with `health` of the bar filled."""
     border = Image.open(ROOT / "media" / "TooltipBorderModern.tga").convert("RGBA")
     measure = ui.canvas(1, 1)
     fonts = [FONTS["GameTooltipHeaderText"]] + [FONTS["GameTooltipText"]] * (len(lines) - 1)

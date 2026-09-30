@@ -74,7 +74,7 @@ local function Pin(kind, mini)
 	return pin
 end
 frames.a, frames.b = Pin(6, false), Pin(8, true)
-setfenv(assert(loadfile("QuestiePins.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Quests/QuestiePins.lua")), env)("TweaksForever", ns)
 init()
 assert(frames.a.texture.atlas == "questnormal" and frames.a.width == 24)
 assert(frames.b.texture.atlas == "questturnin" and frames.b.width == 20)

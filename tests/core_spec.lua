@@ -25,7 +25,7 @@ local function Load(saved)
 		end,
 	}, { __index = _G })
 	local ns = {}
-	setfenv(assert(loadfile("Core.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "enabled", default = true })
 	ns.Feature({ key = "disabled", default = false })
 	ns.Feature({ key = "gearMark", default = "strip" })
@@ -35,7 +35,7 @@ local function Load(saved)
 	ns.Feature({ key = "needsPresent", default = true, needs = { title = "Present", check = present } })
 	ns.Feature({ key = "needsMissing", default = true, needs = { title = "Missing", check = function() end } })
 	ns.Feature({ key = "needsBroken", default = true, needs = { title = "Broken", check = error } })
-	-- A setting callback names the variable Settings.lua registers, and only for a declared feature.
+	-- A setting callback names the variable UI/Settings.lua registers, and only for a declared feature.
 	local changed = function() end
 	ns.OnSettingChanged("gearMark", changed)
 	assert(callbacks.TweaksForever_gearMark == changed and ns.SettingVariable("gearMark") == "TweaksForever_gearMark")

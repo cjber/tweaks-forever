@@ -11,7 +11,7 @@ local env = setmetatable({
 	Enum = { EditModeLayoutType = { Preset = 0, Account = 1, Character = 2 } },
 }, { __index = _G })
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("Frames.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("UI/Frames.lua")), env)("TweaksForever", ns)
 local Model = ns.Frames
 assert(features.moveWindows.default and #initializers == 1)
 assert(features.moveWindows.conflicts[1].addon == "BlizzMove")

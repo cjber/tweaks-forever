@@ -22,8 +22,10 @@ publishes that entry as its notes.
 
 ## Layout
 
-- `Core.lua` — `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, and TOC
+- `Core/Core.lua` — `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, and TOC
   order sets the settings subpage order.
+- `Bags/`, `Quests/`, `Map/`, `Features/` — feature modules grouped by the part of the game they change.
+- `UI/` — settings, tooltips, nameplates and window helpers; `Integrations/` — companion navigation.
 - `Data/` — lookup tables; a generated one names the script that regenerates it in its header.
 - `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.
 - `Locales/` — `ns.L` (enUS.lua), keyed by the English text, and one `<locale>.lua` per translation, each in the
@@ -72,7 +74,7 @@ Owner-approved exceptions to `wow-forever-addon`:
 - WFA-2: Reveal unexplored areas is off by default: unexplored areas are a spoiler for players who like to explore.
 - WFA-2: Hide macro names is off by default: it changes action bars players set up themselves.
 - WFA-4: tooltips default to the charcoal Modern style, a headline feature pictured on the store page.
-- WFA-13: `QuestDistance.lua`'s 1 s ticker keeps running: it is the only catch for Questie tracker toggles and
+- WFA-13: `Quests/QuestDistance.lua`'s 1 s ticker keeps running: it is the only catch for Questie tracker toggles and
   tracker collapses, which set no dirty flag, and it is cheap.
 
 ## Standards

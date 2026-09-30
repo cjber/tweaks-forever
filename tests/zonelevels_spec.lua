@@ -20,7 +20,7 @@ local env = setmetatable({
 	},
 }, { __index = _G })
 assert(loadfile("Data/ZoneLevels.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("ZoneLevels.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Map/ZoneLevels.lua")), env)("TweaksForever", ns)
 local Model = ns.ZoneLevels
 assert(#initializers == 1 and features.zoneLevels.default == true)
 

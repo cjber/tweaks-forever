@@ -1,4 +1,4 @@
--- Exercise Frames.lua's real installation, lazy addon discovery and Edit Mode controls.
+-- Exercise UI/Frames.lua's real installation, lazy addon discovery and Edit Mode controls.
 local function Run(installed, early, fromEditor)
 	local callbacks, events, initializers, pending, frames = {}, {}, {}, {}, {}
 	local combat = false
@@ -278,7 +278,7 @@ local function Run(installed, early, fromEditor)
 		end
 	end
 	setfenv(assert(loadfile("Locales/enUS.lua")), env)("TweaksForever", ns)
-	setfenv(assert(loadfile("Frames.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("UI/Frames.lua")), env)("TweaksForever", ns)
 	local layout = ns.Frames.Layout(ns.db, "account:1:Solo", true)
 	layout.AdventureGuideForeverWindow = { x = 0.6, y = 0.4, scale = 1.2 }
 	local guide = frame(root)

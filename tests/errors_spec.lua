@@ -32,7 +32,7 @@ env.UIErrorsFrame = {
 	end,
 }
 env._G = env
-setfenv(assert(loadfile("Errors.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("UI/Errors.lua")), env)("TweaksForever", ns)
 assert(features.quietErrors.default == true and #initializers == 1)
 local hidden = env.BLACK_LISTED_MESSAGE_TYPES
 db.quietErrors = true

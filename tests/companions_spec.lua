@@ -15,7 +15,7 @@ function ns.Feature() end
 function ns.Active(key)
 	return ns.db[key]
 end
-setfenv(assert(loadfile("Companions.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Integrations/Companions.lua")), env)("TweaksForever", ns)
 
 local function Hint()
 	return ns.Suggestion("ShortestPathForever", "Install it.", "Enable it.")

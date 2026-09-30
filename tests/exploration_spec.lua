@@ -9,7 +9,7 @@ local ns = {
 }
 local env = setmetatable({}, { __index = _G })
 assert(loadfile("Data/Overlays.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("Exploration.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Map/Exploration.lua")), env)("TweaksForever", ns)
 local Model = ns.Exploration
 assert(#initializers == 1 and features.exploration.default == false)
 

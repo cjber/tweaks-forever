@@ -47,7 +47,7 @@ local env = setmetatable({
 	end,
 }, { __index = _G })
 env._G = env
-setfenv(assert(loadfile("MacroNames.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("UI/MacroNames.lua")), env)("TweaksForever", ns)
 local feature = features.hideMacroNames
 assert(feature.default == false and feature.category == "Interface" and #initializers == 1)
 

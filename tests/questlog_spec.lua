@@ -73,8 +73,8 @@ local env = setmetatable({
 	},
 }, { __index = _G })
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("QuestLevels.lua")), env)("TweaksForever", ns)
-setfenv(assert(loadfile("QuestLog.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Quests/QuestLevels.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Quests/QuestLog.lua")), env)("TweaksForever", ns)
 assert(loadfile("Data/ForeverQuests.lua"))("TweaksForever", ns)
 assert(ns.ForeverQuests[92750] and not ns.ForeverQuests[455] and not ns.ForeverQuests[9999999])
 assert(ns.QuestTitle(101, "First") == "First")

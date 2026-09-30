@@ -2,8 +2,8 @@ local ns = {
 	Feature = function() end,
 	Init = function() end,
 }
-assert(loadfile("Sections.lua"))("TweaksForever", ns)
-assert(loadfile("Reagents.lua"))("TweaksForever", ns)
+assert(loadfile("Bags/Sections.lua"))("TweaksForever", ns)
+assert(loadfile("Bags/Reagents.lua"))("TweaksForever", ns)
 local Model = ns.Reagents
 
 -- A 16-slot bag in ten columns: slot 1 at the top left, slot 11 starting the bottom row on the money frame.
