@@ -13,6 +13,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [0.7.3] - 2026-09-30
 
+- **Development disclosure.** This release was developed with AI assistance. Changes were reviewed and checked with automated tests, linting and type checks; live verification remains ongoing.
+
 - **Open gear groups without the client menu crash.** Ctrl+Right-click opens a stock panel owned by Tweaks, keeping group checks, equipment actions and colours outside the native menu path that asserted in Forever. Long lists scroll, and the panel reuses its controls.
 
 ## [0.7.2] - 2026-09-29
