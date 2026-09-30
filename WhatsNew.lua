@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.7.2"
-ns.WHATS_NEW = L["Other addons can ask where your class trainer is."]
+ns.WHATS_NEW_VERSION = "0.7.3"
+ns.WHATS_NEW = L["Gear groups open without the client menu crash."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@project-version@"

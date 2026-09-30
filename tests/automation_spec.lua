@@ -105,4 +105,22 @@ active = {}
 
 db.gossip = false
 assert(talk(flightMaster) == nil, "the setting off leaves every option alone")
+assert(features.fastLoot.default == true, "fast looting starts on")
+local looted = {}
+env.GetNumLootItems = function()
+	return 3
+end
+env.LootSlot = function(slot)
+	looted[#looted + 1] = slot
+end
+db.fastLoot = features.fastLoot.default
+handlers.LOOT_READY(true)
+assert(table.concat(looted, ",") == "3,2,1", "auto loot takes every slot")
+looted = {}
+handlers.LOOT_READY(false)
+handlers.LOOT_READY(nil)
+assert(#looted == 0, "manual or modified-click looting remains manual")
+db.fastLoot = false
+handlers.LOOT_READY(true)
+assert(#looted == 0, "the toggle disables fast looting immediately")
 print("automation: ok")
