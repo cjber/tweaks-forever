@@ -76,7 +76,7 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdLi
 - `ns.HookBagButtons` and `ns.IsBagActionClick` (Core/Core.lua) — the one home for bag-slot button hooks and
   the remappable-click guard, used by Bags/Junk.lua and Bags/Gear.lua. The specs never run `ns.Init`, so a change here
   needs a stubbed load of Core + the feature file (hook-registration trace) to show behaviour is unchanged.
-- `ns.Junk`, `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration`, `ns.Sections`, `ns.Reagents`, `ns.Camp`,
+- `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration`, `ns.Sections`, `ns.Reagents`, `ns.Camp`,
   `ns.ZoneLevels`, `ns.Entrances`, `ns.FutureSpells` — pure `Model` tables exported for the specs, each named
   once in production. Some are also cross-file APIs: `ns.Fishing.IsPole` (Gear), `ns.Gear.MarksOf`/`ColourOf`/
   `OnRefresh`/`Settling` (Sections), `ns.Sections` constants, `lift` and `Relayout` (Reagents).
@@ -107,7 +107,7 @@ finding.
   these strings are the persisted `windowLayouts` key format; changing them changes saved data.
 - stringly-typed on the `gearMark` values (`Bags/Gear.lua`): the three-member set already fails loudly on an
   unknown value (`error("unknown gear mark …")`).
-- Model fields named once in production (`ns.Junk`, `ns.Camp`, …) and `types/` classes referenced once
+- Model fields named once in production (`ns.Gear`, `ns.Camp`, …) and `types/` classes referenced once
   (`NamePlateFrame`, `SpellBookFrameTemplate_PagedSpellsFrame`, `SpellBookSingleSkillLineCategoryMixin`,
   `TFEntrancePin`): spec exports and annotations of external or XML-made objects, not dead code.
 - `Bags/Sections.lua` `Layout`/`Bags/Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
@@ -115,8 +115,7 @@ finding.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
 - `Bags/Sections.lua`/`Bags/Reagents.lua` `Relayout`: a three-line schedule idiom, not a shared implementation.
 - Gear's colour kinds `"group"`/`"set"`/`"fishing"`: persisted keys in `TweaksForeverCharDB.colours`.
-- Junk `Model.SaleValue`'s `not info` (an empty slot's info is nil; the spec calls the model directly) and
-  Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
+- Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
 - Gear's `Char()` short alias, Frames' repeated `if Active() then Schedule() end`, and Tooltips'
   single-caller `HealthBarStyle` (kept under the function-length limit).
 - Small nil-safe reads of a saved variable or a Questie profile option (`Features/Automation.lua`, `Quests/QuestDistance.lua`):

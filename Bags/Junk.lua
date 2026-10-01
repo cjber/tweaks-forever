@@ -44,24 +44,13 @@ ns.Feature({
 	conflicts = conflicts,
 })
 
----@class TFJunk
-local Model = {}
-ns.Junk = Model
 local POOR = 0
-
----@param marks TFMarks
----@param itemID integer
----@return boolean
-function Model.Toggle(marks, itemID)
-	marks[itemID] = not marks[itemID] or nil
-	return marks[itemID] == true
-end
 
 ---@param info ContainerItemInfo?
 ---@param marks TFMarks
 ---@param includeGreys boolean
 ---@return boolean
-function Model.IsJunk(info, marks, includeGreys)
+local function IsJunk(info, marks, includeGreys)
 	if not info or not info.itemID or info.quality == nil then
 		return false
 	end
@@ -71,15 +60,14 @@ function Model.IsJunk(info, marks, includeGreys)
 	return marks[info.itemID] == true
 end
 
----@param info ContainerItemInfo?
+---@param info ContainerItemInfo
 ---@param price number?
 ---@param marks TFMarks
 ---@param includeGreys boolean
 ---@return number?
-function Model.SaleValue(info, price, marks, includeGreys)
+local function SaleValue(info, price, marks, includeGreys)
 	if
-		not info
-		or not Model.IsJunk(info, marks, includeGreys)
+		not IsJunk(info, marks, includeGreys)
 		or info.isLocked
 		or info.hasNoValue
 		or not price
@@ -95,7 +83,7 @@ end
 ---@param before ContainerItemInfo
 ---@param after ContainerItemInfo?
 ---@return boolean?
-function Model.SameStack(before, after)
+local function SameStack(before, after)
 	return after
 		and before.itemID == after.itemID
 		and before.hyperlink == after.hyperlink
@@ -105,7 +93,7 @@ end
 
 local emptyMarks = {}
 local function Marks()
-	return ns.Active("markJunk") and TweaksForeverDB.junk or emptyMarks
+	return ns.Active("markJunk") and ns.db.junk or emptyMarks
 end
 
 local function LeatrixSellsGreys()
@@ -161,7 +149,8 @@ local function Toggle(bag, slot)
 	if not info or info.isLocked then
 		return false
 	end
-	Model.Toggle(TweaksForeverDB.junk, info.itemID)
+	local marks = ns.db.junk
+	marks[info.itemID] = not marks[info.itemID] or nil
 	RefreshBags()
 	UpdateMerchantButton()
 	return true
@@ -209,10 +198,10 @@ local function Scan(includeGreys, limit)
 				C_Item.GetItemInfo(info.hyperlink)
 				pending = true
 			end
-			if info and Model.IsJunk(info, marks, includeGreys) and not info.hasNoValue and not info.isLocked then
+			if info and IsJunk(info, marks, includeGreys) and not info.hasNoValue and not info.isLocked then
 				local price = select(11, C_Item.GetItemInfo(info.hyperlink))
 				pending = pending or price == nil
-				local value = Model.SaleValue(info, price, marks, includeGreys)
+				local value = SaleValue(info, price, marks, includeGreys)
 				if value and not Refundable(bag, slot) then
 					result[#result + 1] = { bag = bag, slot = slot, info = info, value = value }
 					if #result == limit then
@@ -308,8 +297,8 @@ Step = function(run)
 		local includeGreys = not run.manual and not LeatrixSellsGreys()
 		local price = item.value / item.info.stackCount
 		if
-			Model.SameStack(item.info, info)
-			and Model.SaleValue(info, price, Marks(), includeGreys)
+			SameStack(item.info, info)
+			and SaleValue(info, price, Marks(), includeGreys)
 			and not Refundable(item.bag, item.slot)
 		then
 			run.waiting, run.polls = item, 0
