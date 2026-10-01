@@ -39,6 +39,8 @@ jobs:
       - if: steps.build.outputs.new == 'true'
         run: python3 tools/gen_overlays.py && python3 tools/gen_camp.py && python3 tools/gen_zonelevels.py && python3 tools/gen_dungeons.py && python3 tools/gen_classspells.py
       - if: steps.build.outputs.new == 'true'
+        run: python3 tools/check_generated.py --offline
+      - if: steps.build.outputs.new == 'true'
         run: |
           sudo apt-get update && sudo apt-get install -y luajit lua-check
           luacheck .

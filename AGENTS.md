@@ -12,6 +12,7 @@ tools/typecheck.sh
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 ruff check tools && ruff format --check tools
 uvx ty@0.0.83 check tools
+python3 tools/check_generated.py --offline # omit --offline to fetch missing pinned inputs
 python3 tools/changelog.py --check
 python3 .sift/gate.py --base origin/main && python3 .sift/agents.py check
 ```
