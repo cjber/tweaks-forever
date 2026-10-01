@@ -35,9 +35,9 @@ jobs:
             exit 0
           fi
           echo "new=true" >> "$GITHUB_OUTPUT"
-          sed -i -E "s/^BUILD = \".*\"/BUILD = \"$build\"/" tools/gen_overlays.py tools/gen_camp.py tools/gen_zonelevels.py tools/gen_dungeons.py tools/gen_classspells.py
+          sed -i -E "s/^BUILD = \".*\"/BUILD = \"$build\"/" tools/gen_overlays.py tools/gen_camp.py tools/gen_zonelevels.py tools/gen_dungeons.py tools/gen_classspells.py tools/gen_foreverquests.py
       - if: steps.build.outputs.new == 'true'
-        run: python3 tools/gen_overlays.py && python3 tools/gen_camp.py && python3 tools/gen_zonelevels.py && python3 tools/gen_dungeons.py && python3 tools/gen_classspells.py
+        run: python3 tools/gen_overlays.py && python3 tools/gen_camp.py && python3 tools/gen_zonelevels.py && python3 tools/gen_dungeons.py && python3 tools/gen_classspells.py && python3 tools/gen_foreverquests.py
       - if: steps.build.outputs.new == 'true'
         run: python3 tools/check_generated.py --offline
       - if: steps.build.outputs.new == 'true'
