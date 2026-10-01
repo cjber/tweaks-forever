@@ -6,6 +6,8 @@ python3 tools/gen_camp.py          # Data/CampBenefits.lua (stdlib only)
 python3 tools/gen_zonelevels.py    # Data/ZoneLevels.lua (stdlib only)
 python3 tools/gen_dungeons.py      # Data/DungeonEntrances.lua (stdlib only)
 python3 tools/gen_classspells.py   # Data/ClassSpells.lua (stdlib only)
+python3 tools/gen_foreverquests.py # Data/ForeverQuests.lua: pinned Forever IDs minus Era IDs
+python3 tools/check_generated.py  # freshness and repeatability in a disposable tree
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/changelog.py --check # every v* tag has a CHANGELOG entry
