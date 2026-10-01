@@ -206,6 +206,7 @@ TweaksForeverCharDB = nil
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
 ---@field Exploration TFExploration
+---@field CombinedBag TFCombinedBag
 ---@field Sections TFSections
 ---@field Reagents TFReagents
 ---@field CampBenefits TFCampBenefit[]

@@ -27,6 +27,7 @@ Bags\Vendor.lua
 Core\Modes.lua
 Bags\Junk.lua
 Bags\Gear.lua
+Bags\CombinedBag.lua
 Bags\Sections.lua
 Bags\Reagents.lua
 Map\Campsites.lua
