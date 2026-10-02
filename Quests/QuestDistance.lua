@@ -20,10 +20,6 @@ ns.Feature({
 	},
 })
 
----@class TFQuestDistance
-local Model = {}
-ns.QuestDistance = Model
-
 -- Yards you move before your position is checked against quest areas again, and before the list is re-sorted.
 local RECHECK, RESORT = 5, 25
 -- Space between the distance column and the item buttons.
@@ -43,7 +39,7 @@ end
 ---@param ids integer[] the watched quests in the tracker's order
 ---@param distances table<integer, number> squared distance by quest, for those on this continent
 ---@return integer[]?
-function Model.Nearest(ids, distances)
+local function Nearest(ids, distances)
 	local order = {}
 	for index, id in ipairs(ids) do
 		order[index] = { id = id, index = index, distance = distances[id] }
@@ -79,7 +75,7 @@ local function SortNearest()
 			distances[id] = onContinent and distanceSq or nil
 		end
 	end
-	local order = Model.Nearest(ids, distances)
+	local order = Nearest(ids, distances)
 	if not order then
 		return
 	end

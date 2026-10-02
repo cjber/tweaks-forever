@@ -225,7 +225,6 @@ TweaksForeverCharDB = nil
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
 ---@field QuestGivers TFQuestGivers
----@field QuestDistance TFQuestDistance
 ---@field QuestProgress TFQuestProgress
 ---@field QuestieDB fun(): TFQuestieDB?
 ---@field Print fun(message: string)
