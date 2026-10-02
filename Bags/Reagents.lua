@@ -4,7 +4,7 @@ local _, ns = ...
 ns.Feature({
 	key = "combinedReagents",
 	category = "Interface",
-	name = "Show the reagent bag in the combined bag",
+	name = "Reagent bag in combined bag",
 	tooltip = "With Combine Bags on, the reagent bag's slots sit at the bottom of the combined bag, tinted green "
 		.. "under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. "
 		.. "Opened on its own from the bag bar, it keeps its own window.",

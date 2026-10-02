@@ -2,6 +2,7 @@
 -- RemoveAllPinsByTemplate are forbidden while combat lockdown is active.
 local combat, acquired, removed = false, 0, 0
 local provider, onEvent
+local mapEvents = 0
 local pins = {}
 local map = {
 	IsShown = function()
@@ -88,12 +89,15 @@ local env = setmetatable({
 	CreateFromMixins = function(mixin)
 		return setmetatable({}, { __index = mixin })
 	end,
-	CVarMapCanvasDataProviderMixin = {
-		Init = function() end,
-		IsCVarSet = function()
-			return true
+	MapCanvasDataProviderMixin = {
+		RegisterEvent = function()
+			mapEvents = mapEvents + 1
 		end,
+		OnShow = function() end,
 	},
+	GetCVarBool = function()
+		return true
+	end,
 	BaseMapPoiPinMixin = {
 		CreateSubPin = function()
 			return {}
@@ -144,4 +148,11 @@ if eventFrame.registered then
 	onEvent(eventFrame, "PLAYER_REGEN_ENABLED")
 end
 assert(removed == 2, "second combat never rebuilt deferred pins")
+-- The map's own toggle redraws through our frame, never through the map's shared event counts.
+onEvent(eventFrame, "CVAR_UPDATE", "questPOI")
+assert(removed == 2, "another cvar redrew the entrances")
+onEvent(eventFrame, "CVAR_UPDATE", "showDungeonEntrancesOnMap")
+assert(removed == 3, "the entrance toggle did not redraw")
+provider:OnShow()
+assert(mapEvents == 0, "showing the map registered an event through the map")
 print("dungeonentrances_combat: protected MapCanvas refresh contract passed")

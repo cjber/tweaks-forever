@@ -5,7 +5,7 @@ local L = ns.L
 ns.Feature({
 	key = "dungeonEntrances",
 	category = "Maps",
-	name = "Dungeon and raid entrances on the world map",
+	name = "Instance entrances",
 	tooltip = "Mark every dungeon and raid entrance on zone and continent maps with the retail icons; point at "
 		.. "one for its name, and click it to travel there. Follows the map's own Show instance entrances filter.",
 	default = true,
@@ -175,8 +175,10 @@ ns.Init(function()
 		end
 	end
 
-	local Provider = CreateFromMixins(CVarMapCanvasDataProviderMixin)
-	Provider:Init("showDungeonEntrancesOnMap")
+	-- Not CVarMapCanvasDataProviderMixin: it registers CVAR_UPDATE through the map, which writes our taint into
+	-- the event counts every provider shares, and the quest pins are then blocked in combat.
+	local CVAR = "showDungeonEntrancesOnMap"
+	local Provider = CreateFromMixins(MapCanvasDataProviderMixin)
 	local refreshPending = false
 
 	local function HidePins()
@@ -197,7 +199,7 @@ ns.Init(function()
 		end
 		refreshPending = false
 		self:RemoveAllData()
-		if not (ns.Active("dungeonEntrances") and self:IsCVarSet()) then
+		if not (ns.Active("dungeonEntrances") and GetCVarBool(CVAR)) then
 			return
 		end
 		for _, entry in ipairs(ns.DungeonEntrances[self:GetMap():GetMapID()] or {}) do
@@ -208,8 +210,9 @@ ns.Init(function()
 	map:AddDataProvider(Provider)
 	local events = CreateFrame("Frame")
 	events:RegisterEvent("PLAYER_REGEN_ENABLED")
-	events:SetScript("OnEvent", function()
-		if refreshPending and map:IsShown() then
+	events:RegisterEvent("CVAR_UPDATE")
+	events:SetScript("OnEvent", function(_, event, cvar)
+		if map:IsShown() and (event == "CVAR_UPDATE" and cvar == CVAR or refreshPending) then
 			Provider:RefreshAllData()
 		end
 	end)

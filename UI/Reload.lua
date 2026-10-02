@@ -4,7 +4,7 @@ local _, ns = ...
 ns.Feature({
 	key = "reloadCommand",
 	category = "Interface",
-	name = "Type /rl to reload the interface",
+	name = "Type /rl to reload the UI",
 	tooltip = "A shorter /reload. Switching this on or off takes effect after the next reload.",
 	default = true,
 	conflicts = { { addon = "Leatrix_Plus" } },

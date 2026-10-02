@@ -5,7 +5,7 @@ local L = ns.L
 ns.Feature({
 	key = "gearGroups",
 	category = "Gear",
-	name = "Group gear with Ctrl+Right-click",
+	name = "Sort gear into named groups",
 	tooltip = "Ctrl+Right-click a bag item, or pick Group gear from a bag's portrait menu, to put it in a named "
 		.. "group, such as Healing, DPS or Levelling, or to start a new one. The same menu equips a whole group "
 		.. "and picks each group's colour. Items in a group or an Equipment Manager set are marked in your bags "
@@ -16,7 +16,7 @@ ns.Feature({
 ns.Feature({
 	key = "beforeFishing",
 	category = "Gear",
-	name = "Remember the weapons a fishing pole replaces",
+	name = "Keep swapped weapons",
 	tooltip = "Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your "
 		.. "bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on.",
 	default = true,

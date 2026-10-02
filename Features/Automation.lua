@@ -16,8 +16,9 @@ end
 ns.Feature({
 	key = "quests",
 	category = "Automation",
-	name = "Accept and turn in quests automatically",
-	tooltip = "Hold Shift while talking to skip it. A quest with a choice of rewards is left for you to pick.",
+	name = "Accept and turn in quests",
+	tooltip = "Quests are accepted and turned in for you as you talk to an NPC. Hold Shift while talking to skip "
+		.. "it. A quest with a choice of rewards is left for you to pick.",
 	default = false,
 	conflicts = {
 		Leatrix("AutomateQuests"),
@@ -35,7 +36,7 @@ ns.Feature({
 ns.Feature({
 	key = "gossip",
 	category = "Automation",
-	name = "Skip gossip with a single option",
+	name = "Skip single-option gossip",
 	tooltip = "Goes straight to the only thing an NPC offers, or a flight master's flight map. Hold Shift to see it.",
 	default = false,
 	conflicts = { Leatrix("AutomateGossip") },
@@ -62,8 +63,9 @@ ns.Feature({
 ns.Feature({
 	key = "releasePvP",
 	category = "Automation",
-	name = "Release your spirit in battlegrounds",
-	tooltip = "Unless you can resurrect yourself (a soulstone or Reincarnation).",
+	name = "Release in battlegrounds",
+	tooltip = "Releases your spirit as soon as you die in a battleground, unless you can resurrect yourself (a "
+		.. "soulstone or Reincarnation).",
 	default = false,
 	conflicts = { Leatrix("AutoReleasePvP") },
 })

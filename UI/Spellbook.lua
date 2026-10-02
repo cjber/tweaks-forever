@@ -5,7 +5,7 @@ local L = ns.L
 ns.Feature({
 	key = "trainableSpells",
 	category = "Interface",
-	name = "Show future spells in the spellbook",
+	name = "Future spells in spellbook",
 	tooltip = "Spells you have not learned yet appear greyed out after the ones you know, as the Retail spellbook "
 		.. "shows them: what your trainer can teach you now, and each spell's next rank with the level it comes at. "
 		.. "Visiting your trainer brings the list and its prices up to date.",
