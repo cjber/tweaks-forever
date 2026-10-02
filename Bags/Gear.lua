@@ -361,7 +361,8 @@ local function Colour(mark)
 	return Model.Colour(Char().colours, mark.kind, mark.name)
 end
 
--- For Sections.lua: the lists an item is in, a list's colour, and a call after every refresh of the marks.
+-- For the combined bag's layout (CombinedBag.lua, Sections.lua): the lists an item is in, a list's colour, and a
+-- call after every refresh of the marks.
 ---@param itemID integer
 ---@return TFGearMark[]
 function Model.MarksOf(itemID)
@@ -731,7 +732,7 @@ local function TrackWeapons()
 	-- event per slot, so reading waits a moment for both to settle. A weapon held only between two events, such
 	-- as one swapped in just before the pole, is caught as it passes.
 	local worn, seen, pending = {}, nil, false
-	-- Sections wait for this: the weapons a pole replaced reach the bag before they are known as Before fishing.
+	-- The bag's layout waits for this: the weapons a pole replaced reach the bag before they are known as Before fishing.
 	function Model.Settling()
 		return pending
 	end

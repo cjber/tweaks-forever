@@ -12,26 +12,17 @@ ns.Feature({
 	parent = "gearGroups",
 })
 
+-- The gear sections' part of the combined bag's layout (CombinedBag.lua), which calls Active and Arrange.
 ---@class TFSections
--- Set by Reagents.lua: Reserve folds the reagent bag in when it fits and returns its lift; Placed lays its rows out.
----@field Reserve fun(base: number, columns: integer): number?
----@field Placed fun(columns: integer)?
 local Model = {}
 ns.Sections = Model
 
--- ContainerFrameItemButtonTemplate is 37 square with 5 between buttons; the grid starts 4 above the money frame
--- (ContainerFrameCombinedBagsMixin:GetInitialItemAnchor).
-local ITEM, STEP, ORIGIN_Y = 37, 42, 4
--- Room for a heading above its section, and a gap between the sections and the rest of the bag.
-local HEADING, GAP = 16, 6
+local Bag = ns.CombinedBag
+local ITEM, STEP, ORIGIN_Y, GAP, MIN_SCALE = Bag.ITEM, Bag.STEP, Bag.ORIGIN_Y, Bag.GAP, Bag.MIN_SCALE
+-- Room for a heading above its section.
+local HEADING = 16
 -- Before fishing is a moment rather than a set, so its heading carries the fishing icon to say so.
 local FISHING_ICON = "|TInterface\\Icons\\Trade_Fishing:0|t "
--- The smallest scale Blizzard shrinks bags to so they fit on screen (CONTAINER_SCALE in ContainerFrame.lua).
-local MIN_SCALE = 0.75
--- Shared with the reagent bag's section (Reagents.lua), so the two line up.
-Model.ITEM, Model.STEP, Model.ORIGIN_Y, Model.GAP, Model.MIN_SCALE = ITEM, STEP, ORIGIN_Y, GAP, MIN_SCALE
--- How far the reagent bag's rows at the bottom lift the rest of the bag, from Model.Reserve on each layout.
-Model.lift = 0
 
 -- Where each item and heading goes, bottom-up from the money frame as Blizzard's grid is. `items` is in
 -- Blizzard's order (bottom right first), each { section = key or nil }; `sections` is the keys top to bottom.
@@ -75,12 +66,10 @@ end
 ---@type ContainerFrameCombinedBags
 local bag
 local headings = {}
--- The bag's height and scale as Blizzard last set them, and the height this addon then gave it.
-local base, scale, grown
--- Whether the bag is laid out differently from Blizzard's grid now, so switching both features off undoes it once.
-local changed = false
 
-local function Active()
+-- Whether grouped gear is gathered into sections at all; they still go in only when Arrange finds they fit.
+---@return boolean
+function Model.Active()
 	return ns.Active("gearGroups") and ns.Active("gearSections") and not InputUtil.IsGamepadUIEnabled()
 end
 
@@ -132,47 +121,19 @@ local function Heading(index)
 	return headings[index]
 end
 
--- Blizzard chose the bags' scale for the bag's own height. Shrink it, never below Blizzard's smallest, so a taller bag
--- stays on screen, with its corner where Blizzard anchored it.
+-- Puts every item of the bag `lift` above the money frame, in Blizzard's grid or under section headings, and
+-- returns the bag's height: `height` (Blizzard's plus the lift) as given, or taller for the sections. Sections go
+-- in only when the taller bag fits on screen at the smallest scale, as its top rows could not be reached otherwise.
 ---@param height number
-local function Fit(height)
-	local want = math.max(MIN_SCALE, math.min(scale, (GetScreenHeight() - CONTAINER_OFFSET_Y) / height))
-	local now = bag:GetScale()
-	if want ~= now then
-		local point, relative, relativePoint, x, y = bag:GetPoint()
-		bag:SetScale(want)
-		bag:SetPoint(point, relative, relativePoint, x * now / want, y * now / want)
-	end
-end
-
--- Lays the whole combined bag out again (points, height, scale, corner cropping): after Blizzard's own
--- layout, which always ends in UpdateContainerFrameAnchors, and whenever its contents or these settings change.
--- Never by calling Blizzard's UpdateFrameSize, UpdateItemLayout or UpdateContainerFrameAnchors: run from addon code
--- they build the bags' cached item and open-bag lists tainted, and Blizzard's bank code is then blocked.
--- Sections go in only when the taller bag fits on screen at the smallest scale, as its top rows could not be
--- reached otherwise.
-local function Layout()
-	if not bag:IsShown() then
-		return
-	end
-	-- The engine hands a height back a little off what it was given (481 as 481.00003), so the bag counts as grown
-	-- by this addon when it is within a pixel of that; only a height Blizzard set is a new base.
-	local height = bag:GetHeight()
-	if not grown or math.abs(height - grown) > 0.5 then
-		base = height
-	end
-	scale = scale or bag:GetScale()
-	local columns = bag:GetColumns()
-	local lift = Model.Reserve and Model.Reserve(base, columns) or 0
-	Model.lift = lift
-	if lift == 0 and not Active() and not changed then
-		return
-	end
+---@param lift number
+---@param columns integer
+---@return number
+function Model.Arrange(height, lift, columns)
 	local items, sections, firsts = Plan()
 	table.sort(items, BlizzardOrder)
 	local rows = math.ceil(#items / columns)
-	local total = base + lift
-	if Active() then
+	local total = height
+	if Model.Active() then
 		local _, _, sectionsHeight = Model.Layout(items, sections, columns)
 		local tall = total + sectionsHeight - rows * STEP
 		if tall * MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
@@ -202,30 +163,9 @@ local function Layout()
 		text:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, origin + head.y + 2)
 		text:Show()
 	end
-
-	grown, changed = total, total ~= base
-	bag:SetHeight(total)
-	NineSliceUtil.UpdateCornerCropping(bag, total)
-	Fit(total)
-	if Model.Placed then
-		Model.Placed(columns)
-	end
-end
-
--- While equipped weapons are settling, the refresh that ends it lays the bag out, so the moved weapons do not show
--- under another section first.
-function Model.Relayout()
-	if not ns.Gear.Settling() then
-		Layout()
-	end
+	return total
 end
 
 ns.Init(function()
 	bag = ContainerFrameCombinedBags
-	hooksecurefunc("UpdateContainerFrameAnchors", function()
-		scale = bag:GetScale()
-		Layout()
-	end)
-	ns.Gear.OnRefresh(Model.Relayout)
-	ns.OnSettingChanged("gearSections", Model.Relayout)
 end)

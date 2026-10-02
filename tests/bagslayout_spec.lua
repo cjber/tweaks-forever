@@ -1,5 +1,7 @@
--- Bags/Sections.lua layout: bank tabs, reagent bags and sidebar widths.
--- layout: folds the reagent bag in, adds sections, undoes each exactly, and leaves the bag alone when both are off.
+-- The combined bag's layout pass (Bags/CombinedBag.lua) with both of its parts, driven as the client drives it:
+-- Blizzard's anchor update, a setting change, a gear refresh and the reagent bag closing.
+-- It folds the reagent bag in, then adds sections above it, undoes each exactly, leaves the bag alone when both are
+-- off, grows from Blizzard's height rather than its own, and waits for settling weapons.
 -- luacheck: ignore 212/self (stub methods mirror the frame API)
 local function Region(props)
 	local r = props or {}
@@ -107,10 +109,16 @@ end
 
 local bag = Region({ height = 300, scale = 0.9 })
 bag.MoneyFrame = Region()
+bag:SetPoint("BOTTOMRIGHT", nil, "BOTTOMRIGHT", -9, 90)
 bag.Items = Buttons({ 0, 1 }, 10, bag)
 bag.size = #bag.Items
 function bag:GetColumns()
 	return 10
+end
+local rule
+function bag:CreateTexture()
+	rule = Region()
+	return rule
 end
 local reagents = Region({ height = 120 })
 reagents.Items = Buttons({ 5 }, 12, reagents)
@@ -121,6 +129,7 @@ end
 reagents:SetPoint("BOTTOMRIGHT", bag, "BOTTOMLEFT", -11, 0)
 
 local hooks, inits, settings = {}, {}, {}
+local settling, screen, Refreshed = false, 1000, nil
 local db = { gearGroups = true, gearSections = true, combinedReagents = true }
 local ns = {
 	Feature = function() end,
@@ -152,9 +161,11 @@ local ns = {
 		ColourOf = function()
 			return { 1, 1, 1 }
 		end,
-		OnRefresh = function() end,
+		OnRefresh = function(fn)
+			Refreshed = fn
+		end,
 		Settling = function()
-			return false
+			return settling
 		end,
 	},
 }
@@ -170,7 +181,7 @@ local env = setmetatable({
 		end,
 	},
 	GetScreenHeight = function()
-		return 1000
+		return screen
 	end,
 	CONTAINER_OFFSET_Y = 70,
 	NineSliceUtil = { UpdateCornerCropping = function() end },
@@ -208,7 +219,7 @@ local env = setmetatable({
 		return false
 	end,
 }, { __index = _G })
-for _, file in ipairs({ "Bags/Sections.lua", "Bags/Reagents.lua" }) do
+for _, file in ipairs({ "Bags/CombinedBag.lua", "Bags/Sections.lua", "Bags/Reagents.lua" }) do
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
 end
 for _, fn in ipairs(inits) do
@@ -216,16 +227,31 @@ for _, fn in ipairs(inits) do
 end
 
 local Anchors = hooks.UpdateContainerFrameAnchors
--- Blizzard lays the bag out and anchors it.
+local money = bag.MoneyFrame
+-- A region's place on the money frame as "x,y", or nil when it is anchored elsewhere.
+local function at(region)
+	local _, relative, _, x, y = region:GetPoint()
+	return relative == money and (x + 0) .. "," .. y or nil -- -0 + 0 is 0
+end
+
+-- Blizzard lays the bag out and anchors it. Twelve reagent slots in ten columns: two rows and the gap lift the rest.
 Anchors()
-local lift = ns.Sections.lift
-assert(lift == ns.Reagents.Lift(12, 10), "reagents fold in: " .. lift)
+local lift = 2 * 42 + 6
 assert(reagents:GetParent() == bag, "reagent window moves into the bag")
-assert(select(2, reagents:GetPoint()) == bag.MoneyFrame)
-assert(select(2, reagents.Items[1]:GetPoint()) == bag.MoneyFrame, "reagent buttons sit on the money frame")
+assert(at(reagents) == "0,0" and reagents:GetScale() == 1, "reagent window sits on the money frame")
+-- Slot 1 at the top left, slot 11 starting the bottom row on the money frame.
+assert(at(reagents.Items[1]) == "-378,46", at(reagents.Items[1]))
+assert(at(reagents.Items[10]) == "0,46", at(reagents.Items[10]))
+assert(at(reagents.Items[11]) == "-378,4", at(reagents.Items[11]))
+assert(at(reagents.Items[12]) == "-336,4", at(reagents.Items[12]))
+-- The rest of the bag starts above the lift, under a rule in the gap: the last bag's last slot at the bottom right.
+assert(at(bag.Items[20]) == "0," .. 4 + lift, at(bag.Items[20]))
+assert(rule:IsShown() and select(5, rule:GetPoint()) == 4 + lift - 6, "rule between reagents and the rest")
+-- Six of the twenty items are grouped: the rest still takes two rows, so the gap, a section row and a heading are new.
 local grown = bag:GetHeight()
-assert(grown > 300 + lift, "bag grows for reagents and sections: " .. grown)
--- Anchoring again without a new size keeps Blizzard's base, not the grown height.
+assert(grown == 300 + lift + 6 + 42 + 16, "bag grows for reagents and sections: " .. grown)
+assert(at(bag.Items[18]) == "-378," .. 4 + lift + 2 * 42 + 6, "grouped gear from the top left: " .. at(bag.Items[18]))
+-- Anchoring again without a new size keeps Blizzard's base, not the grown height (#78).
 Anchors()
 assert(bag:GetHeight() == grown, "no double growth: " .. bag:GetHeight())
 -- The engine rounds a height it is given, so the grown height comes back a hair off; still not a new base.
@@ -234,7 +260,59 @@ Anchors()
 Anchors()
 assert(math.abs(bag:GetHeight() - grown) < 0.01, "no double growth from rounding: " .. bag:GetHeight())
 bag.drift = nil
+-- Whether the reagent bag fits is asked of Blizzard's height too: on a screen with room for the reagent rows but not
+-- the sections, it stays folded in though the bag is still at its grown height.
+screen = 400
+Anchors()
+assert(reagents:GetParent() == bag and bag:GetHeight() == 300 + lift, "reagents fit from the base: " .. bag:GetHeight())
+-- The bag shrinks from Blizzard's scale to stay on that screen, its corner where Blizzard anchored it.
+local shrunk = bag:GetScale()
+assert(math.abs(bag:GetHeight() * shrunk + 70 - 400) < 1e-6, "fits on screen: " .. shrunk)
+assert(math.abs(select(5, bag:GetPoint()) * shrunk - 90 * 0.9) < 1e-6, "corner stays put")
+-- Room for neither: Blizzard's height and grid, the reagent bag back in its own window.
+screen = 300
+Anchors()
+assert(bag:GetHeight() == 300 and reagents:GetParent() ~= bag, "neither fits: " .. bag:GetHeight())
+assert(at(bag.Items[20]) == "0,4" and not rule:IsShown())
+assert(select(2, reagents.Items[1]:GetPoint()) == reagents, "buttons back in their window")
+screen = 1000
+bag:SetScale(0.9)
+-- A height Blizzard sets is a new base.
+bag.height = 342
+Anchors()
+assert(bag:GetHeight() == 342 + grown - 300, "grows from Blizzard's new height: " .. bag:GetHeight())
+bag.height = 300
+Anchors()
+assert(bag:GetHeight() == grown)
+
+-- While equipped weapons settle, this addon's own changes wait for the gear refresh that ends it.
+settling = true
+db.gearSections = false
+settings.gearSections()
+Refreshed()
+assert(bag:GetHeight() == grown, "no layout while weapons settle: " .. bag:GetHeight())
+settling = false
+Refreshed()
 -- Sections off: only the reagent lift remains.
+assert(bag:GetHeight() == 300 + lift, "sections undone: " .. bag:GetHeight())
+-- Blizzard's own layout is never held back: it has just put the buttons back on its grid.
+settling = true
+db.gearSections = true
+Anchors()
+assert(bag:GetHeight() == grown, "Blizzard's layout is laid over while settling: " .. bag:GetHeight())
+-- The reagent bag closing while settling leaves the bag at once; its rows' height goes with the refresh.
+reagents:Hide()
+hooks["ContainerFrame.CloseBag"](nil, reagents)
+assert(reagents:GetParent() ~= bag, "unfolded on close")
+assert(bag:GetHeight() == grown, "height waits for settling: " .. bag:GetHeight())
+settling = false
+Refreshed()
+assert(bag:GetHeight() == grown - lift, "reagent rows gone: " .. bag:GetHeight())
+assert(at(bag.Items[20]) == "0,4", at(bag.Items[20]))
+reagents:Show()
+Anchors()
+assert(bag:GetHeight() == grown and reagents:GetParent() == bag, "folded in again")
+
 db.gearSections = false
 settings.gearSections()
 assert(bag:GetHeight() == 300 + lift, "sections undone: " .. bag:GetHeight())
