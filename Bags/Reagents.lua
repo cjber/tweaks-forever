@@ -18,11 +18,13 @@ ns.Feature({
 	},
 })
 
+-- The reagent bag's part of the combined bag's layout (CombinedBag.lua), which calls Reserve, then Placed.
 ---@class TFReagents
 local Model = {}
 ns.Reagents = Model
 
-local Sections = ns.Sections
+local Bag = ns.CombinedBag
+local ITEM, STEP, ORIGIN_Y, GAP, MIN_SCALE = Bag.ITEM, Bag.STEP, Bag.ORIGIN_Y, Bag.GAP, Bag.MIN_SCALE
 
 -- Rows the reagent bag takes at the bottom of the combined bag.
 ---@param slots integer
@@ -38,24 +40,16 @@ end
 ---@param slots integer
 ---@param columns integer
 ---@return integer, number
-function Model.Place(slot, slots, columns)
+local function Place(slot, slots, columns)
 	local index = slot - 1
 	local row = math.floor(index / columns)
-	return columns - 1 - index % columns, Sections.ORIGIN_Y + (Rows(slots, columns) - 1 - row) * Sections.STEP
-end
-
--- How much the reagent rows and the gap above them lift the rest of the bag.
----@param slots integer
----@param columns integer
----@return number
-function Model.Lift(slots, columns)
-	return Rows(slots, columns) * Sections.STEP + Sections.GAP
+	return columns - 1 - index % columns, ORIGIN_Y + (Rows(slots, columns) - 1 - row) * STEP
 end
 
 -- Taint: the reagent bag keeps Blizzard's own window and item buttons, opened and closed only by Blizzard's code, so
 -- a click on a reagent runs the same untouched path as in its own window. This file never writes a Blizzard table
 -- field or calls a Blizzard function that opens, closes or fills a bag; it moves, reparents, fades and hides frames,
--- which are engine calls, not Lua state, from the combined bag's layout (Sections.lua) and an EventRegistry callback.
+-- which are engine calls, not Lua state, from the bag's layout (CombinedBag.lua) and an EventRegistry callback.
 ---@type ContainerFrameCombinedBags, ContainerFrameTemplate
 local bag, reagents
 ---@type Texture
@@ -168,15 +162,16 @@ local function Unfold()
 	end
 end
 
--- Whether the reagent bag goes in, and how far its rows lift the rest: not when the taller bag would run off the
--- screen even at the smallest scale, as its top rows could not be reached.
+-- Whether the reagent bag goes in, and how far its rows and the gap above them lift the rest: not when the taller
+-- bag would run off the screen even at the smallest scale, as its top rows could not be reached. `base` is the
+-- height Blizzard gave the bag.
 ---@param base number
 ---@param columns integer
 ---@return number
-local function Reserve(base, columns)
+function Model.Reserve(base, columns)
 	if Wanted() then
-		local lift = Model.Lift(ns.BagSize(reagents), columns)
-		if (base + lift) * Sections.MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
+		local lift = Rows(ns.BagSize(reagents), columns) * STEP + GAP
+		if (base + lift) * MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
 			Fold()
 			return lift
 		end
@@ -185,24 +180,25 @@ local function Reserve(base, columns)
 	return 0
 end
 
--- The reagent rows along the bottom of the bag, and the window they belong to over them, as the bag's own. Blizzard
--- stands the window beside the bags at their scale each time it anchors them.
+-- The reagent rows along the bottom of the bag, under the `lift` Reserve returned, and the window they belong to
+-- over them, as the bag's own. Blizzard stands the window beside the bags at their scale each time it anchors them.
+---@param lift number
 ---@param columns integer
-local function Placed(columns)
+function Model.Placed(lift, columns)
 	if not folded then
 		return
 	end
 	local slots, money = ns.BagSize(reagents), bag.MoneyFrame
 	for _, button in ns.BagItems(reagents) do
 		points[button] = Blizzards(button) or points[button]
-		local column, y = Model.Place(button:GetID(), slots, columns)
+		local column, y = Place(button:GetID(), slots, columns)
 		button:ClearAllPoints()
-		button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -column * Sections.STEP, y)
+		button:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", -column * STEP, y)
 		Background(button):Show()
 	end
-	local y = Sections.ORIGIN_Y + Sections.lift - Sections.GAP
+	local y = ORIGIN_Y + lift - GAP
 	rule:ClearAllPoints()
-	rule:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * Sections.STEP - Sections.ITEM, y)
+	rule:SetPoint("BOTTOMLEFT", money, "TOPRIGHT", -(columns - 1) * STEP - ITEM, y)
 	rule:SetPoint("BOTTOMRIGHT", money, "TOPRIGHT", 0, y)
 	rule:Show()
 	local point = Blizzards(reagents)
@@ -226,7 +222,7 @@ local function Close()
 	end
 	if not reagents:IsShown() then
 		Unfold()
-		Sections.Relayout()
+		Bag.Relayout()
 	end
 end
 
@@ -266,8 +262,7 @@ ns.Init(function()
 	local binder, Bind = InitBackpackBinding()
 
 	-- Opened while the combined bag is open, Blizzard lays it out and anchors the bags, and the bag's layout
-	-- (Sections.lua) folds it in.
-	Sections.Reserve, Sections.Placed = Reserve, Placed
+	-- (CombinedBag.lua) folds it in.
 	EventRegistry:RegisterCallback("ContainerFrame.CloseBag", function(_, frame)
 		if frame ~= reagents or not folded then
 			return
@@ -282,6 +277,6 @@ ns.Init(function()
 	end, binder)
 	ns.OnSettingChanged("combinedReagents", function()
 		Bind()
-		Sections.Relayout()
+		Bag.Relayout()
 	end)
 end)

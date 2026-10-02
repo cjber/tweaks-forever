@@ -78,12 +78,14 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdLi
   needs a stubbed load of Core + the feature file (hook-registration trace) to show behaviour is unchanged.
 - `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration`, `ns.Sections`, `ns.Reagents`, `ns.Camp`,
   `ns.ZoneLevels`, `ns.Entrances`, `ns.FutureSpells` — pure `Model` tables exported for the specs, each named
-  once in production. Some are also cross-file APIs: `ns.Fishing.IsPole` (Gear), `ns.Gear.MarksOf`/`ColourOf`/
-  `OnRefresh`/`Settling` (Sections), `ns.Sections` constants, `lift` and `Relayout` (Reagents).
+  once in production. Some are also cross-file APIs: `ns.Fishing.IsPole` (Gear), `ns.Gear.MarksOf`/`ColourOf`
+  (Sections) and `OnRefresh`/`Settling` (CombinedBag). `ns.CombinedBag` (Bags/CombinedBag.lua) owns the combined bag's
+  layout pass, its grid constants and `Relayout`; it calls `ns.Reagents.Reserve`, `ns.Sections.Active`/`Arrange`, then
+  `ns.Reagents.Placed`, in that order.
 - `ns.ClickMode` (Core/Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core/Core.lua), `ns.Suggestion`
   (Integrations/Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Integrations/Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
   `ns.LineName`, `ns.GeneralName` (also read by Core/API.lua) — shared helpers.
-- `ns.QuestDistance`, `ns.QuestGivers`, `ns.QuestProgress`, `ns.WhatsNew` — more `Model` tables exported for the specs.
+- `ns.QuestGivers`, `ns.QuestProgress`, `ns.WhatsNew` — more `Model` tables exported for the specs.
 - `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.InstanceEntrances`, `ns.RaidInstances`,
   `ns.Overlays`, `ns.ClassSpells` — generated `Data/` tables.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;
@@ -110,7 +112,7 @@ finding.
 - Model fields named once in production (`ns.Gear`, `ns.Camp`, …) and `types/` classes referenced once
   (`NamePlateFrame`, `SpellBookFrameTemplate_PagedSpellsFrame`, `SpellBookSingleSkillLineCategoryMixin`,
   `TFEntrancePin`): spec exports and annotations of external or XML-made objects, not dead code.
-- `Bags/Sections.lua` `Layout`/`Bags/Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
+- `Bags/Sections.lua` `Arrange`/`Bags/Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
   and `MIN_SCALE` is already one constant; each owns its own state.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
 - `Bags/Sections.lua`/`Bags/Reagents.lua` `Relayout`: a three-line schedule idiom, not a shared implementation.
@@ -173,7 +175,7 @@ Audit slices from lowest to highest risk:
 4. `Features/Automation.lua`, `Map/Exploration.lua`, `Features/Fishing.lua`, `Core/Modes.lua`, `Map/Campsites.lua`, `Quests/QuestDistance.lua`,
    `Quests/QuestGivers.lua`, `Quests/QuestProgress.lua`, `Map/ZoneLevels.lua`, `Map/DungeonEntrances.lua`/`.xml`, `UI/Spellbook.lua` — event
    handlers, map pins, the tracker, one secure button.
-5. `UI/Tooltips.lua`, `UI/Nameplates.lua`, `Bags/Sections.lua`, `Bags/Reagents.lua` — restyle Blizzard frames; in-game only.
+5. `UI/Tooltips.lua`, `UI/Nameplates.lua`, `Bags/CombinedBag.lua`, `Bags/Sections.lua`, `Bags/Reagents.lua` — restyle Blizzard frames; in-game only.
 6. `Bags/Junk.lua`, `Bags/Gear.lua` — bag hooks, selling items and equipping gear.
 7. `UI/Frames.lua` — hooks Edit Mode and panel positioning; taint-sensitive.
 

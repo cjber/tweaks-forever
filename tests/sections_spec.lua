@@ -5,6 +5,7 @@ local ns = {
 	end,
 	Init = function() end,
 }
+assert(loadfile("Bags/CombinedBag.lua"))("TweaksForever", ns)
 assert(loadfile("Bags/Sections.lua"))("TweaksForever", ns)
 local Model = ns.Sections
 assert(features.gearSections.parent == "gearGroups")
