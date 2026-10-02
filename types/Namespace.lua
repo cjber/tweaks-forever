@@ -201,7 +201,6 @@ TweaksForeverCharDB = nil
 ---@field db TFDatabase
 ---@field features TFFeature[]
 ---@field Overlays table<integer, string>
----@field Junk TFJunk
 ---@field Gear TFGear
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
