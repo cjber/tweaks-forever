@@ -88,12 +88,10 @@ local env = setmetatable({
 	CreateFromMixins = function(mixin)
 		return setmetatable({}, { __index = mixin })
 	end,
-	CVarMapCanvasDataProviderMixin = {
-		Init = function() end,
-		IsCVarSet = function()
-			return true
-		end,
-	},
+	MapCanvasDataProviderMixin = {},
+	GetCVarBool = function()
+		return true
+	end,
 	BaseMapPoiPinMixin = {
 		CreateSubPin = function()
 			return {}
@@ -144,4 +142,10 @@ if eventFrame.registered then
 	onEvent(eventFrame, "PLAYER_REGEN_ENABLED")
 end
 assert(removed == 2, "second combat never rebuilt deferred pins")
+-- The map's own toggle redraws through our frame, never through the map's shared event counts.
+onEvent(eventFrame, "CVAR_UPDATE", "questPOI")
+assert(removed == 2, "another cvar redrew the entrances")
+onEvent(eventFrame, "CVAR_UPDATE", "showDungeonEntrancesOnMap")
+assert(removed == 3, "the entrance toggle did not redraw")
+assert(provider.RegisterEvent == nil, "the provider can register events through the map")
 print("dungeonentrances_combat: protected MapCanvas refresh contract passed")

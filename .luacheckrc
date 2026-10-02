@@ -93,7 +93,6 @@ read_globals = {
 	"CreateVector2D",
 	"CursorHasItem",
 	"CurveConstants",
-	"CVarMapCanvasDataProviderMixin",
 	"EditModeImportLayoutDialog",
 	"EditModeLayoutDialog",
 	"EditModeManagerFrame",
