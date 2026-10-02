@@ -28,7 +28,7 @@ import urllib.request
 from dataclasses import dataclass, field
 from pathlib import Path
 
-BUILD = "1.60.1.70124"
+BUILD = "1.60.1.70170"
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / ".cache"
 OUTPUT = ROOT / "Data" / "DungeonEntrances.lua"
