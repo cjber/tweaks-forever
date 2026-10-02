@@ -2,6 +2,7 @@
 -- RemoveAllPinsByTemplate are forbidden while combat lockdown is active.
 local combat, acquired, removed = false, 0, 0
 local provider, onEvent
+local mapEvents = 0
 local pins = {}
 local map = {
 	IsShown = function()
@@ -88,7 +89,12 @@ local env = setmetatable({
 	CreateFromMixins = function(mixin)
 		return setmetatable({}, { __index = mixin })
 	end,
-	MapCanvasDataProviderMixin = {},
+	MapCanvasDataProviderMixin = {
+		RegisterEvent = function()
+			mapEvents = mapEvents + 1
+		end,
+		OnShow = function() end,
+	},
 	GetCVarBool = function()
 		return true
 	end,
@@ -147,5 +153,6 @@ onEvent(eventFrame, "CVAR_UPDATE", "questPOI")
 assert(removed == 2, "another cvar redrew the entrances")
 onEvent(eventFrame, "CVAR_UPDATE", "showDungeonEntrancesOnMap")
 assert(removed == 3, "the entrance toggle did not redraw")
-assert(provider.RegisterEvent == nil, "the provider can register events through the map")
+provider:OnShow()
+assert(mapEvents == 0, "showing the map registered an event through the map")
 print("dungeonentrances_combat: protected MapCanvas refresh contract passed")
