@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.7.5"
-ns.WHATS_NEW = L["What's new messages now appear after installing a release update."]
+ns.WHATS_NEW_VERSION = "0.7.6"
+ns.WHATS_NEW = L["Opening the map in combat no longer raises a blocked-action warning."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

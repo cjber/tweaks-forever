@@ -11,8 +11,9 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
-- **Stop the blocked-action warning when opening the map in combat.** Dungeon and raid entrances no longer listen for the map toggle through the world map itself, which made the game blame Tweaks Forever and drop quest markers in combat.
+## [0.7.6] - 2026-10-02
 
+- **Stop the blocked-action warning when opening the map in combat.** Dungeon and raid entrances no longer listen for the map toggle through the world map itself, which made the game blame Tweaks Forever and drop quest markers in combat.
 - **Shorter setting names.** Setting names that were cut off with an ellipsis in the settings panel are shortened to fit, and each tooltip still gives the full detail.
 
 ## [0.7.5] - 2026-09-30
