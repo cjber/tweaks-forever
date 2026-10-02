@@ -16,7 +16,7 @@ ns.Feature({
 ns.Feature({
 	key = "beforeFishing",
 	category = "Gear",
-	name = "Remember pre-fishing weapons",
+	name = "Remember swapped weapons",
 	tooltip = "Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your "
 		.. "bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on.",
 	default = true,

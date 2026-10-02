@@ -40,7 +40,7 @@ All off until you turn them on, except faster auto loot.
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
 - `/rl` reloads the interface.
-- Show what's new after updates. The first time you log in after Tweaks Forever updates, one line in chat says what changed. On by default.
+- What's new after an update. The first time you log in after Tweaks Forever updates, one line in chat says what changed. On by default.
 - Suggest companion addons. Where another Forever addon would help, such as Shortest Path Forever on a dungeon entrance, a grey line in the tooltip says so, and goes once it is loaded. On by default.
 - Hide macro names (off by default). Macros on your action bars show just their icon, without the name across the bottom.
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
