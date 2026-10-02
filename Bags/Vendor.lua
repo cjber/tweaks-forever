@@ -21,7 +21,9 @@ ns.Feature({
 ns.Feature({
 	key = "repairGuild",
 	category = "Vendors",
-	name = "Use guild funds for repairs when allowed",
+	name = "Repair with guild funds",
+	tooltip = "When your guild lets you repair from its bank and your withdrawal limit covers the cost. Otherwise "
+		.. "the repair comes out of your own money.",
 	default = true,
 	parent = "repair",
 })

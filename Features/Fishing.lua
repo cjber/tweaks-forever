@@ -29,7 +29,7 @@ ns.Feature({
 ns.Feature({
 	key = "lureWarning",
 	category = "Fishing",
-	name = "Warn when your pole has no lure",
+	name = "Warn about a missing lure",
 	tooltip = "A message when you log in or equip a fishing pole without a lure, and each time you cast without one.",
 	default = true,
 	conflicts = FISHING_ADDONS,
@@ -38,7 +38,7 @@ ns.Feature({
 ns.Feature({
 	key = "fishingSounds",
 	category = "Fishing",
-	name = "Louder splashes while fishing",
+	name = "Louder fishing splashes",
 	tooltip = "While a fishing pole is equipped, sound effects play at full volume and music and ambience "
 		.. "are silenced, so the bobber's splash is easy to hear. Your volumes come back when you unequip it.",
 	default = false,

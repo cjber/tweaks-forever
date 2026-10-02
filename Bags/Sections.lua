@@ -4,7 +4,7 @@ local _, ns = ...
 ns.Feature({
 	key = "gearSections",
 	category = "Gear",
-	name = "Gather grouped gear in the combined bag",
+	name = "Gather grouped gear in bags",
 	tooltip = "With Combine Bags on, grouped gear sits together at the top of the bag under a heading for each "
 		.. "group, in the group's colour. An item in several groups goes under the first. Separate bags keep "
 		.. "items where they are.",

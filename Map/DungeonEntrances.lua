@@ -5,7 +5,7 @@ local L = ns.L
 ns.Feature({
 	key = "dungeonEntrances",
 	category = "Maps",
-	name = "Dungeon and raid entrances on the world map",
+	name = "Dungeon entrances on the map",
 	tooltip = "Mark every dungeon and raid entrance on zone and continent maps with the retail icons; point at "
 		.. "one for its name, and click it to travel there. Follows the map's own Show instance entrances filter.",
 	default = true,

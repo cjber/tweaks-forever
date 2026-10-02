@@ -5,7 +5,7 @@ local L = ns.L
 ns.Feature({
 	key = "whatsNew",
 	category = "Interface",
-	name = "Tell me what's new after an update",
+	name = "Show what's new after updates",
 	tooltip = "The first time you log in after Tweaks Forever updates, one line in chat says what changed.",
 	default = true,
 })

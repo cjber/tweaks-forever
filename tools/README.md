@@ -61,7 +61,7 @@ area. An instance with an entrance but no curated zone fails the run; instances
 with no entrance at all are listed. Same cache and flags as `gen_overlays.py`.
 
 `gen_classspells.py` writes `Data/ClassSpells.lua`: what each class trainer teaches,
-for *Show future spells in the spellbook* before you have visited one, and the class
+for *Future spells in spellbook* before you have visited one, and the class
 trainer NPCs to visit and where each stands, for addons. Forever's client has no
 trainer lists, so the rows come from the class trainers in CMaNGOS classic-db (pinned
 by commit), each teaching spell resolved to the spell you learn through the Classic Era

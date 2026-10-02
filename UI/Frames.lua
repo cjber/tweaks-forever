@@ -5,7 +5,7 @@ local L = ns.L
 ns.Feature({
 	key = "moveWindows",
 	category = "Interface",
-	name = "Move and scale windows in Edit Mode",
+	name = "Move and scale windows",
 	tooltip = "Use the Windows tab in Edit Mode to preview, move and scale game windows and Adventure Guide. "
 		.. "Changes save immediately for the current layout. Reset returns a window to its default placement.",
 	default = true,
