@@ -83,7 +83,7 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdLi
 - `ns.ClickMode` (Core/Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core/Core.lua), `ns.Suggestion`
   (Integrations/Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Integrations/Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
   `ns.LineName`, `ns.GeneralName` (also read by Core/API.lua) — shared helpers.
-- `ns.QuestDistance`, `ns.QuestGivers`, `ns.QuestProgress`, `ns.WhatsNew` — more `Model` tables exported for the specs.
+- `ns.QuestGivers`, `ns.QuestProgress`, `ns.WhatsNew` — more `Model` tables exported for the specs.
 - `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.InstanceEntrances`, `ns.RaidInstances`,
   `ns.Overlays`, `ns.ClassSpells` — generated `Data/` tables.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;
