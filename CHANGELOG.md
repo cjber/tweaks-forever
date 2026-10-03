@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-10-03
+
 - **Class trainers are placed by Questie.** Addons that ask Tweaks Forever where your class trainers stand, such as Adventure Guide Forever, now get each trainer's name and place from your installed Questie, or its QuestieDB addon on its own, in your game's language. Without it they are told what to install, and everything else works as before.
 
 - **Nearest quests first sorts as soon as distances are known.** Just after logging in, or after tracking a new quest, a farther quest could sit above a nearer one until you had walked 25 yards. The list now sorts again the moment a quest's distance appears or the tracked quests change.
