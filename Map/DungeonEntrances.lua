@@ -153,7 +153,7 @@ ns.Init(function()
 		return ns.NavigateHint()
 	end
 
-	-- The game's own tooltip, then a grey line when Shortest Path Forever could walk the player there.
+	-- The game's own tooltip, then a grey hint to install or enable Shortest Path Forever while it is not loaded.
 	function Pin:OnMouseEnter()
 		BaseMapPoiPinMixin.OnMouseEnter(self)
 		local hint = ns.Suggestion(

@@ -2,8 +2,7 @@
 
 Usage: python3 tools/gen_foreverquests.py [--offline | --refresh]
        python3 tools/gen_foreverquests.py FOREVER.csv ERA.csv
-Sources: https://wago.tools/db2/QuestV2/csv?build=1.60.1.69913
-         https://wago.tools/db2/QuestV2/csv?build=1.15.9.69722
+Sources: https://wago.tools/db2/QuestV2/csv for builds BUILD (Forever) and ERA_BUILD (Classic Era)
 An unknown ID is deliberately unmarked; regenerate when the client data changes.
 """
 
@@ -11,7 +10,7 @@ import argparse
 import csv
 from pathlib import Path
 
-from gen_classspells import CACHE, db2
+from gen_classspells import db2
 
 BUILD = "1.60.1.70205"
 ERA_BUILD = "1.15.9.69722"
@@ -50,9 +49,11 @@ def main():
     if args.forever:
         quests = ids(args.forever) - ids(args.era)
     else:
-        for build in (BUILD, ERA_BUILD):
-            db2("QuestV2", build, offline=args.offline, refresh=args.refresh)
-        quests = ids(CACHE / f"QuestV2-{BUILD}.csv") - ids(CACHE / f"QuestV2-{ERA_BUILD}.csv")
+        forever, era = (
+            {int(row["ID"]) for row in db2("QuestV2", build, offline=args.offline, refresh=args.refresh)}
+            for build in (BUILD, ERA_BUILD)
+        )
+        quests = forever - era
     output = Path(__file__).resolve().parent.parent / "Data" / "ForeverQuests.lua"
     output.write_text(render(quests))
 

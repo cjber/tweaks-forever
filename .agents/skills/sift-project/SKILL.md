@@ -7,8 +7,9 @@ description: "Project profile for sift in Tweaks Forever: the exact quality-gate
 
 A World of Warcraft addon for the WoW: Forever client (`## Interface: 16001`; the client's own UI code is
 called "Camelot" in comments). Lua 5.1 run by the game, loaded in `.toc` order, no `require`. Packaged by
-the BigWigs packager on a `v*` tag; players install the zip. Stdlib-only Python scripts under `tools/`
-support it. Headless specs run under LuaJIT with stubbed WoW globals; they cannot exercise the real client.
+the BigWigs packager on a `v*` tag; players install the zip. Python scripts under `tools/` support it;
+all are stdlib-only except `tools/screenshots.py`, which needs Pillow and the wowmock library.
+Headless specs run under LuaJIT with stubbed WoW globals; they cannot exercise the real client.
 
 ## Gate
 
@@ -85,9 +86,9 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdLi
 - `ns.ClickMode` (Core/Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core/Core.lua), `ns.Suggestion`
   (Integrations/Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Integrations/Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
   `ns.LineName`, `ns.GeneralName` (also read by Core/API.lua) — shared helpers.
-- `ns.QuestGivers`, `ns.QuestProgress`, `ns.WhatsNew` — more `Model` tables exported for the specs.
+- `ns.QuestGivers`, `ns.QuestProgress`, `ns.QuestLog`, `ns.WhatsNew` — more `Model` tables exported for the specs.
 - `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.InstanceEntrances`, `ns.RaidInstances`,
-  `ns.Overlays`, `ns.ClassSpells` — generated `Data/` tables.
+  `ns.Overlays`, `ns.ClassSpells`, `ns.ForeverQuests` — generated `Data/` tables.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;
   `Locales/phrases.txt` is `tools/phrases.py`'s template for translators.
 - `TweaksForeverDungeonEntrancePinMixin` — global named by `Map/DungeonEntrances.xml`'s pin template.
@@ -115,7 +116,6 @@ finding.
 - `Bags/Sections.lua` `Arrange`/`Bags/Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
   and `MIN_SCALE` is already one constant; each owns its own state.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
-- `Bags/Sections.lua`/`Bags/Reagents.lua` `Relayout`: a three-line schedule idiom, not a shared implementation.
 - Gear's colour kinds `"group"`/`"set"`/`"fishing"`: persisted keys in `TweaksForeverCharDB.colours`.
 - Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
 - Gear's `Char()` short alias, Frames' repeated `if Active() then Schedule() end`, and Tooltips'
@@ -133,6 +133,10 @@ finding.
 
 Shapes this codebase has produced more than once and a reviewer confirmed. Check new code against them.
 
+- A spec that asserts how many `ns.Init` callbacks a file registers (`#initializers == 1`): the count is private.
+  Assert the feature's default and run the initializers.
+- A spec stub for a client global or `ns` helper that the paths the spec drives never call. Stub what the spec
+  reaches; a stub that raises when called shows whether one is needed.
 
 ## Zones
 
@@ -149,6 +153,7 @@ Unlisted paths are `production`.
 | `docs/curseforge.md` | docs | the store page, pasted by hand; its facts must match the README |
 | `docs/features.md`, `Locales/README.md` | docs | |
 | `Locales/phrases.txt` | generated | written by `python3 -m tools.phrases --write`; never edit or review |
+| `LibAHTab/` | vendor | third-party library with its own TOC and licence; not reviewed |
 | `.sift/gate.py`, `.sift/agents.py`, `.sift/LICENSE` | vendor | copied byte for byte from sift; changed only by `sift update` |
 | `media/`, `docs/screenshots/` | asset | not reviewed |
 | `.agents/`, `.sift/` | docs | this profile and audit reports |
@@ -185,6 +190,8 @@ Audit slices from lowest to highest risk:
   tracked Lua, XML or `Locales/phrases.txt` names.
 - Rules: `setting-callback-outside-core` (`.sift/scripts/setting-callback-outside-core.py`): a
   `SetOnValueChangedCallback` call outside Core/Core.lua; use `ns.OnSettingChanged`.
+- Rules: `workflow-hashfiles-unmatched` (`.sift/scripts/workflow-hashfiles-unmatched.py`): a `hashFiles()`
+  pattern in a workflow that matches no tracked file.
 - Lenses: none yet.
 
-The type gate also runs `python3 -m tools.lint_taint` and `python3 tools/typecheck_coverage.py`: native-method hooks, shared UI-state writes and omitted runtime type coverage fail CI. Tracker initialization follows both native load events, deferred one frame; AddContainer hooks are retired.
+The type gate also runs `python3 -m tools.lint_taint` and `python3 tools/typecheck_coverage.py`: native-method hooks, shared UI-state writes and omitted runtime type coverage fail CI.

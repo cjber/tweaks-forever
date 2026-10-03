@@ -159,7 +159,7 @@ local env = setmetatable({
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestGivers.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestGivers
-assert(features.giverTooltips.default == true and #initializers == 1)
+assert(features.giverTooltips.default == true)
 
 -- Without the Forever build of a contract-2 QuestieDB there is nothing to read, and the option is greyed out.
 local needs = features.giverTooltips.needs

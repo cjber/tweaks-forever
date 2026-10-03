@@ -5,7 +5,6 @@ local function Login(saved, version, on, packaged)
 	local env = setmetatable({
 		TweaksForeverDB = saved,
 		C_AddOns = {
-			IsAddOnLoaded = function() end,
 			GetAddOnMetadata = function(addon, field)
 				assert(addon == "TweaksForever" and field == "Version")
 				return version

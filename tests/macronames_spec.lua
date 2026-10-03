@@ -46,10 +46,9 @@ local env = setmetatable({
 		error("the action bars' events frame is never hooked")
 	end,
 }, { __index = _G })
-env._G = env
 setfenv(assert(loadfile("UI/MacroNames.lua")), env)("TweaksForever", ns)
 local feature = features.hideMacroNames
-assert(feature.default == false and feature.category == "Interface" and #initializers == 1)
+assert(feature.default == false and feature.category == "Interface")
 
 local first, second = registry.frames[1], registry.frames[2]
 initializers[1]()

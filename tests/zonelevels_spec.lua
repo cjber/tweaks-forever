@@ -1,11 +1,9 @@
-local features, initializers = {}, {}
+local features = {}
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,
-	Init = function(fn)
-		initializers[#initializers + 1] = fn
-	end,
+	Init = function() end,
 }
 local clientLevels = {}
 local env = setmetatable({
@@ -22,7 +20,7 @@ local env = setmetatable({
 assert(loadfile("Data/ZoneLevels.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Map/ZoneLevels.lua")), env)("TweaksForever", ns)
 local Model = ns.ZoneLevels
-assert(#initializers == 1 and features.zoneLevels.default == true)
+assert(features.zoneLevels.default == true)
 
 -- Leatrix Maps shows zone levels unless its option is explicitly off.
 local leatrix = features.zoneLevels.conflicts[1]

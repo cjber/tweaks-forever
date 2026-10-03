@@ -18,9 +18,6 @@ local function Run(installed, early, fromEditor)
 		"SetClampedToScreen",
 		"SetDontSavePosition",
 		"EnableMouse",
-		"RegisterForDrag",
-		"StopMovingOrSizing",
-		"StartMoving",
 		"SetAllPoints",
 		"SetScrollChild",
 		"ShowHighlighted",
@@ -187,17 +184,6 @@ local function Run(installed, early, fromEditor)
 		return false
 	end
 	manager.ClearSelectedSystem = noop
-	manager.IsSnapEnabled = function()
-		return false
-	end
-	manager.GetRegions = function()
-		return manager.Title
-	end
-	manager.GetChildren = function() end
-	methods.GetAlpha = function()
-		return 1
-	end
-	methods.SetAlpha = noop
 	local settingsDialog = frame(root)
 	local env = setmetatable({
 		UIParent = root,
@@ -248,8 +234,6 @@ local function Run(installed, early, fromEditor)
 		PanelTemplates_SetNumTabs = noop,
 		PanelTemplates_SetTab = noop,
 		MinimalSliderWithSteppersMixin = { Event = { OnValueChanged = "value" } },
-		SOUNDKIT = { IG_CHARACTER_INFO_TAB = 1 },
-		PlaySound = noop,
 	}, { __index = _G })
 	env._G = env
 	local ns = {

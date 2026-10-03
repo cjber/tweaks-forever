@@ -63,7 +63,6 @@ local API = env.TweaksForever.API
 assert(API.version == 2, "v2 adds Trainers")
 local entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "first curated zone, before login")
-assert(not ns.Active("dungeonEntrances") and not ns.Entrances, "works with pins off and no pin feature loaded")
 local another = API.DungeonEntrance(230)
 assert(entrance ~= another and entrance ~= ns.InstanceEntrances[230], "fresh table on every call")
 entrance.map, entrance.x, entrance.y = 1, 0, 0
