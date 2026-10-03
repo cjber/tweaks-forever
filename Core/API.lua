@@ -7,8 +7,8 @@ local _, ns = ...
 -- list's. As with Shortest Path Forever's API, nil means ask again later: before login the spellbook isn't known
 -- yet, so every rank would look unlearned, and in combat the work waits.
 --
--- v2 adds Trainers(), the class trainers to visit and where they stand, which is baked so it answers before login
--- and in combat. v1's members keep their behavior, so a caller that checks version still gets both.
+-- Trainers() needs version 2 or later. TrainableSpells() and DungeonEntrance() are there from version 1 and behave
+-- the same in both, so a caller checks version only before Trainers().
 ---@class TFPublicAPI
 local API = { version = 2 }
 
@@ -46,7 +46,7 @@ function API.Trainers()
 	if not baked then
 		return trainers
 	end
-	for _, row in ipairs(baked.trainers or {}) do
+	for _, row in ipairs(baked.trainers) do
 		local trainer = { npc = row[1], name = row[2] }
 		if row[3] then
 			trainer.map, trainer.x, trainer.y = row[3], row[4], row[5]

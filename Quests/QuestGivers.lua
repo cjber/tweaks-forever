@@ -263,7 +263,7 @@ local function ByLevel(a, b)
 end
 
 -- What an NPC has for you: quests you can take now, then level-locked quests (`soon`), and the quests in your log it
--- takes back (`turnIn`, with `ready` once complete).
+-- takes back (the second list, with `ready` once complete).
 ---@param npc TFGiverCandidate
 ---@return TFGiverQuest[] offers
 ---@return TFGiverQuest[] turnIns
