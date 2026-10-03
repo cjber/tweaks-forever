@@ -193,6 +193,23 @@ world.x = 26
 world.tick()
 Order(world, { 2, 1 }, "over 25 yards from the last sort, in small steps")
 
+-- A distance the client had not worked out when the list was first sorted (just after login) sorts its quest in
+-- when it arrives, with no need to move: 759 yards never stays above 757.
+world = Load({ 1, 2 }, { 759 })
+world.tick()
+Order(world, { 1, 2 }, "the only quest with a distance leads")
+world.at[2] = 757
+world.tick()
+Order(world, { 2, 1 }, "a distance that arrives later re-sorts while standing still")
+moves = world.moves
+world.tick()
+assert(world.moves == moves, "then nothing more to re-watch")
+-- A quest watched since the last sort goes to its place too: the client puts a new watch first.
+world.at[3] = 900
+table.insert(world.watches, 1, 3)
+world.tick()
+Order(world, { 2, 1, 3 }, "a newly watched quest is sorted in without moving")
+
 -- Never in combat, when the tracker's item buttons can't be moved; the sort it missed runs once combat ends.
 world = Load({ 1, 2 }, { 10, 90 })
 world.tick()

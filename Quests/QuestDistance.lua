@@ -61,20 +61,33 @@ local function Nearest(ids, distances)
 	return changed and order or nil
 end
 
--- The client's SortQuestWatches leaves manual watches where they are, and every watch here is manual, so the order is
--- set by hand: AddQuestWatch puts a quest first (as a manual watch, all Forever's AddQuestWatch makes), so the quests
--- with a distance are watched again farthest first and the super-tracked quest stays super-tracked. The rest keep
--- their places after them.
-local function SortNearest()
-	local ids, distances = {}, {}
+-- The watched quests in the tracker's order, the squared distance of each one on this continent, and a number that
+-- changes when a quest is watched or dropped or a quest's distance arrives or goes. The client fills distances in
+-- over the first moments after login, so a sort made before then has to be made again without waiting for you to move.
+---@return integer[] ids
+---@return table<integer, number> distances
+---@return number known
+local function Watches()
+	local ids, distances, known = {}, {}, 0
 	for i = 1, C_QuestLog.GetNumQuestWatches() do
 		local id = C_QuestLog.GetQuestIDForQuestWatchIndex(i)
 		if id then
 			ids[#ids + 1] = id
 			local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(id)
 			distances[id] = onContinent and distanceSq or nil
+			known = known + (distances[id] and 2 * id or id)
 		end
 	end
+	return ids, distances, known
+end
+
+-- The client's SortQuestWatches leaves manual watches where they are, and every watch here is manual, so the order is
+-- set by hand: AddQuestWatch puts a quest first (as a manual watch, all Forever's AddQuestWatch makes), so the quests
+-- with a distance are watched again farthest first and the super-tracked quest stays super-tracked. The rest keep
+-- their places after them.
+---@param ids integer[]
+---@param distances table<integer, number>
+local function SortNearest(ids, distances)
 	local order = Nearest(ids, distances)
 	if not order then
 		return
@@ -262,8 +275,11 @@ ns.Init(function()
 		return not last.x or (x - last.x) ^ 2 + (y - last.y) ^ 2 > yards * yards
 	end
 
-	-- Re-sort only after real movement and never in combat, when the tracker's item buttons can't be moved.
-	local sorted, checked = {}, {}
+	-- Re-sort only after real movement, or when the watched quests or the distances the client has for them change,
+	-- and never in combat, when the tracker's item buttons can't be moved.
+	---@type {x: number?, y: number?, known: number?}
+	local sorted = {}
+	local checked = {}
 	C_Timer.NewTicker(1, function()
 		-- Questie's tracker option can turn on or off at any time, and sets no flag we can watch.
 		Watch()
@@ -281,9 +297,12 @@ ns.Init(function()
 			checked.x, checked.y = x, y
 			CheckAreas()
 		end
-		if readable and not InCombatLockdown() and Moved(sorted, x, y, RESORT) then
-			sorted.x, sorted.y = x, y
-			SortNearest()
+		if readable and not InCombatLockdown() then
+			local ids, distances, known = Watches()
+			if known ~= sorted.known or Moved(sorted, x, y, RESORT) then
+				sorted.x, sorted.y, sorted.known = x, y, known
+				SortNearest(ids, distances)
+			end
 		end
 		-- Also catches a tracker update that ran without marking it dirty (collapsing it, say).
 		Layout()
