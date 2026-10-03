@@ -284,14 +284,12 @@ ns.Init(function()
 		end
 		local y, x = UnitPosition("player")
 		-- The client can hand back a position the addon may not read, which is no number to do sums with.
-		if not (canaccessvalue(x) and canaccessvalue(y)) then
-			x = nil
-		end
-		if x and Moved(checked, x, y, RECHECK) then
+		local readable = x ~= nil and canaccessvalue(x) and canaccessvalue(y)
+		if readable and Moved(checked, x, y, RECHECK) then
 			checked.x, checked.y = x, y
 			CheckAreas()
 		end
-		if x and not InCombatLockdown() and Moved(sorted, x, y, RESORT) then
+		if readable and not InCombatLockdown() and Moved(sorted, x, y, RESORT) then
 			sorted.x, sorted.y = x, y
 			SortNearest()
 		end
