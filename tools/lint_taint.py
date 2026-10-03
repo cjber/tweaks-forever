@@ -12,7 +12,7 @@ from pathlib import Path
 from tools.lint_multivalue import LuaSyntaxError, Token, tokenize
 from tools.typecheck_coverage import runtime_files
 
-# Globals this addon owns. Every other global root is Blizzard's (or another addon's).
+# Globals the Forever addon family owns. Every other global root is Blizzard's (or a third-party addon's).
 OWN = re.compile(
     r"(?:Tweaks|SkillUp|Legacy|ShortestPath|AdventureGuide|WorkOrders)Forever\w*|WOF_\w+|SLASH_\w+|SlashCmdList"
 )

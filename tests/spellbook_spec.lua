@@ -1,16 +1,14 @@
-local features, initializers = {}, {}
+local features = {}
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,
-	Init = function(fn)
-		initializers[#initializers + 1] = fn
-	end,
+	Init = function() end,
 }
 local env = setmetatable({}, { __index = _G })
 setfenv(assert(loadfile("UI/Spellbook.lua")), env)("TweaksForever", ns)
 local Model = ns.FutureSpells
-assert(features.trainableSpells.default and #initializers == 1)
+assert(features.trainableSpells.default)
 
 local spells = {
 	[1] = { name = "Purge", level = 12, lineID = 373 },

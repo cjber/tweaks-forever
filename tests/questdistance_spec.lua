@@ -3,11 +3,6 @@
 -- feature's own work.
 local ns = {
 	Feature = function() end,
-	L = setmetatable({}, {
-		__index = function(_, k)
-			return k
-		end,
-	}),
 }
 
 local function Frame()
@@ -52,7 +47,7 @@ local function Load(watched, at)
 		areaChecks = 0,
 	}
 	local frames = {}
-	local module = { parentContainer = world.tracker, EnumerateActiveBlocks = function() end }
+	local module = { EnumerateActiveBlocks = function() end }
 	local function IndexOf(id)
 		for index, watch in ipairs(world.watches) do
 			if watch == id then

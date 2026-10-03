@@ -51,7 +51,6 @@ local env = setmetatable({
 		end,
 	},
 }, { __index = _G })
-env._G = env
 setfenv(assert(loadfile("Features/Automation.lua")), env)("TweaksForever", ns)
 assert(features.gossip.default == false)
 

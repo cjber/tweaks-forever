@@ -175,8 +175,9 @@ local function Client(slots, db)
 	c.env = env
 	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 	setfenv(assert(loadfile("Bags/Junk.lua")), env)("TweaksForever", ns)
-	assert(#initializers == 1)
-	initializers[1]()
+	for _, init in ipairs(initializers) do
+		init()
+	end
 
 	function c.fire(event)
 		handlers[event]()

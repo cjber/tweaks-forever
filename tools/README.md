@@ -96,7 +96,7 @@ Two runs give byte-identical images.
 `media/TooltipBorderRetail.tga`, the whole tooltip *Modern tooltips* draws in place of
 Forever's beige one, one file per Tooltip style: a rounded one-unit grey line lit
 brighter along the top, with the tooltip's background baked in everywhere inside it,
-at two texels per unit. `Tooltips.lua` cuts all nine NineSlice pieces from one such
+at two texels per unit. `UI/Tooltips.lua` cuts all nine NineSlice pieces from one such
 file, the Center included: the 7-unit corners, and a 2-unit middle it stretches along
 each edge and across the middle. Tooltips draw without pixel snapping, so the line and
 the background have to be one image; as two textures meeting edge to edge, a sub-pixel
@@ -126,8 +126,8 @@ assignment, operator or non-final argument already consumes one value.
 
 `python3 -m tools.lint_taint` checks the same files for code that taints Blizzard's UI on Forever:
 `hooksecurefunc` on an object rather than a function name or a table the file built itself, a field
-written or method defined on a global the addon does not own, and calls to Blizzard's bag and panel
-layout, its lazy bag caches, `SetParentInitializer` and `AddMaskableTexture`. AGENTS.md lists what to
+written or method defined on a global the addon does not own, and calls to Blizzard's bag, panel and
+nameplate layout, its lazy bag caches, `SetModuleContainer`, `SetParentInitializer` and `AddMaskableTexture`. AGENTS.md lists what to
 use instead. A deliberate exception takes a trailing `-- taint-ok: reason` on the flagged line.
 
 The gate runs the Python regression tests first; run them separately with
@@ -136,7 +136,7 @@ and missing/malformed reports and checker crashes fail closed.
 
 `phrases.py` lists every phrase the addon translates: each `L["..."]` in the shipped Lua, plus the category,
 name, tooltip and option labels an `ns.Feature` declares and the label and tooltip of an `ns.ClickMode`, which
-Settings.lua and Modes.lua translate where they show them. The English text is the key. With no argument it prints
+`UI/Settings.lua` and `Core/Modes.lua` translate where they show them. The English text is the key. With no argument it prints
 a translation template, a `Locales/<locale>.lua` with an `L["x"] = "x"` line per phrase; `--write` saves that to
 `Locales/phrases.txt` for translators to copy. `--check` (in `tools/typecheck.sh`) fails when that file is stale,
 when a declaration's text is not plain English, when shipped code hands text with words in it straight to a UI call

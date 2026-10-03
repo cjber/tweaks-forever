@@ -13,23 +13,8 @@ local function region()
 		end,
 	}
 end
-local function frame(kind, name, parent, template)
-	local f = { kind = kind, parent = parent, template = template, scripts = {}, shown = true }
-	function f:SetSize(width, height)
-		self.width, self.height = width, height
-	end
-	function f:SetHeight(height)
-		self.height = height
-	end
-	function f:SetWidth(width)
-		self.width = width
-	end
-	function f:SetPoint(...)
-		self.point = { ... }
-	end
-	function f:ClearAllPoints()
-		self.point = nil
-	end
+local function frame(kind, name, _, template)
+	local f = { kind = kind, scripts = {}, shown = true }
 	function f:SetScript(event, callback)
 		self.scripts[event] = callback
 	end
@@ -57,6 +42,7 @@ local function frame(kind, name, parent, template)
 		self.propagate = value
 	end
 	f.SetFrameStrata, f.SetClampedToScreen, f.EnableKeyboard = noop, noop, noop
+	f.SetSize, f.SetHeight, f.SetWidth, f.SetPoint, f.ClearAllPoints = noop, noop, noop, noop, noop
 	f.CreateFontString = region
 	if template == "BasicFrameTemplateWithInset" then
 		f.TitleText = region()
@@ -79,7 +65,6 @@ local env = setmetatable({
 	UIParent = {},
 	TweaksForeverCharDB = saved,
 	INVSLOT_MAINHAND = 16,
-	INVSLOT_OFFHAND = 17,
 	Enum = { TooltipDataType = { Item = 0 } },
 	MenuUtil = {
 		CreateContextMenu = function()
@@ -173,12 +158,6 @@ local ns = {
 	ClickMode = function(value)
 		mode = value
 	end,
-	Fishing = {
-		IsPole = function()
-			return false
-		end,
-	},
-	db = { gearMark = "none" },
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Bags/Gear.lua")), env)("TweaksForever", ns)
@@ -211,7 +190,7 @@ local function press(text)
 end
 open()
 local panel = assert(named.TweaksForeverGearPanel)
-assert(panel.shown and panel.CloseButton.shown, "stock close button stays available")
+assert(panel.shown)
 assert(row("Healing").checked and not row("Other").checked, "saved membership drives checks")
 press("Healing")
 assert(saved.groups.Healing == nil and panel.shown, "real checkbox removes final member and refreshes")

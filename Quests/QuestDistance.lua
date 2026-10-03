@@ -168,19 +168,16 @@ local function CreateDecorations(inside, Each)
 
 	-- A quest with no area on this continent shows nothing.
 	---@param block TFQuestBlock
-	---@param relayout? boolean
-	local function Update(block, relayout)
+	local function Update(block)
 		local distanceSq, onContinent = C_QuestLog.GetDistanceSqToQuest(block.id)
 		if not distanceSq or not onContinent then
 			return Hide(block)
 		end
 		local d = Decor(block)
 		local here = inside[block.id]
-		if relayout then
-			d.label:ClearAllPoints()
-			d.label:SetPoint("TOP", block.HeaderText, "TOP")
-			d.label:SetPoint("RIGHT", block, "RIGHT", column, 0)
-		end
+		d.label:ClearAllPoints()
+		d.label:SetPoint("TOP", block.HeaderText, "TOP")
+		d.label:SetPoint("RIGHT", block, "RIGHT", column, 0)
 		d.label:SetText(here and L["here"] or Format(math.sqrt(distanceSq)))
 		if here then
 			d.label:SetTextColor(GREEN_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
@@ -189,11 +186,6 @@ local function CreateDecorations(inside, Each)
 		end
 		d.label:Show()
 		d.glow:SetShown(here)
-	end
-
-	---@param block TFQuestBlock
-	local function Relayout(block)
-		Update(block, true)
 	end
 
 	---@param block TFQuestBlock
@@ -207,7 +199,7 @@ local function CreateDecorations(inside, Each)
 		if column < 0 then
 			column = column - GAP
 		end
-		Each(Relayout)
+		Each(Update)
 	end
 
 	return Hide, Layout

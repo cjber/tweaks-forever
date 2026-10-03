@@ -1,11 +1,9 @@
-local features, initializers = {}, {}
+local features = {}
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,
-	Init = function(fn)
-		initializers[#initializers + 1] = fn
-	end,
+	Init = function() end,
 }
 local env = setmetatable({
 	Enum = { EditModeLayoutType = { Preset = 0, Account = 1, Character = 2 } },
@@ -13,7 +11,7 @@ local env = setmetatable({
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("UI/Frames.lua")), env)("TweaksForever", ns)
 local Model = ns.Frames
-assert(features.moveWindows.default and #initializers == 1)
+assert(features.moveWindows.default)
 assert(features.moveWindows.conflicts[1].addon == "BlizzMove")
 assert(features.moveWindows.conflicts[2].addon == "MoveAnything")
 

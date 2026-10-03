@@ -3,10 +3,8 @@
 # sift-fix: call ns.OnSettingChanged(key, fn) instead; Core builds the TweaksForever_ variable and asserts the key
 """Settings.SetOnValueChangedCallback is called only from Core/Core.lua's ns.OnSettingChanged.
 
-Written in the 2026-09-27 decisions pass (ledger ca2907f157): ten feature files each restated the
-"TweaksForever_" .. key variable by hand, so a misspelt key registered a callback that never fired. Specs and
-annotations are out of scope: they stub the API. Whole-tree run at writing: the 13 sites that moved, no
-false positives.
+A feature file that restates the "TweaksForever_" .. key variable by hand registers a callback that never
+fires when the key is misspelt. Specs and annotations are out of scope: they stub the API.
 """
 
 import os

@@ -1,11 +1,9 @@
-local features, initializers = {}, {}
+local features = {}
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,
-	Init = function(fn)
-		initializers[#initializers + 1] = fn
-	end,
+	Init = function() end,
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 assert(loadfile("Bags/Gear.lua"))("TweaksForever", ns)

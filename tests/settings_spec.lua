@@ -35,17 +35,8 @@ local function Initializer(kind, setting)
 	}
 end
 
-local categories = 0
-local function Category(name, parent)
-	categories = categories + 1
-	local id = categories
-	return {
-		name = name,
-		parent = parent,
-		GetID = function()
-			return id
-		end,
-	}, Layout()
+local function Category(name)
+	return { name = name }, Layout()
 end
 
 local env = setmetatable({
@@ -54,8 +45,8 @@ local env = setmetatable({
 		RegisterVerticalLayoutCategory = function(name)
 			return Category(name)
 		end,
-		RegisterVerticalLayoutSubcategory = function(parent, name)
-			return Category(name, parent)
+		RegisterVerticalLayoutSubcategory = function(_, name)
+			return Category(name)
 		end,
 		RegisterAddOnSetting = function(category, variable, key, _, varType, name)
 			return { category = category, variable = variable, key = key, varType = varType, name = name }
@@ -74,7 +65,6 @@ local env = setmetatable({
 			registered[#registered + 1] = { category = category, initializer = initializer }
 		end,
 		RegisterAddOnCategory = function() end,
-		OpenToCategory = function() end,
 	},
 	CreateSettingsButtonInitializer = function(name, _, _, _, addSearchTags)
 		assert(addSearchTags == false, "index buttons stay out of search")

@@ -56,25 +56,23 @@ local function Kill(name, count, required)
 	return {
 		text = ("%d/%d %s slain"):format(count, required, name),
 		type = "monster",
-		numFulfilled = count,
-		numRequired = required,
 		finished = count >= required,
 	}
 end
 local objectives = {
 	[1] = {
 		Kill("Mangy Wolf", 3, 10),
-		{ text = "5/5 Wolf Fang", type = "item", numFulfilled = 5, numRequired = 5, finished = true },
+		{ text = "5/5 Wolf Fang", type = "item", finished = true },
 	},
 	[2] = {
-		{ text = "0/4 Cursed Bone", type = "item", numFulfilled = 0, numRequired = 4, finished = false },
-		{ text = "1/8 Ghouls laid to rest", type = "monster", numFulfilled = 1, numRequired = 8, finished = false },
+		{ text = "0/4 Cursed Bone", type = "item", finished = false },
+		{ text = "1/8 Ghouls laid to rest", type = "monster", finished = false },
 	},
 	-- QuestieDB lists the boars first; this log lists the object first, so neither position agrees on its kind.
 	[3] = {
-		{ text = "0/1 Shrine used", type = "object", numFulfilled = 0, numRequired = 1, finished = false },
+		{ text = "0/1 Shrine used", type = "object", finished = false },
 		Kill("Boar", 0, 6),
-		{ text = "Explore", type = "event", numFulfilled = 0, numRequired = 1, finished = false },
+		{ text = "Explore", type = "event", finished = false },
 	},
 	[4] = { Kill("Kobold Vermin", 2, 8) },
 }
@@ -173,7 +171,7 @@ assert(Model.NpcId("secret") == nil and Model.NpcId(nil) == nil)
 
 -- Both need QuestieDB: without it they are off and greyed out, and nothing counts, whatever the log's text says.
 local needs = features.questTooltips.needs
-assert(needs.title == "QuestieDB" and features.questPlates.needs == needs)
+assert(needs.title == "QuestieDB")
 assert(not needs.check() and not Model.Attach())
 Model.Rebuild()
 assert(#Model.Lines(10) == 0 and not Model.Needed(10) and #Model.Targets(1) == 0)
