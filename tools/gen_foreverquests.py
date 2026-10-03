@@ -13,7 +13,7 @@ from pathlib import Path
 
 from gen_classspells import CACHE, db2
 
-BUILD = "1.60.1.69913"
+BUILD = "1.60.1.70205"
 ERA_BUILD = "1.15.9.69722"
 
 
