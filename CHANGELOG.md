@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **New group no longer removes an item.** Typing the name of a gear group the item was already in took the item out of that group, and deleted the group when it was the last item. The item now stays in the group.
+
 ## [0.7.7] - 2026-10-03
 
 - **New Forever quests are highlighted.** Quests added in the latest Forever update get the gold highlight in your quest log.
