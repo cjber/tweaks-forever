@@ -1,17 +1,15 @@
-local features, initializers = {}, {}
+local features = {}
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,
-	Init = function(fn)
-		initializers[#initializers + 1] = fn
-	end,
+	Init = function() end,
 }
 local env = setmetatable({}, { __index = _G })
 assert(loadfile("Data/Overlays.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Map/Exploration.lua")), env)("TweaksForever", ns)
 local Model = ns.Exploration
-assert(#initializers == 1 and features.exploration.default == false)
+assert(features.exploration.default == false)
 
 local predicates = {}
 for _, conflict in ipairs(features.exploration.conflicts) do

@@ -1,11 +1,9 @@
-local features, initializers = {}, {}
+local features = {}
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,
-	Init = function(fn)
-		initializers[#initializers + 1] = fn
-	end,
+	Init = function() end,
 }
 local env = setmetatable({
 	GetRealZoneText = function(instance)
@@ -23,7 +21,7 @@ local env = setmetatable({
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Map/DungeonEntrances.lua")), env)("TweaksForever", ns)
 local Model = ns.Entrances
-assert(#initializers == 1 and features.dungeonEntrances.default == true)
+assert(features.dungeonEntrances.default == true)
 
 -- Leatrix Maps draws entrances with its points of interest unless that option is explicitly off.
 local leatrix = features.dungeonEntrances.conflicts[1]

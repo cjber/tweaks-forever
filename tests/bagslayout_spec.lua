@@ -37,12 +37,6 @@ local function Region(props)
 	function r:GetScale()
 		return self.scale
 	end
-	function r:SetAlpha(a)
-		self.alpha = a
-	end
-	function r:GetAlpha()
-		return self.alpha
-	end
 	function r:EnableMouse() end
 	function r:IsMouseEnabled()
 		return true
@@ -99,7 +93,6 @@ local function Buttons(bagIDs, perBag, owner)
 			function b:IsExtended()
 				return false
 			end
-			b.GetSlotAndBagID = function() end
 			b:SetPoint("BOTTOMRIGHT", owner, "BOTTOMRIGHT", -slot, bagID)
 			items[#items + 1] = b
 		end
@@ -207,14 +200,8 @@ local env = setmetatable({
 			return true
 		end,
 	},
-	C_Timer = {
-		After = function(_, fn)
-			fn()
-		end,
-	},
 	GetBindingKey = function() end,
 	ClearOverrideBindings = function() end,
-	SetOverrideBinding = function() end,
 	InCombatLockdown = function()
 		return false
 	end,

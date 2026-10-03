@@ -3,7 +3,6 @@
 local combat, acquired, removed = false, 0, 0
 local provider, onEvent
 local mapEvents = 0
-local pins = {}
 local map = {
 	IsShown = function()
 		return true
@@ -11,26 +10,8 @@ local map = {
 	GetMapID = function()
 		return 1427
 	end,
-	GetCanvas = function()
-		return {
-			GetWidth = function()
-				return 1000
-			end,
-			GetHeight = function()
-				return 1000
-			end,
-		}
-	end,
-	GetScaleForMinZoom = function()
-		return 1
-	end,
-	EnumeratePinsByTemplate = function(_, template)
-		local index = 0
-		return function()
-			index = index + 1
-			local pin = pins[template] and pins[template][index]
-			return pin
-		end
+	EnumeratePinsByTemplate = function()
+		return function() end
 	end,
 	RemoveAllPinsByTemplate = function(_, template)
 		assert(not combat, "RemoveAllPinsByTemplate is protected in combat: " .. template)
@@ -41,38 +22,26 @@ local map = {
 		acquired = acquired + 1
 		return {}
 	end,
-	AddDataProvider = function(_, value)
+	AddDataProvider = function(self, value)
 		provider = value
 		provider.GetMap = function()
-			return _G.__dungeonCombatMap
+			return self
 		end
 	end,
 	HookScript = function() end,
 }
-_G.__dungeonCombatMap = map
 local ns = {
 	Feature = function() end,
 	Init = function(fn)
 		fn()
 	end,
-	L = {},
-	RaidInstances = {},
-	DungeonEntrances = { [1427] = {} },
 	Active = function()
 		return true
 	end,
-	NavigateHint = function()
-		return "hint"
-	end,
-	Suggestion = function() end,
-	Navigate = function() end,
 }
 local eventFrame = {
 	RegisterEvent = function(self)
 		self.registered = true
-	end,
-	UnregisterEvent = function(self)
-		self.registered = false
 	end,
 	SetScript = function(_, _, fn)
 		onEvent = fn
@@ -102,28 +71,7 @@ local env = setmetatable({
 		CreateSubPin = function()
 			return {}
 		end,
-		OnAcquired = function() end,
-		OnMouseEnter = function() end,
 	},
-	CreateVector2D = function(x, y)
-		return { x = x, y = y }
-	end,
-	GetRealZoneText = function(instance)
-		return "instance " .. instance
-	end,
-	C_Map = {
-		GetAreaInfo = function(area)
-			return "area " .. area
-		end,
-	},
-	CreateAtlasMarkup = function(atlas)
-		return atlas
-	end,
-	GameTooltip_AddDisabledLine = function() end,
-	GetAppropriateTooltip = function()
-		return {}
-	end,
-	L = {},
 }, { __index = _G })
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Map/DungeonEntrances.lua")), env)("TweaksForever", ns)

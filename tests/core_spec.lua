@@ -8,7 +8,6 @@ local function Load(saved)
 				callbacks[variable] = fn
 			end,
 		},
-		C_AddOns = { IsAddOnLoaded = function() end },
 		CreateFrame = function()
 			local frame = {}
 			function frame.RegisterEvent() end

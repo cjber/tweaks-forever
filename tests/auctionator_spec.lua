@@ -30,7 +30,6 @@ local function frame()
 end
 strmatch = string.match
 assert(loadfile("LibAHTab/LibStub/LibStub.lua"))()
-local lib
 WOW_PROJECT_ID, WOW_PROJECT_MAINLINE = 1, 1
 CreateFrame = frame
 PanelTemplates_DeselectTab = function(tab)
@@ -49,14 +48,13 @@ local native = function(self, mode)
 	for _, name in ipairs({ "Buy", "Sell", "Commodities" }) do
 		self[name]:Hide()
 	end
-	self.displayMode = mode
 	for _, name in ipairs(mode) do
 		self[name]:Show()
 	end
 end
 AuctionHouseFrame.SetDisplayMode = native
 assert(loadfile("LibAHTab/LibAHTab.lua"))()
-lib = LibStub:GetLibrary("LibAHTab-1-0")
+local lib = LibStub:GetLibrary("LibAHTab-1-0")
 local custom = frame()
 lib:CreateTab("addon", custom, "Addon")
 for _, mode in pairs(AuctionHouseFrameDisplayMode) do
@@ -66,8 +64,6 @@ for _, mode in pairs(AuctionHouseFrameDisplayMode) do
 	assert(not custom.shown and not lib:GetButton("addon").selected)
 	assert(AuctionHouseFrame.SetDisplayMode == native)
 end
-print("Auctionator: native method preserved; all native panels hide and deselect addon tabs")
-
 local create = lib.CreateTab
 assert(LibStub:NewLibrary("LibAHTab-1-0", 4) == nil, "embedded revision cannot overwrite compatibility copy")
 assert(loadfile("LibAHTab/LibAHTab.lua"))()
@@ -77,3 +73,4 @@ local future = function() end
 upgraded.CreateTab = future
 assert(loadfile("LibAHTab/LibAHTab.lua"))()
 assert(upgraded.CreateTab == future, "newer upstream revision wins")
+print("Auctionator: native method preserved; all native panels hide and deselect addon tabs")

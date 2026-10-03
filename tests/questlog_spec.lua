@@ -48,8 +48,8 @@ local env = setmetatable({
 			return log[index]
 		end,
 		GetLogIndexForQuestID = Find,
-		IsQuestDisabledForSession = function(id)
-			return id == 105
+		IsQuestDisabledForSession = function()
+			return false
 		end,
 		CanAbandonQuest = function(id)
 			return id ~= 102
@@ -111,6 +111,7 @@ for _, name in ipairs({
 	"SetHitRectInsets",
 	"SetFontString",
 	"HookScript",
+	"SetChecked",
 }) do
 	methods[name] = function() end
 end
@@ -137,12 +138,6 @@ function methods:IsShown()
 end
 function methods:SetEnabled(enabled)
 	self.enabled = enabled
-end
-function methods:SetChecked(checked)
-	self.checked = checked
-end
-function methods:GetChecked()
-	return self.checked
 end
 function methods:SetFrameLevel(level)
 	self.level = level
