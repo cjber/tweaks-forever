@@ -133,6 +133,10 @@ finding.
 
 Shapes this codebase has produced more than once and a reviewer confirmed. Check new code against them.
 
+- A spec that asserts how many `ns.Init` callbacks a file registers (`#initializers == 1`): the count is private.
+  Assert the feature's default and run the initializers.
+- A spec stub for a client global or `ns` helper that the paths the spec drives never call. Stub what the spec
+  reaches; a stub that raises when called shows whether one is needed.
 
 ## Zones
 
@@ -149,6 +153,7 @@ Unlisted paths are `production`.
 | `docs/curseforge.md` | docs | the store page, pasted by hand; its facts must match the README |
 | `docs/features.md`, `Locales/README.md` | docs | |
 | `Locales/phrases.txt` | generated | written by `python3 -m tools.phrases --write`; never edit or review |
+| `LibAHTab/` | vendor | third-party library with its own TOC and licence; not reviewed |
 | `.sift/gate.py`, `.sift/agents.py`, `.sift/LICENSE` | vendor | copied byte for byte from sift; changed only by `sift update` |
 | `media/`, `docs/screenshots/` | asset | not reviewed |
 | `.agents/`, `.sift/` | docs | this profile and audit reports |
@@ -185,6 +190,8 @@ Audit slices from lowest to highest risk:
   tracked Lua, XML or `Locales/phrases.txt` names.
 - Rules: `setting-callback-outside-core` (`.sift/scripts/setting-callback-outside-core.py`): a
   `SetOnValueChangedCallback` call outside Core/Core.lua; use `ns.OnSettingChanged`.
+- Rules: `workflow-hashfiles-unmatched` (`.sift/scripts/workflow-hashfiles-unmatched.py`): a `hashFiles()`
+  pattern in a workflow that matches no tracked file.
 - Lenses: none yet.
 
 The type gate also runs `python3 -m tools.lint_taint` and `python3 tools/typecheck_coverage.py`: native-method hooks, shared UI-state writes and omitted runtime type coverage fail CI.
