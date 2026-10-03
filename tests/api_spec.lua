@@ -1,6 +1,9 @@
+local inits = {}
 local ns = {
 	Feature = function() end,
-	Init = function() end,
+	Init = function(fn)
+		inits[#inits + 1] = fn
+	end,
 	Active = function()
 		return false
 	end,
@@ -8,7 +11,59 @@ local ns = {
 local NAMES = { [403] = "Lightning Bolt", [529] = "Lightning Bolt", [548] = "Lightning Bolt", [915] = "Lightning Bolt" }
 local known, level, class, combat = { [403] = true, [529] = true }, 18, "SHAMAN", false
 local tabName = "Elemental Combat"
+-- A synthetic QuestieDB: made-up names and spawns for two of the Shaman trainers the data lists, on a made-up area 10
+-- drawn on map 100.
+local questieNpcs = {
+	[3030] = { name = "First Teacher", spawns = { [10] = { { 25, 75 } } }, zoneID = 10 },
+	[373] = { name = "Second Teacher" },
+}
+local questie = {
+	RequireContract = function(required)
+		return required == 2
+	end,
+	Npc = {
+		GetAll = function(id, keys)
+			local row, values = questieNpcs[id], {}
+			for i, key in ipairs(row and keys or {}) do
+				values[i] = row[key]
+			end
+			return row and values
+		end,
+	},
+	Support = {
+		Get = function()
+			return {
+				private = {
+					areaIdToUiMapId = "return { [10] = 100 }",
+					areaIdToUiMapIdOverride = "return {}",
+					subZoneToParentZone = "return {}",
+				},
+			}
+		end,
+	},
+}
+local timers = {}
+local function Frame()
+	local due = timers
+	timers = {}
+	for _, fn in ipairs(due) do
+		fn()
+	end
+end
 local env = setmetatable({
+	C_AddOns = {
+		GetAddOnMetadata = function()
+			return "Forever"
+		end,
+	},
+	C_Timer = {
+		After = function(_, fn)
+			timers[#timers + 1] = fn
+		end,
+	},
+	debugprofilestop = function()
+		return 0
+	end,
 	InCombatLockdown = function()
 		return combat
 	end,
@@ -56,11 +111,18 @@ local env = setmetatable({
 		return false
 	end,
 }, { __index = _G })
-for _, file in ipairs({ "Data/ClassSpells.lua", "Data/DungeonEntrances.lua", "UI/Spellbook.lua", "Core/API.lua" }) do
+assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
+for _, file in ipairs({
+	"Data/ClassSpells.lua",
+	"Data/DungeonEntrances.lua",
+	"Integrations/QuestieSource.lua",
+	"UI/Spellbook.lua",
+	"Core/API.lua",
+}) do
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
 end
 local API = env.TweaksForever.API
-assert(API.version == 2, "v2 adds Trainers")
+assert(API.version == 3, "v2 adds Trainers, v3 reads their names and places from QuestieDB")
 local entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "first curated zone, before login")
 local another = API.DungeonEntrance(230)
@@ -69,27 +131,43 @@ entrance.map, entrance.x, entrance.y = 1, 0, 0
 assert(another.map == 1427 and another.x == 0.271 and another.y == 0.725, "copies are isolated")
 entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "callers cannot change the source")
-local trainers = API.Trainers()
+-- Which NPCs train the class is baked, so they are listed before login and without QuestieDB, which earns the caller
+-- a line to show the player instead of the places.
+local trainers, install = API.Trainers()
 assert(#trainers > 5, "a Shaman's class trainers, before login")
-local function Trainer(npc)
-	for _, row in ipairs(trainers) do
+assert(install:find("QuestieDB", 1, true), "without QuestieDB, what to install")
+local function Trainer(npc, list)
+	for _, row in ipairs(list or trainers) do
 		if row.npc == npc then
 			return row
 		end
 	end
 end
-local siln = Trainer(3030)
-assert(siln.name == "Siln Skychaser", "the trainer's own name")
-assert(siln.map == 1456 and siln.x == 0.228 and siln.y == 0.211, "and where the dump places one of them")
-assert(Trainer(373).map == nil and Trainer(373).name == "Murak Winterborn", "unplaced keeps its id and name")
-for _, row in ipairs(API.Trainers()) do
-	assert(row.npc and row.name, "every trainer names its NPC")
+assert(Trainer(3030).name == nil and Trainer(3030).map == nil, "no name or place of its own without QuestieDB")
+assert(#timers == 0, "and nothing booked")
+-- With QuestieDB the names and places are its own, read over the frames after login, not in the caller's frame.
+env.LibQuestieDB = questie
+inits[1]() -- QuestieSource.lua's: login opens the read
+inits[#inits]() -- API.lua's: books the player's own trainers
+assert(#timers == 1, "the read is booked at login")
+trainers, install = API.Trainers()
+assert(install == nil and Trainer(3030).name == nil, "installed and not read yet: ask again later")
+while #timers > 0 do
+	Frame()
+end
+trainers, install = API.Trainers()
+local first = Trainer(3030)
+assert(install == nil and first.name == "First Teacher", "QuestieDB's name for the trainer")
+assert(first.map == 100 and first.x == 0.25 and first.y == 0.75, "and where it places one of them")
+assert(Trainer(373).map == nil and Trainer(373).name == "Second Teacher", "unplaced keeps its id and name")
+assert(Trainer(3032).npc == 3032 and Trainer(3032).name == nil, "a trainer QuestieDB lacks keeps its id")
+for _, row in ipairs(trainers) do
 	assert((row.map == nil) == (row.x == nil), "a place brings its map and both fractions")
 end
 local again = API.Trainers()
 assert(again[1] ~= trainers[1] and again ~= trainers, "a fresh table and rows on every call")
-again[1].name = "Changed by caller"
-assert(API.Trainers()[1].name == "Murak Winterborn", "callers cannot change the source")
+Trainer(3030, again).name = "Changed by caller"
+assert(Trainer(3030, API.Trainers()).name == "First Teacher", "callers cannot change the source")
 local deathknight = class
 class = "DEATHKNIGHT"
 assert(#API.Trainers() == 0, "a class with no trainer list")

@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 -- Public addon-to-addon interface. It answers with the facts whether or not the spellbook shows Future Spells: a
 -- caller such as Adventure Guide Forever plans a trainer visit from them, and turning the display off shouldn't
@@ -8,9 +9,10 @@ local _, ns = ...
 -- yet, so every rank would look unlearned, and in combat the work waits.
 --
 -- Trainers() needs version 2 or later. TrainableSpells() and DungeonEntrance() are there from version 1 and behave
--- the same in both, so a caller checks version only before Trainers().
+-- the same in every version, so a caller checks version only before Trainers(). From version 3 a trainer's name and
+-- place are QuestieDB's, so either can be missing, and Trainers() returns a second value.
 ---@class TFPublicAPI
-local API = { version = 2 }
+local API = { version = 3 }
 
 function API.TrainableSpells()
 	if not ns.db or InCombatLockdown() then
@@ -35,10 +37,13 @@ function API.TrainableSpells()
 	return trainable
 end
 
--- The class trainers to visit and where one of each stands, for the player's class. Baked from the class
--- trainer data, so it answers before login, in combat and with the spellbook's Future Spells off. An unknown or
--- unplayable class has none; a trainer the dump places nowhere keeps its npc and name and no map.
+-- The class trainers to visit, for the player's class, and where one of each stands. Which NPCs train a class is
+-- baked, so every trainer is listed before login, in combat and with the spellbook's Future Spells off; an unknown
+-- or unplayable class has none. A trainer's name and place are read from the installed QuestieDB a little each
+-- frame, so they fill in over the first moments after login: ask again later. Without a QuestieDB to read, the
+-- second value is a line for the player saying what to install.
 ---@return TFAPITrainer[]
+---@return string? install
 function API.Trainers()
 	local _, class = UnitClass("player")
 	local baked = ns.ClassSpells[class]
@@ -46,12 +51,14 @@ function API.Trainers()
 	if not baked then
 		return trainers
 	end
-	for _, row in ipairs(baked.trainers) do
-		local trainer = { npc = row[1], name = row[2] }
-		if row[3] then
-			trainer.map, trainer.x, trainer.y = row[3], row[4], row[5]
-		end
-		trainers[#trainers + 1] = trainer
+	local places, state = ns.QuestieSource.Places(baked.trainers)
+	for _, npc in ipairs(baked.trainers) do
+		local place = places[npc]
+		trainers[#trainers + 1] = place and { npc = npc, name = place.name, map = place.map, x = place.x, y = place.y }
+			or { npc = npc }
+	end
+	if state == "absent" then
+		return trainers, L["Install Questie, or its QuestieDB addon on its own, to see where your class trainers are."]
 	end
 	return trainers
 end
@@ -68,3 +75,6 @@ end
 
 TweaksForever = TweaksForever or {}
 TweaksForever.API = API
+
+-- Books the read of the player's own trainers at login, so the first caller usually finds them placed.
+ns.Init(API.Trainers)

@@ -87,6 +87,8 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdLi
   (Integrations/Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Integrations/Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
   `ns.LineName`, `ns.GeneralName` (also read by Core/API.lua) — shared helpers.
 - `ns.QuestGivers`, `ns.QuestProgress`, `ns.QuestLog`, `ns.WhatsNew` — more `Model` tables exported for the specs.
+- `ns.QuestieDB`, `ns.QuestieSource` (Integrations/QuestieSource.lua) — the installed QuestieDB and what is read from it
+  in game: its area-to-map lookup (QuestGivers) and NPC names and places (Core/API.lua).
 - `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.InstanceEntrances`, `ns.RaidInstances`,
   `ns.Overlays`, `ns.ClassSpells`, `ns.ForeverQuests` — generated `Data/` tables.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;

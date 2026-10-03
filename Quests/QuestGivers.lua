@@ -20,8 +20,6 @@ ns.Feature({
 	},
 })
 
--- QuestieDB, read at runtime only: its public API (contract 2) for the Forever flavour. QuestProgress.lua reads it too.
-local ADDON, CONTRACT = "QuestieDB", 2
 -- Yards from you a giver can stand and still be on the minimap, whose widest view is about 233 yards across its radius.
 local RANGE = 250
 local QUEST_FIELDS = {
@@ -49,88 +47,33 @@ local UNREADY = "|A:SideInProgressquesticon:16:14|a "
 local Model = {}
 ns.QuestGivers = Model
 
+-- QuestieDB and the map each of its areas is drawn on, read in game through Integrations/QuestieSource.lua.
 local lib ---@type TFQuestieDB
--- QuestieDB's area-to-map tables, read from its ZoneDB support source.
-local areaMap, areaOverride, parentZone
--- [library] = its three zone tables, or false when any can't be read; read once per library.
-local zonesOf = setmetatable({}, { __mode = "k" })
+local MapOf ---@type fun(area: integer): integer?
 -- [name] = the quest NPCs of that name with their spawns in world yards.
 ---@type table<string, TFGiverCandidate[]>
 local candidates = {}
 
--- One of ZoneDB's tables, which QuestieDB keeps as Lua source returning a table literal: run with no globals. Nil when
--- it is missing, doesn't parse, errors or returns something else, which leaves the feature off (Model.Library).
----@param source any
----@return table?
-local function Table(source)
-	local chunk = type(source) == "string" and loadstring(source)
-	if chunk then
-		local ok, value = pcall(setfenv(chunk, {}))
-		if ok and type(value) == "table" then
-			return value
-		end
-	end
-end
-
--- The loaded QuestieDB, if it is the Forever build of a contract this addon was written against.
+-- The loaded QuestieDB with everything this file reads, and its area-to-map lookup; nil when any of it is missing or
+-- its zone tables can't be read, so a giver is never placed from partial data.
 ---@return TFQuestieDB?
-function ns.QuestieDB()
-	local db = LibQuestieDB
-	if type(db) ~= "table" or C_AddOns.GetAddOnMetadata(ADDON, "X-Flavor") ~= "Forever" then
-		return nil
-	end
-	local ok, fits = pcall(db.RequireContract, CONTRACT)
-	return ok and fits and db or nil
-end
-
--- The loaded QuestieDB with everything this file reads, and its zone tables; nil when any of it is missing or its zone
--- tables can't be read, so a giver is never placed from partial data.
----@return TFQuestieDB?, table?, table?, table?
+---@return (fun(area: integer): integer?)?
 function Model.Library()
-	local db = ns.QuestieDB()
-	if not db or not (db.Npc and db.Npc.IdsByName and db.Quest and db.Support) then
-		return nil
-	end
-	local zones = zonesOf[db]
-	if zones == nil then
-		local source = db.Support.Get("ZoneDB")
-		local private = type(source) == "table" and source.private
-		zones = false
-		if type(private) == "table" then
-			local map, override, parent =
-				Table(private.areaIdToUiMapId),
-				Table(private.areaIdToUiMapIdOverride),
-				Table(private.subZoneToParentZone)
-			zones = map and override and parent and { map, override, parent } or false
-		end
-		zonesOf[db] = zones
-	end
-	if zones then
-		return db, zones[1], zones[2], zones[3]
+	local db, mapOf = ns.QuestieSource.Zones()
+	if db and db.Npc.IdsByName and db.Quest then
+		return db, mapOf
 	end
 end
 
 ---@return boolean
 function Model.Attach()
 	candidates = {}
-	local db, map, override, parent = Model.Library()
-	if not db then
+	local db, mapOf = Model.Library()
+	if not db or not mapOf then
 		return false
 	end
-	lib, areaMap, areaOverride, parentZone = db, map, override, parent
+	lib, MapOf = db, mapOf
 	return true
-end
-
--- An area's map, or its parent zone's; an override of 0 means the area has no map.
----@param area integer
----@return integer?
-local function MapOf(area)
-	local map = areaOverride[area] or areaMap[area]
-	if map == nil and parentZone[area] then
-		local parent = parentZone[area]
-		map = areaOverride[parent] or areaMap[parent]
-	end
-	return type(map) == "number" and map ~= 0 and map or nil
 end
 
 -- The quest NPCs named `name`, each with its spawns as world positions, once per name.

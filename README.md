@@ -98,7 +98,7 @@ Translations are welcome as a pull request, or pasted into an issue, on [GitHub]
 
 ## For addon authors
 
-`TweaksForever.API` (`version = 2`) gives the class trainer spells you can learn, your class's trainers and where they stand, and each dungeon's own entrance. [docs/features.md](docs/features.md#for-addon-authors) has the details.
+`TweaksForever.API` (`version = 3`) gives the class trainer spells you can learn, your class's trainers and where they stand, and each dungeon's own entrance. [docs/features.md](docs/features.md#for-addon-authors) has the details.
 
 ## Works alongside
 
