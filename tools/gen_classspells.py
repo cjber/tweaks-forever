@@ -156,7 +156,7 @@ def trainers(trainer_class, class_id, spawns, maps):
     for entry, (klass, name) in sorted(trainer_class.items()):
         if klass != class_id:
             continue
-        if name and TRAINER_UNUSED.search(name):
+        if TRAINER_UNUSED.search(name):
             unused += 1
             continue
         row = {"npc": entry, "name": name}

@@ -21,12 +21,8 @@ DATA = (
 )
 
 
-def run(root, *command, output=None):
-    if output is None:
-        subprocess.run(command, cwd=root, check=True)
-    else:
-        with (root / output).open("wb") as stream:
-            subprocess.run(command, cwd=root, stdout=stream, check=True)
+def run(root, *command):
+    subprocess.run(command, cwd=root, check=True)
 
 
 def outputs(root):
