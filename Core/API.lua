@@ -38,7 +38,7 @@ end
 -- The class trainers to visit and where one of each stands, for the player's class. Baked from the class
 -- trainer data, so it answers before login, in combat and with the spellbook's Future Spells off. An unknown or
 -- unplayable class has none; a trainer the dump places nowhere keeps its npc and name and no map.
----@return TFClassTrainer[]
+---@return TFAPITrainer[]
 function API.Trainers()
 	local _, class = UnitClass("player")
 	local baked = ns.ClassSpells[class]

@@ -17,11 +17,18 @@
 ---@field x number 0..1
 ---@field y number 0..1
 
+---@class TFAPITrainer
+---@field npc integer
+---@field name string
+---@field map? integer UiMapID, when curated
+---@field x? number 0..1
+---@field y? number 0..1
+
 ---@class TFPublicAPI
 ---@field version integer 2
 ---@field TrainableSpells fun(): TFAPITrainableSpell[]? spells your level allows that you haven't learned, each spell's next rank only, on your class's spellbook tabs and the General tab (no weapon skills or riding), in fresh tables; answers whether or not the spellbook shows them; nil before login and in combat
 ---@field DungeonEntrance fun(instanceID: integer): TFDungeonEntrance? instance Map.ID; fresh copy of its unclustered entrance on the first curated zone map; nil when unknown or unplaced, independent of pin settings and conflicts
----@field Trainers fun(): TFClassTrainer[] one trainer spawn per class trainer, with map coordinates when curated; safe before login and in combat
+---@field Trainers fun(): TFAPITrainer[] one trainer spawn per class trainer, with map coordinates when curated; safe before login and in combat
 
 ---@class TFPublicAddon
 ---@field API TFPublicAPI

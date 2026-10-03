@@ -18,7 +18,7 @@ TEMPLATES = {"Locales/phrases.txt"}
 
 
 def entries(text):
-    """(name, line) for each quoted name inside a top-level `globals` or `read_globals` table."""
+    """(name, line) for each quoted name inside a `globals` or `read_globals` table that opens its own line."""
     found = []
     inside = False
     for number, line in enumerate(text.splitlines(), 1):

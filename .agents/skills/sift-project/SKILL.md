@@ -7,8 +7,9 @@ description: "Project profile for sift in Tweaks Forever: the exact quality-gate
 
 A World of Warcraft addon for the WoW: Forever client (`## Interface: 16001`; the client's own UI code is
 called "Camelot" in comments). Lua 5.1 run by the game, loaded in `.toc` order, no `require`. Packaged by
-the BigWigs packager on a `v*` tag; players install the zip. Stdlib-only Python scripts under `tools/`
-support it. Headless specs run under LuaJIT with stubbed WoW globals; they cannot exercise the real client.
+the BigWigs packager on a `v*` tag; players install the zip. Python scripts under `tools/` support it;
+all are stdlib-only except `tools/screenshots.py`, which needs Pillow and the wowmock library.
+Headless specs run under LuaJIT with stubbed WoW globals; they cannot exercise the real client.
 
 ## Gate
 
@@ -85,9 +86,9 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdLi
 - `ns.ClickMode` (Core/Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core/Core.lua), `ns.Suggestion`
   (Integrations/Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Integrations/Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
   `ns.LineName`, `ns.GeneralName` (also read by Core/API.lua) — shared helpers.
-- `ns.QuestGivers`, `ns.QuestProgress`, `ns.WhatsNew` — more `Model` tables exported for the specs.
+- `ns.QuestGivers`, `ns.QuestProgress`, `ns.QuestLog`, `ns.WhatsNew` — more `Model` tables exported for the specs.
 - `ns.CampBenefits`, `ns.ZoneRanges`, `ns.DungeonEntrances`, `ns.InstanceEntrances`, `ns.RaidInstances`,
-  `ns.Overlays`, `ns.ClassSpells` — generated `Data/` tables.
+  `ns.Overlays`, `ns.ClassSpells`, `ns.ForeverQuests` — generated `Data/` tables.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;
   `Locales/phrases.txt` is `tools/phrases.py`'s template for translators.
 - `TweaksForeverDungeonEntrancePinMixin` — global named by `Map/DungeonEntrances.xml`'s pin template.
@@ -115,7 +116,6 @@ finding.
 - `Bags/Sections.lua` `Arrange`/`Bags/Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
   and `MIN_SCALE` is already one constant; each owns its own state.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
-- `Bags/Sections.lua`/`Bags/Reagents.lua` `Relayout`: a three-line schedule idiom, not a shared implementation.
 - Gear's colour kinds `"group"`/`"set"`/`"fishing"`: persisted keys in `TweaksForeverCharDB.colours`.
 - Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
 - Gear's `Char()` short alias, Frames' repeated `if Active() then Schedule() end`, and Tooltips'
@@ -187,4 +187,4 @@ Audit slices from lowest to highest risk:
   `SetOnValueChangedCallback` call outside Core/Core.lua; use `ns.OnSettingChanged`.
 - Lenses: none yet.
 
-The type gate also runs `python3 -m tools.lint_taint` and `python3 tools/typecheck_coverage.py`: native-method hooks, shared UI-state writes and omitted runtime type coverage fail CI. Tracker initialization follows both native load events, deferred one frame; AddContainer hooks are retired.
+The type gate also runs `python3 -m tools.lint_taint` and `python3 tools/typecheck_coverage.py`: native-method hooks, shared UI-state writes and omitted runtime type coverage fail CI.

@@ -59,9 +59,9 @@ jobs:
           title: "data: game data for Forever ${{ steps.build.outputs.version }}"
           commit-message: "data: game data for Forever ${{ steps.build.outputs.version }}"
           body: |
-            Regenerated `Data/Overlays.lua` (world map overlays), `Data/CampBenefits.lua` (camp benefit texts), `Data/ZoneLevels.lua` (zone level ranges), `Data/DungeonEntrances.lua` (dungeon and raid entrances) and `Data/ClassSpells.lua` (class trainer spells) for Forever build ${{ steps.build.outputs.version }}; `tools/README.md` names each file's sources.
+            Regenerated `Data/Overlays.lua` (world map overlays), `Data/CampBenefits.lua` (camp benefit texts), `Data/ZoneLevels.lua` (zone level ranges), `Data/DungeonEntrances.lua` (dungeon and raid entrances), `Data/ClassSpells.lua` (class trainer spells) and `Data/ForeverQuests.lua` (quests added in Forever) for Forever build ${{ steps.build.outputs.version }}; `tools/README.md` names each file's sources.
 
-            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers, and `Data/ClassSpells.lua` for spells that dropped out.
+            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers, `Data/ClassSpells.lua` for spells that dropped out, and `Data/ForeverQuests.lua` for quest IDs that dropped out.
 
             CI is dispatched on this branch straight away; approve the pending workflows on this PR too, since only those count as its required checks.
 
