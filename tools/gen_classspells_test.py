@@ -2,40 +2,13 @@
 
 import unittest
 
-from tools.gen_classspells import CREATURE_COLUMNS, generate, place, race_ids, teachings, ui_maps, values
+from tools.gen_classspells import CREATURE_COLUMNS, generate, race_ids, teachings, values
 
 
 def creature(entry, trainer_class, template=0, trainer_type=0, name="Trainer"):
     row = ["0"] * CREATURE_COLUMNS
     row[0], row[1], row[71], row[73], row[75] = (str(entry), name, str(trainer_type), str(trainer_class), str(template))
     return row
-
-
-def spawn(entry, map_id, x, y):
-    return ["0", str(entry), str(map_id), "1", str(x), str(y), "0", "0", "300", "300", "0", "0"]
-
-
-def zone_map(ui_map, map_id, x0, y0, x1, y1, ui_min=0.0, ui_max=1.0):
-    return {
-        "UiMapID": str(ui_map),
-        "MapID": str(map_id),
-        "Region_0": str(x0),
-        "Region_1": str(y0),
-        "Region_3": str(x1),
-        "Region_4": str(y1),
-        "UiMin_0": str(ui_min),
-        "UiMax_0": str(ui_max),
-        "UiMin_1": "0.0",
-        "UiMax_1": "1.0",
-    }
-
-
-MAPS = ui_maps(
-    {
-        "UiMap": [{"ID": "1", "Type": "3"}, {"ID": "2", "Type": "3"}, {"ID": "947", "Type": "1"}],
-        "UiMapAssignment": [zone_map(1, 0, 0, 0, 100, 100), zone_map(2, 0, 0, 0, 50, 50)],
-    }
-)
 
 
 def offer(entry, spell, cost, level, skill=0):
@@ -78,7 +51,6 @@ class GenerateTest(unittest.TestCase):
     def test_shaman(self):
         tables = {
             "creature_template": [creature(10, 7), creature(11, 7, template=5), creature(12, 7, trainer_type=2)],
-            "creature": [spawn(10, 0, 10, 10)],
             "npc_trainer": [
                 offer(10, 8057, 2200, 20),  # teaches Frost Shock
                 offer(10, 1324, 100, 8),  # teaches Lightning Bolt rank 2
@@ -103,35 +75,23 @@ class GenerateTest(unittest.TestCase):
             "SkillLineAbility": [ability(8056, 375, low=0b100), ability(403, 375), ability(529, 375)],
             "ChrRaces": RACES,
         }
-        result, stats = generate(tables, taught, forever, MAPS)
+        result, stats = generate(tables, taught, forever)
         self.assertEqual(
             result["SHAMAN"],
             (
                 [375],
                 [(529, 8, 100, 375, [403], None), (8056, 20, 2200, 375, None, [3])],
-                [{"npc": 10, "name": "Trainer", "map": 2, "x": 0.8, "y": 0.8}, {"npc": 11, "name": "Trainer"}],
+                [10, 11],
             ),
         )
         self.assertEqual((stats["SHAMAN"], stats["not_in_client"], stats["skill_gated"]), (2, 1, 1))
         self.assertEqual(stats["trainers"], 2)
 
 
-class ProjectTest(unittest.TestCase):
-    def test_map_position_rounds_off_the_edge(self):
-        assignment = zone_map(1, 0, 0, 0, 100, 100)
-        self.assertEqual(place({0: [assignment]}, 0, 25, 75), {"map": 1, "x": 0.25, "y": 0.75})
-        self.assertIsNone(place({0: [assignment]}, 0, 200, 0), "off the map")
-
-    def test_smallest_zone_wins(self):
-        self.assertEqual(place(MAPS, 0, 20, 20), {"map": 2, "x": 0.6, "y": 0.6}, "the city over the zone")
-        self.assertEqual(place(MAPS, 0, 80, 80), {"map": 1, "x": 0.2, "y": 0.2}, "the zone alone")
-
-
 class TrainersTest(unittest.TestCase):
-    def generate_trainers(self, trainers, creature_rows):
+    def generate_trainers(self, trainers):
         tables = {
             "creature_template": trainers,
-            "creature": creature_rows,
             "npc_trainer": [offer(entry, 8057, 100, 20) for entry in (100, 101)],
             "npc_trainer_template": [],
         }
@@ -143,18 +103,14 @@ class TrainersTest(unittest.TestCase):
             "ChrRaces": RACES,
         }
         taught = teachings([learn(8057, 1)], [])
-        return generate(tables, taught, forever, MAPS)
+        return generate(tables, taught, forever)
 
-    def test_places_one_spawn_and_keeps_an_unplaced_trainer(self):
+    def test_keeps_each_trainer_by_id_and_drops_unused_templates(self):
         result, stats = self.generate_trainers(
-            [creature(100, 7, name="Siln"), creature(101, 7, name="Murak"), creature(102, 7, name="[UNUSED] Test")],
-            [spawn(100, 0, 10, 10), spawn(102, 0, 10, 10)],
+            [creature(101, 7, name="Murak"), creature(100, 7, name="Siln"), creature(102, 7, name="[UNUSED] Test")]
         )
-        self.assertEqual(
-            result["SHAMAN"][2],
-            [{"npc": 100, "name": "Siln", "map": 2, "x": 0.8, "y": 0.8}, {"npc": 101, "name": "Murak"}],
-        )
-        self.assertEqual((stats["unused"], stats["placed"], stats["unplaced"]), (1, 1, 1))
+        self.assertEqual(result["SHAMAN"][2], [100, 101])
+        self.assertEqual((stats["unused"], stats["kept"]), (1, 2))
 
 
 if __name__ == "__main__":

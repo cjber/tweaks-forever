@@ -26,8 +26,11 @@ publishes that entry as its notes.
 - `Core/Core.lua` — `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, and TOC
   order sets the settings subpage order.
 - `Bags/`, `Quests/`, `Map/`, `Features/` — feature modules grouped by the part of the game they change.
-- `UI/` — settings, tooltips, nameplates and window helpers; `Integrations/` — companion navigation.
-- `Data/` — lookup tables; a generated one names the script that regenerates it in its header.
+- `UI/` — settings, tooltips, nameplates and window helpers; `Integrations/` — companion navigation, and
+  `Integrations/QuestieSource.lua`, the one place QuestieDB is opened: quests, NPC names and spawns are read from the installed
+  addon in game, a little each frame, and never copied here.
+- `Data/` — lookup tables for what neither QuestieDB nor AtlasLoot holds (the WFA-28 waivers below); a generated one
+  names the script that regenerates it and its sources in its header.
 - `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.
 - `Locales/` — `ns.L` (enUS.lua), keyed by the English text, and one `<locale>.lua` per translation, each in the
   TOC. After changing player-visible text, run `python3 -m tools.phrases --write` (translators copy `Locales/phrases.txt`).
@@ -77,10 +80,29 @@ Owner-approved exceptions to `wow-forever-addon`:
 - WFA-4: tooltips default to the charcoal Modern style, a headline feature pictured on the store page.
 - WFA-13: `Quests/QuestDistance.lua`'s 1 s ticker keeps running: it is the only catch for Questie tracker toggles and
   tracker collapses, which set no dirty flag, and it is cheap.
+- WFA-28: class trainer spells with their level and fee (`Data/ClassSpells.lua` `spells`): CMaNGOS classic-db trainer
+  tables, with skill lines, ranks and races from the Forever client's DB2 on wago.tools. QuestieDB's NPC rows carry no
+  trainer offers and AtlasLoot lists profession recipes only. A trainer visit records the game's own list, level and
+  fee, which win over the bundled row.
+- WFA-28: which NPCs train each class (`Data/ClassSpells.lua` `trainers`, NPC IDs only): CMaNGOS classic-db
+  `creature_template.TrainerClass`. QuestieDB marks a trainer with a general flag and a translated subtitle, never
+  its class, and AtlasLoot has no trainers. Their names and places are read from QuestieDB.
+- WFA-28: dungeon and raid entrances (`Data/DungeonEntrances.lua`): the Forever client's `Map` corpse points on
+  wago.tools. QuestieDB keeps one zone point per dungeon, shared by every instance of a complex such as Blackrock
+  Mountain, not each instance's own door, and AtlasLoot has no map points.
+- WFA-28: world map overlays (`Data/Overlays.lua`): the Forever client's `WorldMapOverlay` art tables on wago.tools.
+  Neither database holds map art.
+- WFA-28: camp benefit texts (`Data/CampBenefits.lua`): the Forever client's `Spell` tables on wago.tools. Neither
+  database holds spell descriptions. The aura you have supplies its own values, which win.
+- WFA-28: zone level ranges (`Data/ZoneLevels.lua`): the published ranges on warcraft.wiki.gg for the original zones
+  and the Forever client's `AreaTable.ExplorationLevel` for new ones. QuestieDB has no zone ranges and AtlasLoot has
+  them for dungeons only. `C_Map.GetMapLevels` wins wherever the client fills it in.
+- WFA-28: quests added in Forever (`Data/ForeverQuests.lua`): the Forever client's `QuestV2` IDs less Classic Era's,
+  both on wago.tools. QuestieDB's quest rows have no field for the version a quest arrived in.
 
 ## Standards
 
-- `wow-forever-addon` — https://github.com/cjber/skills/tree/38f085e8a1025413d4a7031ab957cd5f2280a120/wow-forever-addon (UI look,
+- `wow-forever-addon` — https://github.com/cjber/skills/tree/19082fc10bf90cbb466b8129bddc4a7f32334756/wow-forever-addon (UI look,
   icon, README and store page, CI and release requirements shared by every WoW: Forever addon)
 
 

@@ -37,18 +37,21 @@
 ---@field needs? integer[] the rank before it, which no trainer teaches: any of these must be known first
 ---@field races? integer[] the ChrRaces IDs it is for, when not every race
 
--- A baked class trainer, as a positional row: { npc, name, map, x, y }, a representative spawn's place last.
----@class TFClassTrainer
----@field [1] integer the trainer creature's entry, as a caller sees it in a target or an NPC id
----@field [2] string the trainer's name, in the dump's English
----@field [3]? integer the UiMap ID of one representative spawn
----@field [4]? number that spawn's fraction across the map, 0-1
----@field [5]? number that spawn's fraction down the map, 0-1
+-- What QuestieDB tells of an NPC: its name in the client's language and one of its spawns.
+---@class TFNpcPlace
+---@field name string
+---@field map? integer UiMapID
+---@field x? number fraction across the map, 0-1
+---@field y? number fraction down the map, 0-1
+
+---@class TFQuestieSource
+---@field Zones fun(): TFQuestieDB?, (fun(area: integer): integer?)?
+---@field Places fun(npcs: integer[]): table<integer, TFNpcPlace>, "absent"|"pending"|"ready"
 
 ---@class TFClassSpells
 ---@field lines integer[] its class skill line IDs (spellbook tabs)
 ---@field spells TFClassSpell[]
----@field trainers TFClassTrainer[] the class trainers to visit, one spawn each where the dump places one
+---@field trainers integer[] the NPC IDs of the class trainers to visit
 
 -- What the client knows of a spell, for a trainer row it has never seen.
 ---@class TFSpellFacts
@@ -226,6 +229,7 @@ TweaksForeverCharDB = nil
 ---@field QuestGivers TFQuestGivers
 ---@field QuestProgress TFQuestProgress
 ---@field QuestieDB fun(): TFQuestieDB?
+---@field QuestieSource TFQuestieSource
 ---@field Print fun(message: string)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(): string

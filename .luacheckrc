@@ -93,6 +93,7 @@ read_globals = {
 	"CreateVector2D",
 	"CursorHasItem",
 	"CurveConstants",
+	"debugprofilestop",
 	"EditModeImportLayoutDialog",
 	"EditModeLayoutDialog",
 	"EditModeManagerFrame",

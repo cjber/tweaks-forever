@@ -7,10 +7,10 @@ LeaPlusDB = nil
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
----@type {usedIcons: table<integer, string>?, db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
+---@type {API: {RegisterOnReady: fun(callback: fun())?}?, usedIcons: table<integer, string>?, db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
 Questie = nil
 
--- QuestieDB's public API (contract 2), only the parts QuestGivers.lua and QuestProgress.lua read. Entity reads return packed values.
+-- QuestieDB's public API (contract 2), only the parts QuestieSource.lua, QuestGivers.lua and QuestProgress.lua read. Entity reads return packed values.
 ---@class TFQuestieEntity
 ---@field GetAll fun(id: integer, keys: string[]): table?
 ---@field IdsByName fun(name: string): integer[]?

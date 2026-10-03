@@ -14,6 +14,10 @@ teaches, such as a talent, a quest reward or a starting spell, the row names it:
 A learned spell Forever's client doesn't know, or that sits on no class skill line, is left out and counted;
 so are rows gated on a skill rank (rogue poisons). A trainer visit in game records the server's own list,
 which wins over this one.
+
+The dump also says which NPCs train each class, a fact neither QuestieDB nor AtlasLoot records, so each class keeps
+its trainers' NPC IDs and nothing else about them: a trainer's name and where it stands are read from the installed
+QuestieDB in game (Integrations/QuestieSource.lua).
 """
 
 import argparse
@@ -22,6 +26,7 @@ import gzip
 import io
 import re
 import sys
+import textwrap
 import urllib.error
 import urllib.request
 from collections import Counter, defaultdict
@@ -53,12 +58,9 @@ CLASSES = {
 LEARN_SPELL = 36
 RANK = re.compile(r"Rank (\d+)")
 CLASS_CATEGORY = 7  # SkillLine.CategoryID of class skill lines (spellbook tabs), pet families included
-ZONE = 3  # Enum.UIMapType zone, the maps a trainer's point projects onto
-# creature_template, creature, npc_trainer and npc_trainer_template columns read, by position.
+# creature_template, npc_trainer and npc_trainer_template columns read, by position.
 ENTRY, NAME, TRAINER_TYPE, TRAINER_CLASS, TRAINER_TEMPLATE = 0, 1, 71, 73, 75
 SPELL, COST, REQ_SKILL, LEVEL = 1, 2, 3, 5
-# creature: guid, then the template entry a spawn places, its map and point.
-SPAWN_ENTRY, SPAWN_MAP, SPAWN_X, SPAWN_Y = 1, 2, 4, 5
 CREATURE_COLUMNS = 87
 TRAINER_UNUSED = re.compile(r"\[UNUSED\]|\*Temp\*|^World .* Trainer$")
 
@@ -83,7 +85,7 @@ def db2(name, build, refresh=False, offline=False):
 
 
 def classicdb(refresh=False, offline=False):
-    """The dump's INSERT lines for the trainer tables and creature spawns, by table."""
+    """The dump's INSERT lines for the trainer tables, by table."""
     if not CLASSICDB_CACHE.exists() or refresh:
         if offline:
             raise ValueError(f"Missing cached source: {CLASSICDB_CACHE}")
@@ -94,7 +96,7 @@ def classicdb(refresh=False, offline=False):
         temporary = CLASSICDB_CACHE.with_suffix(".tmp")
         temporary.write_bytes(data)
         temporary.replace(CLASSICDB_CACHE)
-    tables = {"creature_template": [], "creature": [], "npc_trainer": [], "npc_trainer_template": []}
+    tables = {"creature_template": [], "npc_trainer": [], "npc_trainer_template": []}
     with gzip.open(CLASSICDB_CACHE, "rt", encoding="utf-8", errors="replace") as dump:
         for line in dump:
             for table, rows in tables.items():
@@ -105,67 +107,16 @@ def classicdb(refresh=False, offline=False):
     return tables
 
 
-def ui_maps(rows):
-    """The version's map rectangles for projecting a world point onto a zone map: zone ID -> UiMapAssignment
-    rows, matched by the world Map ID a spawn names, as gen_dungeons.py does."""
-    zones = {int(r["ID"]) for r in rows["UiMap"] if int(r["Type"]) == ZONE}
-    found: defaultdict[int, list[dict[str, str]]] = defaultdict(list)
-    for row in rows["UiMapAssignment"]:
-        if int(row["UiMapID"]) in zones:
-            found[int(float(row["MapID"]))].append(row)
-    return found
-
-
-def project(assignment, x, y):
-    """A world point as a zone map position, or None off the map. Rounded as gen_dungeons.py rounds its pins."""
-    r0, r1, r3, r4 = (float(assignment[f"Region_{i}"]) for i in (0, 1, 3, 4))
-    if not (r0 <= x <= r3 and r1 <= y <= r4):
-        return None
-    u0, u1, v0, v1 = (float(assignment[k]) for k in ("UiMin_0", "UiMax_0", "UiMin_1", "UiMax_1"))
-    px = u0 + (r4 - y) / (r4 - r1) * (u1 - u0)
-    py = v0 + (r3 - x) / (r3 - r0) * (v1 - v0)
-    if not (0 <= px <= 1 and 0 <= py <= 1):
-        return None
-    return round(px, 3), round(py, 3)
-
-
-def place(maps, map_id, x, y):
-    """The smallest zone map a world point is on, as {map, x, y}, or None where none shows it."""
-    found = []
-    for assignment in maps.get(int(map_id), ()):
-        at = project(assignment, x, y)
-        if at is None:
-            continue
-        region = float(assignment["Region_3"]) - float(assignment["Region_0"])
-        region *= float(assignment["Region_4"]) - float(assignment["Region_1"])
-        found.append((region, int(assignment["UiMapID"]), at[0], at[1]))
-    if not found:
-        return None
-    _, ui_map, px, py = min(found)
-    return {"map": ui_map, "x": px, "y": py}
-
-
-def lua_string(text):
-    return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
-
-
-def trainers(trainer_class, class_id, spawns, maps):
-    """A class's trainer NPCs, by entry, each with one representative spawn where the dump has one; the unused
-    templates are dropped, and counted."""
+def trainers(trainer_class, class_id):
+    """A class's trainer NPC entries in order; the unused templates are dropped, and counted."""
     found, unused = [], 0
     for entry, (klass, name) in sorted(trainer_class.items()):
         if klass != class_id:
             continue
         if TRAINER_UNUSED.search(name):
             unused += 1
-            continue
-        row = {"npc": entry, "name": name}
-        for map_id, x, y in sorted(set(spawns.get(entry, ()))):
-            spot = place(maps, map_id, x, y)
-            if spot:
-                row.update(spot)
-                break
-        found.append(row)
+        else:
+            found.append(entry)
     return found, unused
 
 
@@ -269,9 +220,9 @@ def for_class(row, bit):
     return int(row["ClassMask"]) in (0, -1) or int(row["ClassMask"]) & bit
 
 
-def generate(tables, taught, forever, maps):
+def generate(tables, taught, forever):
     """Per class token: its skill line IDs and rows of (spell, level, fee, skill line ID, needs, races), plus its
-    trainer NPCs by entry."""
+    trainer NPC entries."""
     names = {int(r["ID"]): r["Name_lang"] for r in forever["SpellName"]}
     subtexts = {int(r["ID"]): r["NameSubtext_lang"] for r in forever["Spell"]}
     # Lines are baked by ID: their names are the client's locale, so an English name matches no other client's tab.
@@ -285,9 +236,6 @@ def generate(tables, taught, forever, maps):
         if int(row["SkillLine"]) in lines:
             abilities[int(row["Spell"])].append(row)
     seen, trainer_class, skill_gated = offers(tables)
-    spawns: defaultdict[int, list[tuple[int, float, float]]] = defaultdict(list)
-    for row in tables["creature"]:
-        spawns[int(row[SPAWN_ENTRY])].append((int(row[SPAWN_MAP]), float(row[SPAWN_X]), float(row[SPAWN_Y])))
     learned = defaultdict(Counter)
     for (klass, spell), counts in seen.items():
         for spell_id in taught.get(spell, {spell}):
@@ -320,10 +268,9 @@ def generate(tables, taught, forever, maps):
             races = race_ids([(int(r["RaceMasks_0"]), int(r["RaceMasks_1"])) for r in own], forever["ChrRaces"])
             rows.append((spell, level, cost, line_ids[0], needs, races))
         used = sorted({line for _, _, _, line, _, _ in rows})
-        class_trainers, unused = trainers(trainer_class, klass, spawns, maps)
+        class_trainers, unused = trainers(trainer_class, klass)
         stats["unused"] += unused
-        stats["placed"] += sum(1 for row in class_trainers if "map" in row)
-        stats["unplaced"] += sum(1 for row in class_trainers if "map" not in row)
+        stats["kept"] += len(class_trainers)
         result[token] = (used, sorted(rows, key=lambda row: row[:2]), class_trainers)
         stats[token] = len(rows)
     return result, stats
@@ -336,15 +283,13 @@ def render(result, stats):
         f"-- resolved through wago.tools SpellEffect {TEACH_BUILD}; skill lines, ranks and races from Forever {BUILD}.",
         f"-- Left out: {stats['not_in_client']} spells Forever's client lacks, {stats['no_class_line']} on no class"
         f" skill line, {stats['skill_gated']} gated on a skill rank.",
-        f"-- {stats['unused']} unused trainer templates are left out; of {stats['placed'] + stats['unplaced']}"
-        f" trainers, {stats['placed']} have a spawn on a zone map and {stats['unplaced']} none.",
+        f"-- {stats['unused']} unused trainer templates are left out, which leaves {stats['kept']} trainers.",
         "-- A trainer visit in game records the server's own list, which wins over this one.",
         "---@type string, TFNamespace",
         "local _, ns = ...",
         "-- [class] = { lines = SkillLine IDs, spells = { { spell, level, fee in copper, SkillLine ID, needs =",
         "-- earlier rank no trainer teaches, races = the ChrRaces IDs it is for } },",
-        "-- trainers = { { npc, name, map, x, y } }; a trainer without a spawn on a zone map keeps its NPC id and",
-        "-- name and no place.",
+        "-- trainers = the NPC IDs of its class trainers }. A trainer's name and place are QuestieDB's, read in game.",
         "-- stylua: ignore",
         "ns.ClassSpells = {",
     ]
@@ -359,11 +304,8 @@ def render(result, stats):
                 f", races = {{ {', '.join(map(str, races))} }}" if races else ""
             )
             lines.append(f"\t\t\t{{ {spell}, {level}, {cost}, {line}{extra} }},")
-        lines += ["\t\t},", "\t\ttrainers = {"]
-        for row in class_trainers:
-            spot = f", {row['map']}, {row['x']}, {row['y']}" if "map" in row else ""
-            lines.append(f"\t\t\t{{ {row['npc']}, {lua_string(row['name'])}{spot} }},")
-        lines += ["\t\t},", "\t},"]
+        ids = textwrap.wrap(", ".join(map(str, class_trainers)), 100)
+        lines += ["\t\t},", "\t\ttrainers = {", *(f"\t\t\t{row.rstrip(',')}," for row in ids), "\t\t},", "\t},"]
     return "\n".join(lines + ["}", ""])
 
 
@@ -380,8 +322,7 @@ def main():
         for name in ("Spell", "SpellName", "SkillLine", "SkillLineAbility", "ChrRaces")
     }
     taught = teachings(db2("SpellEffect", TEACH_BUILD, **options), db2("SpellEffect", BUILD, **options))
-    maps = ui_maps({name: db2(name, BUILD, **options) for name in ("UiMap", "UiMapAssignment")})
-    result, stats = generate(classicdb(**options), taught, forever, maps)
+    result, stats = generate(classicdb(**options), taught, forever)
     text = render(result, stats)
     if args.check:
         if OUTPUT.read_text(encoding="utf-8") != text:

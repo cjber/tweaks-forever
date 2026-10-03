@@ -19,16 +19,16 @@
 
 ---@class TFAPITrainer
 ---@field npc integer
----@field name string
----@field map? integer UiMapID, when curated
+---@field name? string in the client's language, once QuestieDB has been read
+---@field map? integer UiMapID, when QuestieDB places the trainer
 ---@field x? number 0..1
 ---@field y? number 0..1
 
 ---@class TFPublicAPI
----@field version integer 2
+---@field version integer 3
 ---@field TrainableSpells fun(): TFAPITrainableSpell[]? spells your level allows that you haven't learned, each spell's next rank only, on your class's spellbook tabs and the General tab (no weapon skills or riding), in fresh tables; answers whether or not the spellbook shows them; nil before login and in combat
 ---@field DungeonEntrance fun(instanceID: integer): TFDungeonEntrance? instance Map.ID; fresh copy of its unclustered entrance on the first curated zone map; nil when unknown or unplaced, independent of pin settings and conflicts
----@field Trainers fun(): TFAPITrainer[] one trainer spawn per class trainer, with map coordinates when curated; safe before login and in combat
+---@field Trainers fun(): TFAPITrainer[], string? every class trainer of your class, with the name and one spawn QuestieDB gives it once read; safe before login and in combat; the second value is a line saying what to install when no QuestieDB can be read
 
 ---@class TFPublicAddon
 ---@field API TFPublicAPI
