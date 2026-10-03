@@ -677,7 +677,7 @@ end
 ---@param slot integer
 local function OpenItemMenu(owner, bag, slot)
 	local itemID = C_Container.GetContainerItemID(bag, slot)
-	if itemID and select(4, C_Item.GetItemInfoInstant(itemID)) ~= "" then
+	if itemID and SLOTS[select(4, C_Item.GetItemInfoInstant(itemID))] then
 		OpenMenu(owner, itemID)
 	end
 end

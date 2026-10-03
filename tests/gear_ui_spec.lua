@@ -71,6 +71,7 @@ local function frame(kind, name, parent, template)
 	end
 	return f
 end
+local invType = "INVTYPE_WEAPON"
 local saved =
 	{ groups = { Healing = { [100] = true }, Other = { [101] = true } }, colours = {}, beforeFishing = { [16] = 100 } }
 local env = setmetatable({
@@ -92,7 +93,7 @@ local env = setmetatable({
 	},
 	C_Item = {
 		GetItemInfoInstant = function()
-			return 100, nil, nil, "INVTYPE_WEAPON"
+			return 100, nil, nil, invType
 		end,
 		GetItemNameByID = function()
 			return "Test sword"
@@ -259,6 +260,11 @@ for _, f in ipairs(frames) do
 	end
 end
 assert(scroll and scroll.child and scroll.scroll == 0, "dynamic rows use resettable scroll content")
+panel:Hide()
+invType = "INVTYPE_NON_EQUIP_IGNORE"
+open()
+assert(not panel.shown, "an item with no equipment slot opens no gear menu")
+invType = "INVTYPE_WEAPON"
 mode.Apply(owner, 0, 1)
 panel.scripts.OnKeyDown(panel, "A")
 assert(panel.propagate and panel.shown, "ordinary keys pass through")
