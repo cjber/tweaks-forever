@@ -11,6 +11,12 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **The gear menu opens on gear only.** Right-clicking cloth, food or any other item that cannot be worn opened the gear group menu. It now opens only for items that go in an equipment slot.
+
+- **Nearest quests first copes with a hidden position.** Where the game withholds your position, the quest tracker sort could raise an error every second. It now waits until the position can be read.
+
+- **New group no longer removes an item.** Typing the name of a gear group the item was already in took the item out of that group, and deleted the group when it was the last item. The item now stays in the group.
+
 ## [0.7.7] - 2026-10-03
 
 - **New Forever quests are highlighted.** Quests added in the latest Forever update get the gold highlight in your quest log.

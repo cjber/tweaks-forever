@@ -557,7 +557,11 @@ local function NewGroup(itemID, onCreated)
 		callback = function(text)
 			local name = strtrim(text)
 			if name ~= "" and name ~= BEFORE_FISHING then
-				ToggleGroup(name, itemID)
+				-- Naming a group the item is already in keeps it there: only a checkbox takes an item out.
+				local group = Char().groups[name]
+				if not (group and group[itemID]) then
+					ToggleGroup(name, itemID)
+				end
 				onCreated()
 			end
 		end,
@@ -673,7 +677,7 @@ end
 ---@param slot integer
 local function OpenItemMenu(owner, bag, slot)
 	local itemID = C_Container.GetContainerItemID(bag, slot)
-	if itemID and select(4, C_Item.GetItemInfoInstant(itemID)) ~= "" then
+	if itemID and SLOTS[select(4, C_Item.GetItemInfoInstant(itemID))] then
 		OpenMenu(owner, itemID)
 	end
 end

@@ -57,6 +57,7 @@ local function frame(kind, name, _, template)
 	end
 	return f
 end
+local invType = "INVTYPE_WEAPON"
 local saved =
 	{ groups = { Healing = { [100] = true }, Other = { [101] = true } }, colours = {}, beforeFishing = { [16] = 100 } }
 local env = setmetatable({
@@ -77,7 +78,7 @@ local env = setmetatable({
 	},
 	C_Item = {
 		GetItemInfoInstant = function()
-			return 100, nil, nil, "INVTYPE_WEAPON"
+			return 100, nil, nil, invType
 		end,
 		GetItemNameByID = function()
 			return "Test sword"
@@ -199,6 +200,9 @@ press("New group...")
 assert(popup and not panel.shown)
 popup.callback("  Levelling  ")
 assert(saved.groups.Levelling[100] and row("Levelling").checked, "new-group acceptance reopens fresh rows")
+press("New group...")
+popup.callback("Levelling")
+assert(saved.groups.Levelling[100] and row("Levelling").checked, "naming a group the item is in keeps it there")
 press("Equip Levelling")
 assert(equipped[#equipped][1] == 100 and not panel.shown, "group equips through its real action")
 open()
@@ -235,6 +239,11 @@ for _, f in ipairs(frames) do
 	end
 end
 assert(scroll and scroll.child and scroll.scroll == 0, "dynamic rows use resettable scroll content")
+panel:Hide()
+invType = "INVTYPE_NON_EQUIP_IGNORE"
+open()
+assert(not panel.shown, "an item with no equipment slot opens no gear menu")
+invType = "INVTYPE_WEAPON"
 mode.Apply(owner, 0, 1)
 panel.scripts.OnKeyDown(panel, "A")
 assert(panel.propagate and panel.shown, "ordinary keys pass through")
