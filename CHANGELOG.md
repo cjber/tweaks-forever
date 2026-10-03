@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.7.8] - 2026-10-03
+
 - **The gear menu opens on gear only.** Right-clicking cloth, food or any other item that cannot be worn opened the gear group menu. It now opens only for items that go in an equipment slot.
 
 - **Nearest quests first copes with a hidden position.** Where the game withholds your position, the quest tracker sort could raise an error every second. It now waits until the position can be read.
