@@ -136,6 +136,9 @@ local function Load(watched, at)
 			UnitPosition = function()
 				return world.y, world.x
 			end,
+			canaccessvalue = function(value)
+				return value ~= "secret"
+			end,
 			wipe = function(t)
 				for k in pairs(t) do
 					t[k] = nil
@@ -173,6 +176,13 @@ assert(world.moves == moves, "no movement, no re-watch")
 world.x = 100
 world.tick()
 Order(world, { 3, 2, 1, 4 }, "moved, order still right")
+
+-- A position the addon may not read is treated as no position: no sums on it, no re-watch.
+moves = world.moves
+world.x, world.y = "secret", "secret"
+world.tick()
+assert(world.moves == moves, "an unreadable position re-sorts nothing")
+world.x, world.y = 100, 0
 assert(world.moves == moves, "already in order: nothing re-watched")
 
 -- The list re-sorts after 25 yards from where it was last sorted, however many ticks that takes.
