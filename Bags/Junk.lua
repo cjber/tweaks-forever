@@ -2,7 +2,7 @@
 local _, ns = ...
 local L = ns.L
 
--- Stacks sold per merchant visit, so everything sold is still in the buyback tab.
+-- Stack limit for automatic sales per merchant visit and for each confirmed sale of marked junk.
 local BATCH_SIZE = 12
 
 local conflicts = {
