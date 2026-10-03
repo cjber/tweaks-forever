@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.7.7] - 2026-10-03
+
+- **New Forever quests are highlighted.** Quests added in the latest Forever update get the gold highlight in your quest log.
+
 ## [0.7.6] - 2026-10-02
 
 - **Stop the blocked-action warning when opening the map in combat.** Dungeon and raid entrances no longer listen for the map toggle through the world map itself, which made the game blame Tweaks Forever and drop quest markers in combat.
