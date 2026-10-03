@@ -3,9 +3,8 @@
 # sift-fix: delete the entry from .luacheckrc; luacheck never reports an allowed global that nothing reads
 """Every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file.
 
-Written in the 2026-09-27 audit against `StaticPopupDialogs` and `tInvert`, left behind when #66 moved
-Junk.lua off them. Locales/phrases.txt counts as Lua: translators copy it into Locales/<locale>.lua, so its
-`GetLocale()` line needs the entry. Whole-tree run at writing: those two hits, no false positives.
+Locales/phrases.txt counts as Lua: translators copy it into Locales/<locale>.lua, so its `GetLocale()` line
+needs the entry.
 """
 
 import os
