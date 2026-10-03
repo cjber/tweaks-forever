@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.7.7"
-ns.WHATS_NEW = L["Quests added in the latest Forever update get the gold highlight in your quest log."]
+ns.WHATS_NEW_VERSION = "0.7.8"
+ns.WHATS_NEW = L["The gear group menu now opens on gear only, and New group keeps an item already in the group."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
