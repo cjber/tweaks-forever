@@ -47,7 +47,7 @@ Camp tooltips say what sitting nearby gives you.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a group such as Healing or DPS, then equip the whole group from the same menu.
 - **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, and unexplored areas are revealed in a blue tint.
 - **Nameplates**: a taller bar with name and level above, your target outlined, and casts in a slim bar.
-- **Target range** (off until you turn it on): a small band in the game's own font on your target's health bar and nameplate, such as Melee, 8-35 or 35+, taken from the class spells you know.
+- **Target range** (off until you turn it on): a faint red shade over your target's health bar and nameplate while your attacks cannot reach it.
 - **Tooltips**: a thin rounded border over charcoal, class-coloured player names, and the health bar inside.
 - **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
 - **Quests and camps**: the quest tracker sorts nearest first. With [Questie](https://www.curseforge.com/wow/addons/questie) installed (or just its QuestieDB addon), a creature you need shows your progress in its tooltip and a quest icon by its nameplate. Camp features say what they give and whether you have it.
@@ -55,7 +55,7 @@ Camp tooltips say what sitting nearby gives you.
 - **Fishing**: double right-click with a pole to cast, or to put on your best lure.
 - **Also**: quiet the errors a spammed macro repeats, hide macro names, and `/rl` reloads.
 
-Beyond hiding macro names if you ask, it leaves your action bars alone, and it adds nothing to your target frame or nameplates beyond the optional range label.
+Beyond hiding macro names if you ask, it leaves your action bars alone, and it adds nothing to your target frame or nameplates beyond the optional range shade.
 
 ## Usage
 

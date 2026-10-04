@@ -11,7 +11,7 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
-- **Range to your target.** A small label in the game's own font on the target frame's health bar and on the target's nameplate reads Melee, the band of your main attack such as 8-35, or how far past it the target is, such as 35+. The bands come from the class spells you know, so a hunter inside Auto Shot's minimum range reads Too close. Off by default.
+- **Shade a target out of range.** A faint red shade covers your target's health bar, on the target frame and on its nameplate, while your attacks cannot reach it, the way an action button reddens. It follows the class spells you know, so a hunter inside Auto Shot's minimum range is shaded too. Off by default.
 
 ## [0.8.0] - 2026-10-03
 

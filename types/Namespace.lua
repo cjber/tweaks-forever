@@ -149,25 +149,17 @@
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
--- One of a class's range bands, from a spell it knows: its yards and whether the target is inside.
+-- One of a class's range bands, from a spell it knows: whether the target is inside it.
 ---@class TFRangeBand
----@field min integer the spell's minimum range, 0 when it has none
----@field max integer
----@field melee boolean? the class's melee ability, whose reach read as Melee
+---@field melee boolean? the class's melee ability
 ---@field inRange boolean
 
----@class TFRangeLabel
----@field kind 'melee'|'close'|'span'|'beyond'
----@field min? integer
----@field max? integer
-
 ---@alias TFRangeKnown fun(id: integer): boolean
----@alias TFRangeInfo fun(id: integer): SpellInfo?
 ---@alias TFRangeInRange fun(id: integer): boolean
 
 ---@class TFTargetRange
----@field Bands fun(class: string, known: TFRangeKnown, info: TFRangeInfo, inRange: TFRangeInRange): TFRangeBand[]
----@field Label fun(bands: TFRangeBand[]): TFRangeLabel
+---@field Bands fun(class: string, known: TFRangeKnown, inRange: TFRangeInRange): TFRangeBand[]
+---@field OutOfReach fun(bands: TFRangeBand[]): boolean
 
 ---@class TFDatabase
 ---@field junk TFMarks
