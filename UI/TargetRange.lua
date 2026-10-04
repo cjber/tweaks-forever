@@ -1,18 +1,17 @@
 ---@type string, TFNamespace
 local _, ns = ...
-local L = ns.L
 
 local KEY = "targetRange"
 
--- Nameplate addons that already show range, or take over the plates the label sits on.
+-- Nameplate addons that already show range, or take over the plates the shade sits on.
 ns.Feature({
 	key = KEY,
 	category = "Interface",
-	name = "Range to your target",
-	tooltip = "Shows how far your target is, in the game's own font on the target frame's health bar and on the "
-		.. "target's nameplate: Melee, the band of your main attack such as 8-35, or how far past it the target "
-		.. "is. The bands come from the class spells you know, so they follow your character. Hidden with no "
-		.. "target or with a dead one.",
+	name = "Shade a target out of range",
+	tooltip = "Lays a faint red shade over your target's health bar, on the target frame and on its nameplate, "
+		.. "while your attacks cannot reach it, the way an action button reddens. It follows the class spells "
+		.. "you know: your ranged attacks, or your melee ability when you have none. No shade with no target or "
+		.. "with a dead one.",
 	default = false,
 	conflicts = {
 		{ addon = "Plater" },
@@ -24,10 +23,10 @@ ns.Feature({
 	},
 })
 
--- The class spells that set the range bands, closest reach first: the melee ability where the class has one,
--- then its main attack, then a longer spell where it has one. Only the spells the character knows are used, and
--- each band's yards are the client's own spell data. Spell ID and range verified against the pinned Forever
--- client build 1.60.1.70205 on wago.tools (SpellMisc RangeIndex, SpellRange RangeMin/RangeMax).
+-- The class spells that say whether the target can be reached: the melee ability where the class has one, then
+-- its ranged attacks. Only the spells the character knows are used, and the client answers for each whether the
+-- target is inside its range; it gives no distance in yards to a hostile unit. Spell ID and range verified
+-- against the pinned Forever client build 1.60.1.70205 on wago.tools (SpellMisc RangeIndex, SpellRange).
 local SPELLS = {
 	WARRIOR = { { id = 78, melee = true } }, -- Heroic Strike, 0-5
 	PALADIN = { { id = 20271 }, { id = 879 } }, -- Judgement 0-10, Exorcism 0-30
@@ -44,73 +43,37 @@ local SPELLS = {
 local Model = {}
 ns.TargetRange = Model
 
--- Every band of the class the character knows, ascending by reach: each melee or ranged spell the book holds,
--- with its yards and whether the target is inside. The client reads are passed in so the specs can drive them.
+-- Every band of the class the character knows: each melee or ranged spell the book holds, and whether the
+-- target is inside it. The client reads are passed in so the specs can drive them.
 ---@param class string
 ---@param known fun(id: integer): boolean
----@param info fun(id: integer): SpellInfo?
 ---@param inRange fun(id: integer): boolean
 ---@return TFRangeBand[]
-function Model.Bands(class, known, info, inRange)
+function Model.Bands(class, known, inRange)
 	local bands = {}
 	for _, spell in ipairs(SPELLS[class] or {}) do
-		local facts = known(spell.id) and info(spell.id)
-		if facts then
-			bands[#bands + 1] = {
-				min = facts.minRange,
-				max = facts.maxRange,
-				melee = spell.melee,
-				inRange = inRange(spell.id),
-			}
+		if known(spell.id) then
+			bands[#bands + 1] = { melee = spell.melee, inRange = inRange(spell.id) }
 		end
 	end
 	return bands
 end
 
--- The band the target falls in: the closest reach it is inside, or how far past the longest one it is. Inside a
--- melee ability reads "Melee", or "Too close" when a longer spell starts beyond that reach.
----@param bands TFRangeBand[] ascending by max
----@return TFRangeLabel
-function Model.Label(bands)
-	local inside
+-- Whether the target is out of reach: outside every ranged attack the character knows, or outside the melee
+-- ability when it knows no ranged one. A hunter inside Auto Shot's minimum range is out of reach of the shot.
+---@param bands TFRangeBand[]
+---@return boolean
+function Model.OutOfReach(bands)
+	local ranged = false
 	for _, band in ipairs(bands) do
-		if band.inRange then
-			inside = band
-			break
+		ranged = ranged or not band.melee
+	end
+	for _, band in ipairs(bands) do
+		if band.inRange and (not ranged or not band.melee) then
+			return false
 		end
 	end
-	if not inside then
-		return { kind = "beyond", max = bands[#bands].max }
-	end
-	if inside.melee then
-		for _, band in ipairs(bands) do
-			if not band.inRange and band.min > inside.max then
-				return { kind = "close" }
-			end
-		end
-		return { kind = "melee" }
-	end
-	return { kind = "span", min = inside.min, max = inside.max }
-end
-
--- The English labels, as whole phrases for translators; a band is its format string.
-local LABELS = {
-	melee = L["Melee"],
-	close = L["Too close"],
-	span = L["%d-%d"],
-	beyond = L["%d+"],
-}
-
----@param label TFRangeLabel
----@return string
-local function Text(label)
-	if label.kind == "span" then
-		return LABELS.span:format(label.min, label.max)
-	end
-	if label.kind == "beyond" then
-		return LABELS.beyond:format(label.max)
-	end
-	return LABELS[label.kind]
+	return #bands > 0
 end
 
 -- The class's spell IDs, to pick our own out of SPELL_RANGE_CHECK_UPDATE, which fires for every spell the UI
@@ -175,47 +138,33 @@ local function Bands()
 	local function inRange(id)
 		return C_Spell.IsSpellInRange(id, "target")
 	end
-	return Model.Bands(class, Known, C_Spell.GetSpellInfo, inRange)
+	return Model.Bands(class, Known, inRange)
 end
 
--- The FontStrings drawn, by the bar they sit on. Weak keys: a plate is pooled, and its label lives and dies with
--- it. Blizzard's frames never have a field of ours written to them.
----@type table<Frame, FontString>
-local labels = setmetatable({}, { __mode = "k" })
--- The labels shown right now, so a target change hides the last plate's.
----@type FontString[]
+-- The shades drawn, by the bar they cover. Weak keys: a plate is pooled, and its shade lives and dies with it.
+-- Blizzard's frames never have a field of ours written to them.
+---@type table<Frame, Texture>
+local shades = setmetatable({}, { __mode = "k" })
+-- The shades shown right now, so a target change clears the last plate's.
+---@type Texture[]
 local shown = {}
 
--- The nameplate frame the target's label is on, so the plate it leaves is cleared before the client pools it for
+-- The nameplate frame the target's shade is on, so the plate it leaves is cleared before the client pools it for
 -- another unit.
 ---@type NamePlateFrame?
 local plateFrame
 
 ---@param bar Frame
----@param font string
----@param x number
----@return FontString
-local function Attach(bar, font, x)
-	local label = labels[bar]
-	if not label then
-		label = bar:CreateFontString(nil, "OVERLAY", font)
-		label:SetPoint("LEFT", bar, "LEFT", x, 0)
-		label:SetJustifyH("LEFT")
-		label:SetTextColor(1, 1, 1, 0.85)
-		labels[bar] = label
+local function Shade(bar)
+	local shade = shades[bar]
+	if not shade then
+		shade = bar:CreateTexture(nil, "OVERLAY")
+		shade:SetAllPoints(bar)
+		shade:SetColorTexture(0.45, 0, 0, 0.5)
+		shades[bar] = shade
 	end
-	return label
-end
-
----@param bar Frame
----@param font string
----@param x number
----@param text string
-local function Draw(bar, font, x, text)
-	local label = Attach(bar, font, x)
-	label:SetText(text)
-	label:Show()
-	shown[#shown + 1] = label
+	shade:Show()
+	shown[#shown + 1] = shade
 end
 
 -- The target frame's health bar, as the frame XML lays it out.
@@ -239,26 +188,24 @@ end
 local lastDead = false
 
 local function Render()
-	for _, label in ipairs(shown) do
-		label:Hide()
+	for _, shade in ipairs(shown) do
+		shade:Hide()
 	end
 	wipe(shown)
 	plateFrame = nil
 	if not ns.Active(KEY) or not UnitExists("target") or UnitIsDeadOrGhost("target") then
 		return
 	end
-	local bands = Bands()
-	if #bands == 0 then
+	if not Model.OutOfReach(Bands()) then
 		return
 	end
-	local text = Text(Model.Label(bands))
 	local bar = TargetBar()
 	if bar then
-		Draw(bar, "TextStatusBarText", 4, text)
+		Shade(bar)
 	end
 	local frame, plateBar = TargetPlate()
 	if plateBar then
-		Draw(plateBar, "SystemFont_NamePlate_Outlined", 2, text)
+		Shade(plateBar)
 		plateFrame = frame
 	end
 end
@@ -303,7 +250,7 @@ ns.Init(function()
 			Render()
 		end
 	end)
-	-- The plate the label is on leaves: clear it before the plate is pooled and handed to another unit.
+	-- The plate the shade is on leaves: clear it before the plate is pooled and handed to another unit.
 	ns.On("NAME_PLATE_UNIT_REMOVED", function(unit)
 		if C_NamePlate.GetNamePlateForUnit(unit) == plateFrame then
 			Render()

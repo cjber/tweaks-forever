@@ -28,34 +28,24 @@ local book = {
 	{ actionID = 116 },
 	{ actionID = 133 },
 }
-local info = {
-	[75] = { minRange = 8, maxRange = 35 },
-	[116] = { minRange = 0, maxRange = 30 },
-	[133] = { minRange = 0, maxRange = 35 },
-	[2973] = { minRange = 0, maxRange = 5 },
-}
 local ranges = {}
 local target, dead = true, false
 local enabled = {}
 
 local function Bar()
 	local bar = {}
-	function bar.CreateFontString(owner)
-		local font = { shown = false }
-		function font.SetPoint() end
-		function font.SetJustifyH() end
-		function font.SetTextColor() end
-		function font.SetText(label, text)
-			label.text = text
+	function bar.CreateTexture(owner)
+		local shade = { shown = false }
+		function shade.SetAllPoints() end
+		function shade.SetColorTexture() end
+		function shade.Show(self)
+			self.shown = true
 		end
-		function font.Show(label)
-			label.shown = true
+		function shade.Hide(self)
+			self.shown = false
 		end
-		function font.Hide(label)
-			label.shown = false
-		end
-		owner.label = font
-		return font
+		owner.shade = shade
+		return shade
 	end
 	return bar
 end
@@ -85,9 +75,6 @@ local env = setmetatable({
 		return dead
 	end,
 	C_Spell = {
-		GetSpellInfo = function(id)
-			return info[id]
-		end,
 		IsSpellInRange = function(id)
 			return ranges[id]
 		end,
@@ -127,7 +114,7 @@ local env = setmetatable({
 		end
 	end,
 }, { __index = _G })
-setfenv(assert(loadfile("UI/RangeLabel.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("UI/TargetRange.lua")), env)("TweaksForever", ns)
 local Model = ns.TargetRange
 
 assert(features.targetRange.default == false)
@@ -135,7 +122,7 @@ assert(features.targetRange.category == "Interface")
 assert(not features.targetRange.parent)
 assert(features.targetRange.conflicts[1].addon == "Plater")
 
--- Bands: only the spells of the class the character knows, ascending by reach, each with its own range.
+-- Bands: only the spells of the class the character knows, each with whether the target is inside it.
 local function knownSpells(...)
 	local known = {}
 	for _, id in ipairs({ ... }) do
@@ -145,49 +132,31 @@ local function knownSpells(...)
 		return known[id] == true
 	end
 end
-local function facts(id)
-	return info[id]
-end
-local bands = Model.Bands("MAGE", knownSpells(116, 133), facts, function(id)
+local bands = Model.Bands("MAGE", knownSpells(116, 133), function(id)
 	return id == 116
 end)
 assert(#bands == 2)
-assert(bands[1].min == 0 and bands[1].max == 30 and bands[1].inRange and not bands[1].melee)
-assert(bands[2].min == 0 and bands[2].max == 35 and not bands[2].inRange)
-assert(#Model.Bands("MAGE", knownSpells(116, 133), function()
-	return nil
-end, function()
-	return false
-end) == 0, "a spell with no client facts is left out")
-assert(#Model.Bands("MONK", knownSpells(116), facts, function()
+assert(bands[1].inRange and not bands[1].melee and not bands[2].inRange)
+assert(#Model.Bands("MONK", knownSpells(116), function()
 	return true
 end) == 0, "a class with no bands has none")
-assert(#Model.Bands("MAGE", knownSpells(), facts, function()
+assert(#Model.Bands("MAGE", knownSpells(), function()
 	return true
 end) == 0, "only the spells the character knows count")
 
--- Labels: the closest reach the target is inside, and how far past the longest when it is inside none.
-local function band(min, max, inRange, melee)
-	return { min = min, max = max, inRange = inRange, melee = melee }
+-- Out of reach: outside every ranged attack, or outside melee for a character with no ranged one.
+local function band(inRange, melee)
+	return { inRange = inRange, melee = melee }
 end
-local melee = band(0, 5, true, true)
-local auto = band(8, 35, false)
-assert(Model.Label({ melee, auto }).kind == "close", "a hunter in melee is too close to shoot")
-auto.inRange = true
-melee.inRange = false
-local label = Model.Label({ melee, auto })
-assert(label.kind == "span" and label.min == 8 and label.max == 35)
-auto.inRange = false
-assert(Model.Label({ melee, auto }).kind == "beyond" and Model.Label({ melee, auto }).max == 35)
-melee.inRange = true
-assert(Model.Label({ melee }).kind == "melee")
-melee.inRange = false
-assert(Model.Label({ melee }).kind == "beyond" and Model.Label({ melee }).max == 5)
-local nuke = band(0, 30, true)
-label = Model.Label({ nuke })
-assert(label.kind == "span" and label.min == 0 and label.max == 30)
+assert(Model.OutOfReach({ band(true, true), band(false) }), "a hunter in melee is too close to shoot")
+assert(not Model.OutOfReach({ band(false, true), band(true) }), "inside the shot")
+assert(Model.OutOfReach({ band(false, true), band(false) }), "past the shot")
+assert(not Model.OutOfReach({ band(true, true) }), "a warrior in melee")
+assert(Model.OutOfReach({ band(false, true) }), "a warrior out of melee")
+assert(not Model.OutOfReach({ band(false), band(true) }), "one ranged attack reaching is enough")
+assert(not Model.OutOfReach({}), "a character with no bands is never shaded")
 
--- Wired up: the label is drawn on the target frame and the target's nameplate, and hidden when it can't apply.
+-- Wired up: the shade covers the target frame's bar and the target's nameplate bar, and clears when it can't apply.
 target = true
 db.targetRange = true
 for _, fn in ipairs(initializers) do
@@ -196,34 +165,33 @@ end
 assert(#enabled == 2 and enabled[1] == 2973 and enabled[2] == 75, "only the hunter spells the character knows")
 ranges[2973], ranges[75] = true, false
 handlers.PLAYER_TARGET_CHANGED()
-assert(targetBar.label.shown and targetBar.label.text == "Too close")
-assert(plateBar.label.shown and plateBar.label.text == "Too close", "the same band on the target's plate")
+assert(targetBar.shade.shown and plateBar.shade.shown, "too close to shoot shades both bars")
 ranges[2973], ranges[75] = false, true
 handlers.SPELL_RANGE_CHECK_UPDATE(75)
-assert(targetBar.label.text == "8-35")
+assert(not targetBar.shade.shown and not plateBar.shade.shown, "inside the shot, no shade")
+ranges[75] = false
 handlers.SPELL_RANGE_CHECK_UPDATE(99999)
-assert(targetBar.label.text == "8-35", "another spell's range does not move ours")
-ranges[2973], ranges[75] = false, false
+assert(not targetBar.shade.shown, "another spell's range does not move ours")
 handlers.PLAYER_TARGET_CHANGED()
-assert(targetBar.label.text == "35+")
+assert(targetBar.shade.shown, "past the shot")
 
 dead = true
 handlers.UNIT_HEALTH("target")
-assert(not targetBar.label.shown and not plateBar.label.shown, "a dead target shows nothing")
+assert(not targetBar.shade.shown and not plateBar.shade.shown, "a dead target has no shade")
 dead = false
 handlers.UNIT_HEALTH("target")
-assert(targetBar.label.shown)
+assert(targetBar.shade.shown)
 target = false
 handlers.PLAYER_TARGET_CHANGED()
-assert(not targetBar.label.shown, "no target, nothing shown")
+assert(not targetBar.shade.shown, "no target, no shade")
 target = true
 handlers.PLAYER_TARGET_CHANGED()
-assert(targetBar.label.shown)
+assert(targetBar.shade.shown)
 db.targetRange = false
 changes.targetRange()
-assert(not targetBar.label.shown and not plateBar.label.shown, "switched off")
+assert(not targetBar.shade.shown and not plateBar.shade.shown, "switched off")
 
--- The target's plate is pooled: the label follows its plate on and clears when the plate is handed to another unit,
+-- The target's plate is pooled: the shade follows its plate on and clears when the plate is handed to another unit,
 -- and survives the plate leaving nameplate range and coming back.
 db.targetRange, target = true, true
 ranges[2973], ranges[75] = true, false
@@ -231,27 +199,27 @@ ranges[2973], ranges[75] = true, false
 -- The target is chosen while its plate is out of nameplate range, then the plate appears.
 plateToken, plateUnit = nil, nil
 handlers.PLAYER_TARGET_CHANGED()
-assert(targetBar.label.shown and not plateBar.label.shown, "a target with no plate has only the frame's label")
+assert(targetBar.shade.shown and not plateBar.shade.shown, "a target with no plate shades only the frame")
 plateToken, plateUnit = "nameplate1", "target"
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(plateBar.label.shown and plateBar.label.text == "Too close", "the plate that appears gets the band")
+assert(plateBar.shade.shown, "the plate that appears is shaded")
 
--- The plate leaves and is pooled for another unit: the label must not stay on it.
+-- The plate leaves and is pooled for another unit: the shade must not stay on it.
 plateUnit = nil
 handlers.NAME_PLATE_UNIT_REMOVED("nameplate1")
 plateToken, plateUnit = "nameplate1", "mob2"
-assert(not plateBar.label.shown, "a plate reused for another unit carries no label")
+assert(not plateBar.shade.shown, "a plate reused for another unit carries no shade")
 
--- Walking out of and back into nameplate range clears the label with the plate and restores it with the plate.
+-- Walking out of and back into nameplate range clears the shade with the plate and restores it with the plate.
 plateToken, plateUnit = "nameplate1", "target"
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(plateBar.label.shown)
+assert(plateBar.shade.shown)
 plateUnit = nil
 handlers.NAME_PLATE_UNIT_REMOVED("nameplate1")
 plateToken = nil
-assert(not plateBar.label.shown, "walking out of nameplate range clears the plate's label")
+assert(not plateBar.shade.shown, "walking out of nameplate range clears the plate's shade")
 plateToken, plateUnit = "nameplate1", "target"
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(plateBar.label.shown and plateBar.label.text == "Too close", "walking back in restores it")
+assert(plateBar.shade.shown, "walking back in restores it")
 
-print("rangelabel_spec: ok")
+print("targetrange_spec: ok")
