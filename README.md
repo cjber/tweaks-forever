@@ -50,6 +50,7 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
 - **Hide macro names.** Macros on your action bars show just their icon. Off until you turn it on.
+- **Item level in the auction house.** Weapons and armour on the Browse tab get a sortable **iLvl** column, and the item level stops repeating after the name.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and optionally hear splashes over everything else.
 
 <p align="center">
@@ -120,6 +121,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
+| Item level in the auction house | TradeSkillMaster, Auctioneer |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |

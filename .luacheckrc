@@ -14,6 +14,7 @@ globals = {
 	"TweaksForeverDungeonEntrancePinMixin",
 }
 read_globals = {
+	"AuctionCategories",
 	"AuctionHouseFrame",
 	"AuctionHouseFrameDisplayMode",
 	"PanelTemplates_SelectTab",
@@ -31,6 +32,8 @@ read_globals = {
 	"AcceptResurrect",
 	"ActionBarButtonEventsFrame",
 	"AreaLabelDataProviderMixin",
+	"AUCTION_CATEGORY_ARMOR",
+	"AUCTION_CATEGORY_WEAPONS",
 	"BANK",
 	"BaseMapPoiPinMixin",
 	"bit",
@@ -167,6 +170,7 @@ read_globals = {
 	"IsQuestCompletable",
 	"IsShiftKeyDown",
 	"IsTradeskillTrainer",
+	"ITEM_LEVEL_ABBR",
 	"ItemRefShoppingTooltip1",
 	"ItemRefShoppingTooltip2",
 	"ItemRefTooltip",
