@@ -149,6 +149,26 @@
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
+-- One of a class's range bands, from a spell it knows: its yards and whether the target is inside.
+---@class TFRangeBand
+---@field min integer the spell's minimum range, 0 when it has none
+---@field max integer
+---@field melee boolean? the class's melee ability, whose reach read as Melee
+---@field inRange boolean
+
+---@class TFRangeLabel
+---@field kind 'melee'|'close'|'span'|'beyond'
+---@field min? integer
+---@field max? integer
+
+---@alias TFRangeKnown fun(id: integer): boolean
+---@alias TFRangeInfo fun(id: integer): SpellInfo?
+---@alias TFRangeInRange fun(id: integer): boolean
+
+---@class TFTargetRange
+---@field Bands fun(class: string, known: TFRangeKnown, info: TFRangeInfo, inRange: TFRangeInRange): TFRangeBand[]
+---@field Label fun(bands: TFRangeBand[]): TFRangeLabel
+
 ---@class TFDatabase
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
@@ -207,6 +227,7 @@ TweaksForeverCharDB = nil
 ---@field Gear TFGear
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
+---@field TargetRange TFTargetRange
 ---@field Exploration TFExploration
 ---@field CombinedBag TFCombinedBag
 ---@field Sections TFSections
