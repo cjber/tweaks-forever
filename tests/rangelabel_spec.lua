@@ -61,6 +61,18 @@ local function Bar()
 end
 
 local targetBar, plateBar = Bar(), Bar()
+
+-- One nameplate, as the token it currently carries and the unit it displays: the client pools the plate and hands it
+-- to whatever unit next comes into nameplate range.
+local plateFrame = { UnitFrame = { HealthBarsContainer = { healthBar = plateBar } } }
+local plateToken, plateUnit = "nameplate1", "target"
+local function GetNamePlateForUnit(unit)
+	if unit == plateToken or (unit == "target" and plateUnit == "target") then
+		return plateFrame
+	end
+	return nil
+end
+
 local env = setmetatable({
 	Enum = { SpellBookSpellBank = { Player = 0 } },
 	UnitClass = function()
@@ -104,9 +116,7 @@ local env = setmetatable({
 		end,
 	},
 	C_NamePlate = {
-		GetNamePlateForUnit = function(unit)
-			return unit == "target" and { UnitFrame = { HealthBarsContainer = { healthBar = plateBar } } } or nil
-		end,
+		GetNamePlateForUnit = GetNamePlateForUnit,
 	},
 	TargetFrame = {
 		TargetFrameContent = { TargetFrameContentMain = { HealthBarsContainer = { HealthBar = targetBar } } },
@@ -212,5 +222,36 @@ assert(targetBar.label.shown)
 db.targetRange = false
 changes.targetRange()
 assert(not targetBar.label.shown and not plateBar.label.shown, "switched off")
+
+-- The target's plate is pooled: the label follows its plate on and clears when the plate is handed to another unit,
+-- and survives the plate leaving nameplate range and coming back.
+db.targetRange, target = true, true
+ranges[2973], ranges[75] = true, false
+
+-- The target is chosen while its plate is out of nameplate range, then the plate appears.
+plateToken, plateUnit = nil, nil
+handlers.PLAYER_TARGET_CHANGED()
+assert(targetBar.label.shown and not plateBar.label.shown, "a target with no plate has only the frame's label")
+plateToken, plateUnit = "nameplate1", "target"
+handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
+assert(plateBar.label.shown and plateBar.label.text == "Too close", "the plate that appears gets the band")
+
+-- The plate leaves and is pooled for another unit: the label must not stay on it.
+plateUnit = nil
+handlers.NAME_PLATE_UNIT_REMOVED("nameplate1")
+plateToken, plateUnit = "nameplate1", "mob2"
+assert(not plateBar.label.shown, "a plate reused for another unit carries no label")
+
+-- Walking out of and back into nameplate range clears the label with the plate and restores it with the plate.
+plateToken, plateUnit = "nameplate1", "target"
+handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
+assert(plateBar.label.shown)
+plateUnit = nil
+handlers.NAME_PLATE_UNIT_REMOVED("nameplate1")
+plateToken = nil
+assert(not plateBar.label.shown, "walking out of nameplate range clears the plate's label")
+plateToken, plateUnit = "nameplate1", "target"
+handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
+assert(plateBar.label.shown and plateBar.label.text == "Too close", "walking back in restores it")
 
 print("rangelabel_spec: ok")
