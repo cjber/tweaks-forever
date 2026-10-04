@@ -186,6 +186,11 @@ local labels = setmetatable({}, { __mode = "k" })
 ---@type FontString[]
 local shown = {}
 
+-- The nameplate frame the target's label is on, so the plate it leaves is cleared before the client pools it for
+-- another unit.
+---@type NamePlateFrame?
+local plateFrame
+
 ---@param bar Frame
 ---@param font string
 ---@param x number
@@ -222,13 +227,13 @@ local function TargetBar()
 	return health and health.HealthBar
 end
 
--- The current target's nameplate bar, when a plate of ours has it.
----@return NamePlateHealthBar?
-local function PlateBar()
+-- The current target's nameplate, when a plate of ours has it.
+---@return NamePlateFrame?, NamePlateHealthBar?
+local function TargetPlate()
 	local frame = C_NamePlate.GetNamePlateForUnit("target")
 	local unit = frame and frame.UnitFrame
 	local health = unit and unit.HealthBarsContainer
-	return health and health.healthBar
+	return frame, health and health.healthBar
 end
 
 local lastDead = false
@@ -238,6 +243,7 @@ local function Render()
 		label:Hide()
 	end
 	wipe(shown)
+	plateFrame = nil
 	if not ns.Active(KEY) or not UnitExists("target") or UnitIsDeadOrGhost("target") then
 		return
 	end
@@ -250,9 +256,10 @@ local function Render()
 	if bar then
 		Draw(bar, "TextStatusBarText", 4, text)
 	end
-	bar = PlateBar()
-	if bar then
-		Draw(bar, "SystemFont_NamePlate_Outlined", 2, text)
+	local frame, plateBar = TargetPlate()
+	if plateBar then
+		Draw(plateBar, "SystemFont_NamePlate_Outlined", 2, text)
+		plateFrame = frame
 	end
 end
 
@@ -288,13 +295,17 @@ ns.Init(function()
 			end
 		end
 	end)
+	-- A plate's unit token is a nameplate token, not "target", so the plate is compared to the one the target
+	-- resolves to.
 	ns.On("NAME_PLATE_UNIT_ADDED", function(unit)
-		if unit == "target" then
+		local frame = C_NamePlate.GetNamePlateForUnit(unit)
+		if frame and frame == C_NamePlate.GetNamePlateForUnit("target") then
 			Render()
 		end
 	end)
+	-- The plate the label is on leaves: clear it before the plate is pooled and handed to another unit.
 	ns.On("NAME_PLATE_UNIT_REMOVED", function(unit)
-		if unit == "target" then
+		if C_NamePlate.GetNamePlateForUnit(unit) == plateFrame then
 			Render()
 		end
 	end)
