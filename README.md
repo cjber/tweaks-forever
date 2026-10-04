@@ -41,7 +41,7 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 - **Map extras.** Reveal unexplored areas in a blue tint, see each zone's level range coloured like quest levels, and find every dungeon and raid entrance marked with retail's icons.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout, with Reset to put them back.
 - **Nameplates.** A taller bar in retail's own frame, with name and level above, your target outlined and cast bars with the spell's icon.
-- **Shade a target out of range.** A faint red shade over your target's health bar and nameplate while your attacks cannot reach it. Off until you turn it on.
+- **Spell reach under nameplates.** A small icon for each of your main attacks under every enemy nameplate: full colour when the spell can reach, dark red when it cannot. Off until you turn it on.
 - **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
 - **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
@@ -123,7 +123,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
-| Shade a target out of range | Plater, Kui Nameplates, NeatPlates, Threat Plates, Platynator, ElvUI |
+| Spell reach under nameplates | Range Lens, Plater, Kui Nameplates, NeatPlates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |
 
 It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.

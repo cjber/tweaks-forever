@@ -40,7 +40,7 @@ Quests\QuestProgress.lua
 Quests\QuestLog.lua
 UI\Tooltips.lua
 UI\Nameplates.lua
-UI\TargetRange.lua
+UI\SpellReach.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua
 Integrations\Navigate.lua

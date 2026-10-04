@@ -229,7 +229,7 @@ read_globals = {
 	"SPELLBOOK_UNLEARNED_TINT_COLOR",
 	"SpellBookItemMixin",
 	"StaticPopup_Hide",
-	"TargetFrame",
+	"UnitCanAttack",
 	"StaticPopup_ShowCustomGenericInputBox",
 	"strtrim",
 	"tContains",

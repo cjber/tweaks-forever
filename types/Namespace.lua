@@ -149,17 +149,16 @@
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
--- One of a class's range bands, from a spell it knows: whether the target is inside it.
----@class TFRangeBand
----@field melee boolean? the class's melee ability
----@field inRange boolean
+-- One spell icon under an enemy's nameplate: the spell, and whether it reaches that enemy.
+---@class TFReachIcon
+---@field id integer
+---@field reaches boolean
 
----@alias TFRangeKnown fun(id: integer): boolean
----@alias TFRangeInRange fun(id: integer): boolean
+---@class TFReachRow : Frame
+---@field icons Texture[]
 
----@class TFTargetRange
----@field Bands fun(class: string, known: TFRangeKnown, inRange: TFRangeInRange): TFRangeBand[]
----@field OutOfReach fun(bands: TFRangeBand[]): boolean
+---@class TFSpellReach
+---@field Icons fun(class: string, known: (fun(id: integer): boolean), inRange: (fun(id: integer): boolean?)): TFReachIcon[]
 
 ---@class TFDatabase
 ---@field junk TFMarks
@@ -219,7 +218,7 @@ TweaksForeverCharDB = nil
 ---@field Gear TFGear
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
----@field TargetRange TFTargetRange
+---@field SpellReach TFSpellReach
 ---@field Exploration TFExploration
 ---@field CombinedBag TFCombinedBag
 ---@field Sections TFSections
