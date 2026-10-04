@@ -156,9 +156,11 @@
 
 ---@class TFReachRow : Frame
 ---@field icons Texture[]
+---@field borders Texture[]
 
 ---@class TFSpellReach
 ---@field Icons fun(class: string, known: (fun(id: integer): boolean), inRange: (fun(id: integer): boolean?)): TFReachIcon[]
+---@field Size fun(barHeight: number, percent: number?): integer
 
 ---@class TFDatabase
 ---@field junk TFMarks
@@ -166,7 +168,7 @@
 ---@field savedSounds? table<string, string>
 ---@field lastVersion? string the addon version last logged in with
 ---@field windowLayouts? table<string, table<string, TFPosition>>
----@field [string] boolean|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>
+---@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>
 
 ---@class TFCharacterDatabase
 ---@field groups TFGroups
@@ -189,9 +191,10 @@ TweaksForeverCharDB = nil
 ---@field category string
 ---@field name string
 ---@field tooltip? string
----@field default boolean|string
+---@field default boolean|string|number
 ---@field conflicts? TFConflict[]
 ---@field options? [string, string][]
+---@field slider? { min: number, max: number, step?: number }
 ---@field parent? string
 ---@field needs? TFNeed
 

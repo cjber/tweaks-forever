@@ -27,12 +27,25 @@ local hostile = { nameplate1 = true, nameplate2 = true }
 local dead = {}
 
 local function Region()
-	local region = { shown = false }
-	function region.SetSize() end
+	local region = { shown = false, points = {} }
+	function region.SetSize(self, width, height)
+		self.width, self.height = width, height
+	end
 	function region.SetWidth(self, width)
 		self.width = width
 	end
-	function region.SetPoint() end
+	function region.SetHeight(self, height)
+		self.height = height
+	end
+	function region.GetHeight(self)
+		return self.height
+	end
+	function region.SetPoint(self, ...)
+		self.points[#self.points + 1] = { ... }
+	end
+	function region.ClearAllPoints(self)
+		self.points = {}
+	end
 	function region.SetTexCoord() end
 	function region.SetTexture(self, texture)
 		self.texture = texture
@@ -40,14 +53,29 @@ local function Region()
 	function region.SetVertexColor(self, red, green, blue)
 		self.color = { red, green, blue }
 	end
+	function region.SetDesaturated(self, desaturated)
+		self.desaturated = desaturated
+	end
+	function region.SetAlpha(self, alpha)
+		self.alpha = alpha
+	end
+	function region.SetColorTexture(self, red, green, blue, alpha)
+		self.colorTexture = { red, green, blue, alpha }
+	end
+	function region.SetAllPoints() end
+	function region.SetFrameLevel() end
+	function region.GetFrameLevel()
+		return 1
+	end
 	function region.Show(self)
 		self.shown = true
 	end
 	function region.Hide(self)
 		self.shown = false
 	end
-	function region.CreateTexture(self)
+	function region.CreateTexture(self, _, layer)
 		local texture = Region()
+		texture.layer = layer
 		self.textures[#self.textures + 1] = texture
 		return texture
 	end
@@ -55,10 +83,28 @@ local function Region()
 	return region
 end
 
-local created = {}
-local function Plate()
-	return { UnitFrame = { HealthBarsContainer = {} } }
+local function Bar()
+	local bar = Region()
+	bar.height = 20
+	return bar
 end
+
+local function Plate()
+	local bar = Bar()
+	bar.name = "bar"
+	local level, raid, cast = Region(), Region(), Region()
+	level.name, raid.name, cast.name = "level", "raid", "cast"
+	return {
+		UnitFrame = {
+			HealthBarsContainer = { healthBar = bar },
+			PlayerLevelDiffFrame = level,
+			RaidTargetFrame = raid,
+			CastBarsContainer = cast,
+		},
+	}
+end
+
+local created = {}
 local plateFrames = { nameplate1 = Plate(), nameplate2 = Plate() }
 local ticks, cancelled = {}, 0
 
@@ -127,10 +173,17 @@ local env = setmetatable({
 setfenv(assert(loadfile("UI/SpellReach.lua")), env)("TweaksForever", ns)
 local Model = ns.SpellReach
 
+-- Features: the switch, and the sub-options indented under it, each with its own default.
 assert(features.spellReach.default == false)
 assert(features.spellReach.category == "Interface")
 assert(not features.spellReach.parent)
 assert(features.spellReach.conflicts[1].addon == "RangeLens")
+assert(features.spellReachPosition.parent == "spellReach" and features.spellReachPosition.default == "left")
+assert(features.spellReachPosition.options[1][1] == "left" and features.spellReachPosition.options[3][1] == "below")
+assert(features.spellReachSize.parent == "spellReach" and features.spellReachSize.default == 100)
+assert(features.spellReachSize.slider.min == 50 and features.spellReachSize.slider.max == 200)
+assert(features.spellReachStyle.default == "red" and features.spellReachStyle.options[3][1] == "hidden")
+assert(features.spellReachTargets.default == "all" and features.spellReachTargets.options[2][1] == "target")
 
 -- Icons: the class's spells the character knows, in the class's order, each with whether it reaches.
 local function knownSpells(...)
@@ -159,6 +212,11 @@ assert(#Model.Icons("MONK", knownSpells(8042), function()
 	return true
 end) == 0, "a class with no spells has none")
 
+-- Size: the chosen percentage of the bar's height, clamped to the slider's bounds.
+assert(Model.Size(20, 100) == 20 and Model.Size(10, 50) == 5 and Model.Size(20, 200) == 40)
+assert(Model.Size(20, nil) == 20, "no setting is the bar's own height")
+assert(Model.Size(20, 5) == 10 and Model.Size(20, 900) == 40, "the size stays inside the slider's bounds")
+
 -- Wired up: every enemy plate gets its row, lit by what reaches that enemy.
 db.spellReach = true
 for _, fn in ipairs(initializers) do
@@ -167,21 +225,77 @@ end
 assert(#ticks == 0, "no plate, no polling")
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#ticks == 1, "the first plate starts the polling")
-local row1 = created[plateFrames.nameplate1.UnitFrame]
-assert(row1.shown and row1.width == 14 * 2 + 2)
-local shock, bolt = row1.textures[1], row1.textures[2]
-assert(shock.texture == "icon8042" and shock.color[1] == 0.6 and shock.color[2] == 0.1, "the shock is dark red")
-assert(bolt.texture == "icon403" and bolt.color[1] == 1 and bolt.color[2] == 1, "the bolt is in full colour")
+local row1 = created[plateFrames.nameplate1]
+assert(row1.shown and row1.width == 20 * 2 + 2, "the default size is the bar height")
+local shock, bolt = row1.textures[1], row1.textures[3]
+assert(
+	shock.texture == "icon8042" and shock.desaturated and shock.color[1] == 1 and shock.color[2] == 0.08,
+	"the shock is solid red"
+)
+assert(
+	bolt.texture == "icon403" and bolt.desaturated == false and bolt.color[1] == 1 and bolt.color[2] == 1,
+	"the bolt is in full colour"
+)
 
 handlers.NAME_PLATE_UNIT_ADDED("nameplate2")
 assert(#ticks == 1, "one ticker for every plate")
-local row2 = created[plateFrames.nameplate2.UnitFrame]
-assert(row2.textures[1].color[1] == 1 and row2.textures[2].color[1] == 1, "both reach the second enemy")
+local row2 = created[plateFrames.nameplate2]
+assert(row2.textures[1].color[1] == 1 and row2.textures[3].color[1] == 1, "both reach the second enemy")
 
 -- Walking in: the next poll lights the shock.
 reach.nameplate1[8042] = true
 ticks[1]()
-assert(shock.color[1] == 1 and shock.color[2] == 1)
+assert(shock.desaturated == false and shock.color[1] == 1 and shock.color[2] == 1)
+
+-- Position: each choice anchors the row against the stock plate's own neighbour frame, so it clears the raid
+-- marker, the level and the cast bar.
+local function Points(region)
+	local out = {}
+	for _, point in ipairs(region.points) do
+		out[#out + 1] = string.format("%s:%s:%s:%s:%s", point[1], point[2].name, point[3], point[4], point[5])
+	end
+	return out
+end
+assert(Points(row1)[1] == "RIGHT:raid:LEFT:-2:0", "left of the bar sits past the raid marker")
+db.spellReachPosition = "right"
+changes.spellReachPosition()
+assert(Points(row1)[1] == "LEFT:level:RIGHT:2:0", "right of the bar sits past the level")
+db.spellReachPosition = "below"
+changes.spellReachPosition()
+assert(Points(row1)[1] == "TOP:cast:BOTTOM:0:-2", "below the bar sits under the plate, clear of the cast bar")
+db.spellReachPosition = "left"
+changes.spellReachPosition()
+assert(Points(row1)[1] == "RIGHT:raid:LEFT:-2:0")
+
+-- Size: the slider reaches the drawn icon.
+db.spellReachSize = 50
+changes.spellReachSize()
+assert(row1.width == 10 * 2 + 2 and shock.width == 10, "a smaller size redraws the row and its icons")
+db.spellReachSize = 100
+changes.spellReachSize()
+
+-- Out of range look: red by default, faded dims and desaturates, hidden drops the icon.
+reach.nameplate1[8042] = false
+ticks[1]()
+db.spellReachStyle = "faded"
+changes.spellReachStyle()
+assert(shock.desaturated and shock.color[1] == 0.6 and shock.alpha == 0.7 and shock.shown)
+db.spellReachStyle = "hidden"
+changes.spellReachStyle()
+assert(not shock.shown and not row1.borders[1].shown, "hidden out of range icons are not drawn")
+db.spellReachStyle = "red"
+changes.spellReachStyle()
+assert(shock.shown and shock.color[1] == 1 and shock.color[2] == 0.08)
+
+-- Which plates: every enemy by default, or only the current target's.
+plateFrames.target = plateFrames.nameplate1
+db.spellReachTargets = "target"
+changes.spellReachTargets()
+assert(row1.shown and not row2.shown, "target only keeps the target's plate and drops the rest")
+db.spellReachTargets = "all"
+changes.spellReachTargets()
+assert(row1.shown and row2.shown)
+plateFrames.target = nil
 
 -- A friendly or dead unit carries no row.
 hostile.nameplate2 = false

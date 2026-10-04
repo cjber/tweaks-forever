@@ -47,7 +47,7 @@ Camp tooltips say what sitting nearby gives you.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a group such as Healing or DPS, then equip the whole group from the same menu.
 - **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, and unexplored areas are revealed in a blue tint.
 - **Nameplates**: a taller bar with name and level above, your target outlined, and casts in a slim bar.
-- **Spell reach** (off until you turn it on): a small icon for each of your main attacks under every enemy nameplate, full colour when the spell can reach and dark red when it cannot.
+- **Spell reach** (off until you turn it on): a small icon for each of your class's main attacks on every enemy nameplate, full colour when the spell can reach and solid red when it cannot. Choose where the icons sit, their size, the out of range look and which plates they show on.
 - **Tooltips**: a thin rounded border over charcoal, class-coloured player names, and the health bar inside.
 - **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
 - **Quests and camps**: the quest tracker sorts nearest first. With [Questie](https://www.curseforge.com/wow/addons/questie) installed (or just its QuestieDB addon), a creature you need shows your progress in its tooltip and a quest icon by its nameplate. Camp features say what they give and whether you have it.
