@@ -49,6 +49,7 @@ Map\DungeonEntrances.xml
 UI\Frames.lua
 UI\Errors.lua
 UI\MacroNames.lua
+UI\AuctionHouse.lua
 UI\Spellbook.lua
 Features\Fishing.lua
 UI\Reload.lua

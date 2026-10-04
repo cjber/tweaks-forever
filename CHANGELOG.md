@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Item level column in the auction house.** Weapons and armour on the Browse tab get a sortable iLvl column between Name and Available, with the item level no longer repeated after the name. On by default.
+
 - **Spell reach under nameplates.** A small icon for each of your class's main attacks sits under every enemy nameplate, in full colour when that spell can reach the enemy and dark red when it cannot, so you can see what reaches a mob before you pull it. The icons follow the spells you know, one for each reach: a shaman sees a shock and Lightning Bolt, a hunter Raptor Strike and Auto Shot. Off by default.
 
 ## [0.8.0] - 2026-10-03
