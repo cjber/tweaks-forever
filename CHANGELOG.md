@@ -11,6 +11,16 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Maximum camera zoom.** The camera pulls back further than the game's own Max Camera Distance setting allows. Off by default, and the value you had before comes back when you switch it off.
+
+- **No screen glow.** Turns off the full screen glow effect. Off by default, and the value you had before comes back when you switch it off.
+
+- **Train all button.** A button beside the class trainer's Train button buys every spell the trainer is offering that your gold covers, in one click. It buys nothing on its own, and its tooltip says why when nothing is available or you cannot pay for it all. Off by default.
+
+- **Invite from whispers.** A whisper that is exactly the keyword you pick, **inv**, **invite** or **group**, invites its sender to your group when you can invite. Off by default.
+
+- **Skip loot confirmations.** The game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on Pickup item, is confirmed for you. Only the warnings your own clicks raise. Off by default.
+
 - **Item level column in the auction house.** Weapons and armour on the Browse tab get a sortable iLvl column between Name and Available, with the item level no longer repeated after the name. On by default.
 
 - **Spell reach under nameplates.** A small icon for each of your class's main attacks sits on every enemy nameplate, in full colour when that spell can reach the enemy and a solid red when it cannot, so you can see what reaches a mob before you pull it. The icons follow the spells you know, one for each reach: a shaman sees a shock and Lightning Bolt, a hunter Raptor Strike and Auto Shot. The icon sits on the health bar and is sized to it by default, clear of the raid marker, the level and the cast bar, and the setting chooses where it sits, its size, whether out of range icons are red, faded or hidden, and whether they show on every enemy or only your target. Off by default.

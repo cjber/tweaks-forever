@@ -166,6 +166,8 @@
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
 ---@field savedSounds? table<string, string>
+---@field cameraZoomSaved? string
+---@field screenGlowSaved? string
 ---@field lastVersion? string the addon version last logged in with
 ---@field windowLayouts? table<string, table<string, TFPosition>>
 ---@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>
@@ -223,6 +225,7 @@ TweaksForeverCharDB = nil
 ---@field Frames TFFrames
 ---@field SpellReach TFSpellReach
 ---@field AuctionHouse TFAuctionHouse
+---@field WhisperInvite TFWhisperInvite
 ---@field Exploration TFExploration
 ---@field CombinedBag TFCombinedBag
 ---@field Sections TFSections
