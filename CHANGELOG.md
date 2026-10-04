@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Range to your target.** A small label in the game's own font on the target frame's health bar and on the target's nameplate reads Melee, the band of your main attack such as 8-35, or how far past it the target is, such as 35+. The bands come from the class spells you know, so a hunter inside Auto Shot's minimum range reads Too close. Off by default.
+
 ## [0.8.0] - 2026-10-03
 
 - **Class trainers are placed by Questie.** Addons that ask Tweaks Forever where your class trainers stand, such as Adventure Guide Forever, now get each trainer's name and place from your installed Questie, or its QuestieDB addon on its own, in your game's language. Without it they are told what to install, and everything else works as before.
