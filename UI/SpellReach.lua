@@ -2,15 +2,17 @@
 local _, ns = ...
 
 local KEY = "spellReach"
+local POSITION, SIZE, STYLE, TARGETS = "spellReachPosition", "spellReachSize", "spellReachStyle", "spellReachTargets"
 
 -- Nameplate addons that already show range, or take over the plates the icons sit under.
 ns.Feature({
 	key = KEY,
 	category = "Interface",
 	name = "Spell reach under nameplates",
-	tooltip = "Puts a small icon for each of your class's main attacks under every enemy nameplate. An icon in "
-		.. "full colour means that spell can reach the enemy; dark red means it cannot. The icons follow the "
-		.. "spells you know, one for each reach: a shaman sees a shock and Lightning Bolt.",
+	tooltip = "Puts a small icon for each of your class's main attacks on every enemy nameplate. An icon in full "
+		.. "colour means that spell can reach the enemy; out of range it turns a solid red, fades or hides. The "
+		.. "icons follow the spells you know, one for each reach: a shaman sees a shock and Lightning Bolt. "
+		.. "Position, size and the out of range look are under this setting.",
 	default = false,
 	conflicts = {
 		{ addon = "RangeLens" },
@@ -21,6 +23,59 @@ ns.Feature({
 		{ addon = "Platynator" },
 		{ addon = "ElvUI" },
 	},
+})
+
+ns.Feature({
+	key = POSITION,
+	category = "Interface",
+	name = "Icons sit",
+	tooltip = "Where the icons sit on the health bar: to its left (beside the raid marker), to its right (beside "
+		.. "the level), or centred below it, clear of the cast bar.",
+	default = "left",
+	options = {
+		{ "left", "Left of the health bar" },
+		{ "right", "Right of the health bar" },
+		{ "below", "Below the health bar" },
+	},
+	parent = KEY,
+})
+
+ns.Feature({
+	key = SIZE,
+	category = "Interface",
+	name = "Icon size",
+	tooltip = "The icon's size as a percentage of the health bar's height. 100% matches the bar.",
+	default = 100,
+	slider = { min = 50, max = 200, step = 5 },
+	parent = KEY,
+})
+
+ns.Feature({
+	key = STYLE,
+	category = "Interface",
+	name = "Out of range icons",
+	tooltip = "A spell that cannot reach the enemy turns a solid red, fades out or hides, so what reaches is clear "
+		.. "at a glance.",
+	default = "red",
+	options = {
+		{ "red", "Red" },
+		{ "faded", "Faded" },
+		{ "hidden", "Hidden" },
+	},
+	parent = KEY,
+})
+
+ns.Feature({
+	key = TARGETS,
+	category = "Interface",
+	name = "Show on",
+	tooltip = "Show the icons on every enemy at once, or only on your current target's nameplate.",
+	default = "all",
+	options = {
+		{ "all", "All enemies" },
+		{ "target", "Target only" },
+	},
+	parent = KEY,
 })
 
 -- The class spells shown, one for each reach a class fights at, closest first. Only the spells the character
@@ -39,8 +94,13 @@ local SPELLS = {
 	DRUID = { 6807, 5176 }, -- Maul 0-5, Wrath 0-30
 }
 
-local SIZE, GAP = 14, 2
-local REACHES, OUT = { 1, 1, 1 }, { 0.6, 0.1, 0.1 }
+local GAP, BORDER = 2, 1
+local MIN_SIZE, MAX_SIZE = 50, 200
+-- Out of range: a desaturated texture tinted with the vertex colour, so it reads as solid red rather than the
+-- icon's own colours darkened. Faded keeps the desaturation but drops the colour and the alpha.
+local OUT = { 1, 0.08, 0.08 }
+local FADED = { 0.6, 0.6, 0.6 }
+local FADED_ALPHA = 0.7
 local PERIOD = 0.2
 
 ---@class TFSpellReach
@@ -64,6 +124,16 @@ function Model.Icons(class, known, inRange)
 		end
 	end
 	return icons
+end
+
+-- The size one icon is drawn at: the health bar's height scaled by the chosen percentage. The default of 100%
+-- is the bar height, so the icons sit in the plate at the same scale as the game's own art.
+---@param barHeight number
+---@param percent number?
+---@return integer
+function Model.Size(barHeight, percent)
+	local scale = math.min(MAX_SIZE, math.max(MIN_SIZE, tonumber(percent) or 100))
+	return math.max(1, math.floor(barHeight * scale / 100 + 0.5))
 end
 
 -- Every base spell in the player's book, so a rank the character has learnt stands for its base: a level 60 mage
@@ -94,7 +164,7 @@ local function Known(id)
 	return C_SpellBook.IsSpellKnown(id) or learnt[id] == true
 end
 
--- The icon rows drawn, by the plate they hang under. Weak keys: a plate is pooled, and its row lives and dies
+-- The icon rows drawn, by the plate they hang on. Weak keys: a plate is pooled, and its row lives and dies
 -- with it. Blizzard's frames never have a field of ours written to them.
 ---@type table<NamePlateFrame, TFReachRow>
 local rows = setmetatable({}, { __mode = "k" })
@@ -102,19 +172,38 @@ local rows = setmetatable({}, { __mode = "k" })
 ---@type table<string, NamePlateFrame>
 local plates = {}
 
+-- Parented to the plate, not its unit frame: a plate is pooled and takes a fresh unit frame each time it is
+-- handed a unit, and the row must follow the plate rather than the frame it was first built under.
 ---@param plate NamePlateFrame
----@param unitFrame NamePlateUnitFrame
 ---@return TFReachRow
-local function Row(plate, unitFrame)
+local function Row(plate)
 	local row = rows[plate]
 	if not row then
-		row = CreateFrame("Frame", nil, unitFrame) --[[@as TFReachRow]]
-		row:SetSize(SIZE, SIZE)
-		row:SetPoint("TOP", unitFrame.HealthBarsContainer, "BOTTOM", 0, -GAP)
+		local unitFrame = plate.UnitFrame
+		row = CreateFrame("Frame", nil, plate) --[[@as TFReachRow]]
+		if unitFrame and unitFrame.GetFrameLevel then
+			row:SetFrameLevel(unitFrame:GetFrameLevel() + 5)
+		end
 		row.icons = {}
+		row.borders = {}
 		rows[plate] = row
 	end
 	return row
+end
+
+-- The dark 1 px edge round an icon, drawn behind it in the stock plate's own style, so the icon is not a raw
+-- square of art.
+---@param row TFReachRow
+---@param index integer
+---@return Texture
+local function Border(row, index)
+	local border = row.borders[index]
+	if not border then
+		border = row:CreateTexture(nil, "BACKGROUND")
+		border:SetColorTexture(0, 0, 0, 0.8)
+		row.borders[index] = border
+	end
+	return border
 end
 
 ---@param row TFReachRow
@@ -124,8 +213,6 @@ local function Icon(row, index)
 	local icon = row.icons[index]
 	if not icon then
 		icon = row:CreateTexture(nil, "ARTWORK")
-		icon:SetSize(SIZE, SIZE)
-		icon:SetPoint("LEFT", row, "LEFT", (index - 1) * (SIZE + GAP), 0)
 		icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 		row.icons[index] = icon
 	end
@@ -140,11 +227,79 @@ local function Clear(plate)
 	end
 end
 
+-- The health bar's height in the plate's own units, which our row shares. The bar can be absent before Blizzard
+-- has laid the plate out; the stock Medium height stands in.
+---@param unitFrame NamePlateUnitFrame
+---@return number
+local function BarHeight(unitFrame)
+	local health = unitFrame.HealthBarsContainer
+	local bar = health and health.healthBar
+	local height = bar and bar.GetHeight and bar:GetHeight()
+	if type(height) == "number" and height > 0 then
+		return height
+	end
+	return 14
+end
+
+-- Lay the row against the health bar's neighbours, vertically centred on the bar when beside it and centred
+-- under it otherwise. Beside the bar the icons clear the raid marker on the left and the level on the right;
+-- below the bar they clear the stock cast bar by sitting under the plate.
+---@param row TFReachRow
+---@param unitFrame NamePlateUnitFrame
+---@param size integer
+---@param count integer
+local function Place(row, unitFrame, size, count)
+	local health = unitFrame.HealthBarsContainer
+	local bar = health and health.healthBar or health
+	row:SetSize(count * size + (count - 1) * GAP, size)
+	row:ClearAllPoints()
+	local position = ns.db[POSITION]
+	if position == "right" then
+		row:SetPoint("LEFT", unitFrame.PlayerLevelDiffFrame or bar, "RIGHT", GAP, 0)
+	elseif position == "below" then
+		row:SetPoint("TOP", unitFrame.CastBarsContainer or bar, "BOTTOM", 0, -GAP)
+	else
+		row:SetPoint("RIGHT", unitFrame.RaidTargetFrame or bar, "LEFT", -GAP, 0)
+	end
+end
+
+-- The out of range look, and the plain bright icon in range. A desaturated texture is greyscale before the
+-- vertex colour tints it, so solid red reads as red rather than the icon's own colours run through red.
+---@param icon Texture
+---@param border Texture
+---@param reaches boolean
+---@param style string?
+local function Paint(icon, border, reaches, style)
+	icon:SetDesaturated(not reaches)
+	if reaches then
+		icon:SetVertexColor(1, 1, 1)
+		icon:SetAlpha(1)
+	elseif style == "hidden" then
+		icon:Hide()
+		border:Hide()
+		return
+	elseif style == "faded" then
+		icon:SetVertexColor(unpack(FADED))
+		icon:SetAlpha(FADED_ALPHA)
+	else
+		icon:SetVertexColor(unpack(OUT))
+		icon:SetAlpha(1)
+	end
+	icon:Show()
+	border:Show()
+end
+
 ---@param unit string
 ---@param plate NamePlateFrame
 local function Draw(unit, plate)
 	local unitFrame = plate.UnitFrame
 	if not unitFrame or not UnitCanAttack("player", unit) or UnitIsDeadOrGhost(unit) then
+		Clear(plate)
+		return
+	end
+	-- Target only: the token's own plate is the one the game hands back, so no unit comparison that can be
+	-- secret in an instance is needed.
+	if ns.db[TARGETS] == "target" and plate ~= C_NamePlate.GetNamePlateForUnit("target") then
 		Clear(plate)
 		return
 	end
@@ -156,16 +311,24 @@ local function Draw(unit, plate)
 		Clear(plate)
 		return
 	end
-	local row = Row(plate, unitFrame)
-	row:SetWidth(#icons * SIZE + (#icons - 1) * GAP)
+	local row = Row(plate)
+	local size = Model.Size(BarHeight(unitFrame), ns.db[SIZE])
+	Place(row, unitFrame, size, #icons)
+	local style = ns.db[STYLE]
 	for index, spell in ipairs(icons) do
-		local icon = Icon(row, index)
+		local icon, border = Icon(row, index), Border(row, index)
+		icon:ClearAllPoints()
+		icon:SetPoint("LEFT", row, "LEFT", (index - 1) * (size + GAP), 0)
+		icon:SetSize(size, size)
 		icon:SetTexture(C_Spell.GetSpellTexture(spell.id))
-		icon:SetVertexColor(unpack(spell.reaches and REACHES or OUT))
-		icon:Show()
+		border:ClearAllPoints()
+		border:SetPoint("TOPLEFT", icon, "TOPLEFT", -BORDER, BORDER)
+		border:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", BORDER, -BORDER)
+		Paint(icon, border, spell.reaches, style)
 	end
 	for index = #icons + 1, #row.icons do
 		row.icons[index]:Hide()
+		row.borders[index]:Hide()
 	end
 	row:Show()
 end
@@ -202,14 +365,15 @@ ns.Init(function()
 	local function Rescan()
 		if ns.Active(KEY) then
 			ScanSpells()
-			Sync()
 		end
+		Sync()
 	end
 	Rescan()
-	ns.OnSettingChanged(KEY, function()
-		ScanSpells()
-		Sync()
-	end)
+	ns.OnSettingChanged(KEY, Rescan)
+	-- Position, size, out of range look and which plates redraw on the next tick, with no reload.
+	for _, key in ipairs({ POSITION, SIZE, STYLE, TARGETS }) do
+		ns.OnSettingChanged(key, Sync)
+	end
 	ns.On("SPELLS_CHANGED", Rescan)
 	ns.On("NAME_PLATE_UNIT_ADDED", function(unit)
 		plates[unit] = C_NamePlate.GetNamePlateForUnit(unit)

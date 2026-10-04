@@ -119,6 +119,7 @@ function GetTrainerServiceInfo(index) end
 ---@class NamePlateUnitFrame : Button
 ---@field HealthBarsContainer Frame|{healthBar: NamePlateHealthBar}
 ---@field CastBarsContainer Frame|{castBar: NamePlateCastBar}
+---@field RaidTargetFrame Frame
 ---@field PlayerLevelDiffFrame NamePlateLevelFrame
 ---@field LevelFrame Frame
 ---@field name FontString

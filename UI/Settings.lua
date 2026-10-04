@@ -31,13 +31,13 @@ end
 ---@param category SettingsCategoryMixin
 ---@param feature TFFeature
 local function AddSetting(category, feature)
-	local options = feature.options
+	local options, slider = feature.options, feature.slider
 	local setting = Settings.RegisterAddOnSetting(
 		category,
 		ns.SettingVariable(feature.key),
 		feature.key,
 		ns.db,
-		options and Settings.VarType.String or Settings.VarType.Boolean,
+		options and Settings.VarType.String or slider and Settings.VarType.Number or Settings.VarType.Boolean,
 		L[feature.name],
 		feature.default
 	)
@@ -50,6 +50,13 @@ local function AddSetting(category, feature)
 			end
 			return container:GetData()
 		end, Tooltip(feature))
+	elseif slider then
+		-- A number the player drags, in the stock slider style, with the value shown as a percentage.
+		local sliderOptions = Settings.CreateSliderOptions(slider.min, slider.max, slider.step or 1)
+		sliderOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
+			return string.format("%d%%", math.floor(value + 0.5))
+		end)
+		initializer = Settings.CreateSliderInitializer(setting, sliderOptions, Tooltip(feature))
 	else
 		initializer = Settings.CreateCheckboxInitializer(setting, nil, Tooltip(feature))
 	end
