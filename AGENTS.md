@@ -109,7 +109,6 @@ Owner-approved exceptions to `wow-forever-addon`:
 ## Secure UI regression checks
 
 `tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage and `tools/lint_taint.py`.
-Do not hook Blizzard object methods: use events, `HookScript` or a supported callback registry.
 Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame
 so Blizzard finishes its own initialization. This supersedes WFA-5's AddContainer hook guidance.
 A `taint-ok` exception must identify an addon-owned object or a verified safe contract; it cannot
