@@ -42,7 +42,7 @@ Camp tooltips say what sitting nearby gives you.
 
 ## Features
 
-- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map at a flight master, accept summons and group resurrections, release in battlegrounds, decline duels. Faster auto loot is on by default.
+- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map at a flight master, accept summons and group resurrections, release in battlegrounds, decline duels. Faster auto loot is on by default. Off until you turn it on: invite anyone who whispers a keyword you pick (inv, invite or group), and skip the game's warning when you roll Need or Disenchant and when you loot a Bind on Pickup item.
 - **Vendors**: repair automatically (from guild funds when allowed) and sell junk so it all stays in buyback. Alt+Right-click marks anything as junk.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a group such as Healing or DPS, then equip the whole group from the same menu.
 - **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, and unexplored areas are revealed in a blue tint.
@@ -50,6 +50,8 @@ Camp tooltips say what sitting nearby gives you.
 - **Spell reach** (off until you turn it on): a small icon for each of your class's main attacks on every enemy nameplate, full colour when the spell can reach and solid red when it cannot. Choose where the icons sit, their size, the out of range look and which plates they show on.
 - **Tooltips**: a thin rounded border over charcoal, class-coloured player names, and the health bar inside.
 - **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
+- **Camera and glow** (off until you turn it on): pull the camera back further than the game's own Max Camera Distance allows, and turn off the full screen glow effect.
+- **Trainer**: a Train all button beside the class trainer's Train button buys every spell the trainer offers that your gold covers, in one click.
 - **Quests and camps**: the quest tracker sorts nearest first. With [Questie](https://www.curseforge.com/wow/addons/questie) installed (or just its QuestieDB addon), a creature you need shows your progress in its tooltip and a quest icon by its nameplate. Camp features say what they give and whether you have it.
 - **Spellbook and bags**: the spellbook shows spells you haven't learned yet, as retail does. The reagent bag joins the combined bag.
 - **Fishing**: double right-click with a pole to cast, or to put on your best lure.

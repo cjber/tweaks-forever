@@ -12,6 +12,8 @@ All off until you turn them on, except faster auto loot.
 - Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time.
 - Release your spirit in battlegrounds unless you can resurrect yourself.
 - Decline duels.
+- Invite from whispers (off by default). Someone who whispers you the keyword you pick, as their whole message, is invited to your group, as long as you can invite: you are ungrouped, the group leader or a raid assistant. The keyword is **inv**, **invite** or **group**. Nothing is sent until such a whisper arrives.
+- Skip loot confirmations (off by default). The game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on Pickup item, is confirmed for you. Only the warnings your own clicks raise; nothing rolls or loots by itself.
 - Faster auto loot: everything at once instead of waiting for the loot window.
 
 ## Vendors
@@ -39,6 +41,9 @@ All off until you turn them on, except faster auto loot.
 
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
+- Maximum camera zoom (off by default). The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch it off.
+- No screen glow (off by default). Turns off the full screen glow effect, putting your earlier value back when you switch it off.
+- Train all button (off by default). A Train all button sits beside the class trainer's Train button. One click buys every spell the trainer is offering that your gold covers; it is disabled, and its tooltip says why, when nothing is available or you cannot pay for it all. It buys nothing on its own, and profession trainers are left alone.
 - `/rl` reloads the interface.
 - What's new after an update. The first time you log in after Tweaks Forever updates, one line in chat says what changed. On by default.
 - Suggest companion addons. Where another Forever addon would help, such as Shortest Path Forever on a dungeon entrance, a grey line in the tooltip says so, and goes once it is loaded. On by default.

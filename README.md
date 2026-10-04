@@ -36,6 +36,8 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 - **Abandon quests together.** Select quests in the quest log, then confirm the batch once.
 - **Quest and gossip automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map at a flight master, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
+- **Invite from whispers.** Someone who whispers you **inv**, **invite** or **group** as their whole message is invited to your group, when you can invite. Off until you turn it on.
+- **Skip loot confirmations.** Confirms the game's warning when you roll Need or Disenchant, and when you loot a Bind on Pickup item. Off until you turn it on.
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells greys in batches that stay in the buyback tab. **Alt+Right-click** marks any item as junk, with the game's junk coin.
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. With Combine Bags on, grouped gear sits together at the top.
 - **Map extras.** Reveal unexplored areas in a blue tint, see each zone's level range coloured like quest levels, and find every dungeon and raid entrance marked with retail's icons.
@@ -49,6 +51,9 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 - **Camp benefits.** Camp tooltips say what sitting nearby gives you and for how long, and each benefit you gain is named on screen.
 - **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
+- **Maximum camera zoom.** Pulls the camera back further than the game's own Max Camera Distance allows. Off until you turn it on.
+- **No screen glow.** Turns off the full screen glow effect. Off until you turn it on.
+- **Train all button.** A button beside the class trainer's Train button buys every spell you can afford in one click. Off until you turn it on.
 - **Hide macro names.** Macros on your action bars show just their icon. Off until you turn it on.
 - **Item level in the auction house.** Weapons and armour on the Browse tab get a sortable **iLvl** column, and the item level stops repeating after the name.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and optionally hear splashes over everything else.
@@ -113,6 +118,11 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Quest progress on tooltips | Questie, while its tooltips are on |
 | Quest icons on nameplates | Questie, while its nameplate icons are on |
 | Other automations, repairs, quiet errors | Leatrix Plus |
+| Invite from whispers | Leatrix Plus |
+| Skip loot confirmations | Leatrix Plus |
+| Maximum camera zoom | Leatrix Plus |
+| No screen glow | Leatrix Plus |
+| Train all button | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
 | Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
