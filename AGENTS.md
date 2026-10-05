@@ -109,6 +109,8 @@ Owner-approved exceptions to `wow-forever-addon`:
 ## Secure UI regression checks
 
 `tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage and `tools/lint_taint.py`.
+`tools/forever_tools/` is the shared tooling (cjber/skills, `wow-forever-addon/tooling`), vendored byte for byte: never edit it here.
+`python3 tools/forever_tools/sync.py check` verifies it offline; `sync.py update --source <checkout>` is the only way to refresh it.
 Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame
 so Blizzard finishes its own initialization. This supersedes WFA-5's AddContainer hook guidance.
 A `taint-ok` exception must identify an addon-owned object or a verified safe contract; it cannot

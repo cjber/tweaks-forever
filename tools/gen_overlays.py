@@ -6,16 +6,21 @@
 """Generate lazy map-art overlay data for the pinned Forever client (stdlib only)."""
 
 import argparse
-import csv
-import io
 import sys
 import urllib.error
-import urllib.request
 from collections import defaultdict
 from pathlib import Path
 
+try:
+    from tools.forever_tools import wago
+    from tools.forever_tools.fsio import atomic_write
+except ModuleNotFoundError:
+    from forever_tools import wago
+    from forever_tools.fsio import atomic_write
+
 BUILD = "1.60.1.70205"
 ROOT = Path(__file__).resolve().parent.parent
+USER_AGENT = "TweaksForever/1.0"
 CACHE = ROOT / "tools" / ".cache"
 OUTPUT = ROOT / "Data" / "Overlays.lua"
 SCHEMAS = {
@@ -26,44 +31,15 @@ SCHEMAS = {
 }
 
 
-def write_atomic(path, data):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    try:
-        temporary.write_bytes(data)
-        temporary.replace(path)
-    finally:
-        temporary.unlink(missing_ok=True)
-
-
 def db2(name, refresh=False, offline=False):
-    path = CACHE / f"{name}-{BUILD}.csv"
-    if path.exists() and not refresh:
-        data = path.read_bytes()
-    else:
-        if offline:
-            raise ValueError(f"Missing cached source: {path}")
-        url = f"https://wago.tools/db2/{name}/csv?build={BUILD}"
-        request = urllib.request.Request(url, headers={"User-Agent": "TweaksForever/1.0"})
-        with urllib.request.urlopen(request, timeout=60) as response:
-            data = response.read()
-    content = data.decode("utf-8-sig")
-    reader = csv.DictReader(io.StringIO(content), strict=True)
-    fields = reader.fieldnames or []
     columns = ("ID", *SCHEMAS[name])
-    if not set(columns) <= set(fields) or len(fields) != len(set(fields)):
-        raise ValueError(f"{name}: missing/duplicate CSV columns (or an HTML response)")
     rows = {}
-    for line, row in enumerate(reader, 2):
-        if None in row or None in row.values():
-            raise ValueError(f"{name}:{line}: malformed CSV row")
-        parsed = {key: int(row[key]) for key in columns}
-        if parsed["ID"] <= 0 or parsed["ID"] in rows:
-            raise ValueError(f"{name}:{line}: invalid/duplicate ID")
-        rows[parsed["ID"]] = parsed
-    if not rows:
-        raise ValueError(f"{name}: empty DB2 export")
-    write_atomic(path, data)
+    for row in wago.db2_rows(
+        name, BUILD, CACHE, user_agent=USER_AGENT, refresh=refresh, offline=offline, ints=columns, required=columns
+    ):
+        if row["ID"] <= 0:
+            raise ValueError(f"{name}: invalid ID {row['ID']}")
+        rows[row["ID"]] = {key: row[key] for key in columns}
     return rows
 
 
@@ -145,12 +121,12 @@ def main():
     args = parser.parse_args()
     tables = {name: db2(name, **vars(args)) for name in SCHEMAS}
     data, arts, count, missing = generate(tables)
-    write_atomic(OUTPUT, data)
+    atomic_write(OUTPUT, data)
     print(f"{OUTPUT}: {len(data):,} bytes, {arts} map arts, {count} overlays; {missing} tile-less rows omitted")
 
 
 if __name__ == "__main__":
     try:
         main()
-    except (ValueError, KeyError, OSError, csv.Error, urllib.error.URLError) as error:
+    except (ValueError, KeyError, OSError, urllib.error.URLError) as error:
         sys.exit(f"gen_overlays: {error}")
