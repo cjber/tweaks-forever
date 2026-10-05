@@ -2,7 +2,7 @@
 local _, ns = ...
 local L = ns.L
 
--- Stack limit for automatic sales per merchant visit and for each confirmed sale of marked junk.
+-- Marked stacks per merchant visit and per confirmed sale. Blizzard sells all grey junk.
 local BATCH_SIZE = 12
 
 local conflicts = {
@@ -27,9 +27,9 @@ ns.Feature({
 	key = "sellJunk",
 	category = "Vendors",
 	name = "Sell junk automatically",
-	tooltip = L["Sell up to %d grey or marked stacks per merchant visit."]:format(BATCH_SIZE)
-		.. " "
-		.. L["With Leatrix Plus auto-selling, only marked non-grey items are sold here."],
+	tooltip = L["Sell all grey junk through the game and up to %d marked non-grey stacks per merchant visit."]:format(
+		BATCH_SIZE
+	) .. " " .. L["With Leatrix Plus auto-selling, only marked non-grey items are sold here."],
 	default = true,
 	-- Leatrix owns only greys; disabling this feature entirely would strand our marks.
 	conflicts = conflicts,
@@ -48,14 +48,13 @@ local POOR = 0
 
 ---@param info ContainerItemInfo?
 ---@param marks TFMarks
----@param includeGreys boolean
 ---@return boolean
-local function IsJunk(info, marks, includeGreys)
+local function IsJunk(info, marks)
 	if not info or not info.itemID or info.quality == nil then
 		return false
 	end
 	if info.quality == POOR then
-		return includeGreys
+		return false
 	end
 	return marks[info.itemID] == true
 end
@@ -63,11 +62,10 @@ end
 ---@param info ContainerItemInfo
 ---@param price number?
 ---@param marks TFMarks
----@param includeGreys boolean
 ---@return number?
-local function SaleValue(info, price, marks, includeGreys)
+local function SaleValue(info, price, marks)
 	if
-		not IsJunk(info, marks, includeGreys)
+		not IsJunk(info, marks)
 		or info.isLocked
 		or info.hasNoValue
 		or not price
@@ -186,9 +184,8 @@ local function Refundable(bag, slot)
 	return purchase and purchase.refundSeconds and purchase.refundSeconds > 0
 end
 
----@param includeGreys boolean
 ---@param limit integer
-local function Scan(includeGreys, limit)
+local function Scan(limit)
 	local result, pending = {}, false
 	local marks = Marks()
 	for bag = 0, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
@@ -198,10 +195,10 @@ local function Scan(includeGreys, limit)
 				C_Item.GetItemInfo(info.hyperlink)
 				pending = true
 			end
-			if info and IsJunk(info, marks, includeGreys) and not info.hasNoValue and not info.isLocked then
+			if info and IsJunk(info, marks) and not info.hasNoValue and not info.isLocked then
 				local price = select(11, C_Item.GetItemInfo(info.hyperlink))
 				pending = pending or price == nil
-				local value = SaleValue(info, price, marks, includeGreys)
+				local value = SaleValue(info, price, marks)
 				if value and not Refundable(bag, slot) then
 					result[#result + 1] = { bag = bag, slot = slot, info = info, value = value }
 					if #result == limit then
@@ -222,7 +219,7 @@ UpdateMerchantButton = function()
 	if not MerchantFrame:IsShown() then
 		return
 	end
-	local marked = ManualEnabled() and #Scan(false, 1) > 0
+	local marked = ManualEnabled() and #Scan(1) > 0
 	if not marked and not extendedButton then
 		return
 	end
@@ -272,6 +269,28 @@ Step = function(run)
 		Finish(run)
 		return
 	end
+	if run.drain then
+		local count = C_MerchantFrame.GetNumJunkItems()
+		if count < run.junk then
+			run.polls = 0
+		end
+		run.junk = count
+		if count > 0 and run.polls < 10 then
+			run.polls = run.polls + 1
+			C_Timer.After(0.2, function()
+				Step(run)
+			end)
+			return
+		end
+		run.drain = nil
+	end
+	if not run.items then
+		local pending
+		run.items, pending = Scan(run.manual and BATCH_SIZE or merchant.remaining)
+		if not run.manual then
+			merchant.pending = pending
+		end
+	end
 	if run.waiting then
 		local item = run.waiting
 		local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
@@ -294,13 +313,8 @@ Step = function(run)
 		local item = run.items[run.index]
 		run.index = run.index + 1
 		local info = C_Container.GetContainerItemInfo(item.bag, item.slot)
-		local includeGreys = not run.manual and not LeatrixSellsGreys()
 		local price = item.value / item.info.stackCount
-		if
-			SameStack(item.info, info)
-			and SaleValue(info, price, Marks(), includeGreys)
-			and not Refundable(item.bag, item.slot)
-		then
+		if SameStack(item.info, info) and SaleValue(info, price, Marks()) and not Refundable(item.bag, item.slot) then
 			run.waiting, run.polls = item, 0
 			if not run.manual then
 				merchant.remaining = merchant.remaining - 1
@@ -326,15 +340,24 @@ Start = function(manual)
 	if not Allowed(run) then
 		return
 	end
-	local pending
-	run.items, pending = Scan(not manual and not LeatrixSellsGreys(), manual and BATCH_SIZE or merchant.remaining)
-	if not manual then
-		merchant.pending = pending
+	local count = C_MerchantFrame.GetNumJunkItems()
+	if
+		not manual
+		and not merchant.native
+		and not LeatrixSellsGreys()
+		and C_MerchantFrame.IsSellAllJunkEnabled()
+		and count > 0
+	then
+		merchant.native = true
+		C_MerchantFrame.SellAllJunkItems()
+		run.drain = true
+	elseif manual then
+		-- Blizzard has just submitted its native sale through the confirmation button.
+		run.drain = true
 	end
-	if #run.items > 0 then
-		batch = run
-		Step(run)
-	end
+	run.junk, run.polls = count, 0
+	batch = run
+	Step(run)
 end
 
 ns.Init(function()

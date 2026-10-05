@@ -138,7 +138,28 @@ local function Client(slots, db)
 		},
 		C_MerchantFrame = {
 			GetNumJunkItems = function()
-				return 0
+				local count = 0
+				for _, item in pairs(c.slots) do
+					if item.quality == 0 then
+						count = count + 1
+					end
+				end
+				return count
+			end,
+			IsSellAllJunkEnabled = function()
+				return not c.nativeDisabled
+			end,
+			SellAllJunkItems = function()
+				c.nativeCalls = (c.nativeCalls or 0) + 1
+				for slot, item in pairs(c.slots) do
+					if item.quality == 0 and not item.isLocked and not item.hasNoValue and not c.refundable[slot] then
+						if c.nativeLag then
+							leaving[#leaving + 1] = { slot = slot, ticks = c.nativeLag }
+						else
+							c.slots[slot] = nil
+						end
+					end
+				end
 			end,
 		},
 		C_CurrencyInfo = {
@@ -226,6 +247,9 @@ local function Client(slots, db)
 		scripts.OnClick()
 	end
 	function c.confirm(text)
+		if (not text or text == SELL_ALL) and c.open then
+			env.C_MerchantFrame.SellAllJunkItems()
+		end
 		env.StaticPopup1.which, env.StaticPopup1.data = "GENERIC_CONFIRMATION", { text = text or SELL_ALL }
 		for _, fn in ipairs(accept) do
 			fn()
@@ -241,41 +265,117 @@ local function Client(slots, db)
 	return c
 end
 
+local function MarkedClient(slots, db)
+	db = db or {}
+	db.markJunk, db.junk = true, db.junk or {}
+	for _, item in pairs(slots) do
+		if item.quality == 0 then
+			item.quality = 2
+			db.junk[item.itemID] = true
+		end
+	end
+	return Client(slots, db)
+end
+
 local function same(actual, expected, why)
 	assert(actual == expected, ("%s: expected %q, got %q"):format(why, tostring(expected), tostring(actual)))
 end
 
-do -- A visit sells greys of value, in bag order, and prints one total.
-	local slots = { grey(1), green(2), grey(3), grey(4), grey(5), grey(6), grey(7, 5), green(8), stack(nil, 9) }
-	slots[3].isLocked = true
-	slots[4].hasNoValue = true
-	local c = Client(slots, { junk = { [8] = true } })
-	c.refundable[5] = true
-	c.price["item:6"] = 0
-	assert(c.features.markJunk.default == false and c.features.sellJunk.default == true)
-	for _, conflict in ipairs(c.features.sellJunk.conflicts) do
-		assert(conflict.addon ~= "Leatrix_Plus", "Leatrix's grey-only conflict must stay partial")
+do -- Native bulk selling includes the final grey and does not use bag-slot queues.
+	local c = Client(fill(13, grey))
+	local calls = 0
+	c.env.C_MerchantFrame.IsSellAllJunkEnabled = function()
+		return true
 	end
-	c.show()
-	same(c.sold(), "", "nothing sells the moment the merchant opens")
-	c.settle()
-	same(c.sold(), "1,7", "locked, worthless, refundable, unpriced-at-zero, unmarked and unknown stacks stay")
-	same(#c.printed, 1, "one total")
-	same(c.printed[1], "Sold 2 junk stacks for 49c.", "the total")
-	assert(c.slots[8], "a mark sells nothing while marking is switched off")
+	c.env.C_MerchantFrame.SellAllJunkItems = function()
+		calls = calls + 1
+		for slot = 1, 20 do
+			local item = c.slots[slot]
+			if item and item.quality == 0 then
+				c.slots[slot] = nil
+			end
+		end
+	end
+	c.visit()
+	assert(not c.slots[13], "the last grey is sold too")
+	same(calls, 1, "the native sale runs once per visit")
+	same(#c.used, 0, "grey items never use the custom per-slot seller")
 end
 
-do -- Marked items sell with the greys once marking is on.
-	local slots = { grey(1), green(2), green(3, 1), stack(nil, 4) }
-	local c = Client(slots, { markJunk = true, junk = { [3] = true, [4] = true } })
+do -- Marked items wait for an asynchronous native sale, which is submitted only once.
+	local c = Client({ grey(1), grey(2), green(3) }, { markJunk = true, junk = { [3] = true } })
+	c.nativeLag = 3
+	c.show()
+	c.tick()
+	same(c.nativeCalls, 1, "one bulk sale")
+	same(c.sold(), "", "marks wait while greys are in flight")
+	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.tick()
+	c.tick()
+	same(c.sold(), "", "marks still wait before the native acknowledgement")
+	c.settle()
+	same(c.sold(), "3", "the marked item follows the native acknowledgement")
+	same(c.nativeCalls, 1, "no duplicate native call")
+end
+
+do -- A native sale that makes no progress does not leave an endless timer.
+	local c = Client({ grey(1), green(2) }, { markJunk = true, junk = { [2] = true } })
+	local calls = 0
+	c.env.C_MerchantFrame.SellAllJunkItems = function()
+		calls = calls + 1
+	end
+	c.visit()
+	same(calls, 1, "a stalled bulk sale is not resubmitted")
+	same(c.sold(), "2", "marks remain usable after the bounded native wait")
+	assert(c.slots[1], "the native failure is left for the game's merchant button")
+end
+
+do -- Merchant, feature and client guards prevent the native call.
+	local blocks = {
+		function(c)
+			c.combat = true
+		end,
+		function(c)
+			c.cursor = true
+		end,
+		function(c)
+			c.repairing = true
+		end,
+		function(c)
+			c.env.MerchantFrame.selectedTab = 2
+		end,
+		function(c)
+			c.db.sellJunk = false
+		end,
+		function(c)
+			c.open = false
+		end,
+		function(c)
+			c.nativeDisabled = true
+		end,
+	}
+	for _, block in ipairs(blocks) do
+		local c = Client({ grey(1) })
+		c.show()
+		block(c)
+		c.settle()
+		same(c.nativeCalls, nil, "a blocked native sale is never submitted")
+		assert(c.slots[1])
+	end
+end
+
+do -- Native selling leaves marked non-grey items to the custom seller.
+	local c = Client({ grey(1), green(2), green(3, 1) }, { markJunk = true, junk = { [3] = true } })
 	c.price["item:3"] = 100
 	c.visit()
-	same(c.sold(), "1,3", "greys and marks; a mark on an item of unknown quality must not bypass grey ownership")
-	same(c.printed[1], "Sold 2 junk stacks for 114c.", "the total")
+	same(c.nativeCalls, 1, "grey junk is handled by the game")
+	same(c.sold(), "3", "only the marked non-grey uses the custom seller")
+	same(c.printed[1], "Sold 1 junk stacks for 100c.", "only acknowledged custom sales are reported")
+	assert(c.slots[2], "unmarked items stay")
 end
 
 do -- A stack that changed between the scan and its turn is never sold.
-	local c = Client(
+	local c = MarkedClient(
 		fill(10, function(slot)
 			return slot == 7 and green(7) or grey(slot)
 		end),
@@ -302,7 +402,7 @@ do -- A stack that changed between the scan and its turn is never sold.
 end
 
 do -- Closing the merchant stops the run, and a new visit starts its own.
-	local c = Client(fill(4, grey))
+	local c = MarkedClient(fill(4, grey))
 	c.show()
 	c.tick()
 	c.tick()
@@ -327,7 +427,7 @@ do -- Closing the merchant stops the run, and a new visit starts its own.
 end
 
 do -- A sale the server never acknowledges ends the run after ten polls: no endless retry, nothing more sold.
-	local c = Client(fill(3, grey))
+	local c = MarkedClient(fill(3, grey))
 	c.rejects = true
 	same(c.visit(), 12, "the opening delay, the sale and ten polls")
 	same(c.sold(), "1", "the rejected stack is tried once and nothing follows it")
@@ -339,7 +439,7 @@ do -- A sale the server never acknowledges ends the run after ten polls: no endl
 end
 
 do -- A slow sale inside the cap is waited for and counted.
-	local c = Client(fill(2, grey))
+	local c = MarkedClient(fill(2, grey))
 	c.lag = 10
 	c.visit()
 	same(c.sold(), "1,2", "both sell")
@@ -347,7 +447,7 @@ do -- A slow sale inside the cap is waited for and counted.
 end
 
 do -- One visit sells twelve stacks, so all of them fit the buyback tab.
-	local c = Client(fill(14, grey))
+	local c = MarkedClient(fill(14, grey))
 	c.unpriced["item:1"] = true
 	c.visit()
 	same(c.sold(), "2,3,4,5,6,7,8,9,10,11,12,13", "a batch")
@@ -383,13 +483,13 @@ do -- Each condition that blocks selling blocks it at the start and stops a run 
 		end,
 	}
 	for index, block in ipairs(blocks) do
-		local c = Client(fill(3, grey))
+		local c = MarkedClient(fill(3, grey))
 		c.show()
 		block(c)
 		c.settle()
 		same(c.sold(), "", "block " .. index .. " at the start")
 
-		c = Client(fill(3, grey))
+		c = MarkedClient(fill(3, grey))
 		c.show()
 		c.tick()
 		block(c)
@@ -400,12 +500,13 @@ do -- Each condition that blocks selling blocks it at the start and stops a run 
 end
 
 do -- An item whose price or quality is not cached yet is left, then sold when its info arrives.
-	local c = Client({ grey(1), grey(2), stack(nil, 3) })
+	local c = MarkedClient({ grey(1), grey(2), stack(nil, 3) })
 	c.unpriced["item:1"] = true
 	c.visit()
 	same(c.sold(), "2", "unknown price and unknown quality are not sold")
 	assert(c.requested["item:3"], "the unknown item is requested")
-	c.unpriced["item:1"], c.slots[3].quality = nil, 0
+	c.unpriced["item:1"], c.slots[3].quality = nil, 2
+	c.db.junk[3] = true
 	c.fire("GET_ITEM_INFO_RECEIVED")
 	c.settle()
 	same(c.sold(), "2,1,3", "they sell once known")
@@ -416,7 +517,7 @@ do -- An item whose price or quality is not cached yet is left, then sold when i
 end
 
 do -- Item info arriving during a run retries after it, within the same visit's batch.
-	local c = Client(fill(12, grey))
+	local c = MarkedClient(fill(12, grey))
 	c.unpriced["item:1"] = true
 	c.show()
 	c.tick()
@@ -429,29 +530,18 @@ do -- Item info arriving during a run retries after it, within the same visit's 
 	same(c.printed[2], "Sold 1 junk stacks for 14c.", "the retry's total")
 end
 
-do -- With Leatrix Plus selling greys, only marked non-grey items are sold here.
-	local function bags()
-		return Client({ grey(1), green(2), grey(3), green(4) }, { markJunk = true, junk = { [1] = true, [2] = true } })
-	end
-	local c = bags()
-	c.leatrix = "On"
-	c.env.LeaPlusDB = { AutoSellJunk = "On" }
+do -- Leatrix owns greys only when its auto-sell is on.
+	local c = Client({ grey(1), green(2) }, { markJunk = true, junk = { [2] = true } })
+	c.leatrix, c.env.LeaPlusDB = "On", { AutoSellJunk = "On" }
 	c.visit()
-	same(c.sold(), "2", "even marked greys belong to Leatrix")
+	same(c.nativeCalls, nil, "Leatrix sells the greys")
+	same(c.sold(), "2", "marked non-grey items still sell")
+	assert(c.slots[1])
 
-	c = bags()
-	c.leatrix = "Off"
-	c.env.LeaPlusDB = { AutoSellJunk = "Off" }
+	c = Client({ grey(1) })
+	c.leatrix, c.env.LeaPlusDB = "Off", { AutoSellJunk = "Off" }
 	c.visit()
-	same(c.sold(), "1,2,3", "Leatrix loaded with its auto-sell off leaves the greys here")
-
-	c = bags()
-	c.show()
-	c.tick()
-	c.leatrix = "On"
-	c.env.LeaPlusDB = { AutoSellJunk = "On" }
-	c.settle()
-	same(c.sold(), "1,2", "the hand-off is checked again at each stack")
+	same(c.nativeCalls, 1, "Leatrix with auto-sell off leaves native selling here")
 end
 
 do -- Sell All Junk, once confirmed, also sells the marked non-grey stacks; Blizzard sells the greys.
@@ -489,7 +579,7 @@ do -- Sell All Junk, once confirmed, also sells the marked non-grey stacks; Bliz
 end
 
 do -- A confirmed Sell All Junk sells its own twelve, whatever the automatic batch has left.
-	local c = Client(fill(2, grey), { markJunk = true })
+	local c = MarkedClient(fill(2, grey), { markJunk = true })
 	c.visit()
 	same(c.sold(), "1,2", "the automatic run")
 	for slot = 3, 15 do
