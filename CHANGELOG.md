@@ -24,6 +24,7 @@ verbatim rather than rewritten as the addon moves.
 - **Item level column in the auction house.** Weapons and armour on the Browse tab get a sortable iLvl column between Name and Available, with the item level no longer repeated after the name. On by default.
 
 - **Spell reach under nameplates.** A small icon for each attack you track sits on every enemy nameplate, in full colour when that spell can reach the enemy and a solid red when it cannot, melee included, so you can see what reaches a mob before you pull it. It starts with your class's own attacks, one for each reach: a shaman sees a shock and Lightning Bolt, a hunter Raptor Strike and Auto Shot. A **Spells to track** list under the setting shows your known spells by icon and name and remembers your choices per character, specialisation and stance or form. The icon sits to the right of the health bar by default, clear of the level, and the setting chooses where it sits, its size, whether out of range icons are red, faded or hidden, and whether they show on every enemy or only your target. Off by default.
+- **Grey junk uses the game's own Sell All Junk.** Automatic selling delegates grey items to the native bulk sale instead of stepping through bag slots. Manually marked non-grey items retain their 12-stack limit per merchant visit.
 
 ## [0.8.0] - 2026-10-03
 
