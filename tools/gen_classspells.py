@@ -21,16 +21,18 @@ QuestieDB in game (Integrations/QuestieSource.lua).
 """
 
 import argparse
-import csv
 import gzip
-import io
 import re
 import sys
 import textwrap
 import urllib.error
-import urllib.request
 from collections import Counter, defaultdict
 from pathlib import Path
+
+try:
+    from tools.forever_tools import wago
+except ModuleNotFoundError:
+    from forever_tools import wago
 
 BUILD = "1.60.1.70205"
 # Forever's client leaves out the trainers' teaching spells; Classic Era keeps them, with the same IDs.
@@ -40,6 +42,7 @@ CLASSICDB_URL = (
     f"https://raw.githubusercontent.com/cmangos/classic-db/{CLASSICDB_COMMIT}/Full_DB/ClassicDB_1_12_1_z2815.sql.gz"
 )
 ROOT = Path(__file__).resolve().parent.parent
+USER_AGENT = "TweaksForever/1.0"
 CACHE = ROOT / "tools" / ".cache"
 CLASSICDB_CACHE = CACHE / f"classicdb-{CLASSICDB_COMMIT[:7]}.sql.gz"
 OUTPUT = ROOT / "Data" / "ClassSpells.lua"
@@ -66,36 +69,22 @@ TRAINER_UNUSED = re.compile(r"\[UNUSED\]|\*Temp\*|^World .* Trainer$")
 
 
 def db2(name, build, refresh=False, offline=False):
-    path = CACHE / f"{name}-{build}.csv"
-    if path.exists() and not refresh:
-        data = path.read_bytes()
-    else:
-        if offline:
-            raise ValueError(f"Missing cached source: {path}")
-        url = f"https://wago.tools/db2/{name}/csv?build={build}"
-        request = urllib.request.Request(url, headers={"User-Agent": "TweaksForever/1.0"})
-        with urllib.request.urlopen(request, timeout=600) as response:
-            data = response.read()
-    rows = list(csv.DictReader(io.StringIO(data.decode("utf-8-sig")), strict=True))
-    if not rows or "ID" not in rows[0]:
-        raise ValueError(f"{name} {build}: empty export (or an HTML response)")
-    CACHE.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(data)
-    return rows
+    return wago.db2_rows(
+        name, build, CACHE, user_agent=USER_AGENT, refresh=refresh, offline=offline, timeout=600, required=["ID"]
+    )
 
 
 def classicdb(refresh=False, offline=False):
     """The dump's INSERT lines for the trainer tables, by table."""
-    if not CLASSICDB_CACHE.exists() or refresh:
-        if offline:
-            raise ValueError(f"Missing cached source: {CLASSICDB_CACHE}")
-        request = urllib.request.Request(CLASSICDB_URL, headers={"User-Agent": "TweaksForever/1.0"})
-        with urllib.request.urlopen(request, timeout=300) as response:
-            data = response.read()
-        CACHE.mkdir(parents=True, exist_ok=True)
-        temporary = CLASSICDB_CACHE.with_suffix(".tmp")
-        temporary.write_bytes(data)
-        temporary.replace(CLASSICDB_CACHE)
+    wago.fetch(
+        CLASSICDB_URL,
+        CLASSICDB_CACHE,
+        user_agent=USER_AGENT,
+        refresh=refresh,
+        offline=offline,
+        timeout=300,
+        validate=gzip.decompress,
+    )
     tables = {"creature_template": [], "npc_trainer": [], "npc_trainer_template": []}
     with gzip.open(CLASSICDB_CACHE, "rt", encoding="utf-8", errors="replace") as dump:
         for line in dump:
@@ -338,5 +327,5 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (ValueError, KeyError, OSError, csv.Error, urllib.error.URLError) as error:
+    except (ValueError, KeyError, OSError, urllib.error.URLError) as error:
         sys.exit(f"gen_classspells: {error}")
