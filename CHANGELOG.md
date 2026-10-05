@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-05
+
 - **Maximum camera zoom.** The camera pulls back further than the game's own Max Camera Distance setting allows. Off by default, and the value you had before comes back when you switch it off.
 
 - **No screen glow.** Turns off the full screen glow effect. Off by default, and the value you had before comes back when you switch it off.
