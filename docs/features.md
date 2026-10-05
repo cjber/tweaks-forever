@@ -17,7 +17,7 @@ All off until you turn them on, except faster auto loot.
 ## Vendors
 
 - Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat.
-- Sell junk automatically, up to 12 stacks per visit, so everything sold is still in the buyback tab.
+- Sell grey junk automatically through the game when its bulk sale is available, plus up to 12 manually marked non-grey stacks per visit.
 - Grey items show the game's junk coin in your bags all the time, not only at a merchant.
 - Mark any bag item as junk with **Alt+Right-click** (off by default). Marked items get the game's junk coin and a tooltip line, and they are sold with your greys, by the merchant's Sell All Junk button too. Marks are account-wide.
 

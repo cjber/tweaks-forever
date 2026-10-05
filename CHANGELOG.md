@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Grey junk uses the game's own Sell All Junk.** Automatic selling delegates grey items to the native bulk sale instead of stepping through bag slots. Manually marked non-grey items retain their 12-stack limit per merchant visit.
+
 ## [0.8.0] - 2026-10-03
 
 - **Class trainers are placed by Questie.** Addons that ask Tweaks Forever where your class trainers stand, such as Adventure Guide Forever, now get each trainer's name and place from your installed Questie, or its QuestieDB addon on its own, in your game's language. Without it they are told what to install, and everything else works as before.
