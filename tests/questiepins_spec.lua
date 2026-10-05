@@ -57,8 +57,12 @@ local function Pin(kind, mini)
 	function pin:SetSize(w, h)
 		self.width, self.height = w, h
 	end
+	-- As the client does: an atlas leaves its place on the sheet as the coordinates until they are set again.
 	function pin.texture:SetAtlas(atlas)
-		self.atlas = atlas
+		self.atlas, self.crop = atlas, atlas
+	end
+	function pin.texture:SetTexCoord()
+		self.crop = nil
 	end
 	function pin.texture:GetVertexColor()
 		return 1, 1, 1, self.alpha
@@ -98,9 +102,17 @@ manual.isManualIcon = true
 manual.width = 8
 map.utils.SetDrawOrder(manual)
 assert(manual.width == 8 and not manual.texture.atlas, "townsfolk unchanged")
+new.isManualIcon = true
+new:UpdateTexture("townsfolk")
+map.utils.SetDrawOrder(new)
+assert(not new.texture.crop, "a pin reused for a townsfolk icon draws it whole")
 enabled = false
 refresh()
 assert(frames.a.texture.original == "original-pickup" and frames.a.width == 8, "toggle restores originals")
+assert(
+	not frames.a.texture.crop and not frames.b.texture.crop,
+	"Questie's file is drawn whole, not at the atlas's crop"
+)
 enabled = true
 refresh()
 assert(frames.a.texture.atlas == "questnormal" and frames.a.width == 24)

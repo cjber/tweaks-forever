@@ -31,6 +31,7 @@ python3 -m unittest discover -s tools -p '*_test.py'
 python3 tools/typecheck_coverage.py
 python3 tools/lint_multivalue.py
 python3 -m tools.lint_taint
+python3 tools/lint_art.py
 python3 -m tools.phrases --check
 # A fresh output path prevents a crashed checker from reusing an earlier green report.
 report=$(mktemp -d "${TMPDIR:-/tmp}/tweaks-typecheck.XXXXXX")

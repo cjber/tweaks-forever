@@ -14,10 +14,13 @@ local env = setmetatable({
 			return "area " .. area
 		end,
 	},
-	CreateAtlasMarkup = function(atlas)
-		return "|A:" .. atlas .. "|a"
-	end,
+	C_Texture = {
+		GetAtlasInfo = function()
+			return { width = 32, height = 32 }
+		end,
+	},
 }, { __index = _G })
+setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Map/DungeonEntrances.lua")), env)("TweaksForever", ns)
 local Model = ns.Entrances
@@ -51,7 +54,7 @@ assert(Model.Atlas({ x = 0, y = 0, instances = { 36 } }) == "Dungeon")
 -- A lone instance is its own title; a complex is named by its area and lists its instances, iconned when mixed.
 assert(Model.Describe({ x = 0, y = 0, instances = { 36 } }) == "instance 36")
 local title, lines = Model.Describe({ x = 0, y = 0, instances = { 229, 409 }, area = 25 })
-assert(title == "area 25" and lines == "|A:Dungeon|a instance 229\n|A:Raid|a instance 409", lines)
+assert(title == "area 25" and lines == "|A:Dungeon:16:16|a instance 229\n|A:Raid:16:16|a instance 409", lines)
 title, lines = Model.Describe({ x = 0, y = 0, instances = { 509, 531 }, area = 3478 })
 assert(title == "area 3478" and lines == "instance 509\ninstance 531", lines)
 title, lines = Model.Describe({ x = 0, y = 0, instances = { 47, 129 } })

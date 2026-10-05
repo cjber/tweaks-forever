@@ -47,21 +47,27 @@ ns.Init(function()
 	end
 	---@type table<TFQuestiePin, boolean>
 	local watched = setmetatable({}, { __mode = "k" })
+	-- Pins whose texture last drew an atlas of ours: it keeps that atlas's place on its sheet as its coordinates,
+	-- so a file Questie sets over it would show only that corner of the file until they are reset.
+	---@type table<TFQuestiePin, boolean>
+	local cropped = setmetatable({}, { __mode = "k" })
 	---@param frame TFQuestiePin
 	local function Style(frame)
-		if not ns.Active(KEY) or frame.isManualIcon then
-			return
-		end
 		local kind = frame.data and frame.data.Icon
-		local atlas = kind and ATLASES[kind]
+		local atlas = ns.Active(KEY) and not frame.isManualIcon and kind and ATLASES[kind]
 		local info = atlas and C_Texture.GetAtlasInfo(atlas)
 		if not atlas or not info then
+			if cropped[frame] then
+				cropped[frame] = nil
+				frame.texture:SetTexCoord(0, 1, 0, 1)
+			end
 			return
 		end
 		local span = frame.miniMapIcon and 20 or 24
 		local scale = span / math.max(info.width, info.height)
 		frame:SetSize(info.width * scale, info.height * scale)
-		frame.texture:SetAtlas(atlas)
+		frame.texture:SetAtlas(atlas) -- art-ok: the pin, which the texture fills, takes the atlas's aspect above
+		cropped[frame] = true
 		local _, _, _, alpha = frame.texture:GetVertexColor()
 		local shade = kind == 7 and 0.55 or 1
 		frame.texture:SetVertexColor(shade, shade, shade, alpha)

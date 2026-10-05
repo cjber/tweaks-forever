@@ -402,8 +402,10 @@ local function Texture(button, style, index)
 	marks[button][style] = pool
 	if not pool[index] then
 		pool[index] = button:CreateTexture(nil, LAYERS[style], nil, 2)
+		-- art-ok: the quality border's file, cut into slices by Border's coordinates, or a flat colour
 		pool[index]:SetTexture(style == "border" and ICON_FRAME or WHITE)
 		if style == "glow" then
+			-- art-ok: the atlas's sheet, which Border cuts and sizes from the atlas's own coordinates and size
 			pool[index]:SetTexture(C_Texture.GetAtlasInfo(GLOW).file)
 			pool[index]:SetBlendMode("ADD")
 		elseif style == "dots" then

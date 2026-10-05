@@ -373,12 +373,14 @@ local function Paint(item, entry)
 	for _, label in ipairs({ text.Name, text.SubName, text.RequiredLevel }) do
 		label:SetAlpha(item.unlearnedTextAlpha)
 	end
-	button.Icon:SetTexture(spell.icon)
+	button.Icon:SetTexture(spell.icon) -- art-ok: a square spell icon in the stock spell book item's square
 	button.Icon:SetDesaturated(true)
 	button.Icon:SetVertexColor(SPELLBOOK_UNLEARNED_TINT_COLOR:GetRGB()) -- multi-value: r, g, b
 	button.Icon:SetAlpha(item.unlearnedIconAlpha)
+	-- art-ok: a mask, sized by the stock spell book item as SpellBookItemMixin sets it
 	button.IconMask:SetAtlas(art.iconMask, TextureKitConstants.IgnoreAtlasSize)
 	button.IconMask:Show()
+	-- art-ok: sized by the stock spell book item as SpellBookItemMixin sets it
 	button.TrainableBackplate:SetAtlas(art.trainableBackplate, TextureKitConstants.IgnoreAtlasSize)
 	button.TrainableBackplate:SetShown(entry.ready)
 	button.TrainableShadow:SetShown(entry.ready)

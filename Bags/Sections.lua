@@ -22,7 +22,7 @@ local ITEM, STEP, ORIGIN_Y, GAP, MIN_SCALE = Bag.ITEM, Bag.STEP, Bag.ORIGIN_Y, B
 -- Room for a heading above its section.
 local HEADING = 16
 -- Before fishing is a moment rather than a set, so its heading carries the fishing icon to say so.
-local FISHING_ICON = "|TInterface\\Icons\\Trade_Fishing:0|t "
+local FISHING_ICON = "|TInterface\\Icons\\Trade_Fishing:0|t " -- art-ok: a square icon, square at the text's height
 
 -- Where each item and heading goes, bottom-up from the money frame as Blizzard's grid is. `items` is in
 -- Blizzard's order (bottom right first), each { section = key or nil }; `sections` is the keys top to bottom.

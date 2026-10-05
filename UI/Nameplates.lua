@@ -70,10 +70,10 @@ end
 -- in place of the Classic style's border.
 ---@param bar NamePlateHealthBar
 local function HealthArt(bar)
-	bar.barTexture:SetAtlas("UI-HUD-CoolDownManager-Bar")
+	bar.barTexture:SetAtlas("UI-HUD-CoolDownManager-Bar") -- art-ok: a status bar's fill, stretched by design
 	local trough = bar.bgTexture
 	trough:ClearAllPoints()
-	trough:SetAtlas("UI-HUD-CoolDownManager-Bar-BG")
+	trough:SetAtlas("UI-HUD-CoolDownManager-Bar-BG") -- art-ok: a status bar's trough, stretched by design
 	trough:SetDrawLayer("BACKGROUND")
 	trough:SetPoint("TOPLEFT", bar, "TOPLEFT", -2, 3)
 	trough:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 6, -6)

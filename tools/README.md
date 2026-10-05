@@ -143,6 +143,11 @@ written or method defined on a global the addon does not own, and calls to Blizz
 nameplate layout, its lazy bag caches, `SetModuleContainer`, `SetParentInitializer` and `AddMaskableTexture`. AGENTS.md lists what to
 use instead. A deliberate exception takes a trailing `-- taint-ok: reason` on the flagged line.
 
+`python3 tools/lint_art.py` checks the same files and the shipped XML for art that could be stretched: a raw
+`SetAtlas`, `SetTexture`, button atlas or texture, `CreateAtlasMarkup` or `|A`/`|T` markup outside `UI/Art.lua`.
+`SetAtlas(atlas, true)` and XML `useAtlasSize="true"` pass; anything else goes through `ns.Art` or says why its
+shape is right with `-- art-ok: reason` on its line or the line above. An `art-ok` that excuses nothing fails too.
+
 The gate runs the Python regression tests first; run them separately with
 `python3 -m unittest discover -s tools -p '*_test.py'`. Reports use `file:line: code: message`,
 and missing/malformed reports and checker crashes fail closed.
