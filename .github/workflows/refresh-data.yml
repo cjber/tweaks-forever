@@ -52,6 +52,14 @@ jobs:
           version: 2.5.2
           args: --check .
       - if: steps.build.outputs.new == 'true'
+        id: report
+        run: |
+          {
+            echo 'markdown<<REPORT_EOF'
+            python3 tools/data_report.py
+            echo REPORT_EOF
+          } >> "$GITHUB_OUTPUT"
+      - if: steps.build.outputs.new == 'true'
         id: pr
         uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
@@ -60,6 +68,8 @@ jobs:
           commit-message: "data: game data for Forever ${{ steps.build.outputs.version }}"
           body: |
             Regenerated `Data/Overlays.lua` (world map overlays), `Data/CampBenefits.lua` (camp benefit texts), `Data/ZoneLevels.lua` (zone level ranges), `Data/DungeonEntrances.lua` (dungeon and raid entrances), `Data/ClassSpells.lua` (class trainer spells) and `Data/ForeverQuests.lua` (quests added in Forever) for Forever build ${{ steps.build.outputs.version }}; `tools/README.md` names each file's sources.
+
+            ${{ steps.report.outputs.markdown }}
 
             Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers, `Data/ClassSpells.lua` for spells that dropped out, and `Data/ForeverQuests.lua` for quest IDs that dropped out.
 

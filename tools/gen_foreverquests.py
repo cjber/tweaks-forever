@@ -7,9 +7,10 @@ An unknown ID is deliberately unmarked; regenerate when the client data changes.
 """
 
 import argparse
-import csv
 from pathlib import Path
 
+from forever_tools import csvtable
+from forever_tools.fsio import atomic_write
 from gen_classspells import db2
 
 BUILD = "1.60.1.70205"
@@ -17,8 +18,8 @@ ERA_BUILD = "1.15.9.69722"
 
 
 def ids(path):
-    with Path(path).open(encoding="utf-8-sig", newline="") as source:
-        return {int(row["ID"]) for row in csv.DictReader(source)}
+    rows = csvtable.parse_csv(Path(path).read_text(encoding="utf-8-sig"), str(path), ints=["ID"])
+    return {row["ID"] for row in rows}
 
 
 def render(quests):
@@ -55,7 +56,7 @@ def main():
         )
         quests = forever - era
     output = Path(__file__).resolve().parent.parent / "Data" / "ForeverQuests.lua"
-    output.write_text(render(quests))
+    atomic_write(output, render(quests))
 
 
 if __name__ == "__main__":
