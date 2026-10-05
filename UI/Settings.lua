@@ -28,6 +28,18 @@ local function Tooltip(feature)
 	end
 end
 
+-- Indent a row under a feature and grey it out while that feature is off. Not SetParentInitializer: the settings
+-- search reads that link from every row, so ours tainted it and Social's Discord Sign In in the results was blocked.
+---@param initializer any
+---@param key string
+local function Nest(initializer, key)
+	initializer:Indent()
+	initializer:AddModifyPredicate(function()
+		return ns.Active(key)
+	end)
+	initializer:AddEvaluateStateCVar(ns.SettingVariable(key))
+end
+
 ---@param category SettingsCategoryMixin
 ---@param feature TFFeature
 local function AddSetting(category, feature)
@@ -64,16 +76,15 @@ local function AddSetting(category, feature)
 		return not ns.ConflictOf(feature.key) and not ns.MissingOf(feature.key)
 	end)
 	if feature.parent then
-		-- Not SetParentInitializer: the settings search reads that link from every row, so ours tainted it and
-		-- Social's Discord Sign In in the results was blocked. An indent, a predicate and a re-check on the
-		-- parent's value give the same greyed, nested row.
-		initializer:Indent()
-		initializer:AddModifyPredicate(function()
-			return ns.Active(feature.parent)
-		end)
-		initializer:AddEvaluateStateCVar(ns.SettingVariable(feature.parent))
+		Nest(initializer, feature.parent)
 	end
 	Settings.RegisterInitializer(category, initializer)
+	-- A button opening a panel the feature needs, indented under it and greyed while it is off.
+	if feature.button then
+		local button = CreateSettingsButtonInitializer(L["Spells to track"], L["Choose"], feature.button, nil, false)
+		Nest(button, feature.key)
+		Settings.RegisterInitializer(category, button)
+	end
 end
 
 ns.Init(function()

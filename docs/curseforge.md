@@ -47,7 +47,7 @@ Camp tooltips say what sitting nearby gives you.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a group such as Healing or DPS, then equip the whole group from the same menu.
 - **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, and unexplored areas are revealed in a blue tint.
 - **Nameplates**: a taller bar with name and level above, your target outlined, and casts in a slim bar.
-- **Spell reach** (off until you turn it on): a small icon for each of your class's main attacks on every enemy nameplate, full colour when the spell can reach and solid red when it cannot. Choose where the icons sit, their size, the out of range look and which plates they show on.
+- **Spell reach** (off until you turn it on): a small icon for each attack you track on every enemy nameplate, full colour when the spell can reach and solid red when it cannot, melee included. Pick your spells from a list by icon and name, and choose where the icons sit, their size, the out of range look and whether they show on every enemy or only your target.
 - **Tooltips**: a thin rounded border over charcoal, class-coloured player names, and the health bar inside.
 - **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
 - **Camera and glow** (off until you turn it on): pull the camera back further than the game's own Max Camera Distance allows, and turn off the full screen glow effect.

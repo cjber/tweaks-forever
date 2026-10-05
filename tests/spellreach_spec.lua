@@ -18,11 +18,21 @@ local ns = {
 		changes[key] = fn
 	end,
 }
+ns.L = setmetatable({}, {
+	__index = function(_, key)
+		return key
+	end,
+})
 
--- The client reads the module makes, stubbed: a shaman's book, what reaches each unit, and frames that record
--- what is drawn on them.
-local book = { { actionID = 8042 }, { actionID = 403 }, { actionID = 116 } }
-local reach = { nameplate1 = { [8042] = false, [403] = true }, nameplate2 = { [8042] = true, [403] = true } }
+-- The client reads the module makes, stubbed: a hunter's book, what reaches each unit, the 5 yard melee item,
+-- and frames that record what is drawn on them.
+local book = { { actionID = 2973 }, { actionID = 75 }, { actionID = 116 }, { actionID = 78 }, { actionID = 403 } }
+-- What the spell range check answers; a melee ability (2973) answers nil, which is the bug.
+local range = { nameplate1 = { [75] = true, [116] = true }, nameplate2 = { [75] = true, [116] = true } }
+local MELEE_IDS = { [2973] = true, [78] = true }
+-- What the 5 yard item check answers. IsSpellInRange never can.
+local melee = { nameplate1 = false, nameplate2 = true }
+local RANGE = { [2973] = 5, [75] = 35, [116] = 30, [78] = 5, [403] = 30, [8042] = 20, [585] = 30 }
 local hostile = { nameplate1 = true, nameplate2 = true }
 local dead = {}
 
@@ -53,11 +63,17 @@ local function Region()
 	function region.SetVertexColor(self, red, green, blue)
 		self.color = { red, green, blue }
 	end
+	function region.SetVertexColorFromBoolean(self, value, onTrue, onFalse)
+		self.colorFromBoolean = { value = value, onTrue = onTrue, onFalse = onFalse }
+	end
 	function region.SetDesaturated(self, desaturated)
 		self.desaturated = desaturated
 	end
 	function region.SetAlpha(self, alpha)
 		self.alpha = alpha
+	end
+	function region.SetAlphaFromBoolean(self, value, alphaIfTrue, alphaIfFalse)
+		self.alphaFromBoolean = { value = value, alphaIfTrue = alphaIfTrue, alphaIfFalse = alphaIfFalse }
 	end
 	function region.SetColorTexture(self, red, green, blue, alpha)
 		self.colorTexture = { red, green, blue, alpha }
@@ -66,6 +82,14 @@ local function Region()
 	function region.SetFrameLevel() end
 	function region.GetFrameLevel()
 		return 1
+	end
+	function region.SetJustifyH() end
+	function region.SetFontObject() end
+	function region.SetText(self, text)
+		self.text = text
+	end
+	function region.GetText(self)
+		return self.text
 	end
 	function region.Show(self)
 		self.shown = true
@@ -76,6 +100,7 @@ local function Region()
 	function region.CreateTexture(self, _, layer)
 		local texture = Region()
 		texture.layer = layer
+		self.textures = self.textures or {}
 		self.textures[#self.textures + 1] = texture
 		return texture
 	end
@@ -104,14 +129,59 @@ local function Plate()
 	}
 end
 
+-- One frame or texture the module builds, recording its kind, template, scripts and children.
+local function Frame(kind, name, _, template)
+	local frame = Region()
+	frame.kind, frame.name, frame.template, frame.scripts = kind, name, template, {}
+	if kind == "CheckButton" then
+		frame.Text = Region()
+		frame.enabled = true
+		function frame.SetChecked(self, checked)
+			self.checked = checked
+		end
+		function frame.GetChecked(self)
+			return self.checked
+		end
+		function frame.SetEnabled(self, enabled)
+			self.enabled = enabled
+		end
+		function frame.SetText(self, text)
+			self.Text:SetText(text)
+		end
+	end
+	function frame.SetScript(self, event, callback)
+		self.scripts[event] = callback
+	end
+	function frame.SetScrollChild(self, child)
+		self.child = child
+	end
+	function frame.SetFrameStrata() end
+	function frame.SetClampedToScreen() end
+	function frame.EnableKeyboard() end
+	function frame.SetPropagateKeyboardInput() end
+	function frame.CreateFontString(_, _, _, font)
+		local string = Region()
+		string.font = font
+		return string
+	end
+	if template == "BasicFrameTemplateWithInset" then
+		frame.TitleText = Region()
+		frame.CloseButton = Region()
+	end
+	return frame
+end
+
 local created = {}
+local char = {}
 local plateFrames = { nameplate1 = Plate(), nameplate2 = Plate() }
 local ticks, cancelled = {}, 0
 
 local env = setmetatable({
 	Enum = { SpellBookSpellBank = { Player = 0 } },
+	UIParent = {},
+	TweaksForeverCharDB = char,
 	UnitClass = function()
-		return "Shaman", "SHAMAN"
+		return "Hunter", "HUNTER"
 	end,
 	UnitCanAttack = function(_, unit)
 		return hostile[unit] == true
@@ -119,14 +189,37 @@ local env = setmetatable({
 	UnitIsDeadOrGhost = function(unit)
 		return dead[unit] == true
 	end,
-	CreateFrame = function(_, _, parent)
-		local frame = Region()
-		created[parent] = frame
+	canaccessvalue = function(value)
+		return value ~= "secret"
+	end,
+	CreateColor = function(red, green, blue)
+		return { red, green, blue }
+	end,
+	CreateFrame = function(kind, name, parent, template)
+		local frame = Frame(kind, name, parent, template)
+		created[parent] = created[parent] or frame
 		return frame
+	end,
+	C_SpecializationInfo = {
+		GetActiveSpecGroup = function()
+			return 1
+		end,
+	},
+	GetShapeshiftForm = function()
+		return 0
 	end,
 	C_Spell = {
 		IsSpellInRange = function(id, unit)
-			return reach[unit][id]
+			if MELEE_IDS[id] then
+				return nil
+			end
+			return range[unit][id]
+		end,
+		IsSpellHarmful = function()
+			return true
+		end,
+		GetSpellInfo = function(id)
+			return { name = "Spell" .. id, iconID = 1000 + id, maxRange = RANGE[id], minRange = 0 }
 		end,
 		GetSpellTexture = function(id)
 			return "icon" .. id
@@ -147,6 +240,15 @@ local env = setmetatable({
 		end,
 		FindBaseSpellByID = function(id)
 			return id
+		end,
+	},
+	C_Item = {
+		GetItemInfo = function(id)
+			return id == 8149 and "Voodoo Charm" or nil
+		end,
+		RequestLoadItemDataByID = function() end,
+		IsItemInRange = function(_, unit)
+			return melee[unit]
 		end,
 	},
 	C_NamePlate = {
@@ -173,19 +275,32 @@ local env = setmetatable({
 setfenv(assert(loadfile("UI/SpellReach.lua")), env)("TweaksForever", ns)
 local Model = ns.SpellReach
 
--- Features: the switch, and the sub-options indented under it, each with its own default.
+-- Features: the switch, its sub-options and defaults. The icon sits to the right of the bar until the player
+-- moves it, and only the target's plate carries it only when the player asks.
 assert(features.spellReach.default == false)
 assert(features.spellReach.category == "Interface")
 assert(not features.spellReach.parent)
 assert(features.spellReach.conflicts[1].addon == "RangeLens")
-assert(features.spellReachPosition.parent == "spellReach" and features.spellReachPosition.default == "left")
+assert(type(features.spellReach.button) == "function", "the settings offer a spell picker")
+assert(features.spellReachPosition.parent == "spellReach" and features.spellReachPosition.default == "right")
 assert(features.spellReachPosition.options[1][1] == "left" and features.spellReachPosition.options[3][1] == "below")
 assert(features.spellReachSize.parent == "spellReach" and features.spellReachSize.default == 100)
 assert(features.spellReachSize.slider.min == 50 and features.spellReachSize.slider.max == 200)
 assert(features.spellReachStyle.default == "red" and features.spellReachStyle.options[3][1] == "hidden")
-assert(features.spellReachTargets.default == "all" and features.spellReachTargets.options[2][1] == "target")
+assert(features.spellReachTargets.parent == "spellReach")
+assert(features.spellReachTargets.default == false, "only on my target is off by default")
+assert(not features.spellReachTargets.options, "a plain toggle, not a second which-plates choice")
 
--- Icons: the class's spells the character knows, in the class's order, each with whether it reaches.
+-- Context: the active specialisation and stance or form, so each remembers its own spells.
+assert(Model.Context(1, 0) == "1:0")
+assert(Model.Context(nil, nil) == "0:0")
+assert(Model.Context(2, 3) == "2:3")
+
+-- Melee: a Combat Range of 5 yards or less, not a longer ranged one.
+assert(Model.Melee(5) and Model.Melee(1))
+assert(not Model.Melee(10) and not Model.Melee(30) and not Model.Melee(0) and not Model.Melee(nil))
+
+-- Tracked: the player's own picks for this context, only the spells still known, else the class's defaults.
 local function knownSpells(...)
 	local known = {}
 	for _, id in ipairs({ ... }) do
@@ -195,29 +310,64 @@ local function knownSpells(...)
 		return known[id] == true
 	end
 end
-local icons = Model.Icons("SHAMAN", knownSpells(8042, 403), function(id)
-	return id == 403
+local hunter = knownSpells(2973, 75, 116)
+assert(#Model.Default("HUNTER", hunter) == 2, "the hunter's Raptor Strike and Auto Shot")
+assert(Model.Default("HUNTER", knownSpells(75))[1] == 75, "only the spells the character knows")
+assert(#Model.Default("MONK", hunter) == 0, "a class with no attacks has none")
+local saved = { ["1:0"] = { 116, 2973 } }
+local tracked = Model.Tracked("HUNTER", saved, "1:0", hunter)
+assert(#tracked == 2 and tracked[1] == 116 and tracked[2] == 2973, "the picks win")
+saved["1:0"] = { 116, 585 }
+assert(#Model.Tracked("HUNTER", saved, "1:0", hunter) == 1, "a pick the character no longer knows is dropped")
+assert(#Model.Tracked("HUNTER", {}, "1:0", hunter) == 2, "no picks for this context leaves the default")
+assert(#Model.Tracked("HUNTER", { ["1:0"] = {} }, "1:0", hunter) == 0, "an empty pick list means none")
+local picks = {}
+Model.Toggle(picks, 116)
+Model.Toggle(picks, 2973)
+assert(#picks == 2 and picks[1] == 116 and picks[2] == 2973)
+Model.Toggle(picks, 116)
+assert(#picks == 1 and picks[1] == 2973, "toggling again takes it out")
+
+-- Choices: the character's harmful spells with a range, melee included, by name.
+local facts = {
+	[2973] = { name = "Raptor Strike", icon = 1, range = 5, harmful = true },
+	[75] = { name = "Auto Shot", icon = 2, range = 35, harmful = true },
+	[116] = { name = "Frostbolt", icon = 3, range = 30, harmful = true },
+	[585] = { name = "Smite", icon = 4, range = 30, harmful = false },
+	[78] = { name = "Heroic Strike", icon = 5, range = 5, harmful = true },
+}
+local choices = Model.Choices({ 2973, 75, 116, 585, 78 }, function(id)
+	return facts[id]
 end)
-assert(#icons == 2)
-assert(icons[1].id == 8042 and icons[1].reaches == false, "the shock is short")
-assert(icons[2].id == 403 and icons[2].reaches == true, "the bolt reaches")
-icons = Model.Icons("SHAMAN", knownSpells(403), function()
-	return true
-end)
-assert(#icons == 1 and icons[1].id == 403, "only the spells the character knows")
-assert(#Model.Icons("SHAMAN", knownSpells(8042, 403), function()
+assert(#choices == 4, "a friendly spell is left out")
+assert(
+	choices[1].name == "Auto Shot"
+		and choices[2].name == "Frostbolt"
+		and choices[3].name == "Heroic Strike"
+		and choices[4].name == "Raptor Strike",
+	"by name"
+)
+
+-- Icons: each spell the character knows, each with whether it reaches. A nil answer is left out, a secret one
+-- is kept for the engine to read.
+assert(#Model.Icons({ 2973, 75 }, hunter, function(id)
+	return id == 75
+end) == 2)
+assert(#Model.Icons({ 2973 }, hunter, function()
 	return nil
 end) == 0, "a spell the client cannot answer for is left out")
-assert(#Model.Icons("MONK", knownSpells(8042), function()
-	return true
-end) == 0, "a class with no spells has none")
+local secret = Model.Icons({ 2973 }, hunter, function()
+	return "secret"
+end)
+assert(#secret == 1 and secret[1].reaches == "secret", "a secret answer is kept")
 
 -- Size: the chosen percentage of the bar's height, clamped to the slider's bounds.
 assert(Model.Size(20, 100) == 20 and Model.Size(10, 50) == 5 and Model.Size(20, 200) == 40)
 assert(Model.Size(20, nil) == 20, "no setting is the bar's own height")
 assert(Model.Size(20, 5) == 10 and Model.Size(20, 900) == 40, "the size stays inside the slider's bounds")
 
--- Wired up: every enemy plate gets its row, lit by what reaches that enemy.
+-- Wired up: every enemy plate gets its row, lit by what reaches that enemy. The melee ability answers through
+-- the 5 yard item check, which the spell range check cannot.
 db.spellReach = true
 for _, fn in ipairs(initializers) do
 	fn()
@@ -227,28 +377,50 @@ handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#ticks == 1, "the first plate starts the polling")
 local row1 = created[plateFrames.nameplate1]
 assert(row1.shown and row1.width == 20 * 2 + 2, "the default size is the bar height")
-local shock, bolt = row1.textures[1], row1.textures[3]
+local meleeIcon, bolt = row1.textures[1], row1.textures[3]
+assert(meleeIcon.texture == "icon2973" and bolt.texture == "icon75", "both tracked spells are drawn")
 assert(
-	shock.texture == "icon8042" and shock.desaturated and shock.color[1] == 1 and shock.color[2] == 0.08,
-	"the shock is solid red"
+	meleeIcon.desaturated and meleeIcon.color[1] == 1 and meleeIcon.color[2] == 0.08,
+	"a melee ability out of reach is red, answered by the item check"
 )
+assert(bolt.desaturated == false and bolt.color[1] == 1, "the shot reaches, so it stays in colour")
+
+-- Walking into melee reach: the item check says yes and the melee icon lights, where its own range check
+-- answered nil and nothing could ever light it.
+melee.nameplate1 = true
+ticks[1]()
 assert(
-	bolt.texture == "icon403" and bolt.desaturated == false and bolt.color[1] == 1 and bolt.color[2] == 1,
-	"the bolt is in full colour"
+	meleeIcon.desaturated == false and meleeIcon.color[2] == 1,
+	"the melee ability lights up on the item check, not the nil spell range check"
 )
+melee.nameplate1 = false
+ticks[1]()
+
+-- The ranged spell's own range check still answers, so it reddens out of range on its own.
+range.nameplate1[75] = false
+ticks[1]()
+assert(bolt.desaturated and bolt.color[2] == 0.08, "a ranged spell out of range is red")
+range.nameplate1[75] = true
+ticks[1]()
+assert(bolt.desaturated == false and bolt.color[1] == 1)
 
 handlers.NAME_PLATE_UNIT_ADDED("nameplate2")
 assert(#ticks == 1, "one ticker for every plate")
 local row2 = created[plateFrames.nameplate2]
-assert(row2.textures[1].color[1] == 1 and row2.textures[3].color[1] == 1, "both reach the second enemy")
+assert(row2.textures[1].color[2] == 1 and row2.textures[3].color[1] == 1, "both reach the second enemy")
 
--- Walking in: the next poll lights the shock.
-reach.nameplate1[8042] = true
+-- A secret range answer cannot be read: the engine's own setters take it.
+range.nameplate1[75] = "secret"
 ticks[1]()
-assert(shock.desaturated == false and shock.color[1] == 1 and shock.color[2] == 1)
+assert(
+	bolt.alphaFromBoolean and bolt.alphaFromBoolean.value == "secret" and bolt.colorFromBoolean.value == "secret",
+	"a secret answer goes to the engine"
+)
+range.nameplate1[75] = false
+ticks[1]()
 
 -- Position: each choice anchors the row against the stock plate's own neighbour frame, so it clears the raid
--- marker, the level and the cast bar.
+-- marker, the level and the cast bar. The icon sits on the right of the bar by default.
 local function Points(region)
 	local out = {}
 	for _, point in ipairs(region.points) do
@@ -256,43 +428,42 @@ local function Points(region)
 	end
 	return out
 end
-assert(Points(row1)[1] == "RIGHT:raid:LEFT:-2:0", "left of the bar sits past the raid marker")
-db.spellReachPosition = "right"
+assert(Points(row1)[1] == "LEFT:level:RIGHT:2:0", "right of the bar is the default")
+db.spellReachPosition = "left"
 changes.spellReachPosition()
-assert(Points(row1)[1] == "LEFT:level:RIGHT:2:0", "right of the bar sits past the level")
+assert(Points(row1)[1] == "RIGHT:raid:LEFT:-2:0", "left of the bar sits past the raid marker")
 db.spellReachPosition = "below"
 changes.spellReachPosition()
 assert(Points(row1)[1] == "TOP:cast:BOTTOM:0:-2", "below the bar sits under the plate, clear of the cast bar")
-db.spellReachPosition = "left"
+db.spellReachPosition = "right"
 changes.spellReachPosition()
-assert(Points(row1)[1] == "RIGHT:raid:LEFT:-2:0")
 
 -- Size: the slider reaches the drawn icon.
 db.spellReachSize = 50
 changes.spellReachSize()
-assert(row1.width == 10 * 2 + 2 and shock.width == 10, "a smaller size redraws the row and its icons")
+assert(row1.width == 10 * 2 + 2 and meleeIcon.width == 10, "a smaller size redraws the row and its icons")
 db.spellReachSize = 100
 changes.spellReachSize()
 
 -- Out of range look: red by default, faded dims and desaturates, hidden drops the icon.
-reach.nameplate1[8042] = false
+melee.nameplate1 = false
 ticks[1]()
 db.spellReachStyle = "faded"
 changes.spellReachStyle()
-assert(shock.desaturated and shock.color[1] == 0.6 and shock.alpha == 0.7 and shock.shown)
+assert(meleeIcon.desaturated and meleeIcon.color[1] == 0.6 and meleeIcon.alpha == 0.7 and meleeIcon.shown)
 db.spellReachStyle = "hidden"
 changes.spellReachStyle()
-assert(not shock.shown and not row1.borders[1].shown, "hidden out of range icons are not drawn")
+assert(not meleeIcon.shown and not row1.borders[1].shown, "hidden out of range icons are not drawn")
 db.spellReachStyle = "red"
 changes.spellReachStyle()
-assert(shock.shown and shock.color[1] == 1 and shock.color[2] == 0.08)
+assert(meleeIcon.shown and meleeIcon.color[1] == 1 and meleeIcon.color[2] == 0.08)
 
--- Which plates: every enemy by default, or only the current target's.
+-- Only on my target: off shows every enemy, on keeps the target's plate and drops the rest.
 plateFrames.target = plateFrames.nameplate1
-db.spellReachTargets = "target"
+db.spellReachTargets = true
 changes.spellReachTargets()
 assert(row1.shown and not row2.shown, "target only keeps the target's plate and drops the rest")
-db.spellReachTargets = "all"
+db.spellReachTargets = false
 changes.spellReachTargets()
 assert(row1.shown and row2.shown)
 plateFrames.target = nil
@@ -324,5 +495,27 @@ assert(not row1.shown and cancelled == 2, "switched off")
 db.spellReach = true
 changes.spellReach()
 assert(row1.shown and #ticks == 3, "and back on")
+
+-- The picker: the character's spells with a checkbox, icon and name, the class's attacks ticked, and a pick
+-- remembered per specialisation, stance or form.
+local picker = features.spellReach.button()
+assert(picker.TitleText.text == "Spells to track")
+local pickerRows = picker.Rows
+assert(#pickerRows == 5, "the book's harmful spells with a range")
+local bySpell = {}
+for _, pickerRow in ipairs(pickerRows) do
+	bySpell[pickerRow.spell] = pickerRow
+end
+assert(bySpell[2973] and bySpell[2973].Text.text == "Spell2973" and bySpell[2973].Icon.texture == 1000 + 2973)
+assert(bySpell[2973].checked and bySpell[75].checked, "the hunter's defaults start ticked")
+assert(not bySpell[116].checked)
+bySpell[116].scripts.OnClick(bySpell[116])
+assert(#char.spellReach["1:0"] == 3, "a pick is remembered for this specialisation, stance or form")
+assert(bySpell[116].checked, "the picked spell shows ticked")
+bySpell[78].scripts.OnClick(bySpell[78])
+assert(#char.spellReach["1:0"] == 4)
+assert(not bySpell[403].enabled, "a full row stops taking more spells")
+bySpell[116].scripts.OnClick(bySpell[116])
+assert(#char.spellReach["1:0"] == 3 and not bySpell[116].checked, "and unticking takes it back out")
 
 print("spellreach_spec: ok")

@@ -43,7 +43,7 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 - **Map extras.** Reveal unexplored areas in a blue tint, see each zone's level range coloured like quest levels, and find every dungeon and raid entrance marked with retail's icons.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout, with Reset to put them back.
 - **Nameplates.** A taller bar in retail's own frame, with name and level above, your target outlined and cast bars with the spell's icon.
-- **Spell reach under nameplates.** A small icon for each of your class's main attacks on every enemy nameplate: full colour when the spell can reach, solid red when it cannot. Off until you turn it on, with where the icons sit, their size, the out of range look and which plates they show on under the setting.
+- **Spell reach under nameplates.** A small icon for each attack you track on every enemy nameplate: full colour when the spell can reach, solid red when it cannot, melee included. Off until you turn it on, with where the icons sit (to the right of the bar by default), their size, the out of range look, an only-on-my-target toggle, and a spell picker under the setting.
 - **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
 - **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
