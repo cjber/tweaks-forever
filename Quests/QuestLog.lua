@@ -228,7 +228,9 @@ ns.Init(function()
 		selected, pending, page = {}, nil, 1
 	end)
 	panel:SetScript("OnShow", Refresh)
-	local open = CreateFrame("Button", nil, QuestMapFrame.QuestsFrame, "UIPanelButtonTemplate")
+	-- Parented to the list itself, which the world map hides while a quest's details are shown: the button goes
+	-- with it, rather than sitting over the details page.
+	local open = CreateFrame("Button", nil, QuestScrollFrame, "UIPanelButtonTemplate")
 	open:SetFrameLevel(QuestScrollFrame:GetFrameLevel() + 1)
 	open:SetSize(140, 22)
 	open:SetPoint("BOTTOM", 0, 4)
