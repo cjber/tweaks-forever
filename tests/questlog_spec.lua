@@ -136,6 +136,16 @@ end
 function methods:IsShown()
 	return self.shown
 end
+function methods:IsVisible()
+	local frame = self
+	while frame do
+		if not frame.shown then
+			return false
+		end
+		frame = frame.parent
+	end
+	return true
+end
 function methods:SetEnabled(enabled)
 	self.enabled = enabled
 end
@@ -190,6 +200,12 @@ ns.On = function() end
 log = { { title = "First", questID = 101 }, { title = "Last", questID = 104 } }
 init[2]()
 local open = Button("Abandon quests")
+-- The world map hides the quest list and shows one quest's details in its place; the button belongs to the list
+-- and must go with it, rather than sitting over the details page.
+assert(open.parent == scroll, "the Abandon quests button must be parented to the quest list")
+scroll:SetShown(false)
+assert(not open:IsVisible(), "the button hides with the list while a quest's details show")
+scroll:SetShown(true)
 -- The native scroll area's background receives clicks across the button's bounds.
 local receiver = open.level > scroll.level and open or scroll
 assert(receiver.scripts.OnClick, "the native scroll area must not intercept Abandon quests")

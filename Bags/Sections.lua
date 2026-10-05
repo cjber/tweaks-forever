@@ -133,19 +133,22 @@ function Model.Arrange(height, lift, columns)
 	table.sort(items, BlizzardOrder)
 	local rows = math.ceil(#items / columns)
 	local total = height
+	local places, heads
 	if Model.Active() then
-		local _, _, sectionsHeight = Model.Layout(items, sections, columns)
+		-- The heights and places of one layout: sections the bag can hold are placed from it, not laid out again.
+		local measured, measuredHeads, sectionsHeight = Model.Layout(items, sections, columns)
 		local tall = total + sectionsHeight - rows * STEP
 		if tall * MIN_SCALE + CONTAINER_OFFSET_Y <= GetScreenHeight() then
-			total = tall
+			total, places, heads = tall, measured, measuredHeads
 		else
 			sections = {}
 		end
 	else
 		sections = {}
 	end
-
-	local places, heads = Model.Layout(items, sections, columns)
+	if not places then
+		places, heads = Model.Layout(items, sections, columns)
+	end
 	local money, origin = bag.MoneyFrame, ORIGIN_Y + lift
 	for index, item in ipairs(items) do
 		local place = places[index]

@@ -41,7 +41,7 @@ end
 
 local env = setmetatable({
 	Settings = {
-		VarType = { Boolean = "boolean", String = "string" },
+		VarType = { Boolean = "boolean", String = "string", Number = "number" },
 		RegisterVerticalLayoutCategory = function(name)
 			return Category(name)
 		end,
@@ -61,6 +61,15 @@ local env = setmetatable({
 			assert(setting.varType == "string" and options)
 			return Initializer("dropdown", setting)
 		end,
+		CreateSliderOptions = function(minValue, maxValue, step)
+			return { SetLabelFormatter = function() end, min = minValue, max = maxValue, step = step }
+		end,
+		CreateSliderInitializer = function(setting, options)
+			assert(setting.varType == "number" and options)
+			local initializer = Initializer("slider", setting)
+			initializer.options = options
+			return initializer
+		end,
 		RegisterInitializer = function(category, initializer)
 			registered[#registered + 1] = { category = category, initializer = initializer }
 		end,
@@ -71,6 +80,7 @@ local env = setmetatable({
 		return { kind = "button", name = name }
 	end,
 	SettingsPanel = { HookScript = function() end },
+	MinimalSliderWithSteppersMixin = { Label = { Right = "Right" } },
 	RED_FONT_COLOR = {
 		WrapTextInColorCode = function(_, text)
 			return text
@@ -86,6 +96,13 @@ ns = {
 		{ key = "repair", category = "Merchants", name = "Repair", tooltip = "Repairs." },
 		{ key = "guildRepair", category = "Merchants", name = "Guild repair", parent = "repair" },
 		{ key = "gearMark", category = "Bags", name = "Mark", options = { { "strip", "Strip" } } },
+		{
+			key = "iconSize",
+			category = "Interface",
+			name = "Icon size",
+			default = 100,
+			slider = { min = 50, max = 200, step = 5 },
+		},
 	},
 	Init = function(fn)
 		fn()
@@ -113,7 +130,8 @@ for index, entry in ipairs(registered) do
 end
 assert(
 	table.concat(kinds, " ")
-		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever",
+		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever "
+			.. "slider@Interface button@Tweaks Forever",
 	table.concat(kinds, " ")
 )
 local repair, guildRepair = registered[1].initializer, registered[2].initializer
@@ -138,4 +156,10 @@ assert(not Modifiable(repair), "a row missing an addon it needs is greyed out")
 assert(repair.tooltip():find("Needs QuestieDB, which isn't loaded", 1, true), "and says so")
 missing.repair = nil
 assert(registered[4].initializer.setting.variable == "TweaksForever_gearMark")
+local size = registered[6].initializer
+assert(
+	size.setting.variable == "TweaksForever_iconSize" and size.setting.varType == "number",
+	"a slider is a number setting"
+)
+assert(size.options.min == 50 and size.options.max == 200 and size.options.step == 5, "the slider takes its bounds")
 print("settings: ok")

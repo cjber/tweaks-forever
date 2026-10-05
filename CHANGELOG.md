@@ -11,7 +11,26 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-10-05
+
+- **Maximum camera zoom.** The camera pulls back further than the game's own Max Camera Distance setting allows. Off by default, and the value you had before comes back when you switch it off.
+
+- **No screen glow.** Turns off the full screen glow effect. Off by default, and the value you had before comes back when you switch it off.
+
+- **Train all button.** A button beside the class trainer's Train button buys every spell the trainer is offering that your gold covers, in one click. It buys nothing on its own, and its tooltip says why when nothing is available or you cannot pay for it all. Off by default.
+
+- **Invite from whispers.** A whisper that is exactly the keyword you pick, **inv**, **invite** or **group**, invites its sender to your group when you can invite. Off by default.
+
+- **Skip loot confirmations.** The game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on Pickup item, is confirmed for you. Only the warnings your own clicks raise. Off by default.
+
+- **Item level column in the auction house.** Weapons and armour on the Browse tab get a sortable iLvl column between Name and Available, with the item level no longer repeated after the name. On by default.
+
+- **Spell reach under nameplates.** A small icon for each attack you track sits on every enemy nameplate, in full colour when that spell can reach the enemy and a solid red when it cannot, melee included, so you can see what reaches a mob before you pull it. It starts with your class's own attacks, one for each reach: a shaman sees a shock and Lightning Bolt, a hunter Raptor Strike and Auto Shot. A **Spells to track** list under the setting shows your known spells by icon and name and remembers your choices per character, specialisation and stance or form. The icon sits to the right of the health bar by default, clear of the level, and the setting chooses where it sits, its size, whether out of range icons are red, faded or hidden, and whether they show on every enemy or only your target. Off by default.
 - **Grey junk uses the game's own Sell All Junk.** Automatic selling delegates grey items to the native bulk sale instead of stepping through bag slots. Manually marked non-grey items retain their 12-stack limit per merchant visit.
+
+- **Tooltips can follow the cursor.** The game's own tooltips sit under the mouse instead of in the corner of the screen. Off by default, and a window that places its own tooltip, such as a bag item's, is left alone.
+
+- **The Abandon quests button goes with the quest list.** It hides while a single quest's details are open on the world map, instead of showing over them.
 
 ## [0.8.0] - 2026-10-03
 

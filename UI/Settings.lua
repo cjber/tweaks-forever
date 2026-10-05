@@ -28,16 +28,28 @@ local function Tooltip(feature)
 	end
 end
 
+-- Indent a row under a feature and grey it out while that feature is off. Not SetParentInitializer: the settings
+-- search reads that link from every row, so ours tainted it and Social's Discord Sign In in the results was blocked.
+---@param initializer any
+---@param key string
+local function Nest(initializer, key)
+	initializer:Indent()
+	initializer:AddModifyPredicate(function()
+		return ns.Active(key)
+	end)
+	initializer:AddEvaluateStateCVar(ns.SettingVariable(key))
+end
+
 ---@param category SettingsCategoryMixin
 ---@param feature TFFeature
 local function AddSetting(category, feature)
-	local options = feature.options
+	local options, slider = feature.options, feature.slider
 	local setting = Settings.RegisterAddOnSetting(
 		category,
 		ns.SettingVariable(feature.key),
 		feature.key,
 		ns.db,
-		options and Settings.VarType.String or Settings.VarType.Boolean,
+		options and Settings.VarType.String or slider and Settings.VarType.Number or Settings.VarType.Boolean,
 		L[feature.name],
 		feature.default
 	)
@@ -50,6 +62,13 @@ local function AddSetting(category, feature)
 			end
 			return container:GetData()
 		end, Tooltip(feature))
+	elseif slider then
+		-- A number the player drags, in the stock slider style, with the value shown as a percentage.
+		local sliderOptions = Settings.CreateSliderOptions(slider.min, slider.max, slider.step or 1)
+		sliderOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
+			return string.format("%d%%", math.floor(value + 0.5))
+		end)
+		initializer = Settings.CreateSliderInitializer(setting, sliderOptions, Tooltip(feature))
 	else
 		initializer = Settings.CreateCheckboxInitializer(setting, nil, Tooltip(feature))
 	end
@@ -57,16 +76,15 @@ local function AddSetting(category, feature)
 		return not ns.ConflictOf(feature.key) and not ns.MissingOf(feature.key)
 	end)
 	if feature.parent then
-		-- Not SetParentInitializer: the settings search reads that link from every row, so ours tainted it and
-		-- Social's Discord Sign In in the results was blocked. An indent, a predicate and a re-check on the
-		-- parent's value give the same greyed, nested row.
-		initializer:Indent()
-		initializer:AddModifyPredicate(function()
-			return ns.Active(feature.parent)
-		end)
-		initializer:AddEvaluateStateCVar(ns.SettingVariable(feature.parent))
+		Nest(initializer, feature.parent)
 	end
 	Settings.RegisterInitializer(category, initializer)
+	-- A button opening a panel the feature needs, indented under it and greyed while it is off.
+	if feature.button then
+		local button = CreateSettingsButtonInitializer(L["Spells to track"], L["Choose"], feature.button, nil, false)
+		Nest(button, feature.key)
+		Settings.RegisterInitializer(category, button)
+	end
 end
 
 ns.Init(function()

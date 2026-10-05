@@ -149,19 +149,75 @@
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
+-- One spell icon under an enemy's nameplate: the spell, and whether it reaches that enemy. The answer is a
+-- secret in restricted contexts, handed straight to the engine rather than read.
+---@class TFReachIcon
+---@field id integer
+---@field reaches boolean|any
+
+---@class TFReachRow : Frame
+---@field icons Texture[]
+---@field borders Texture[]
+
+-- What the client says about one spell, for the picker and the range check.
+---@class TFFacts
+---@field name string
+---@field icon number
+---@field range number
+---@field harmful boolean
+
+-- One spell the picker offers: what to draw and what to track.
+---@class TFReachChoice
+---@field id integer
+---@field name string
+---@field icon number
+
+-- One row of the spell picker: the stock checkbox plus the spell's icon.
+---@class TFReachPickerRow : CheckButton
+---@field Icon Texture
+---@field Text FontString
+---@field spell integer?
+
+-- The spell picker panel, built the first time it is opened.
+---@class TFSpellReachPicker : Frame
+---@field TitleText FontString
+---@field Content Frame
+---@field Rows TFReachPickerRow[]
+
+-- The client reads a spell's reach: whether a spell is known, and whether it reaches a unit. Aliased so the
+-- nested function types parse inside the field signatures below.
+---@alias TFSpellKnown fun(id: integer): boolean
+---@alias TFSpellReaches fun(id: integer): boolean|nil
+---@alias TFReachFacts fun(id: integer): TFFacts?
+
+---@class TFSpellReach
+---@field Open fun(): TFSpellReachPicker
+---@field Refresh fun()
+---@field Tracked fun(class: string, saved: table<string, integer[]>, context: string, known: TFSpellKnown): integer[]
+---@field Default fun(class: string, known: TFSpellKnown): integer[]
+---@field Toggle fun(list: integer[], id: integer): integer[]
+---@field Context fun(group: integer?, form: integer?): string
+---@field Melee fun(maxRange: number?): boolean
+---@field Choices fun(ids: integer[], facts: TFReachFacts): TFReachChoice[]
+---@field Icons fun(ids: integer[], known: TFSpellKnown, reaches: TFSpellReaches): TFReachIcon[]
+---@field Size fun(barHeight: number, percent: number?): integer
+
 ---@class TFDatabase
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
 ---@field savedSounds? table<string, string>
+---@field cameraZoomSaved? string
+---@field screenGlowSaved? string
 ---@field lastVersion? string the addon version last logged in with
 ---@field windowLayouts? table<string, table<string, TFPosition>>
----@field [string] boolean|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>
+---@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>
 
 ---@class TFCharacterDatabase
 ---@field groups TFGroups
 ---@field colours TFColours
 ---@field beforeFishing? table<integer, integer>
 ---@field trainer? table<integer, TFTrainerSpell>
+---@field spellReach? table<string, integer[]> player-picked spell ids keyed by specialisation, stance or form
 
 ---@type TFDatabase
 TweaksForeverDB = nil
@@ -178,10 +234,12 @@ TweaksForeverCharDB = nil
 ---@field category string
 ---@field name string
 ---@field tooltip? string
----@field default boolean|string
+---@field default boolean|string|number
 ---@field conflicts? TFConflict[]
 ---@field options? [string, string][]
+---@field slider? { min: number, max: number, step?: number }
 ---@field parent? string
+---@field button? fun()
 ---@field needs? TFNeed
 
 -- Another addon a feature can't work without: `check` finds it, and `title` names it while it's missing.
@@ -207,6 +265,9 @@ TweaksForeverCharDB = nil
 ---@field Gear TFGear
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
+---@field SpellReach TFSpellReach
+---@field AuctionHouse TFAuctionHouse
+---@field WhisperInvite TFWhisperInvite
 ---@field Exploration TFExploration
 ---@field CombinedBag TFCombinedBag
 ---@field Sections TFSections

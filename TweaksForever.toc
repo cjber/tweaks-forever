@@ -23,6 +23,8 @@ Data\ClassSpells.lua
 Data\ForeverQuests.lua
 Core\Core.lua
 Features\Automation.lua
+Features\WhisperInvite.lua
+Features\LootConfirm.lua
 Bags\Vendor.lua
 Core\Modes.lua
 Bags\Junk.lua
@@ -39,7 +41,9 @@ Quests\QuestGivers.lua
 Quests\QuestProgress.lua
 Quests\QuestLog.lua
 UI\Tooltips.lua
+UI\CursorTooltip.lua
 UI\Nameplates.lua
+UI\SpellReach.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua
 Integrations\Navigate.lua
@@ -47,7 +51,11 @@ Map\DungeonEntrances.lua
 Map\DungeonEntrances.xml
 UI\Frames.lua
 UI\Errors.lua
+UI\CameraZoom.lua
+UI\ScreenGlow.lua
+UI\TrainAll.lua
 UI\MacroNames.lua
+UI\AuctionHouse.lua
 UI\Spellbook.lua
 Features\Fishing.lua
 UI\Reload.lua

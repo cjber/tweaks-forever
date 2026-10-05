@@ -119,6 +119,7 @@ function GetTrainerServiceInfo(index) end
 ---@class NamePlateUnitFrame : Button
 ---@field HealthBarsContainer Frame|{healthBar: NamePlateHealthBar}
 ---@field CastBarsContainer Frame|{castBar: NamePlateCastBar}
+---@field RaidTargetFrame Frame
 ---@field PlayerLevelDiffFrame NamePlateLevelFrame
 ---@field LevelFrame Frame
 ---@field name FontString
@@ -185,6 +186,21 @@ PROFESSIONS_BUTTON = ""
 SETTINGS = ""
 ---@type string
 TRADE = ""
+
+-- The auction house's category tree (Blizzard_AuctionData.lua). The pinned annotation marks the mixin but not
+-- the fields this addon reads, nor the detail column it sets through the client's own method.
+---@class AuctionCategoryMixin
+---@field name string
+---@field detailColumnString? string
+---@field SetDetailColumnString fun(self: AuctionCategoryMixin, detailColumnString: string?)
+
+-- Auction house strings the addon shows as they are, absent from Ketho's annotations.
+---@type string
+ITEM_LEVEL_ABBR = ""
+---@type string
+AUCTION_CATEGORY_WEAPONS = ""
+---@type string
+AUCTION_CATEGORY_ARMOR = ""
 
 -- QuestMapFrame.xml places its quest text inside this scroll child.
 ---@class QuestMapDetailsScrollFrame

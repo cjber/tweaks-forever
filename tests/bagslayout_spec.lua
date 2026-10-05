@@ -221,8 +221,17 @@ local function at(region)
 	return relative == money and (x + 0) .. "," .. y or nil -- -0 + 0 is 0
 end
 
+-- The sections' layout is one pass over the items: the heights that say whether they fit are the places drawn from.
+local layouts = 0
+local layout = ns.Sections.Layout
+ns.Sections.Layout = function(...)
+	layouts = layouts + 1
+	return layout(...)
+end
+
 -- Blizzard lays the bag out and anchors it. Twelve reagent slots in ten columns: two rows and the gap lift the rest.
 Anchors()
+assert(layouts == 1, "one layout pass when the sections fit: " .. layouts)
 local lift = 2 * 42 + 6
 assert(reagents:GetParent() == bag, "reagent window moves into the bag")
 assert(at(reagents) == "0,0" and reagents:GetScale() == 1, "reagent window sits on the money frame")

@@ -77,7 +77,8 @@ skill line are counted and left out. Same cache and flags as `gen_overlays.py`, 
 
 The *Refresh game data* workflow runs `latest_build.py` daily, and when a newer
 build is listed it bumps `BUILD` in every generator, regenerates, runs the checks and
-opens a PR.
+opens a PR. A scheduled run that fails opens the "Data refresh failed" issue, or
+comments on it when it is already open.
 
 `changelog.py` prints the section of `CHANGELOG.md` for one version; the release
 workflow passes it to the packager as the release notes, and fails on a tag with

@@ -86,3 +86,27 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           BRANCH: ${{ needs.refresh.outputs.branch }}
+
+  # A refresh that fails unseen is how the data falls behind the client: one open issue says so.
+  report:
+    needs: [refresh, ci]
+    if: failure() && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          TITLE: Data refresh failed
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          body="The data refresh failed: $RUN_URL
+
+          A generator rejects client data it cannot place, so read the error in that run, correct the generator from the new client rows, and close this issue once a run passes."
+          issue=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "in:title \"$TITLE\"" \
+            --json number,title --jq "[.[] | select(.title == \"$TITLE\")][0].number // empty")
+          if [ -n "$issue" ]; then
+            gh issue comment "$issue" --repo "$GITHUB_REPOSITORY" --body "Failed again: $RUN_URL"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$TITLE" --body "$body" --assignee "$GITHUB_REPOSITORY_OWNER"
+          fi
