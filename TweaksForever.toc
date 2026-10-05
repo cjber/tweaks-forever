@@ -41,6 +41,7 @@ Quests\QuestGivers.lua
 Quests\QuestProgress.lua
 Quests\QuestLog.lua
 UI\Tooltips.lua
+UI\CursorTooltip.lua
 UI\Nameplates.lua
 UI\SpellReach.lua
 Map\Exploration.lua
