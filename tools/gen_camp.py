@@ -6,15 +6,18 @@
 """Generate the camp benefit texts for the pinned Forever client (stdlib only)."""
 
 import argparse
-import csv
-import io
 import re
 import sys
 import urllib.error
-import urllib.request
 from pathlib import Path
 
+try:
+    from tools.forever_tools import wago
+except ModuleNotFoundError:
+    from forever_tools import wago
+
 BUILD = "1.60.1.70205"
+USER_AGENT = "TweaksForever/1.0"
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / ".cache"
 OUTPUT = ROOT / "Data" / "CampBenefits.lua"
@@ -33,26 +36,11 @@ SCALING = (
 
 
 def db2(name, key, refresh=False, offline=False):
-    path = CACHE / f"{name}-{BUILD}.csv"
-    if path.exists() and not refresh:
-        data = path.read_bytes()
-    else:
-        if offline:
-            raise ValueError(f"Missing cached source: {path}")
-        url = f"https://wago.tools/db2/{name}/csv?build={BUILD}"
-        request = urllib.request.Request(url, headers={"User-Agent": "TweaksForever/1.0"})
-        with urllib.request.urlopen(request, timeout=600) as response:
-            data = response.read()
-    reader = csv.DictReader(io.StringIO(data.decode("utf-8-sig")), strict=True)
-    if key not in (reader.fieldnames or []):
-        raise ValueError(f"{name}: no {key} column (or an HTML response)")
     rows = {}
-    for row in reader:
-        rows.setdefault(int(row[key]), []).append(row)
-    if not rows:
-        raise ValueError(f"{name}: empty DB2 export")
-    CACHE.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(data)
+    for row in wago.db2_rows(
+        name, BUILD, CACHE, user_agent=USER_AGENT, refresh=refresh, offline=offline, timeout=600, ints=[key]
+    ):
+        rows.setdefault(row[key], []).append(row)
     return rows
 
 
@@ -197,5 +185,5 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (ValueError, KeyError, OSError, csv.Error, urllib.error.URLError) as error:
+    except (ValueError, KeyError, OSError, urllib.error.URLError) as error:
         sys.exit(f"gen_camp: {error}")

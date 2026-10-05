@@ -20,15 +20,18 @@ an exploration level; the script lists those so a newer build that adds one is n
 """
 
 import argparse
-import csv
-import io
 import sys
 import urllib.error
-import urllib.request
 from pathlib import Path
+
+try:
+    from tools.forever_tools import wago
+except ModuleNotFoundError:
+    from forever_tools import wago
 
 BUILD = "1.60.1.70205"
 ROOT = Path(__file__).resolve().parent.parent
+USER_AGENT = "TweaksForever/1.0"
 CACHE = ROOT / "tools" / ".cache"
 OUTPUT = ROOT / "Data" / "ZoneLevels.lua"
 AZEROTH = 947
@@ -94,22 +97,9 @@ UNRANGED = {
 
 
 def db2(name, refresh=False, offline=False):
-    path = CACHE / f"{name}-{BUILD}.csv"
-    if path.exists() and not refresh:
-        data = path.read_bytes()
-    else:
-        if offline:
-            raise ValueError(f"Missing cached source: {path}")
-        url = f"https://wago.tools/db2/{name}/csv?build={BUILD}"
-        request = urllib.request.Request(url, headers={"User-Agent": "TweaksForever/1.0"})
-        with urllib.request.urlopen(request, timeout=300) as response:
-            data = response.read()
-    rows = list(csv.DictReader(io.StringIO(data.decode("utf-8-sig")), strict=True))
-    if not rows or "ID" not in rows[0]:
-        raise ValueError(f"{name}: empty export (or an HTML response)")
-    CACHE.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(data)
-    return rows
+    return wago.db2_rows(
+        name, BUILD, CACHE, user_agent=USER_AGENT, refresh=refresh, offline=offline, timeout=300, required=["ID"]
+    )
 
 
 def hover_zones(ui_maps):
@@ -192,5 +182,5 @@ def main():
 if __name__ == "__main__":
     try:
         main()
-    except (ValueError, KeyError, OSError, csv.Error, urllib.error.URLError) as error:
+    except (ValueError, KeyError, OSError, urllib.error.URLError) as error:
         sys.exit(f"gen_zonelevels: {error}")

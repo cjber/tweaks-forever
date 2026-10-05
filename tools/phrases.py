@@ -15,7 +15,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
-from tools.lint_multivalue import LuaSyntaxError, Token, toc_paths, tokenize
+from tools.forever_tools.lua import LuaSyntaxError, Token, tokenize
 
 PHRASES = Path("Locales/phrases.txt")
 TEMPLATE = """-- Copy this file to Locales/<locale>.lua, set the locale below, translate the right-hand side of
@@ -71,6 +71,15 @@ class Finding:
     path: Path
     line: int
     message: str
+
+
+def toc_paths() -> list[Path]:
+    # Follow the release's actual load list, including generated runtime data; XML templates carry no Lua.
+    return [
+        Path(line.replace("\\", "/"))
+        for line in Path("TweaksForever.toc").read_text().splitlines()
+        if line.strip().endswith(".lua") and not line.startswith("#")
+    ]
 
 
 def decode(token: Token) -> str:
