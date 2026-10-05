@@ -65,7 +65,7 @@ jobs:
       - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
       - run: uvx ruff@0.16.8 check tools
       - run: uvx ruff@0.16.8 format --check tools
-      - run: uvx ty@0.0.83 check tools
+      - run: uvx ty@0.0.83 check tools --extra-search-path . --extra-search-path tools
 
   sift:
     runs-on: ubuntu-latest
