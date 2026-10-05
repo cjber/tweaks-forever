@@ -105,7 +105,10 @@ local MELEE_ITEMS =
 	{ 8149, 15826, 16308, 17117, 22259, 22432, 206466, 208760, 208855, 209027, 209057, 213036, 221199, 225943 }
 local MELEE_RANGE, MAX_TRACKED = 5, 4
 
-local GAP, BORDER = 2, 1
+local GAP = 2
+-- The Classic button frame has a 36 px opening in a 64 px file; its visible edge extends 2 px past the icon.
+local FRAME = "Interface\\Buttons\\UI-Quickslot2"
+local FRAME_SCALE, FRAME_OVERHANG = 64 / 36, 2 / 36
 local MIN_SIZE, MAX_SIZE = 50, 200
 -- Out of range: a desaturated texture tinted with the vertex colour, so it reads as solid red rather than the
 -- icon's own colours darkened. Faded keeps the desaturation but drops the colour and the alpha.
@@ -417,16 +420,15 @@ local function Row(plate)
 	return row
 end
 
--- The dark 1 px edge round an icon, drawn behind it in the stock plate's own style, so the icon is not a raw
--- square of art.
+-- The Classic action button frame round an icon, so it is not a raw square of art.
 ---@param row TFReachRow
 ---@param index integer
 ---@return Texture
 local function Border(row, index)
 	local border = row.borders[index]
 	if not border then
-		border = row:CreateTexture(nil, "BACKGROUND")
-		border:SetColorTexture(0, 0, 0, 0.8)
+		border = row:CreateTexture(nil, "OVERLAY")
+		border:SetTexture(FRAME) -- art-ok: the stock button frame's own square 64 px file, sized from the icon
 		row.borders[index] = border
 	end
 	return border
@@ -474,18 +476,21 @@ end
 ---@param unitFrame NamePlateUnitFrame
 ---@param size integer
 ---@param count integer
-local function Place(row, unitFrame, size, count)
+---@param pad number how far each icon's frame reaches past it
+local function Place(row, unitFrame, size, count, pad)
 	local health = unitFrame.HealthBarsContainer
 	local bar = health and health.healthBar or health
-	row:SetSize(count * size + (count - 1) * GAP, size)
+	local gap = GAP + 2 * pad
+	local offset = GAP + pad
+	row:SetSize(count * size + (count - 1) * gap, size)
 	row:ClearAllPoints()
 	local position = ns.db[POSITION]
 	if position == "left" then
-		row:SetPoint("RIGHT", unitFrame.RaidTargetFrame or bar, "LEFT", -GAP, 0)
+		row:SetPoint("RIGHT", unitFrame.RaidTargetFrame or bar, "LEFT", -offset, 0)
 	elseif position == "below" then
-		row:SetPoint("TOP", unitFrame.CastBarsContainer or bar, "BOTTOM", 0, -GAP)
+		row:SetPoint("TOP", unitFrame.CastBarsContainer or bar, "BOTTOM", 0, -offset)
 	else
-		row:SetPoint("LEFT", unitFrame.PlayerLevelDiffFrame or bar, "RIGHT", GAP, 0)
+		row:SetPoint("LEFT", unitFrame.PlayerLevelDiffFrame or bar, "RIGHT", offset, 0)
 	end
 end
 
@@ -506,6 +511,7 @@ local function Paint(icon, border, reaches, style)
 		border:Show()
 		return
 	end
+	border:SetAlpha(1)
 	icon:SetDesaturated(not reaches)
 	if reaches then
 		icon:SetVertexColor(1, 1, 1)
@@ -549,17 +555,18 @@ local function Draw(unit, plate)
 	end
 	local row = Row(plate)
 	local size = Model.Size(BarHeight(unitFrame), ns.db[SIZE])
-	Place(row, unitFrame, size, #icons)
+	local pad = size * FRAME_OVERHANG
+	Place(row, unitFrame, size, #icons, pad)
 	local style = ns.db[STYLE]
 	for index, spell in ipairs(icons) do
 		local icon, border = Icon(row, index), Border(row, index)
 		icon:ClearAllPoints()
-		icon:SetPoint("LEFT", row, "LEFT", (index - 1) * (size + GAP), 0)
+		icon:SetPoint("LEFT", row, "LEFT", (index - 1) * (size + GAP + 2 * pad), 0)
 		icon:SetSize(size, size)
 		icon:SetTexture(C_Spell.GetSpellTexture(spell.id)) -- art-ok: a square spell icon in a square, files only
 		border:ClearAllPoints()
-		border:SetPoint("TOPLEFT", icon, "TOPLEFT", -BORDER, BORDER)
-		border:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", BORDER, -BORDER)
+		border:SetPoint("CENTER", icon, "CENTER", 0, 0)
+		border:SetSize(size * FRAME_SCALE, size * FRAME_SCALE)
 		Paint(icon, border, spell.reaches, style)
 	end
 	for index = #icons + 1, #row.icons do

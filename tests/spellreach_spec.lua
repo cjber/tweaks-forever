@@ -376,7 +376,10 @@ assert(#ticks == 0, "no plate, no polling")
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#ticks == 1, "the first plate starts the polling")
 local row1 = created[plateFrames.nameplate1]
-assert(row1.shown and row1.width == 20 * 2 + 2, "the default size is the bar height")
+local pad = 20 * 2 / 36
+local gap, offset = 2 + 2 * pad, 2 + pad
+assert(row1.shown and row1.width == 20 * 2 + gap, "the default size is the bar height")
+assert(row1.textures[2].width == 20 * 64 / 36, "the frame is square, at the stock button's ratio")
 local meleeIcon, bolt = row1.textures[1], row1.textures[3]
 assert(meleeIcon.texture == "icon2973" and bolt.texture == "icon75", "both tracked spells are drawn")
 assert(
@@ -416,6 +419,14 @@ assert(
 	bolt.alphaFromBoolean and bolt.alphaFromBoolean.value == "secret" and bolt.colorFromBoolean.value == "secret",
 	"a secret answer goes to the engine"
 )
+db.spellReachStyle = "hidden"
+changes.spellReachStyle()
+row1.borders[2].alpha = 0 -- the engine resolved the secret answer as out of range
+range.nameplate1[75] = true
+ticks[1]()
+assert(row1.borders[2].shown and row1.borders[2].alpha == 1, "the frame returns with a readable range answer")
+db.spellReachStyle = "red"
+changes.spellReachStyle()
 range.nameplate1[75] = false
 ticks[1]()
 
@@ -428,20 +439,26 @@ local function Points(region)
 	end
 	return out
 end
-assert(Points(row1)[1] == "LEFT:level:RIGHT:2:0", "right of the bar is the default")
+assert(Points(row1)[1] == string.format("LEFT:level:RIGHT:%s:0", offset), "right of the bar is the default")
 db.spellReachPosition = "left"
 changes.spellReachPosition()
-assert(Points(row1)[1] == "RIGHT:raid:LEFT:-2:0", "left of the bar sits past the raid marker")
+assert(Points(row1)[1] == string.format("RIGHT:raid:LEFT:%s:0", -offset), "left of the bar sits past the raid marker")
 db.spellReachPosition = "below"
 changes.spellReachPosition()
-assert(Points(row1)[1] == "TOP:cast:BOTTOM:0:-2", "below the bar sits under the plate, clear of the cast bar")
+assert(
+	Points(row1)[1] == string.format("TOP:cast:BOTTOM:0:%s", -offset),
+	"below the bar sits under the plate, clear of the cast bar"
+)
 db.spellReachPosition = "right"
 changes.spellReachPosition()
 
 -- Size: the slider reaches the drawn icon.
 db.spellReachSize = 50
 changes.spellReachSize()
-assert(row1.width == 10 * 2 + 2 and meleeIcon.width == 10, "a smaller size redraws the row and its icons")
+assert(
+	row1.width == 10 * 2 + (2 + 2 * 10 * 2 / 36) and meleeIcon.width == 10,
+	"a smaller size redraws the row and its icons"
+)
 db.spellReachSize = 100
 changes.spellReachSize()
 
