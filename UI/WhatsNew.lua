@@ -13,7 +13,7 @@ ns.Feature({
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
 ns.WHATS_NEW_VERSION = "0.9.0"
-ns.WHATS_NEW = L["Spell reach on nameplates, a train all button, and tooltips that can follow the cursor."]
+ns.WHATS_NEW = L["Range icons use the Classic button frame, and quest map icons keep their whole shape."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
