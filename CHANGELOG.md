@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Range icons wear the Classic button frame.** A small bevel and space between spells keep them clear beside nameplates.
+
 - **Native quest map icons.** Turning the option off brings back Questie's whole icons, not a corner of each one, and a marker Questie reuses for a townsfolk icon draws it whole.
 
 ## [0.9.0] - 2026-10-05

@@ -505,10 +505,9 @@ PLATES = [
 ]
 PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
 
-# UI/SpellReach.lua: the row sits LEFT of PlayerLevelDiffFrame's RIGHT with 2 gap, vertically centred on the bar,
-# the icons the bar's height at the default 100%, 2 apart, each behind a 1-unit black border. A shaman sees both
-# defaults, one melee-reach and one ranged: Earth Shock (0-20) and Lightning Bolt (0-30).
-REACH_GAP, REACH_BORDER = 2, 1
+# UI/SpellReach.lua: bar-height icons with the Classic button's frame and room for its visible 2 px edge.
+# A shaman sees Earth Shock (0-20) and Lightning Bolt (0-30).
+REACH_GAP, REACH_FRAME_SCALE, REACH_EDGE = 2, 64 / 36, 2 / 36
 REACH = [
     "interface/icons/spell_nature_earthshock.blp",
     "interface/icons/spell_nature_lightning.blp",
@@ -554,14 +553,24 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
         # UI/SpellReach.lua's row, right of the bar where the level frame sits, centred on it. A spell in reach
         # draws in full colour; one out of reach is desaturated and tinted solid red.
         size = PLATE_HEALTH
+        pad = size * REACH_EDGE
         for index, reaches in enumerate(reach):
-            ix = x + w + REACH_GAP + index * (size + REACH_GAP)
+            ix = x + w + REACH_GAP + pad + index * (size + REACH_GAP + 2 * pad)
             iy = y + (PLATE_HEALTH - size) // 2
-            border = REACH_BORDER
-            c.fill(ix - border, iy - border, size + 2 * border, size + 2 * border, (0, 0, 0, 0.8))
             art = ui.texture(REACH[index])
+            aw, ah = art.size
+            art = art.crop((round(aw * 0.08), round(ah * 0.08), round(aw * 0.92), round(ah * 0.92)))
             colour = (1, 1, 1, 1) if reaches else (1, 0.08, 0.08, 1)
             c.draw(art if reaches else greyed(art), ix, iy, size, size, color=colour)
+            frame_size = size * REACH_FRAME_SCALE
+            frame_offset = (frame_size - size) / 2
+            c.draw(
+                ui.texture("interface/buttons/ui-quickslot2.blp"),
+                ix - frame_offset,
+                iy - frame_offset,
+                frame_size,
+                frame_size,
+            )
     c.text(
         x,
         y,
