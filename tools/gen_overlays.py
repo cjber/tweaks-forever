@@ -37,7 +37,7 @@ def db2(name, refresh=False, offline=False):
     for row in wago.db2_rows(
         name, BUILD, CACHE, user_agent=USER_AGENT, refresh=refresh, offline=offline, ints=columns, required=columns
     ):
-        if row["ID"] <= 0:
+        if int(row["ID"]) <= 0:
             raise ValueError(f"{name}: invalid ID {row['ID']}")
         rows[row["ID"]] = {key: row[key] for key in columns}
     return rows
