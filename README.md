@@ -8,7 +8,7 @@ Small quality-of-life tweaks for WoW: Forever that look like they came with the 
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-I wanted the handful of little addons I always install in one place, looking like they came with the game. Tweaks Forever is quest and gossip automation, repairs, junk selling, gear groups, map extras, movable windows, nameplates and fishing, as checkboxes in the game's own settings. Moving windows is a tab in Edit Mode, and the map uses retail's own dungeon icons.
+I wanted the handful of little addons I always install in one place, looking like they came with the game. Tweaks Forever is quest and gossip automation, repairs, junk selling, gear groups, map extras, movable windows, tooltips, nameplates and fishing, as checkboxes in the game's own settings. Moving windows is a tab in Edit Mode, and the map uses retail's own dungeon icons.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
@@ -30,7 +30,7 @@ Quest levels appear across the quest UI. Forever-only quests get a subtle gold b
 
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/quests.png" width="442" alt="Abandon quests checklist with three quests selected and a confirmation warning">
 
-Every feature has its own checkbox; [docs/features.md](docs/features.md) has the detail.
+Every feature has its own setting; [docs/features.md](docs/features.md) has the detail.
 
 - **Quest levels and new stories.** Show quest levels on native map tooltips and the tracker. A soft gold tint identifies quests added in Forever.
 - **Abandon quests together.** Select quests in the quest log, then confirm the batch once.
@@ -38,32 +38,41 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
 - **Invite from whispers.** Someone who whispers you **inv**, **invite** or **group** as their whole message is invited to your group, when you can invite. Off until you turn it on.
 - **Skip loot confirmations.** Confirms the game's warning when you roll Need or Disenchant, and when you loot a Bind on Pickup item. Off until you turn it on.
-- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells greys in batches that stay in the buyback tab. **Alt+Right-click** marks any item as junk, with the game's junk coin.
-- **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. With Combine Bags on, grouped gear sits together at the top.
+- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked non-grey stacks per merchant visit; everything stays in the buyback tab. **Alt+Right-click** marks any item as junk, with the game's junk coin.
+- **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click, with each item marked by a coloured strip, border or dots. With Combine Bags on, grouped gear sits together at the top. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
 - **Map extras.** Reveal unexplored areas in a blue tint, see each zone's level range coloured like quest levels, and find every dungeon and raid entrance marked with retail's icons.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout, with Reset to put them back.
 - **Nameplates.** A taller bar in retail's own frame, with name and level above, your target outlined and cast bars with the spell's icon.
 - **Spell reach under nameplates.** A small icon for each attack you track on every enemy nameplate: full colour when the spell can reach, solid red when it cannot, melee included. Off until you turn it on, with where the icons sit (to the right of the bar by default), their size, the out of range look, an only-on-my-target toggle, and a spell picker under the setting.
-- **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip.
+- **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip. The style is that charcoal, retail's navy, or the game's own border.
 - **Tooltip at the cursor.** The game's own tooltips follow the mouse instead of the corner of the screen. Off until you turn it on.
 - **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
 - **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
 - **Quest progress.** A creature you still need for a quest shows your progress in its tooltip and a quest icon beside its nameplate. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
+- **Native quest map icons.** Questie's map and minimap markers use the game's own quest symbols at a readable size, keeping Questie's locations and tooltips. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
 - **Camp benefits.** Camp tooltips say what sitting nearby gives you and for how long, and each benefit you gain is named on screen.
-- **Future spells.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now.
+- **Future spells and bags.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now. With Combine Bags on, the reagent bag's slots join the combined bag at the bottom, tinted green.
 - **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
+- **Companion hints.** Where another Forever addon would help, a grey line in the tooltip says so, and goes once it is loaded.
+- **Update notes.** The first login after Tweaks Forever updates prints one line in chat saying what changed.
 - **Maximum camera zoom.** Pulls the camera back further than the game's own Max Camera Distance allows. Off until you turn it on.
 - **No screen glow.** Turns off the full screen glow effect. Off until you turn it on.
 - **Train all button.** A button beside the class trainer's Train button buys every spell you can afford in one click. Off until you turn it on.
 - **Hide macro names.** Macros on your action bars show just their icon. Off until you turn it on.
 - **Item level in the auction house.** Weapons and armour on the Browse tab get a sortable **iLvl** column, and the item level stops repeating after the name.
-- **Fishing.** Double right-click to cast, apply the best lure you have, and optionally hear splashes over everything else.
+- **Fishing.** Double right-click to cast, apply the best lure you have, a warning when you have no lure, and optionally hear splashes over everything else.
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined in white with a quest icon and a Fireball cast">
 </p>
 
 <p align="center">Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/spellreach.png" width="644" alt="Three enemy nameplates with an Earth Shock and a Lightning Bolt icon, in colour when the spell reaches and solid red when it does not">
+</p>
+
+<p align="center">Spell reach icons sit beside the health bar: full colour when the spell reaches, solid red when it does not.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png" width="394" alt="An enemy's tooltip with a red health bar at 72% and a Horde shaman's with a blue bar at 412 / 520">
@@ -93,7 +102,7 @@ Every feature has its own checkbox; [docs/features.md](docs/features.md) has the
 
 Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.
 
-The quest features (quests on minimap givers, quest progress on tooltips and nameplates) read Questie's quest database and are greyed out without it. Most players get it with [Questie](https://www.curseforge.com/wow/addons/questie); if you'd rather not run Questie, its [QuestieDB](https://github.com/Questie/QuestieDB/releases) addon on its own is enough. While Questie's own tooltips or nameplate icons are on, the matching feature here steps aside.
+The quest features that read Questie (quests on minimap givers, quest progress on tooltips and nameplates, and the native quest map icons) are greyed out without it. Most players get it with [Questie](https://www.curseforge.com/wow/addons/questie); if you'd rather not run Questie, its [QuestieDB](https://github.com/Questie/QuestieDB/releases) addon on its own is enough. While Questie's own tooltips or nameplate icons are on, the matching feature here steps aside.
 
 ## Usage
 
@@ -132,6 +141,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
+| Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
 | Item level in the auction house | TradeSkillMaster, Auctioneer |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |

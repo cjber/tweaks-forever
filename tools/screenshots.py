@@ -505,6 +505,22 @@ PLATES = [
 ]
 PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
 
+# UI/SpellReach.lua: the row sits LEFT of PlayerLevelDiffFrame's RIGHT with 2 gap, vertically centred on the bar,
+# the icons the bar's height at the default 100%, 2 apart, each behind a 1-unit black border. A shaman sees both
+# defaults, one melee-reach and one ranged: Earth Shock (0-20) and Lightning Bolt (0-30).
+REACH_GAP, REACH_BORDER = 2, 1
+REACH = [
+    "interface/icons/spell_nature_earthshock.blp",
+    "interface/icons/spell_nature_lightning.blp",
+]
+
+
+def greyed(image):
+    """UI/SpellReach.lua's SetDesaturated: the icon's colours dropped, its alpha kept, for the vertex colour."""
+    red, green, blue, alpha = image.convert("RGBA").split()
+    luma = Image.merge("RGB", (red, green, blue)).convert("L")
+    return Image.merge("RGBA", (luma, luma, luma, alpha))
+
 
 def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
     image = ui.texture(fdid)
@@ -514,8 +530,11 @@ def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
     )
 
 
-def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest):
-    """One nameplate as UI/Nameplates.lua lays out Blizzard's, with the Health Percent option on."""
+def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest, reach=None):
+    """One nameplate as UI/Nameplates.lua lays out Blizzard's, with the Health Percent option on.
+
+    `reach` is UI/SpellReach.lua's row: one flag per REACH spell, true when the spell can reach the unit."""
+
     c = ui.canvas(240, 120)
     x, w = 37, PLATE_W
     cast_y = 110 - PLATE_CAST
@@ -531,6 +550,18 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
         c.draw(
             ui.atlas("questobjective"), x + w + QUEST_GAP, y + (PLATE_HEALTH - QUEST_ICON) / 2, QUEST_ICON, QUEST_ICON
         )
+    if reach is not None:
+        # UI/SpellReach.lua's row, right of the bar where the level frame sits, centred on it. A spell in reach
+        # draws in full colour; one out of reach is desaturated and tinted solid red.
+        size = PLATE_HEALTH
+        for index, reaches in enumerate(reach):
+            ix = x + w + REACH_GAP + index * (size + REACH_GAP)
+            iy = y + (PLATE_HEALTH - size) // 2
+            border = REACH_BORDER
+            c.fill(ix - border, iy - border, size + 2 * border, size + 2 * border, (0, 0, 0, 0.8))
+            art = ui.texture(REACH[index])
+            colour = (1, 1, 1, 1) if reaches else (1, 0.08, 0.08, 1)
+            c.draw(art if reaches else greyed(art), ix, iy, size, size, color=colour)
     c.text(
         x,
         y,
@@ -588,6 +619,20 @@ def nameplates(ui):
 def nameplates_scene(ui):
     layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(PLATES, PLATE_POSITIONS, strict=True)]
     return scene(ui, layers, MARGIN)
+
+
+# A level 22 shaman targeting a Pillager: Earth Shock reaches it, Lightning Bolt does not. The second crawler is
+# inside both, the third Grimtusk outside both, so every state is shown once.
+REACH_PLATES = [
+    ("Defias Pillager", 15, FAIR, HOSTILE, 0.62, True, None, [], False, (True, False)),
+    ("Defias Tide Crawler", 12, EASY, HOSTILE, 1.0, False, None, [], False, (True, True)),
+    ("Grimtusk", 16, FAIR, ROGUE, 0.45, False, None, [], False, (False, False)),
+]
+
+
+def spellreach(ui):
+    layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(REACH_PLATES, PLATE_POSITIONS, strict=True)]
+    scene(ui, layers, MARGIN).save(OUT / "spellreach.png")
 
 
 # The demo: a short tour of dungeon pins, nameplates and junk coins, at 10 frames a second.
@@ -782,6 +827,7 @@ def main():
     campfire_buff(ui)
     editmode(ui)
     nameplates(ui)
+    spellreach(ui)
     tooltips(ui)
     frames, size = demo(ui)
     print(f"demo.gif: {frames} frames, {size} bytes")
