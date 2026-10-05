@@ -36,9 +36,9 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Abandon quests together.** Select quests in the quest log, then confirm the batch once.
 - **Quest and gossip automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map at a flight master, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
-- **Invite from whispers.** Someone who whispers you **inv**, **invite** or **group** as their whole message is invited to your group, when you can invite. Off until you turn it on.
+- **Invite from whispers.** A whisper that is exactly your chosen keyword (inv, invite or group; inv by default) invites its sender, when you can invite. Off until you turn it on.
 - **Skip loot confirmations.** Confirms the game's warning when you roll Need or Disenchant, and when you loot a Bind on Pickup item. Off until you turn it on.
-- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked non-grey stacks per merchant visit; everything stays in the buyback tab. **Alt+Right-click** marks any item as junk, with the game's junk coin.
+- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked non-grey stacks per merchant visit; everything stays in the buyback tab. With *Mark items as junk* on, **Alt+Right-click** marks any item with the game's junk coin. Marking is off by default.
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click, with each item marked by a coloured strip, border or dots. With Combine Bags on, grouped gear sits together at the top. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
 - **Map extras.** Reveal unexplored areas in a blue tint, see each zone's level range coloured like quest levels, and find every dungeon and raid entrance marked with retail's icons.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout, with Reset to put them back.

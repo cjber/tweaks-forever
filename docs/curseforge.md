@@ -46,8 +46,8 @@ Camp tooltips say what sitting nearby gives you.
 
 ## Features
 
-- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map at a flight master, accept summons and group resurrections, release in battlegrounds, decline duels. Faster auto loot is on by default. Off until you turn it on: invite anyone who whispers a keyword you pick (inv, invite or group), and skip the game's warning when you roll Need or Disenchant and when you loot a Bind on Pickup item.
-- **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, plus up to 12 marked non-grey stacks per visit, all staying in buyback. Alt+Right-click marks anything as junk.
+- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map at a flight master, accept summons and group resurrections, release in battlegrounds, decline duels. These are off by default. Faster auto loot is on by default. Off until you turn it on: invite anyone who whispers a keyword you pick (inv, invite or group), and skip the game's warning when you roll Need or Disenchant and when you loot a Bind on Pickup item.
+- **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, plus up to 12 marked non-grey stacks per visit, all staying in buyback. With *Mark items as junk* on, Alt+Right-click marks anything as junk. Marking is off by default.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a group such as Healing or DPS, then equip the whole group from the same menu, each item marked in the group's colour. A fishing pole keeps the weapons it replaced as a Before fishing group.
 - **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, and unexplored areas are revealed in a blue tint.
 - **Nameplates**: a taller bar with name and level above, your target outlined, and casts in a slim bar.
