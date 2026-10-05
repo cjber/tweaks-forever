@@ -111,6 +111,12 @@ local function Client(slots, db)
 			end,
 			UseContainerItem = function(bag, slot)
 				assert(bag == 0 and c.slots[slot], "only a held stack is used")
+				c.greyAtUse = 0
+				for _, item in pairs(c.slots) do
+					if item.quality == 0 then
+						c.greyAtUse = c.greyAtUse + 1
+					end
+				end
 				c.used[#c.used + 1] = slot
 				if not c.rejects then
 					leaving[#leaving + 1] = { slot = slot, ticks = c.lag }
@@ -154,7 +160,8 @@ local function Client(slots, db)
 				for slot, item in pairs(c.slots) do
 					if item.quality == 0 and not item.isLocked and not item.hasNoValue and not c.refundable[slot] then
 						if c.nativeLag then
-							leaving[#leaving + 1] = { slot = slot, ticks = c.nativeLag }
+							leaving[#leaving + 1] =
+								{ slot = slot, ticks = c.nativeLag + (c.staggerNative and slot - 1 or 0) }
 						else
 							c.slots[slot] = nil
 						end
@@ -318,16 +325,45 @@ do -- Marked items wait for an asynchronous native sale, which is submitted only
 	same(c.nativeCalls, 1, "no duplicate native call")
 end
 
-do -- A native sale that makes no progress does not leave an endless timer.
+do -- A native sale that makes no progress ends, and an item-info retry never resubmits it.
 	local c = Client({ grey(1), green(2) }, { markJunk = true, junk = { [2] = true } })
 	local calls = 0
 	c.env.C_MerchantFrame.SellAllJunkItems = function()
 		calls = calls + 1
 	end
+	c.unpriced["item:2"] = true
 	c.visit()
-	same(calls, 1, "a stalled bulk sale is not resubmitted")
+	same(c.sold(), "", "an uncached mark waits")
+	c.unpriced["item:2"] = nil
+	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.settle()
+	same(calls, 1, "an item-info retry never resubmits the stalled native sale")
 	same(c.sold(), "2", "marks remain usable after the bounded native wait")
 	assert(c.slots[1], "the native failure is left for the game's merchant button")
+end
+
+do -- A long native sale keeps making progress, so marks wait beyond ten polls.
+	local slots = fill(14, grey)
+	slots[15] = green(15)
+	local c = Client(slots, { markJunk = true, junk = { [15] = true } })
+	c.nativeLag, c.staggerNative = 1, true
+	c.visit()
+	same(c.sold(), "15", "the marked stack follows the long bulk sale")
+	same(c.greyAtUse, 0, "no mark is sold while native greys are still landing")
+	same(c.nativeCalls, 1, "one bulk sale")
+end
+
+do -- Confirmed marked sales wait for Blizzard's asynchronous sale without submitting another.
+	local c = Client({ grey(1), green(2) }, { sellJunk = false, markJunk = true, junk = { [2] = true } })
+	c.nativeLag = 3
+	c.visit()
+	c.clickSellAll()
+	c.confirm()
+	same(c.sold(), "", "marks wait after the native confirmation")
+	c.settle()
+	same(c.sold(), "2", "the confirmed mark sells after the greys")
+	same(c.greyAtUse, 0, "the native sale has drained")
+	same(c.nativeCalls, 1, "only Blizzard submits the confirmed native sale")
 end
 
 do -- Merchant, feature and client guards prevent the native call.
