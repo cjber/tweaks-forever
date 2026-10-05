@@ -288,8 +288,8 @@ local function Plates()
 			local anchor = plate.UnitFrame and plate.UnitFrame.HealthBarsContainer or plate
 			holder:SetPoint("LEFT", anchor, "RIGHT", GAP, 0)
 			icon = holder:CreateTexture(nil, "OVERLAY")
-			icon:SetAtlas(ICON)
-			icon:SetAllPoints()
+			ns.Art.Fit(icon, ICON, SIZE, SIZE)
+			icon:SetPoint("CENTER")
 			icons[plate] = icon
 		end
 		return icon

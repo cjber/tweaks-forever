@@ -62,6 +62,7 @@ local function Cover(button)
 		overlay:SetAllPoints()
 		overlay:SetFrameLevel(button:GetFrameLevel() + 10)
 		overlay:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+		-- art-ok: the square slot highlight over a square bag slot
 		overlay:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
 		overlay:SetScript("OnClick", Click)
 		-- The tooltip refreshes through its owner once item data loads; without this our lines drop off.

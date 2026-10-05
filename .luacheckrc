@@ -94,7 +94,6 @@ read_globals = {
 	"ContainerFrameContainer",
 	"ContainerFrameSettingsManager",
 	"COSTS_LABEL",
-	"CreateAtlasMarkup",
 	"CreateColor",
 	"CreateFrame",
 	"CreateFromMixins",

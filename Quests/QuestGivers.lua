@@ -37,11 +37,10 @@ local QUEST_FIELDS = {
 	"requiredSpell",
 }
 local NPC_FIELDS = { "spawns", "questStarts", "questEnds" }
-local OFFER = "|TInterface\\GossipFrame\\AvailableQuestIcon:0|t "
-local READY = "|TInterface\\GossipFrame\\ActiveQuestIcon:0|t "
--- The in-progress "?" is 16 by 18 (UiTextureAtlasMember, 1.60.1.70009), never squared: 14 wide by 16 tall keeps its
--- shape in whole pixels. The escape takes the height first.
-local UNREADY = "|A:SideInProgressquesticon:16:14|a "
+local OFFER = "|TInterface\\GossipFrame\\AvailableQuestIcon:0|t " -- art-ok: a square file, square at the text's height
+local READY = "|TInterface\\GossipFrame\\ActiveQuestIcon:0|t " -- art-ok: a square file, square at the text's height
+-- The in-progress "?" is 16 by 18 (UiTextureAtlasMember, 1.60.1.70009), never squared: 14 wide by 16 tall.
+local UNREADY = ns.Art.Markup("SideInProgressquesticon", 16) .. " "
 
 ---@class TFQuestGivers
 local Model = {}

@@ -86,7 +86,10 @@ local function Texture()
 	function texture.SetAtlas(self, atlas)
 		self.atlas = atlas
 	end
-	function texture.SetAllPoints() end
+	function texture.SetSize(self, width, height)
+		self.width, self.height = width, height
+	end
+	function texture.SetPoint() end
 	function texture.Show(self)
 		self.shown = true
 	end
@@ -110,6 +113,11 @@ local env = setmetatable({
 		end,
 		IsComplete = function(id)
 			return complete[id] or false
+		end,
+	},
+	C_Texture = {
+		GetAtlasInfo = function()
+			return { width = 40, height = 32 }
 		end,
 	},
 	C_NamePlate = {
@@ -151,6 +159,7 @@ local env = setmetatable({
 ns.QuestieDB = function()
 	return env.LibQuestieDB
 end
+setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestProgress.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestProgress
 assert(features.questTooltips.default == true and features.questPlates.default == true)
@@ -259,6 +268,7 @@ local plate = { UnitFrame = { HealthBarsContainer = {} } }
 plates.nameplate1, guids.nameplate1 = plate, wolf
 events.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#icons == 1 and icons[1].shown and icons[1].atlas == "questobjective")
+assert(icons[1].width == 20 and icons[1].height == 16, "the icon keeps its atlas's shape inside its square")
 -- Progress arrives as events, coalesced into one rebuild on the next frame.
 objectives[1][1] = Kill("Mangy Wolf", 10, 10)
 events.QUEST_LOG_UPDATE()

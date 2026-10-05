@@ -287,6 +287,7 @@ TweaksForeverCharDB = nil
 ---@field InstanceEntrances table<integer, TFDungeonEntrance> by instance Map.ID, before pin clustering
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
+---@field Art TFArt
 ---@field QuestGivers TFQuestGivers
 ---@field QuestProgress TFQuestProgress
 ---@field QuestieDB fun(): TFQuestieDB?

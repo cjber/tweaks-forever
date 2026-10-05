@@ -97,6 +97,11 @@ local function Vector(x, y)
 	}
 end
 local env = setmetatable({
+	C_Texture = {
+		GetAtlasInfo = function()
+			return { width = 16, height = 18 }
+		end,
+	},
 	LibQuestieDB = library,
 	C_AddOns = {
 		GetAddOnMetadata = function(addon, field)
@@ -158,6 +163,7 @@ local env = setmetatable({
 }, { __index = _G })
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Integrations/QuestieSource.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestGivers.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestGivers
 assert(features.giverTooltips.default == true)

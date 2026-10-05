@@ -74,7 +74,7 @@ local function Paint(tooltip, file)
 	local frame = tooltip.NineSlice
 	for name, piece in pairs(PIECES) do
 		local texture = frame[name]
-		texture:SetTexture(file)
+		texture:SetTexture(file) -- art-ok: a nine-slice piece, its coordinates set below
 		-- The atlases tile; the file stretches. Tiling first, as NineSliceUtil does, then the coordinates.
 		texture:SetHorizTile(false)
 		texture:SetVertTile(false)
@@ -130,7 +130,7 @@ local FRAME_SIZE, FRAME_CAP, FRAME_OUT = 128, 8, 2
 -- One piece of the border, cut from texel `from` to `to` of the file.
 local function FramePiece(bar, from, to)
 	local piece = bar:CreateTexture(nil, "OVERLAY", nil, -1)
-	piece:SetTexture(FRAME)
+	piece:SetTexture(FRAME) -- art-ok: a bar border's piece: the ends at native size, the flat middle stretches
 	piece:SetTexCoord(from / FRAME_SIZE, to / FRAME_SIZE, 0, 1)
 	piece:SetHeight(HEIGHT + 2 * FRAME_OUT)
 	return piece
@@ -138,7 +138,7 @@ end
 
 local function HealthBarArt(bar)
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
-	track:SetTexture(FILL)
+	track:SetTexture(FILL) -- art-ok: a status bar's track, stretched by design
 	track:SetAllPoints()
 	local left = FramePiece(bar, 0, FRAME_CAP)
 	left:SetWidth(FRAME_CAP)

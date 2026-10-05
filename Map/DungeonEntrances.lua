@@ -67,7 +67,7 @@ function Model.Describe(entry)
 	if entry.area and Model.Atlas(entry) == "Dungeon" then
 		for i, instance in ipairs(entry.instances) do
 			local atlas = ns.RaidInstances[instance] and "Raid" or "Dungeon"
-			names[i] = CreateAtlasMarkup(atlas, 16, 16) .. " " .. names[i]
+			names[i] = ns.Art.Markup(atlas, 16) .. " " .. names[i]
 		end
 	end
 	return title, table.concat(names, "\n")

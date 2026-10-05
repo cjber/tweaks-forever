@@ -556,7 +556,7 @@ local function Draw(unit, plate)
 		icon:ClearAllPoints()
 		icon:SetPoint("LEFT", row, "LEFT", (index - 1) * (size + GAP), 0)
 		icon:SetSize(size, size)
-		icon:SetTexture(C_Spell.GetSpellTexture(spell.id))
+		icon:SetTexture(C_Spell.GetSpellTexture(spell.id)) -- art-ok: a square spell icon in a square, files only
 		border:ClearAllPoints()
 		border:SetPoint("TOPLEFT", icon, "TOPLEFT", -BORDER, BORDER)
 		border:SetPoint("BOTTOMRIGHT", icon, "BOTTOMRIGHT", BORDER, -BORDER)
@@ -657,7 +657,7 @@ function RefreshPicker()
 	for index, choice in ipairs(choices) do
 		local row = PickerRow(panel, index)
 		row.spell = choice.id
-		row.Icon:SetTexture(choice.icon)
+		row.Icon:SetTexture(choice.icon) -- art-ok: a square spell icon in a square, files only
 		row.Text:SetText(choice.name)
 		row:SetChecked(chosen[choice.id] == true)
 		row:SetEnabled(chosen[choice.id] == true or not full)

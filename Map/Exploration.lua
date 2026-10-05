@@ -203,6 +203,7 @@ ns.Init(function()
 					end
 					masked[texture] = useMask
 				end
+				-- art-ok: a map tile at its own size, its coordinates cut to it below; the pool draws files only
 				texture:SetTexture(area.files[i], nil, nil, "TRILINEAR")
 				texture:SetSize(tile.width, tile.height)
 				texture:SetTexCoord(0, tile.u, 0, tile.v)

@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Native quest map icons.** Turning the option off brings back Questie's whole icons, not a corner of each one, and a marker Questie reuses for a townsfolk icon draws it whole.
+
 ## [0.9.0] - 2026-10-05
 
 - **Maximum camera zoom.** The camera pulls back further than the game's own Max Camera Distance setting allows. Off by default, and the value you had before comes back when you switch it off.

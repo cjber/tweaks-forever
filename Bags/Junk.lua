@@ -119,7 +119,7 @@ local function Coin(button)
 		local native = button.JunkIcon
 		local layer, sublevel = native:GetDrawLayer()
 		local coin = button:CreateTexture(nil, layer, nil, sublevel)
-		coin:SetAtlas(native:GetAtlas())
+		coin:SetAtlas(native:GetAtlas()) -- art-ok: the game's own coin atlas over the game's own coin, point for point
 		coin:SetAllPoints(native)
 		icons[button] = coin
 	end
