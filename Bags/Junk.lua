@@ -27,9 +27,11 @@ ns.Feature({
 	key = "sellJunk",
 	category = "Vendors",
 	name = "Sell junk automatically",
-	tooltip = L["Sell all grey junk through the game and up to %d marked non-grey stacks per merchant visit."]:format(
+	tooltip = L["Use the game's bulk sale for grey junk when available, and sell up to %d marked non-grey stacks per merchant visit."]:format(
 		BATCH_SIZE
-	) .. " " .. L["With Leatrix Plus auto-selling, only marked non-grey items are sold here."],
+	)
+		.. " "
+		.. L["With Leatrix Plus auto-selling, only marked non-grey items are sold here."],
 	default = true,
 	-- Leatrix owns only greys; disabling this feature entirely would strand our marks.
 	conflicts = conflicts,
