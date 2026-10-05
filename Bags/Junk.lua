@@ -27,7 +27,7 @@ ns.Feature({
 	key = "sellJunk",
 	category = "Vendors",
 	name = "Sell junk automatically",
-	tooltip = L["Use the game's bulk sale for grey junk when available, and sell up to %d marked non-grey stacks per merchant visit."]:format(
+	tooltip = L["Sell grey junk through the game when available, plus up to %d marked non-grey stacks per visit."]:format(
 		BATCH_SIZE
 	)
 		.. " "
