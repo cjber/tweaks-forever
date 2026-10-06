@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.10.0] - 2026-10-06
+
 - **Dungeon interior maps.** Inside a dungeon, the world map opens on the dungeon's own floor map and legend, with a button to pick the floor and a Back to map button to get the stock map back. It needs Atlas and its Classic WoW maps, and the setting says so while they are missing. On by default.
 
 ## [0.9.1] - 2026-10-05
