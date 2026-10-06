@@ -20,6 +20,7 @@ shows as one pin, even where its doors sit apart. Instances with no entrance in 
 """
 
 import argparse
+import math
 import sys
 import urllib.error
 from dataclasses import dataclass, field
@@ -122,8 +123,9 @@ class Pin:
         self.centre()
 
     def centre(self):
-        self.x = round(sum(m[1] for m in self.members) / len(self.members), 3)
-        self.y = round(sum(m[2] for m in self.members) / len(self.members), 3)
+        # fsum, not sum: Python 3.12 changed sum() of floats, which moved a centre on a rounding tie (0.6365).
+        self.x = round(math.fsum(m[1] for m in self.members) / len(self.members), 3)
+        self.y = round(math.fsum(m[2] for m in self.members) / len(self.members), 3)
 
     def overlaps(self, other, footprint):
         return abs(self.x - other.x) < footprint[0] and abs(self.y - other.y) < footprint[1]
