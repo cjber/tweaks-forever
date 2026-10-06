@@ -61,6 +61,7 @@ publishes that entry as its notes.
 - Player-visible text goes through `L["whole sentence"]` (a whole format string, never joined fragments), or a
   Blizzard GlobalString that says exactly the same; `ns.Feature`/`ns.ClickMode` text stays plain English.
 - Commits are signed (`git commit -S`) with the personal email.
+- Release: load `.agents/skills/release/SKILL.md` when preparing or publishing a release.
 - Quality: load `.agents/skills/sift-project/SKILL.md` before cleanup, dead-code or refactoring
   work.
 - A feature another loaded addon already provides is greyed out with that addon named, never run
