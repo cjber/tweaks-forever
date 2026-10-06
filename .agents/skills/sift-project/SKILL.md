@@ -93,6 +93,7 @@ rg -n 'RegisterEvent|SetScript|hooksecurefunc|OnSettingChanged|SLASH_|SlashCmdLi
   `ns.Overlays`, `ns.ClassSpells`, `ns.ForeverQuests` — generated `Data/` tables.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;
   `Locales/phrases.txt` is `tools/phrases.py`'s template for translators.
+- `ns.DungeonMaps` (Map/DungeonMaps.lua) — `Model` table exported for the specs; the feature reads Atlas's `AtlasMaps` global and the TOC's `OptionalDeps` `Atlas`, `Atlas_ClassicWoW` at runtime.
 - `TweaksForeverDungeonEntrancePinMixin` — global named by `Map/DungeonEntrances.xml`'s pin template.
 - `TweaksForeverCharDB.trainer` (Spellbook) — persisted trainer scan.
 - Conflict entries name other addons' folders and read their saved variables (`LeaPlusDB.X == "On"`,

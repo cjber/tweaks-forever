@@ -13,69 +13,54 @@ I wanted the handful of little addons I always install in one place, looking lik
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Dungeon entrances on the map, then enemy nameplates, then a backpack with a ring marked as junk">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Dungeon entrances, nameplates and a junk coin">
 </p>
 
 <p align="center">Dungeon entrances on the map, nameplates, and the junk coin in your bags.</p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms map with an icon at every dungeon entrance and Blackrock Mountain's tooltip">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png" width="768" alt="The world map inside Blackfathom Deeps, showing the dungeon's floor and legend">
+</p>
+
+<p align="center">Inside a dungeon the map opens on its own floor, with the legend beside it and a button for each floor.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms with a dungeon icon at every entrance">
 </p>
 
 <p align="center">Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.</p>
 
 ## Features
 
-Quest levels appear across the quest UI. Forever-only quests get a subtle gold background, and **Abandon quests** opens a checklist with one confirmation for the selected batch.
-
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/quests.png" width="442" alt="Abandon quests checklist with three quests selected and a confirmation warning">
-
 Every feature has its own setting; [docs/features.md](docs/features.md) has the detail.
 
-- **Quest levels and new stories.** Show quest levels on native map tooltips and the tracker. A soft gold tint identifies quests added in Forever.
-- **Abandon quests together.** Select quests in the quest log, then confirm the batch once.
-- **Quest and gossip automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map at a flight master, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on.
+- **Quests.** Quest levels on map tooltips and the tracker, a gold tint on quests added in Forever, **Abandon quests** with one confirmation, and the tracker sorted nearest first with distances.
+- **Automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on, as are invites from a whispered keyword and skipping loot confirmations.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
-- **Invite from whispers.** A whisper that is exactly your chosen keyword (inv, invite or group; inv by default) invites its sender, when you can invite. Off until you turn it on.
-- **Skip loot confirmations.** Confirms the game's warning when you roll Need or Disenchant, and when you loot a Bind on Pickup item. Off until you turn it on.
-- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked non-grey stacks per merchant visit; everything stays in the buyback tab. With *Mark items as junk* on, **Alt+Right-click** marks any item with the game's junk coin. Marking is off by default.
-- **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click, with each item marked by a coloured strip, border or dots. With Combine Bags on, grouped gear sits together at the top. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
-- **Map extras.** Reveal unexplored areas in a blue tint, see each zone's level range coloured like quest levels, and find every dungeon and raid entrance marked with retail's icons.
-- **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout, with Reset to put them back.
-- **Nameplates.** A taller bar in retail's own frame, with name and level above, your target outlined and cast bars with the spell's icon.
-- **Spell reach under nameplates.** A small icon for each attack you track on every enemy nameplate: full colour when the spell can reach, solid red when it cannot, melee included. Off until you turn it on, with where the icons sit (to the right of the bar by default), their size, the out of range look, an only-on-my-target toggle, and a spell picker under the setting.
-- **Modern tooltips.** A thin rounded border over charcoal, class-coloured names, and a health bar inside the tooltip. The style is that charcoal, retail's navy, or the game's own border.
-- **Tooltip at the cursor.** The game's own tooltips follow the mouse instead of the corner of the screen. Off until you turn it on.
-- **Nearest quests first.** The quest tracker sorts by distance as you move and shows how far each quest is.
-- **Quests on minimap givers.** Pointing at a quest giver on the minimap lists their quests for you. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
-- **Quest progress.** A creature you still need for a quest shows your progress in its tooltip and a quest icon beside its nameplate. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
-- **Native quest map icons.** Questie's map and minimap markers use the game's own quest symbols at a readable size, keeping Questie's locations and tooltips. Needs [Questie](https://www.curseforge.com/wow/addons/questie).
-- **Camp benefits.** Camp tooltips say what sitting nearby gives you and for how long, and each benefit you gain is named on screen.
-- **Future spells and bags.** Each spellbook tab ends with the spells you have not learned yet, and what your trainer can teach you now. With Combine Bags on, the reagent bag's slots join the combined bag at the bottom, tinted green.
-- **Quiet errors.** Hides the red text a spammed macro repeats; full bags and other errors still show.
-- **Companion hints.** Where another Forever addon would help, a grey line in the tooltip says so, and goes once it is loaded.
-- **Update notes.** The first login after Tweaks Forever updates prints one line in chat saying what changed.
-- **Maximum camera zoom.** Pulls the camera back further than the game's own Max Camera Distance allows. Off until you turn it on.
-- **No screen glow.** Turns off the full screen glow effect. Off until you turn it on.
-- **Train all button.** A button beside the class trainer's Train button buys every spell you can afford in one click. Off until you turn it on.
-- **Hide macro names.** Macros on your action bars show just their icon. Off until you turn it on.
-- **Item level in the auction house.** Weapons and armour on the Browse tab get a sortable **iLvl** column, and the item level stops repeating after the name.
-- **Fishing.** Double right-click to cast, apply the best lure you have, a warning when you have no lure, and optionally hear splashes over everything else.
+- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on.
+- **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Each item shows a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
+- **Map extras.** Unexplored areas in a blue tint (off until you turn it on), each zone's level range coloured like quest levels, and every dungeon and raid entrance marked with retail's icons.
+- **Dungeon maps.** Inside a dungeon, the world map opens on the dungeon's own floor map and legend, with a button for the floor and a Back to map button. Needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Classic WoW maps, read from your install.
+- **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout.
+- **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
+- **Spell reach.** A small icon for each attack you track on every enemy nameplate: full colour in reach, solid red out of it. Off until you turn it on.
+- **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
+- **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's tooltip with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
+- **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
+- **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet. With Combine Bags on, the reagent bag joins the combined bag.
+- **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.
+- **Auction house.** A sortable **iLvl** column for weapons and armour.
+- **Fishing.** Double right-click to cast, apply the best lure you have, and a warning when you have none.
+- **Small things.** Quiet repeated macro errors, companion hints in tooltips and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined in white with a quest icon and a Fireball cast">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined with a Fireball cast">
 </p>
 
-<p align="center">Nameplates in retail's own frame, with your target outlined, casts in a slim bar and a quest icon on what you still need.</p>
+<p align="center">Nameplates in retail's own frame, with your target outlined and a quest icon on what you still need.</p>
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/spellreach.png" width="644" alt="Three enemy nameplates with an Earth Shock and a Lightning Bolt icon, in colour when the spell reaches and solid red when it does not">
-</p>
-
-<p align="center">Spell reach icons sit beside the health bar: full colour when the spell reaches, solid red when it does not.</p>
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png" width="394" alt="An enemy's tooltip with a red health bar at 72% and a Horde shaman's with a blue bar at 412 / 520">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png" width="394" alt="An enemy's and a shaman's tooltip with health bars">
 </p>
 
 <p align="center">Unit tooltips with the health bar inside, in the retail game's own bar and frame.</p>
@@ -86,32 +71,16 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 
 <p align="center">Move and scale Blizzard windows from a tab in Edit Mode.</p>
 
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/junk.png" width="452" alt="A backpack with the game's gold junk coin on a ring and on stacks of cloth, meat and fins">
-</p>
-
-<p align="center">The game's junk coin on greys and on anything you mark yourself.</p>
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/campsite.png" width="321" alt="A Mana Well tooltip saying what sitting nearby restores">
-</p>
-
-<p align="center">Camp tooltips say what sitting nearby gives you.</p>
-
 ## Install
 
-Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`.
-
-The quest features that read Questie (quests on minimap givers, quest progress on tooltips and nameplates, and the native quest map icons) are greyed out without it. Most players get it with [Questie](https://www.curseforge.com/wow/addons/questie); if you'd rather not run Questie, its [QuestieDB](https://github.com/Questie/QuestieDB/releases) addon on its own is enough. While Questie's own tooltips or nameplate icons are on, the matching feature here steps aside.
+Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into `_classic_beta_/Interface/AddOns/`, so you end up with `AddOns/TweaksForever/TweaksForever.toc`. Questie features and Dungeon maps are greyed out until Questie (or QuestieDB) and Atlas [Classic WoW] are installed.
 
 ## Usage
 
 - `/tweaks` or `/tweaksforever` opens the settings, also under **Options → AddOns → Tweaks Forever** or from the addon compartment on the minimap.
 - `/rl` reloads the interface.
 
-Nothing to set up. Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you tick it.
-
-Translations are welcome as a pull request, or pasted into an issue, on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated yet shows in English.
+Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you tick it. Translations are welcome as a pull request or an issue on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated shows in English.
 
 ## For addon authors
 
@@ -119,59 +88,20 @@ Translations are welcome as a pull request, or pasted into an issue, on [GitHub]
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie and Legacy Forever, it steps aside only while that addon's matching option is on.
-
-| Feature | Addons |
-|---|---|
-| Quests | Leatrix Plus, Questie, AutoTurnIn |
-| Nearest quests first | Questie, while its tracker is on |
-| Quest progress on tooltips | Questie, while its tooltips are on |
-| Quest icons on nameplates | Questie, while its nameplate icons are on |
-| Other automations, repairs, quiet errors | Leatrix Plus |
-| Invite from whispers | Leatrix Plus |
-| Skip loot confirmations | Leatrix Plus |
-| Maximum camera zoom | Leatrix Plus |
-| No screen glow | Leatrix Plus |
-| Train all button | Leatrix Plus |
-| `/rl` | Leatrix Plus, which always adds its own `/rl` |
-| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
-| Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
-| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster |
-| Zone level ranges | Leatrix Maps |
-| Dungeon entrances | Leatrix Maps, while its points of interest are on |
-| Move windows | BlizzMove, MoveAnything |
-| Hide macro names | Dominos, Bartender4, ElvUI |
-| Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
-| Item level in the auction house | TradeSkillMaster, Auctioneer |
-| Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
-| Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
-| Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
-| Spell reach under nameplates | Range Lens, Plater, Kui Nameplates, NeatPlates, Threat Plates, Platynator, ElvUI |
-| Fishing | FishingBuddy, FishingAce |
-
-It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever, BlizzMove, Peddler, FishingBuddy, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
 
 ## Development
 
 Developed with AI assistance; changes are reviewed and checked with automated tests, linting and type checks.
 
-
 ```sh
-# link the checkout into the game
-ln -s "$PWD" ".../World of Warcraft/_classic_beta_/Interface/AddOns/TweaksForever"
-
 tools/typecheck.sh                              # LuaLS 3.19.1 + multi-value lint
-luacheck .                                      # lint
-stylua --check .                                # format
+luacheck . && stylua --check .                  # lint and format
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
 python3 tools/screenshots.py                    # regenerate docs/screenshots from the game's own art
 ```
 
-`tools/typecheck.sh` needs LuaLS **3.19.1**, Git and Python 3.11+. [tools/README.md](tools/README.md) covers the multi-value rule and the `Data/` generators. CI also runs ruff and ty on `tools/`, workflow linting and a secret scan, and a daily workflow opens a PR with regenerated data for each new Forever build.
-
-**Releasing:** move the `[Unreleased]` notes in `CHANGELOG.md` under `## [X.Y.Z] - YYYY-MM-DD`, then `git tag -s vX.Y.Z && git push --tags`. The [BigWigs packager](https://github.com/BigWigsMods/packager) builds the release with that entry as its notes.
-
-**Contributing:** see [CONTRIBUTING.md](https://github.com/cjber/.github/blob/main/CONTRIBUTING.md) and this repository's [AGENTS.md](AGENTS.md); report security problems privately as [SECURITY.md](https://github.com/cjber/.github/blob/main/SECURITY.md) describes.
+[tools/README.md](tools/README.md) covers the `Data/` generators and [AGENTS.md](AGENTS.md) the rest, including releasing and contributing. Report security problems privately, as [SECURITY.md](https://github.com/cjber/.github/blob/main/SECURITY.md) describes.
 
 ## Licence
 

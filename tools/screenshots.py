@@ -297,6 +297,89 @@ def dungeon_layers(ui):
     return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
 
 
+# Map/DungeonMaps.lua over the map's canvas: PAD, HEADER, the picker and Back to map sizes, the sheet's 0.58 share.
+ATLAS = Path.home() / "Games/battlenet/drive_c/Program Files (x86)/World of Warcraft/_classic_beta_/Interface/AddOns"
+DUNGEON_PAD, DUNGEON_HEADER, DUNGEON_PICKER = 12, 46, 200
+DUNGEON_FLOOR = "CL_BlackfathomDeepsA"
+LEGEND_FONT = FONTS["GameFontHighlight"]
+
+
+def atlas_strings(path):
+    """The `L["key"] = "value"` lines of one of Atlas's enUS locale files."""
+    return dict(re.findall(r'L\["([^"]+)"\]\s*=\s*"([^"]*)"', path.read_text()))
+
+
+def atlas_floor(key):
+    """(title, legend lines) of one Atlas_ClassicWoW record, its Lua concatenations resolved as the addon's enUS
+    locale files do: colour constants, L[...], ALC[...], BZ[...] and Atlas_GetBossName(...)."""
+    source = (ATLAS / "Atlas_ClassicWoW/Core/Data-ClassicEra.lua").read_text()
+    words = {**atlas_strings(ATLAS / "Atlas/Locale/Atlas-enUS.lua")}
+    own = atlas_strings(ATLAS / "Atlas_ClassicWoW/Locale/Atlas_ClassicWoW-enUS.lua")
+    colours = dict(re.findall(r'^local ([A-Z]{4}) = "([^"]*)"', source, re.M))
+    found = re.search(rf"^\t{key} = \{{\n(.*?)\n\t\}},", source, re.M | re.S)
+    if not found:
+        sys.exit(f"Atlas has no record {key}")
+    record = found.group(1)
+
+    def resolve(expression):
+        text = ""
+        for part in (p.strip() for p in expression.split("..")):
+            if part in colours:
+                text += colours[part]
+            elif m := re.fullmatch(r'"([^"]*)"', part):
+                text += m.group(1)
+            elif m := re.fullmatch(r'ALC\["([^"]+)"\]', part):
+                text += words[m.group(1)]
+            elif m := re.fullmatch(r'L\["([^"]+)"\]', part):
+                text += own.get(m.group(1), m.group(1))
+            elif m := re.fullmatch(r'(?:BZ\["([^"]+)"\]|Atlas_GetBossName\("([^"]+)"\))', part):
+                name = m.group(1) or m.group(2)
+                text += own.get(name, name)
+            else:
+                sys.exit(f"Atlas {key}: cannot resolve {part!r}")
+        return text
+
+    names = re.search(r"ZoneName = \{ (.*?) \},\n", record)
+    if not names:
+        sys.exit(f"Atlas {key} has no ZoneName")
+    legend = re.findall(r"^\t\t\{ (.*) \},$", record, re.M)
+    return resolve(names.group(1)), [resolve(line) for line in legend]
+
+
+def dungeon_map(ui):
+    """The world map opened inside Blackfathom Deeps: Map/DungeonMaps.lua's host over the map's canvas, laid out by
+    its Layout (the largest square at 58% of the width, the legend in a column beside it), the heading, the floor
+    picker (a UIPanelButtonTemplate showing the floor) and Back to map, with Atlas's own sheet and legend."""
+    title, legend = atlas_floor(DUNGEON_FLOOR)
+    sheet = Image.open(ATLAS / "Atlas_ClassicWoW/Images" / f"{DUNGEON_FLOOR}.blp").convert("RGBA")
+    nav = ("World", "Kalimdor", "Ashenvale")
+    frame, rects = world_map_frame(ui, map_art(ui, ASHENVALE), nav, arrows=nav[1:])
+    cx, cy, cw, ch = rects["container"]
+    frame.fill(cx, cy, cw, ch, (0, 0, 0, 1))
+    pad = DUNGEON_PAD
+    side = min(cw * 0.58, ch - DUNGEON_HEADER - pad)
+    frame.draw(sheet, cx + pad, cy + DUNGEON_HEADER, side, side)
+    back_x = cx + cw - pad - 112
+    ui_panel_button(frame, back_x, cy + pad, 112, 22, "Back to map")
+    picker_x = back_x - 8 - DUNGEON_PICKER
+    ui_panel_button(frame, picker_x, cy + pad, DUNGEON_PICKER, 24, title)
+    frame.text(cx + pad, cy + pad, title, FONTS["GameFontNormalLarge"])
+    # The legend wraps to the scroll frame (art's right + pad, to 2 pads from the host's right edge); each Atlas line
+    # opens with its own colour, which a wrapped line carries on.
+    left, y = cx + pad + side + pad, cy + DUNGEON_HEADER
+    width = cx + cw - 2 * pad - left
+    for line in legend:
+        colour = line[:10] if line.startswith("|c") else ""
+        for index, part in enumerate(wrap_text(frame, line, LEGEND_FONT, width)):
+            frame.text(left, y, (colour if index else "") + part, LEGEND_FONT)
+            y += LEGEND_FONT.height
+    return frame
+
+
+def dungeonmap(ui):
+    scene(ui, [(dungeon_map(ui), 0, 0)], MARGIN).save(OUT / "dungeonmap.png")
+
+
 # Bags/Junk.lua marks (account-wide): things this character sells rather than uses. Greys would only show their coin
 # at a merchant, so the bag has none, and every coin here is the addon's.
 JUNK_BAG = [
@@ -831,6 +914,7 @@ def main():
     exploration(ui)
     zone_levels(ui)
     dungeon_entrances(ui)
+    dungeonmap(ui)
     junk(ui)
     campsite(ui)
     campfire_buff(ui)
