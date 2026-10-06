@@ -14,6 +14,7 @@ globals = {
 	"TweaksForeverDungeonEntrancePinMixin",
 }
 read_globals = {
+	"AtlasMaps",
 	"AuctionCategories",
 	"AuctionHouseFrame",
 	"AuctionHouseFrameDisplayMode",
@@ -130,6 +131,7 @@ read_globals = {
 	"GetCVarBool",
 	"geterrorhandler",
 	"GetGuildBankWithdrawMoney",
+	"GetInstanceInfo",
 	"GetInventoryItemID",
 	"GetLocale",
 	"GetMoney",

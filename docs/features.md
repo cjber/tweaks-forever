@@ -37,6 +37,8 @@ All off until you turn them on, except faster auto loot.
 - Point at a zone on the world map to see its level range after the name, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Forever's map data has no ranges of its own, so the original zones show the original game's, and Zephras Isle and Riverglades show the span of their subzones' exploration levels. Cities, battlegrounds, and Forever zones whose subzones carry no level show none.
 - Mark every dungeon and raid entrance on zone and continent maps with retail's icons; point at one for its name, and left-click it to travel there: Shortest Path Forever plans the journey when it is installed, and otherwise the map's own waypoint marks the entrance. Without Shortest Path Forever, a grey line in the tooltip says where to get it (or to switch it on, when it is installed but off). Instances sharing a way in, such as Blackrock Mountain, share one pin that lists them. The map's own **Show instance entrances** filter turns them off, and an entrance steps aside where a flight master or Shortest Path Forever portal or dock already marks the spot; Legacy Forever draws the same portal with its shield on the corner where a Legacy step is left there. Forever's new instances (Dalaran, the Ruins of Lordaeron, the Hall of Thanes and the Wetlands excavation) have no entrance in the game's data yet, so they have no pin.
 
+- Inside a five-player dungeon, opening the world map on the zone you are in shows the dungeon's own floor map and its legend over the map, with a button that opens a list of the floors and wings and a **Back to map** button that steps aside to the stock map; a **Dungeon map** button on the map's corner brings it back. Your floor choice is kept for the session. It needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Atlas [Classic WoW] maps, which Tweaks Forever reads from your install and never copies; without them the setting is greyed out and says what to install. It adds no pins to the outdoor map and is on by default.
+
 ## Interface
 
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
@@ -86,3 +88,35 @@ All off until you turn them on, except faster auto loot.
 **Abandon multiple quests** adds an Abandon quests button to the quest log. Select individual quests or Select all, then click Abandon selected and Confirm abandon. Progress and associated quest items are lost. Hidden and non-abandonable quests are excluded; combat prevents abandoning.
 
 **Native quest map icons** replaces Questie’s quest-marker artwork with stock pickup, turn-in and objective symbols at readable map/minimap sizes. It keeps Questie’s full marker coverage and tooltips, and leaves its saved settings untouched. Off restores its appearance. QuestieDB is read automatically when installed; the database alone does not draw these markers.
+
+## Works alongside
+
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie and Legacy Forever, it steps aside only while that addon's matching option is on.
+
+| Feature | Addons |
+|---|---|
+| Quests | Leatrix Plus, Questie, AutoTurnIn |
+| Nearest quests first | Questie, while its tracker is on |
+| Quest progress on tooltips | Questie, while its tooltips are on |
+| Quest icons on nameplates | Questie, while its nameplate icons are on |
+| Other automations, repairs, quiet errors | Leatrix Plus |
+| Invite from whispers | Leatrix Plus |
+| Skip loot confirmations | Leatrix Plus |
+| Maximum camera zoom | Leatrix Plus |
+| No screen glow | Leatrix Plus |
+| Train all button | Leatrix Plus |
+| `/rl` | Leatrix Plus, which always adds its own `/rl` |
+| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
+| Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
+| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster |
+| Zone level ranges | Leatrix Maps |
+| Dungeon entrances | Leatrix Maps, while its points of interest are on |
+| Move windows | BlizzMove, MoveAnything |
+| Hide macro names | Dominos, Bartender4, ElvUI |
+| Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
+| Item level in the auction house | TradeSkillMaster, Auctioneer |
+| Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
+| Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
+| Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
+| Spell reach under nameplates | Range Lens, Plater, Kui Nameplates, NeatPlates, Threat Plates, Platynator, ElvUI |
+| Fishing | FishingBuddy, FishingAce |

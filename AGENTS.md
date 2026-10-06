@@ -29,6 +29,7 @@ publishes that entry as its notes.
 - `UI/` — settings, tooltips, nameplates and window helpers; `Integrations/` — companion navigation, and
   `Integrations/QuestieSource.lua`, the one place QuestieDB is opened: quests, NPC names and spawns are read from the installed
   addon in game, a little each frame, and never copied here.
+- `Map/DungeonMaps.lua` reads Atlas [Classic WoW]'s `AtlasMaps` in game for the dungeon interior overlay; its sheets and legends are never copied here.
 - `Data/` — lookup tables for what neither QuestieDB nor AtlasLoot holds (the WFA-28 waivers below); a generated one
   names the script that regenerates it and its sources in its header.
 - `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.

@@ -27,6 +27,10 @@ Questie = nil
 ---@type TFQuestieDB?
 LibQuestieDB = nil
 
+-- Atlas's map records by key, filled as Atlas and its map modules load; read only for "CL_" records of Atlas_ClassicWoW.
+---@type table<string, table>?
+AtlasMaps = nil
+
 -- Shortest Path Forever's public API, narrowed to what Navigate.lua calls; each member is feature-detected.
 ---@class TFShortestPathAPI
 ---@field version? integer

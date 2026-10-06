@@ -87,6 +87,18 @@
 ---@field instances integer[]
 ---@field area? integer
 
+-- One floor or wing of a dungeon, as Atlas draws it: its sheet and its legend as one block of text.
+---@class TFInteriorMap
+---@field key string Atlas's record key
+---@field title string
+---@field texture string a 512 by 512 sheet
+---@field legend string
+
+---@class TFDungeonMaps
+---@field Floors fun(atlas: table?, instance: integer): TFInteriorMap[]
+---@field Inside fun(instanceType: string, instance: integer?, playerMap: integer?, shownMap: integer?): integer?
+---@field Floor fun(count: integer, chosen: integer?): integer
+
 ---@class TFPosition
 ---@field x number
 ---@field y number
@@ -287,6 +299,7 @@ TweaksForeverCharDB = nil
 ---@field InstanceEntrances table<integer, TFDungeonEntrance> by instance Map.ID, before pin clustering
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
+---@field DungeonMaps TFDungeonMaps
 ---@field Art TFArt
 ---@field QuestGivers TFQuestGivers
 ---@field QuestProgress TFQuestProgress
