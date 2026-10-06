@@ -90,6 +90,9 @@ authorization. A preparation-only request ends before tags or uploads.
 
 ## Addon checks
 
+- Update `UI/WhatsNew.lua` to the release version and its headline, then regenerate
+  locale phrase templates and run `tests/whatsnew_spec.lua`.
+
 - Review every generated table and `docs/features.md`. Check default settings
   and companion conflicts against the actual feature registrations.
 - After tooltip art changes, regenerate `media/TooltipBorder*.tga` using the
