@@ -220,6 +220,7 @@
 ---@field savedSounds? table<string, string>
 ---@field cameraZoomSaved? string
 ---@field screenGlowSaved? string
+---@field lootSparklesSaved? table<string, string>
 ---@field lastVersion? string the addon version last logged in with
 ---@field windowLayouts? table<string, table<string, TFPosition>>
 ---@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>

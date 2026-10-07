@@ -55,6 +55,7 @@ UI\Frames.lua
 UI\Errors.lua
 UI\CameraZoom.lua
 UI\ScreenGlow.lua
+UI\LootSparkles.lua
 UI\TrainAll.lua
 UI\MacroNames.lua
 UI\AuctionHouse.lua

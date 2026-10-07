@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-10-07
+
+- **Quest item sparkles.** An option keeps the game's own sparkle effect on lootable quest objects, using the same graphics settings as Forever Loot Sparkles. Off by default. It turns normal and raid outlines off while enabled, keeps sparkles through graphics preset changes, and restores your earlier settings when switched off. Removing the sparkles needs a full game restart. It steps aside when Forever Loot Sparkles is loaded.
+
 ## [0.10.1] - 2026-10-07
 
 - **Data checked against Forever 1.60.1.70245.** The bundled game data is unchanged.
