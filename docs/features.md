@@ -44,6 +44,7 @@ All off until you turn them on, except faster auto loot.
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
 - Maximum camera zoom (off by default). The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch it off.
+- Show quest item sparkles (off by default). Uses the same five graphics settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) for the game's own sparkles on lootable quest objects. Normal and raid outlines stay off while enabled, even after changing graphics presets. Your previous settings are saved across reloads and restored when switched off. Removing sparkles needs a full game restart, because the client retains the effect through `/reload`.
 - No screen glow (off by default). Turns off the full screen glow effect, putting your earlier value back when you switch it off.
 - Train all button (off by default). A Train all button sits beside the class trainer's Train button. One click buys every spell the trainer is offering that your gold covers; it is disabled, and its tooltip says why, when nothing is available or you cannot pay for it all. It buys nothing on its own, and profession trainers are left alone.
 - `/rl` reloads the interface.
@@ -104,6 +105,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Skip loot confirmations | Leatrix Plus |
 | Maximum camera zoom | Leatrix Plus |
 | No screen glow | Leatrix Plus |
+| Quest item sparkles | Forever Loot Sparkles |
 | Train all button | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
 | Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
