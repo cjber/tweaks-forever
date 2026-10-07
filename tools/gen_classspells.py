@@ -34,7 +34,7 @@ try:
 except ModuleNotFoundError:
     from forever_tools import wago
 
-BUILD = "1.60.1.70235"
+BUILD = "1.60.1.70245"
 # Forever's client leaves out the trainers' teaching spells; Classic Era keeps them, with the same IDs.
 TEACH_BUILD = "1.15.9.69722"
 CLASSICDB_COMMIT = "22b51464f1625f6ef6275771de1f5466c6f5d19e"
