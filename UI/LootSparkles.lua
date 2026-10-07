@@ -4,15 +4,15 @@ local _, ns = ...
 local KEY = "lootSparkles"
 -- ForeverLootSparkles uses these same client settings for the native quest object effect.
 local WANTED = {
-	outlineModeShowLootEffectWhenDisabled = "1",
-	graphicsOutlineMode = "0",
-	OutlineEngineMode = "0",
-	raidGraphicsOutlineMode = "0",
-	RAIDOutlineEngineMode = "0",
+	{ "outlineModeShowLootEffectWhenDisabled", "1" },
+	{ "graphicsOutlineMode", "0" },
+	{ "raidGraphicsOutlineMode", "0" },
+	{ "OutlineEngineMode", "0" },
+	{ "RAIDOutlineEngineMode", "0" },
 }
 local watched = { graphicsquality = true, raidgraphicsquality = true }
-for cvar in pairs(WANTED) do
-	watched[cvar:lower()] = true
+for _, setting in ipairs(WANTED) do
+	watched[setting[1]:lower()] = true
 end
 
 ns.Feature({
@@ -45,14 +45,17 @@ local function Apply()
 	if active then
 		saved = saved or {}
 		ns.db.lootSparklesSaved = saved
-		for cvar in pairs(WANTED) do
+		for _, setting in ipairs(WANTED) do
+			local cvar = setting[1]
 			if saved[cvar] == nil then
 				saved[cvar] = GetCVar(cvar)
 			end
 		end
 	end
 	applying = true
-	for cvar, wanted in pairs(WANTED) do
+	-- Graphics settings can update their engine setting too, so restore the engine values last.
+	for _, setting in ipairs(WANTED) do
+		local cvar, wanted = setting[1], setting[2]
 		local current = GetCVar(cvar)
 		if current then
 			local value = active and wanted or saved and saved[cvar]

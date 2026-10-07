@@ -31,6 +31,11 @@ local env = setmetatable({
 	SetCVar = function(cvar, value)
 		assert(not combat, "graphics changes must wait until combat ends")
 		values[cvar] = value
+		if cvar == "graphicsOutlineMode" then
+			values.OutlineEngineMode = value
+		elseif cvar == "raidGraphicsOutlineMode" then
+			values.RAIDOutlineEngineMode = value
+		end
 		writes[#writes + 1] = cvar
 		if events.CVAR_UPDATE then
 			events.CVAR_UPDATE(cvar)
@@ -65,7 +70,7 @@ assert(#writes == 0 and #timers == 0, "default off leaves graphics alone")
 
 db.lootSparkles = true
 changed()
-assert(#writes == 5 and #timers == 1, "own writes do not schedule recursive updates")
+assert(#writes == 3 and #timers == 1, "own writes do not schedule recursive updates")
 for key, value in pairs(original) do
 	assert(db.lootSparklesSaved[key] == value)
 	assert(values[key] == (key == "outlineModeShowLootEffectWhenDisabled" and "1" or "0"))
