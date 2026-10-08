@@ -8,7 +8,7 @@ Small quality-of-life tweaks for WoW: Forever that look like they came with the 
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-I wanted the handful of little addons I always install in one place, looking like they came with the game. Tweaks Forever is quest and gossip automation, repairs, junk selling, gear groups, map extras, movable windows, tooltips, nameplates and fishing, as checkboxes in the game's own settings. Moving windows is a tab in Edit Mode, and the map uses retail's own dungeon icons.
+Tweaks Forever adds options for quest automation, repairs, junk selling, gear groups, maps and fishing to the game’s settings.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
@@ -93,8 +93,6 @@ A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy
 
 ## Development
 
-Developed with AI assistance; changes are reviewed and checked with automated tests, linting and type checks.
-
 ```sh
 tools/typecheck.sh                              # LuaLS 3.19.1 + multi-value lint
 luacheck . && stylua --check .                  # lint and format
@@ -109,3 +107,5 @@ python3 tools/screenshots.py                    # regenerate docs/screenshots fr
 GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
+
+Built with AI assistance.
