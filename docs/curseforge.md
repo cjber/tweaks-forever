@@ -1,6 +1,4 @@
-Developed with AI assistance; changes are reviewed and checked with automated tests, linting and type checks.
-
-I got tired of running a pile of small addons for things that feel like they should be in the default settings, so I put them in one. Everything is made to look like it came with the game: the options are a page in Options → AddOns, moving windows is a tab in Edit Mode, and the map uses retail's own dungeon icons.
+Tweaks Forever adds options for quest automation, repairs, junk selling, gear groups, maps and fishing to the game’s settings.
 
 If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or similar, the overlapping option greys out and names the addon that has it, so the two never fight. Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you turn it on.
 
@@ -41,3 +39,5 @@ Everything is under Options → AddOns → Tweaks Forever. `/tweaks`, `/tweaksfo
 Works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
 
 Bug reports and ideas are welcome. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
+
+Built with AI assistance.
