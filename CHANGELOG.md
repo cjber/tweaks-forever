@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **How the Forever addons work together.** The README and store page list each of the other Forever addons and what it adds when installed alongside this one.
+
 ## [0.11.1] - 2026-10-08
 
 - **Shorter addon descriptions.** The README and store pages explain the options directly and keep the author and licence credits.
