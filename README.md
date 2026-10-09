@@ -89,7 +89,7 @@ Repairs, selling junk and faster auto loot start on; everything else that acts f
 
 ## Works alongside
 
-A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window. [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) covers Legacy challenges and [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) profession levelling.
 
 ## Development
 

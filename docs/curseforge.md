@@ -36,7 +36,14 @@ Nameplates in retail's own frame, with your target outlined.
 
 Everything is under Options → AddOns → Tweaks Forever. `/tweaks`, `/tweaksforever` or the addon compartment on the minimap opens it. Translations are welcome as a pull request or an issue on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales).
 
-Works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there.
+## With my other Forever addons
+
+All optional:
+
+- [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) plans the way when you click a dungeon or raid entrance.
+- [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders. The Windows option moves and scales its guide window.
+- [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) shades undiscovered areas and pins dungeons that count toward a challenge. Tweaks' unexplored tint and entrance icons step aside for it.
+- [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) shows skill-up chances, costs and levelling routes in the Professions window.
 
 Bug reports and ideas are welcome. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
 
