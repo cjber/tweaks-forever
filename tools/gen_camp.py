@@ -16,7 +16,7 @@ try:
 except ModuleNotFoundError:
     from forever_tools import wago
 
-BUILD = "1.60.1.70291"
+BUILD = "1.60.1.70338"
 USER_AGENT = "TweaksForever/1.0"
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / ".cache"
