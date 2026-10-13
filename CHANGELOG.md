@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Movement keys keep working in combat.** The Gear groups panel, the Spells to track list and the dungeon map's floor list pass every key except Escape to the game, in and out of combat, so leaving one open no longer stops you moving in a fight.
+
 ## [0.11.3] - 2026-10-13
 
 - **Data checked against Forever 1.60.1.70338.** The bundled game data is unchanged.

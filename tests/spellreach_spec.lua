@@ -158,7 +158,13 @@ local function Frame(kind, name, _, template)
 	function frame.SetFrameStrata() end
 	function frame.SetClampedToScreen() end
 	function frame.EnableKeyboard() end
-	function frame.SetPropagateKeyboardInput() end
+	function frame.SetPropagateKeyboardInput(self, value)
+		self.propagate = value
+	end
+	function frame.GetPropagateKeyboardInput(self)
+		return self.propagate
+	end
+	function frame.HookScript() end
 	function frame.CreateFontString(_, _, _, font)
 		local string = Region()
 		string.font = font
@@ -256,7 +262,11 @@ local env = setmetatable({
 			return plateFrames[unit]
 		end,
 	},
+	InCombatLockdown = function()
+		return false
+	end,
 	C_Timer = {
+		After = function() end,
 		NewTicker = function(_, fn)
 			ticks[#ticks + 1] = fn
 			return {
@@ -272,6 +282,7 @@ local env = setmetatable({
 		end
 	end,
 }, { __index = _G })
+setfenv(assert(loadfile("UI/Keys.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("UI/SpellReach.lua")), env)("TweaksForever", ns)
 local Model = ns.SpellReach
 

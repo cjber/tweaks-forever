@@ -698,13 +698,7 @@ local function BuildPicker()
 	content:SetWidth(PICKER_WIDTH - 76)
 	scroll:SetScrollChild(content)
 	panel.Content, panel.Rows = content, {}
-	panel:SetScript("OnKeyDown", function(self, key)
-		self:SetPropagateKeyboardInput(key ~= "ESCAPE")
-		if key == "ESCAPE" then
-			self:Hide()
-		end
-	end)
-	panel:EnableKeyboard(true)
+	ns.EscapeCloses(panel)
 	picker = panel
 	return panel
 end
