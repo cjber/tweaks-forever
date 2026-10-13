@@ -15,6 +15,8 @@ verbatim rather than rewritten as the addon moves.
 
 - **Spell reach icons after a reload.** Enemy nameplates already on screen when you reload get their icons straight away, not only plates that appear afterwards.
 
+- **Instance entrances follow the setting at once.** Turning Instance entrances off or on updates an open world map straight away.
+
 ## [0.11.3] - 2026-10-13
 
 - **Data checked against Forever 1.60.1.70338.** The bundled game data is unchanged.

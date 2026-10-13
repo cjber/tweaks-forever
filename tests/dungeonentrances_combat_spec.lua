@@ -3,6 +3,7 @@
 local combat, acquired, removed = false, 0, 0
 local provider, onEvent
 local mapEvents = 0
+local active, settingChanged = true, nil
 local map = {
 	IsShown = function()
 		return true
@@ -36,7 +37,11 @@ local ns = {
 		fn()
 	end,
 	Active = function()
-		return true
+		return active
+	end,
+	OnSettingChanged = function(key, fn)
+		assert(key == "dungeonEntrances")
+		settingChanged = fn
 	end,
 }
 local eventFrame = {
@@ -101,6 +106,20 @@ onEvent(eventFrame, "CVAR_UPDATE", "questPOI")
 assert(removed == 2, "another cvar redrew the entrances")
 onEvent(eventFrame, "CVAR_UPDATE", "showDungeonEntrancesOnMap")
 assert(removed == 3, "the entrance toggle did not redraw")
+-- Turning the setting off or on redraws the open map, and waits for the end of combat like any refresh.
+local acquiredBefore = acquired
+active = false
+settingChanged()
+assert(removed == 4 and acquired == acquiredBefore, "turning the setting off left the entrances on the map")
+active = true
+settingChanged()
+assert(removed == 5 and acquired > acquiredBefore, "turning the setting on drew nothing")
+combat = true
+settingChanged()
+assert(removed == 5, "a setting change in combat touched the pin manager")
+combat = false
+onEvent(eventFrame, "PLAYER_REGEN_ENABLED")
+assert(removed == 6, "a setting change in combat never caught up")
 provider:OnShow()
 assert(mapEvents == 0, "showing the map registered an event through the map")
 print("dungeonentrances_combat: protected MapCanvas refresh contract passed")
