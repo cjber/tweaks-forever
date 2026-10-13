@@ -17,6 +17,8 @@ verbatim rather than rewritten as the addon moves.
 
 - **Instance entrances follow the setting at once.** Turning Instance entrances off or on updates an open world map straight away.
 
+- **Guild names in player tooltips.** A guild whose name holds a race, such as Night Elf Lovers, stays in brackets as the guild, and the class joins the real level line, which is now found by the player's level as well as their race.
+
 ## [0.11.3] - 2026-10-13
 
 - **Data checked against Forever 1.60.1.70338.** The bundled game data is unchanged.

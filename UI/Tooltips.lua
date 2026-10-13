@@ -58,6 +58,10 @@ local PIECES = { -- [piece] = { left, right, top, bottom } in sixteenths of the 
 local LAYOUTS = { TooltipDefaultLayout = true, TooltipDefaultDarkLayout = true }
 local GUILD = { 0.6, 0.6, 0.6 }
 
+---@class TFTooltips
+local Model = {}
+ns.Tooltips = Model
+
 -- The health bar's fill: this far in from the tooltip's sides and bottom, this tall, and this far below the
 -- last line. The tooltip's own margin under its lines is 10. The track under the fill is its colour at this shade.
 local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 12, 10
@@ -271,6 +275,40 @@ local function HealthBar()
 	return Style
 end
 
+-- The unit's level as its level line writes it, "??" for one far above you, read from the token the tooltip was
+-- given (GetPlayerInfoByGUID has no level). Nil when there is no token or the level cannot be read.
+---@param tooltip GameTooltip
+---@return string?
+local function LevelText(tooltip)
+	local info = tooltip:GetProcessingTooltipInfo()
+	local token = info
+		and (
+			info.getterName == "GetUnit" and info.getterArgs and info.getterArgs[1]
+			or info.getterName == "GetWorldCursor" and "mouseover"
+		)
+	if type(token) ~= "string" or not UnitExists(token) then
+		return nil
+	end
+	local level = UnitLevel(token)
+	if not canaccessvalue(level) or type(level) ~= "number" then
+		return nil
+	end
+	return level > 0 and tostring(level) or "??"
+end
+
+-- The level line names the race and holds the level as a word of its own, so a guild whose name holds a race
+-- word ("Night Elf Lovers") is never taken for it. Without a level, the race alone has to do.
+---@param text string
+---@param race string
+---@param level string?
+---@return boolean
+function Model.IsLevelLine(text, race, level)
+	if not text:find(race, 1, true) then
+		return false
+	end
+	return not level or (" " .. text .. " "):find(" " .. level .. " ", 1, true) ~= nil
+end
+
 -- A player's lines as the retail game writes them: the name in the class colour, the guild in brackets, race and
 -- class on the level line, and the faction in its colour. Forever gives the class a line of its own; a line
 -- pre-call drops it before it is added, which Blizzard's TooltipDataProcessor allows insecure callers, and the
@@ -290,8 +328,8 @@ local function UnitLines()
 		if tooltip ~= GameTooltip or not ns.Active(KEY) then
 			return
 		end
-		local _
-		className, classFile, race, _, _, _, _, level = GetPlayerInfoByGUID(data.guid)
+		className, classFile, race = GetPlayerInfoByGUID(data.guid)
+		level = LevelText(tooltip)
 		if classFile then
 			building, passed, dropped = data, false, false
 		end
@@ -310,7 +348,7 @@ local function UnitLines()
 			return
 		end
 		if not passed then
-			passed = text:find(race, 1, true) ~= nil
+			passed = Model.IsLevelLine(text, race, level)
 		elseif text == className and not line.rightText then
 			dropped = true
 			return true
@@ -334,7 +372,7 @@ local function UnitLines()
 			if not canaccessvalue(text) or not text then
 				break
 			end
-			if not levelLine and text:find(race, 1, true) and (not level or text:find(tostring(level), 1, true)) then
+			if not levelLine and Model.IsLevelLine(text, race, level) then
 				levelLine = i
 				if dropped and not text:find(className, 1, true) then
 					local _, stop = text:find(race, 1, true)
