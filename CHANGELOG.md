@@ -11,6 +11,10 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.11.3] - 2026-10-13
+
+- **Data checked against Forever 1.60.1.70338.** The bundled game data is unchanged.
+
 ## [0.11.2] - 2026-10-09
 
 - **Data checked against Forever 1.60.1.70291.** One new Forever quest is included.
