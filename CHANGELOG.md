@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+## [0.11.4] - 2026-10-13
+
 - **Movement keys keep working in combat.** The Gear groups panel, the Spells to track list and the dungeon map's floor list pass every key except Escape to the game, in and out of combat, so leaving one open no longer stops you moving in a fight.
 
 - **Spell reach icons after a reload.** Enemy nameplates already on screen when you reload get their icons straight away, not only plates that appear afterwards.
