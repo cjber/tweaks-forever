@@ -23,6 +23,7 @@ Data\ClassSpells.lua
 Data\ForeverQuests.lua
 Core\Core.lua
 UI\Art.lua
+UI\Keys.lua
 Features\Automation.lua
 Features\WhisperInvite.lua
 Features\LootConfirm.lua

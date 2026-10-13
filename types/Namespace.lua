@@ -280,6 +280,7 @@ TweaksForeverCharDB = nil
 ---@field Frames TFFrames
 ---@field SpellReach TFSpellReach
 ---@field AuctionHouse TFAuctionHouse
+---@field Tooltips TFTooltips
 ---@field WhisperInvite TFWhisperInvite
 ---@field Exploration TFExploration
 ---@field CombinedBag TFCombinedBag
@@ -307,6 +308,7 @@ TweaksForeverCharDB = nil
 ---@field QuestieDB fun(): TFQuestieDB?
 ---@field QuestieSource TFQuestieSource
 ---@field Print fun(message: string)
+---@field EscapeCloses fun(frame: Frame)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(): string
 ---@field Suggestion fun(addon: string, install: string, enable: string): string?

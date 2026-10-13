@@ -208,6 +208,12 @@ ns.Init(function()
 	end
 
 	map:AddDataProvider(Provider)
+	-- The Instance entrances setting redraws an open map at once, as the map's own filter does.
+	ns.OnSettingChanged("dungeonEntrances", function()
+		if map:IsShown() then
+			Provider:RefreshAllData()
+		end
+	end)
 	local events = CreateFrame("Frame")
 	events:RegisterEvent("PLAYER_REGEN_ENABLED")
 	events:RegisterEvent("CVAR_UPDATE")

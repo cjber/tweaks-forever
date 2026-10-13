@@ -70,6 +70,9 @@ local function Frame(kind)
 		SetPropagateKeyboardInput = function(self, value)
 			self.propagate = value
 		end,
+		GetPropagateKeyboardInput = function(self)
+			return self.propagate
+		end,
 		EnableKeyboard = function(self, value)
 			self.keyboard = value
 		end,
@@ -139,6 +142,7 @@ map.AddDataProvider = function(_, value)
 end
 
 local combat, instanceType, instance, playerMap = false, "party", 36, 1000
+local nextFrame = {}
 local loaded = true
 local floors = {
 	CL_TheDeadmines = {
@@ -188,7 +192,13 @@ local env = setmetatable({
 		return setmetatable({}, { __index = mixin })
 	end,
 	MapCanvasDataProviderMixin = {},
+	C_Timer = {
+		After = function(_, fn)
+			nextFrame[#nextFrame + 1] = fn
+		end,
+	},
 }, { __index = _G })
+setfenv(assert(loadfile("UI/Keys.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/DungeonMaps.lua")), env)("TweaksForever", ns)
 local Model = ns.DungeonMaps
 local feature = features.dungeonMaps
@@ -305,6 +315,8 @@ popup.scripts.OnKeyDown(popup, "A")
 assert(popup.shown and popup.propagate == true, "a key other than Escape was swallowed")
 popup.scripts.OnKeyDown(popup, "ESCAPE")
 assert(not popup.shown and popup.propagate == false and not popup.registered.GLOBAL_MOUSE_DOWN)
+nextFrame[1]()
+assert(popup.propagate == true, "keys pass through again on the next frame")
 picker.scripts.OnClick()
 popup.mouseOver = true
 popup.scripts.OnEvent(popup, "GLOBAL_MOUSE_DOWN")
