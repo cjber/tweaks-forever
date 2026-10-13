@@ -730,6 +730,13 @@ ns.Init(function()
 		end
 		Sync()
 	end
+	-- Plates already up before login, as after a reload, raise no NAME_PLATE_UNIT_ADDED.
+	for _, plate in ipairs(C_NamePlate.GetNamePlates()) do
+		local unit = plate.UnitFrame and plate.UnitFrame.unit
+		if unit then
+			plates[unit] = plate
+		end
+	end
 	Rescan()
 	ns.OnSettingChanged(KEY, Rescan)
 	-- Position, size, out of range look and which plates redraw on the next tick, with no reload.

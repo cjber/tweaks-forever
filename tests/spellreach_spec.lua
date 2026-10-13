@@ -181,6 +181,8 @@ local created = {}
 local char = {}
 local plateFrames = { nameplate1 = Plate(), nameplate2 = Plate() }
 local ticks, cancelled = {}, 0
+-- The plates GetNamePlates lists: none at login until the reload check at the end.
+local onScreen = {}
 
 local env = setmetatable({
 	Enum = { SpellBookSpellBank = { Player = 0 } },
@@ -260,6 +262,9 @@ local env = setmetatable({
 	C_NamePlate = {
 		GetNamePlateForUnit = function(unit)
 			return plateFrames[unit]
+		end,
+		GetNamePlates = function()
+			return onScreen
 		end,
 	},
 	InCombatLockdown = function()
@@ -545,5 +550,24 @@ assert(#char.spellReach["1:0"] == 4)
 assert(not bySpell[403].enabled, "a full row stops taking more spells")
 bySpell[116].scripts.OnClick(bySpell[116])
 assert(#char.spellReach["1:0"] == 3 and not bySpell[116].checked, "and unticking takes it back out")
+
+-- After a /reload the plates already on screen raise no NAME_PLATE_UNIT_ADDED: they are read on setup and drawn.
+for key in pairs(created) do
+	created[key] = nil
+end
+for index in ipairs(initializers) do
+	initializers[index] = nil
+end
+local reloaded = plateFrames.nameplate2
+reloaded.UnitFrame = { unit = "nameplate2" }
+onScreen = { reloaded, Plate() }
+local polling = #ticks
+setfenv(assert(loadfile("UI/SpellReach.lua")), env)("TweaksForever", ns)
+for _, fn in ipairs(initializers) do
+	fn()
+end
+assert(created[reloaded] and created[reloaded].shown, "a plate shown before the reload gets its icons")
+assert(#ticks == polling + 1, "and the polling starts for it")
+assert(not created[onScreen[2]], "a plate with no unit is left alone")
 
 print("spellreach_spec: ok")
