@@ -29,7 +29,11 @@ ns.Feature({
 		.. 'your progress to its tooltip, such as "Mangy Wolf slain: 3/10", in white until it is done and grey '
 		.. "after. Needs Questie, or its QuestieDB addon on its own.",
 	default = true,
-	conflicts = { { addon = "Questie", when = QuestieOption("enableTooltips") } },
+	conflicts = {
+		{ addon = "Questie", when = QuestieOption("enableTooltips") },
+		-- Polestar draws these only once its load-on-demand quest database is in.
+		{ addon = "Polestar_QuestDB", polestar = "qol.questTooltips" },
+	},
 	needs = NEEDS,
 })
 
@@ -41,7 +45,10 @@ ns.Feature({
 		.. "log, to kill or for an item it drops, and goes once you have enough. Needs Questie, or its QuestieDB addon "
 		.. "on its own.",
 	default = true,
-	conflicts = { { addon = "Questie", when = QuestieOption("nameplateEnabled") } },
+	conflicts = {
+		{ addon = "Questie", when = QuestieOption("nameplateEnabled") },
+		{ addon = "Polestar_QuestDB", polestar = "qol.nameplateIcons" },
+	},
 	needs = NEEDS,
 })
 

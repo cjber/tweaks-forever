@@ -54,6 +54,26 @@ local env = setmetatable({
 setfenv(assert(loadfile("Features/Automation.lua")), env)("TweaksForever", ns)
 assert(features.gossip.default == false)
 
+-- With Polestar loaded, each of these stands down while Polestar's own matching setting is on.
+local polestar = {
+	quests = "behavior.autoAccept,behavior.autoTurnin",
+	gossip = "qol.skipGossip",
+	summons = "qol.acceptSummon",
+	resurrections = "qol.acceptResurrect",
+	releasePvP = "qol.autoReleasePvP",
+	declineDuels = "qol.declineDuels",
+	fastLoot = "qol.fastLoot",
+}
+for key, paths in pairs(polestar) do
+	local found = {}
+	for _, conflict in ipairs(features[key].conflicts) do
+		if conflict.polestar then
+			found[#found + 1] = conflict.polestar
+		end
+	end
+	assert(table.concat(found, ",") == paths, key .. " names Polestar's " .. paths)
+end
+
 local function option(orderIndex, icon, flagged, status)
 	return {
 		orderIndex = orderIndex,
