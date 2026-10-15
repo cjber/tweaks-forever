@@ -83,7 +83,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Quest log
 
-**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. **In quest dialogs too** adds the level in front of each quest in an NPC's greeting list and in front of the title on the quest's detail and reward pages, where the game knows it. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
+**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. **In quest dialogs too** adds the level in front of each quest in the quest greeting list (an NPC or board offering only quests) and in front of the title on the quest's detail and reward pages, where the game knows it. The gossip window's quest list is left as it is. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
 
 **Highlight new Forever quests** marks quests added since Classic Era with a soft gold background in the log and quest text.
 

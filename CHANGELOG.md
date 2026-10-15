@@ -12,7 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- **Quest levels in quest dialogs.** With Show quest levels on, an NPC's greeting list and a quest's detail and reward titles show its level, such as [12], where the game knows it.
+- **Quest levels in quest dialogs.** With Show quest levels on, the quest greeting list and a quest's detail and reward titles show its level, such as [12], where the game knows it.
 
 - **Summons and resurrections are accepted more carefully.** A summon isn't accepted where the game won't let you teleport out, and one that arrives in a fight is accepted when it ends, a resurrection waits out the delay after dying again soon, and Shift leaves either one, or a battleground release, to you. Their popups now close only once the game has taken the answer, so one it refuses stays up.
 - **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.

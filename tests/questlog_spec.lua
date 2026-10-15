@@ -73,8 +73,8 @@ local env = setmetatable({
 	},
 }, { __index = _G })
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-env.QuestFrameGreetingPanel = { HookScript = function() end }
 env.hooksecurefunc = env.hooksecurefunc or function() end
+ns.On = ns.On or function() end
 setfenv(assert(loadfile("Quests/QuestLevels.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestLog.lua")), env)("TweaksForever", ns)
 assert(loadfile("Data/ForeverQuests.lua"))("TweaksForever", ns)
