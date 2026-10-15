@@ -34,18 +34,19 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 Every feature has its own setting; [docs/features.md](docs/features.md) has the detail.
 
-- **Quests.** Quest levels on map tooltips and the tracker, a gold tint on quests added in Forever, a coin on the reward choice that sells for the most, **Abandon quests** with one confirmation, and the tracker sorted nearest first with distances.
+- **Quests.** Quest levels on map tooltips, the tracker and quest dialogs, a gold tint on quests added in Forever, a coin on the reward choice that sells for the most, **Abandon quests** with one confirmation, the tracker sorted nearest first with distances, and bindable keys for your nearest quest's item and target.
 - **Automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map, accepts summons and group resurrections, releases in battlegrounds, declines duels (friends and guild can be let through), and accepts party invites from friends or declines strangers'. Hold Shift to talk normally. Off until you turn it on, as are invites from a whispered keyword and skipping loot confirmations.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
-- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on.
+- **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on. Hold Shift as a merchant opens to skip both for that visit.
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Each item shows a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
-- **Map extras.** Unexplored areas in a blue tint (off until you turn it on), each zone's level range coloured like quest levels, your and the cursor's coordinates, and every dungeon and raid entrance marked with retail's icons.
+- **Map extras.** Unexplored areas in a blue tint on the world and zone maps (off until you turn it on), each zone's level range coloured like quest levels, your and the cursor's coordinates, and every dungeon and raid entrance marked with retail's icons.
 - **Dungeon maps.** Inside a dungeon, the world map opens on the dungeon's own floor map and legend, with a button for the floor and a Back to map button. Needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Classic WoW maps, read from your install.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout.
 - **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
 - **Spell reach.** A small icon for each attack you track on every enemy nameplate: full colour in reach, solid red out of it. Off until you turn it on.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
 - **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
+- **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Rare alerts (off by default) name a rare near you in chat.
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet. With Combine Bags on, the reagent bag joins the combined bag.
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.

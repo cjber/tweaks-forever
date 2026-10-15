@@ -12,22 +12,25 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- **Keys for the nearest quest item and quest target.** Under Key Bindings > AddOns > Tweaks Forever you can bind one key to use your nearest quest's item, and another to target a creature your nearest unfinished quest still needs, a different one each press (needs QuestieDB).
-- **XP per hour on the experience bar.** Pointing at the experience bar adds your XP per hour over the last 15 minutes, the time to your next level at that pace, and about how many kills or quests that is.
-- **Rare alerts.** A new option, off until you turn it on, puts a chat line and a warning sound up when a rare creature's nameplate or map marker appears near you, once per rare for ten minutes and never in combat.
-- **Unexplored areas show on the zone map too.** With Reveal unexplored areas on, the small zone map (Shift+M) gets the same blue tint as the world map, and an area you discover loses its tint at once.
-- **Hold Shift to skip repairs and junk selling at one merchant.** Holding Shift while a merchant opens skips Tweaks' repair (chat says what it would have cost) and its junk selling for that visit; the Sell All Junk button still works.
-- **Faster auto loot asks for each item once.** When the game repeats its loot-ready signal for the same window, only items it hadn't asked for yet are taken.
-- **Quest progress on item and object tooltips.** With QuestieDB, a quest item shows the quest it counts for and your progress on its tooltip, as creatures already did, and so do objects you use or loot for a quest. An item that starts a quest you haven't done says "Starts a quest:" and names it.
+## [0.12.0] - 2026-10-15
+
 - **Coordinates on the world map.** Your position and the cursor's show along the bottom of the world map. Turn it off under Maps; it steps aside for Leatrix Maps, Mapster, Coordinates and Polestar when they show their own.
-- **Quest levels in quest dialogs.** With Show quest levels on, the quest greeting list and a quest's detail and reward titles show its level, such as [12], where the game knows it.
-- **Party invites by who sends them, and duels from friends.** New options, all off until you turn them on: accept party invites from your friends, Battle.net friends and guild (not while you are queued for a battleground), decline invites from anyone else, and let friends and guild still challenge you when duels are declined.
-- **Summons and resurrections are accepted more carefully.** A summon isn't accepted where the game won't let you teleport out, and one that arrives in a fight is accepted when it ends, a resurrection waits out the delay after dying again soon, and Shift leaves either one, or a battleground release, to you. Their popups now close only once the game has taken the answer, so one it refuses stays up.
+- **XP per hour on the experience bar.** Pointing at the experience bar adds your XP per hour over the last 15 minutes, the time to your next level at that pace, and about how many kills or quests that is.
 - **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.
+- **Quest progress on item and object tooltips.** With QuestieDB, a quest item shows the quest it counts for and your progress on its tooltip, as creatures already did, and so do objects you use or loot for a quest. An item that starts a quest you haven't done says "Starts a quest:" and names it.
+- **Quest levels in quest dialogs.** With Show quest levels on, the quest greeting list and a quest's detail and reward titles show its level, such as [12], where the game knows it.
+- **Keys for the nearest quest item and quest target.** Under Key Bindings > AddOns > Tweaks Forever you can bind one key to use your nearest quest's item, and another to target a creature your nearest unfinished quest still needs, a different one each press (needs QuestieDB).
+- **Unexplored areas show on the zone map too.** With Reveal unexplored areas on, the small zone map (Shift+M) gets the same blue tint as the world map, and an area you discover loses its tint at once.
+- **Rare alerts.** A new option, off until you turn it on, puts a chat line and a warning sound up when a rare creature's nameplate or map marker appears near you, once per rare for ten minutes and never in combat.
+- **Party invites by who sends them, and duels from friends.** New options, all off until you turn them on: accept party invites from your friends, Battle.net friends and guild (not while you are queued for a battleground), decline invites from anyone else, and let friends and guild still challenge you when duels are declined.
 - **`/tweaks report` gives you something to paste into a bug report.** It opens a small window with the text already selected: your addon and game versions, your character, the settings you changed, which features are standing down for another addon, your other addons, and any errors Tweaks caught this session. Press Ctrl+C and paste it.
+- **Hold Shift to skip repairs and junk selling at one merchant.** Holding Shift while a merchant opens skips Tweaks' repair (chat says what it would have cost) and its junk selling for that visit; the Sell All Junk button still works.
 - **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as what you sell there, such as your junk, brings in enough.
+- **Summons and resurrections are accepted more carefully.** A summon isn't accepted where the game won't let you teleport out, and one that arrives in a fight is accepted when it ends. A resurrection waits out the delay after dying again soon, and Shift leaves either one, or a battleground release, to you. Their popups now close only once the game has taken the answer, so one it refuses stays up.
 - **Quest automation leaves the costly ones to you.** A quest that would flag you for PvP is no longer accepted for you, and a hand-in that costs gold is no longer paid without asking. A quest the game has already accepted for you is acknowledged instead of accepted again.
 - **Polestar is respected like the other addons.** With Polestar loaded, auto repair, quest and gossip automation, summons, resurrections, battleground release, duel declines, faster auto loot, quiet errors, revealed maps, zone level ranges, and quest tooltips and nameplate icons (once its quest database has loaded) each stand down, named in the settings, while Polestar's own matching option is on, and follow that option as soon as you change it. While Polestar sells your greys, only your marked non-grey junk is sold here.
+- **Faster auto loot asks for each item once.** When the game repeats its loot-ready signal for the same window, only items it hadn't asked for yet are taken.
+- **Data checked against Forever 1.60.1.70374 and Classic Era 1.15.9.70003.** The bundled game data is unchanged.
 
 ## [0.11.5] - 2026-10-15
 
