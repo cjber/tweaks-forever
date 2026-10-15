@@ -123,7 +123,9 @@ ns.Init(function()
 	-- `/tweaks report` shows the report to copy into a bug report; anything else opens the settings.
 	local function Slash(message)
 		if strtrim(message or ""):lower() == "report" then
-			ns.Report.Show(ns.Report.Text(ns.ReportLines()))
+			-- Tweaks' lines can fail in the very state being reported: the header and caught errors still show.
+			local ok, lines = ns.SafeCall("report lines", ns.ReportLines)
+			ns.Report.Show(ns.Report.Text(ok and lines or { "Report lines failed: " .. tostring(lines) }))
 		else
 			Open()
 		end

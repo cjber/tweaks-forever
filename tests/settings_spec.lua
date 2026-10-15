@@ -130,7 +130,7 @@ ns = {
 		return ns.db[key] ~= false
 	end,
 	SafeCall = function(_, fn, ...)
-		return assert(pcall(fn, ...))
+		return pcall(fn, ...)
 	end,
 	ReportLines = function()
 		return { "own line" }
@@ -198,4 +198,9 @@ env.SlashCmdList.TWEAKSFOREVER("  Report ")
 assert(reported == "report: own line" and opened == nil, "/tweaks report shows the report")
 env.SlashCmdList.TWEAKSFOREVER("anything")
 assert(opened == "Tweaks Forever", "anything else opens the settings")
+ns.ReportLines = function()
+	error("lines broke", 0)
+end
+env.SlashCmdList.TWEAKSFOREVER("report")
+assert(reported == "report: Report lines failed: lines broke", "failing lines still open the report, saying so")
 print("settings: ok")

@@ -73,11 +73,16 @@ local function Widget(kind, template, parent)
 	})
 end
 
-local errors, addons = {}, {}
+local errors, addons, globals = {}, {}, {}
 local env = setmetatable({
-	CreateFrame = function(kind, _, parent, template)
+	UISpecialFrames = {},
+	CreateFrame = function(kind, name, parent, template)
 		made = made + 1
-		return Widget(kind, template, parent)
+		local widget = Widget(kind, template, parent)
+		if name then
+			globals[name] = widget
+		end
+		return widget
 	end,
 	geterrorhandler = function()
 		return function(message)
@@ -219,6 +224,8 @@ do
 	equal(edit.highlighted, text, "and selects it again")
 	edit.scripts.OnEscapePressed(edit)
 	equal(window.shown, false, "Escape hides it")
+	equal(env.UISpecialFrames[1], "TweaksForeverReport", "Escape without focus: a special frame")
+	equal(globals.TweaksForeverReport, window, "named for it")
 	local count = made - before
 	Report()
 	equal(window.shown, true, "shown again")
@@ -282,6 +289,45 @@ do
 	has(text, "Errors (5):", "report: the caught errors")
 	has(text, "- [long] x1 xxx", "report: newest first")
 	equal(#text <= 2000, true, "report: still one message")
+end
+
+-- Client-format stack lines are kept; a long message is cut on a character boundary; nested calls name their own
+-- label; long addon lines leave room for the errors and the addon list.
+do
+	ns.RecordError(
+		"client",
+		"boom",
+		table.concat({
+			'[string "@Interface/AddOns/TweaksForever/Bags/Junk.lua"]:612: in function <...>',
+			"[C]: in function 'xpcall'",
+		}, "\n")
+	)
+	local caught = ns.CaughtErrors()
+	has(caught[#caught].stack, 'Junk.lua"]:612', "client stack: a string chunk line")
+	lacks(caught[#caught].stack, "[C]", "client stack: C frames left out")
+	ns.RecordError("utf8", ("é"):rep(200))
+	local message = ns.CaughtErrors()[5].message
+	equal(message:sub(-3), "...", "utf8: cut")
+	equal(select(2, message:sub(1, -4):gsub("é", "")) * 2, #message - 3, "utf8: whole characters only")
+	ns.SafeCall("outer", function()
+		ns.SafeCall("inner", error, "inner failed", 0)
+	end)
+	caught = ns.CaughtErrors()
+	equal(caught[#caught].label, "inner", "nested: the inner label")
+	local ReportLines = ns.ReportLines
+	ns.ReportLines = function()
+		local long = {}
+		for index = 1, 100 do
+			long[index] = ("line %03d "):format(index) .. ("x"):rep(60)
+		end
+		return long
+	end
+	local _, text = Report()
+	ns.ReportLines = ReportLines
+	equal(#text <= 2000, true, "long lines: one message")
+	lacks(text, "line 100 ", "long lines: the last cut")
+	has(text, "- [inner] x1 inner failed", "long lines: the errors still shown")
+	has(text, "Other addons (", "long lines: the addon list still shown")
 end
 
 -- Many other addons: the list says how many more, and the report stays one message.

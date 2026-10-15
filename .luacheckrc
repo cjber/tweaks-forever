@@ -265,6 +265,7 @@ read_globals = {
 	"UIPanelWindows",
 	"UIParent",
 	"UnitAffectingCombat",
+	"UISpecialFrames",
 	"UnitClass",
 	"UnitEffectiveLevel",
 	"UnitExists",
