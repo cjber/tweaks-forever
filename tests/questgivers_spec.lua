@@ -164,6 +164,7 @@ local env = setmetatable({
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Integrations/QuestieSource.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Core/Secret.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestGivers.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestGivers
 assert(features.giverTooltips.default == true)
