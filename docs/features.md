@@ -11,7 +11,8 @@ All off until you turn them on, except faster auto loot.
 - Accept summons, but not in combat.
 - Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time.
 - Release your spirit in battlegrounds unless you can resurrect yourself.
-- Decline duels.
+- Decline duels, optionally except from friends, Battle.net friends and guild.
+- Accept party invites from friends, Battle.net friends and guild, not while queued for a battleground; decline invites from anyone else.
 - Invite from whispers (off by default). Someone who whispers you the keyword you pick, as their whole message, is invited to your group, as long as you can invite: you are ungrouped, the group leader or a raid assistant. The keyword is **inv**, **invite** or **group**. Nothing is sent until such a whisper arrives.
 - Skip loot confirmations (off by default). The game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on Pickup item, is confirmed for you. Only the warnings your own clicks raise; nothing rolls or loots by itself.
 - Faster auto loot: everything at once instead of waiting for the loot window.

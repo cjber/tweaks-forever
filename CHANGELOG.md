@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Party invites by who sends them, and duels from friends.** New options, all off until you turn them on: accept party invites from your friends, Battle.net friends and guild (not while you are queued for a battleground), decline invites from anyone else, and let friends and guild still challenge you when duels are declined.
+
 - **`/tweaks report` gives you something to paste into a bug report.** It opens a small window with the text already selected: your addon and game versions, your character, the settings you changed, which features are standing down for another addon, your other addons, and any errors Tweaks caught this session. Press Ctrl+C and paste it.
 
 - **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as what you sell there, such as your junk, brings in enough.
