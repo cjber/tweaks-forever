@@ -30,6 +30,7 @@ UI\Keys.lua
 Features\Automation.lua
 Features\WhisperInvite.lua
 Features\LootConfirm.lua
+Features\RareAlerts.lua
 Bags\Vendor.lua
 Core\Modes.lua
 Bags\Junk.lua
@@ -62,6 +63,7 @@ UI\Frames.lua
 UI\Errors.lua
 UI\CameraZoom.lua
 UI\ScreenGlow.lua
+UI\XPRate.lua
 UI\LootSparkles.lua
 UI\TrainAll.lua
 UI\MacroNames.lua
