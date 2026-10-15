@@ -15,6 +15,7 @@ ns.Feature({
 				return LeaPlusDB and LeaPlusDB.AutoRepairGear == "On"
 			end,
 		},
+		{ polestar = "qol.autoRepair" },
 	},
 })
 

@@ -212,6 +212,7 @@ read_globals = {
 	"PLAYER_FACTION_COLORS",
 	"PlayerSpellsFrame",
 	"PlaySound",
+	"Polestar",
 	"PROFESSIONS_BUTTON",
 	"Questie",
 	"QuestieLoader",

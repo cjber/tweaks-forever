@@ -31,6 +31,8 @@ ns.Feature({
 				return fog and fog:IsEnabled()
 			end,
 		},
+		-- "off", "on" or "tint": either of the last two reveals the map.
+		{ polestar = "maps.reveal" },
 	},
 })
 
