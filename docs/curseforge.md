@@ -20,7 +20,7 @@ Nameplates in retail's own frame, with your target outlined.
 
 ## Features
 
-- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map, accept summons and group resurrections, release in battlegrounds, decline duels. All off by default, except faster auto loot.
+- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), accept party invites from friends or decline strangers'. All off by default, except faster auto loot.
 - **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk once you turn that on.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a coloured group such as DPS, then equip the whole group in one click.
 - **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, and unexplored areas are revealed in a blue tint. Inside a dungeon, the map shows its floors and legend (needs Atlas [Classic WoW]).

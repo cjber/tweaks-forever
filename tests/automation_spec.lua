@@ -242,7 +242,16 @@ assert(Quest("QUEST_DETAIL") == "" and Quest("QUEST_COMPLETE") == "", "off leave
 -- Duels from friends and guild, and party invites by who sent them.
 assert(not features.duelFriends.default and features.duelFriends.parent == "declineDuels")
 assert(not features.partyFriends.default and not features.partyStrangers.default, "invite options start off")
-local friends, bnet, guild, queue = { Pal = true }, { "Buddy-OtherRealm" }, { "Mate-Realm" }, "none"
+local friends, guild, queue = { ["Pal-Home"] = true }, { "Mate-Home" }, "none"
+-- One Battle.net friend on two accounts: Retail first, then this game on another realm.
+local games = {
+	{ clientProgram = "WoW", wowProjectID = 1, characterName = "Bob", realmName = "Home" },
+	{ clientProgram = "WoW", wowProjectID = 99, characterName = "Buddy", realmName = "Other Realm" },
+}
+env.BNET_CLIENT_WOW, env.WOW_PROJECT_ID = "WoW", 99
+env.GetNormalizedRealmName = function()
+	return "Home"
+end
 env.C_FriendList = {
 	GetFriendInfo = function(name)
 		return friends[name] and {} or nil
@@ -255,12 +264,15 @@ env.C_BattleNet = {
 	GetAccountInfoByGUID = function(guid)
 		return guid == "Player-1-BUD" and { isFriend = true } or nil
 	end,
-	GetFriendAccountInfo = function(index)
-		return { gameAccountInfo = { characterName = bnet[index] } }
+	GetFriendNumGameAccounts = function()
+		return #games
+	end,
+	GetFriendGameAccountInfo = function(_, slot)
+		return games[slot]
 	end,
 }
 env.BNGetNumFriends = function()
-	return #bnet
+	return 1
 end
 env.IsGuildMember = function(guid)
 	return guid == "Player-1-MATE"
@@ -268,14 +280,17 @@ end
 env.IsInGuild = function()
 	return true
 end
+local rosterAsked = false
+env.C_GuildInfo = {
+	GuildRoster = function()
+		rosterAsked = true
+	end,
+}
 env.GetNumGuildMembers = function()
 	return #guild
 end
 env.GetGuildRosterInfo = function(index)
 	return guild[index]
-end
-env.Ambiguate = function(name)
-	return (name:gsub("%-.*", ""))
 end
 env.GetMaxBattlefieldID = function()
 	return 1
@@ -312,53 +327,81 @@ local function Tick()
 		fn()
 	end
 end
+local function Clear()
+	for index = #hidden, 1, -1 do
+		hidden[index] = nil
+	end
+end
+local function Invite(name, guid, tank)
+	handlers.PARTY_INVITE_REQUEST(name, tank or false, false, false, true, false, guid, false)
+end
 
 db.declineDuels = true
 handlers.DUEL_REQUESTED("Pal")
 assert(cancelled == 1, "without the exception every duel is declined")
 db.duelFriends = true
-for _, name in ipairs({ "Pal", "Buddy", "Mate-Realm" }) do
+handlers.PLAYER_ENTERING_WORLD()
+assert(rosterAsked, "the guild roster is asked for")
+for _, name in ipairs({ "Pal", "Buddy-OtherRealm", "Mate" }) do
 	handlers.DUEL_REQUESTED(name)
 end
 assert(cancelled == 1, "friends, Battle.net friends and guild still ask")
+handlers.DUEL_REQUESTED("Mate-Elsewhere")
+assert(cancelled == 2, "a guildmate's namesake on another realm is declined")
+handlers.DUEL_REQUESTED("Bob")
+assert(cancelled == 3, "a Battle.net friend's character in another game version doesn't count")
 handlers.DUEL_REQUESTED("Stranger")
-assert(cancelled == 2, "a stranger's duel is declined")
+assert(cancelled == 4, "a stranger's duel is declined")
 db.declineDuels, db.duelFriends = false, false
 
 db.partyFriends = true
-for index = #hidden, 1, -1 do
-	hidden[index] = nil
-end
-handlers.PARTY_INVITE_REQUEST("Pal", false, false, false, true, false, "Player-1-PAL")
+Clear()
+Invite("Pal", "Player-1-PAL")
 assert(accepted == 1, "a friend's invite is accepted")
 Tick()
 assert(#hidden == 0, "the popup stays until you are in the group")
-handlers.PARTY_INVITE_REQUEST("Buddy", false, false, false, true, false, "Player-1-BUD")
 inGroup = true
 Tick()
-assert(accepted == 2 and hidden[1] == "PARTY_INVITE", "a Battle.net friend's too, popup gone once grouped")
-handlers.PARTY_INVITE_REQUEST("Mate", false, false, false, true, false, "Player-1-MATE")
-assert(accepted == 3, "a guildmate's too")
+assert(hidden[1] == "PARTY_INVITE", "and goes once grouped")
+inGroup = false
+Invite("Buddy", "Player-1-BUD")
+Invite("Mate", "Player-1-MATE")
+assert(accepted == 3, "a Battle.net friend's and a guildmate's too")
 timers = {}
+Invite("Pal", "Player-1-PAL", true)
+assert(accepted == 3, "an invite asking for a role is left to you")
 queue = "queued"
-handlers.PARTY_INVITE_REQUEST("Pal", false, false, false, true, false, "Player-1-PAL")
+Invite("Pal", "Player-1-PAL")
 assert(accepted == 3, "not while queued for a battleground")
-queue, shift = "none", true
-handlers.PARTY_INVITE_REQUEST("Pal", false, false, false, true, false, "Player-1-PAL")
+queue = "none"
+env.WillAcceptInviteRemoveQueues = function()
+	return true
+end
+Invite("Pal", "Player-1-PAL")
+assert(accepted == 3, "nor when the game says joining drops a queue")
+env.WillAcceptInviteRemoveQueues = nil
+shift = true
+Invite("Pal", "Player-1-PAL")
 assert(accepted == 3, "Shift leaves it to you")
 shift = false
-handlers.PARTY_INVITE_REQUEST("Stranger", false, false, false, true, false, "Player-1-X")
+Invite("Stranger", "Player-1-X")
 assert(accepted == 3 and declined == 0, "a stranger's invite is left alone without the decline option")
 db.partyStrangers = true
-for index = #hidden, 1, -1 do
-	hidden[index] = nil
-end
-handlers.PARTY_INVITE_REQUEST("Stranger", false, false, false, true, false, "Player-1-X")
-assert(declined == 1 and hidden[1] == "PARTY_INVITE", "a stranger's invite is declined")
-handlers.PARTY_INVITE_REQUEST("Pal", false, false, false, true, false, "Player-1-PAL")
-assert(declined == 1, "a friend's never is")
+Clear()
+timers = {}
+Invite("Stranger", "Player-1-X")
+assert(declined == 1 and #hidden == 0, "a stranger's invite is declined")
+Tick()
+assert(hidden[1] == "PARTY_INVITE", "its popup hidden the next frame, after the game showed it")
+shift = true
+Invite("Stranger", "Player-1-X")
+assert(declined == 1, "Shift leaves a stranger's to you too")
+shift = false
+Invite("Pal", "Player-1-PAL")
+assert(declined == 1 and accepted == 4, "a friend's never is declined")
 db.partyFriends, db.partyStrangers = false, false
-handlers.PARTY_INVITE_REQUEST("Pal", false, false, false, true, false, "Player-1-PAL")
+timers = {}
+Invite("Pal", "Player-1-PAL")
 assert(accepted == 4 and declined == 1, "both off leave invites alone")
 
 print("automation: ok")
