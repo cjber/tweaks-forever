@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Rare alerts.** A new option, off until you turn it on, puts a chat line and a warning sound up when a rare creature's nameplate or map marker appears near you, once per rare for ten minutes and never in combat.
 - **Unexplored areas show on the zone map too.** With Reveal unexplored areas on, the small zone map (Shift+M) gets the same blue tint as the world map, and an area you discover loses its tint at once.
 - **Hold Shift to skip repairs and junk selling at one merchant.** Holding Shift while a merchant opens skips Tweaks' repair (chat says what it would have cost) and its junk selling for that visit; the Sell All Junk button still works.
 - **Faster auto loot asks for each item once.** When the game repeats its loot-ready signal for the same window, only items it hadn't asked for yet are taken.

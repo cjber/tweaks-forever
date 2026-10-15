@@ -47,6 +47,7 @@ All off until you turn them on, except faster auto loot.
 
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
+- Rare alerts (off by default). A chat line and the raid warning sound when a rare creature's nameplate, or its marker on the map where the game shows one, appears near you. Never in combat, once per rare for ten minutes, and never for a creature whose name the game keeps hidden.
 - Maximum camera zoom (off by default). The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch it off.
 - Show quest item sparkles (off by default). Uses the same five graphics settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) for the game's own sparkles on lootable quest objects. Normal and raid outlines stay off while enabled, even after changing graphics presets. Your previous settings are saved across reloads and restored when switched off. Removing sparkles needs a full game restart, because the client retains the effect through `/reload`.
 - No screen glow (off by default). Turns off the full screen glow effect, putting your earlier value back when you switch it off.
@@ -118,6 +119,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
 | Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar |
 | Zone level ranges | Leatrix Maps, Polestar |
+| Rare alerts | RareScanner, Nova Rares, Polestar while its rare alerts are on |
 | Coordinates on the world map | Leatrix Maps, Mapster and Polestar while their coordinates are on; Coordinates |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
