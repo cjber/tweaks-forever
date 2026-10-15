@@ -16,7 +16,7 @@ ns.Feature({
 				return LeaPlusDB and LeaPlusDB.HideErrorMessages == "On"
 			end,
 		},
-		{ addon = "Polestar", title = "Polestar", polestar = "qol.hideErrors" },
+		{ polestar = "qol.hideErrors" },
 	},
 })
 

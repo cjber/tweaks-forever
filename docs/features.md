@@ -92,15 +92,15 @@ All off until you turn them on, except faster auto loot.
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie and Legacy Forever, it steps aside only while that addon's matching option is on.
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever and Polestar, it steps aside only while that addon's matching option is on.
 
 | Feature | Addons |
 |---|---|
-| Quests | Leatrix Plus, Questie, AutoTurnIn |
+| Quests | Leatrix Plus, Questie, AutoTurnIn, Polestar |
 | Nearest quests first | Questie, while its tracker is on |
-| Quest progress on tooltips | Questie, while its tooltips are on |
-| Quest icons on nameplates | Questie, while its nameplate icons are on |
-| Other automations, repairs, quiet errors | Leatrix Plus |
+| Quest progress on tooltips | Questie, while its tooltips are on; Polestar, once its quest database has loaded |
+| Quest icons on nameplates | Questie, while its nameplate icons are on; Polestar, once its quest database has loaded |
+| Other automations, repairs, quiet errors | Leatrix Plus, Polestar |
 | Invite from whispers | Leatrix Plus |
 | Skip loot confirmations | Leatrix Plus |
 | Maximum camera zoom | Leatrix Plus |
@@ -108,10 +108,10 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Quest item sparkles | Forever Loot Sparkles |
 | Train all button | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
-| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
+| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus, Polestar |
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
-| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster |
-| Zone level ranges | Leatrix Maps |
+| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar |
+| Zone level ranges | Leatrix Maps, Polestar |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |

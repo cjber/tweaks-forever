@@ -11,7 +11,7 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
-- **Polestar is respected like the other addons.** With Polestar loaded, auto repair, quest and gossip automation, summons, resurrections, battleground release, duel declines, faster auto loot, quiet errors, revealed maps, zone level ranges, instance entrances and quest tooltips and nameplate icons each stand down, named in the settings, while Polestar's own matching option is on. While Polestar sells your greys, only your marked non-grey junk is sold here.
+- **Polestar is respected like the other addons.** With Polestar loaded, auto repair, quest and gossip automation, summons, resurrections, battleground release, duel declines, faster auto loot, quiet errors, revealed maps, zone level ranges, and quest tooltips and nameplate icons (once its quest database has loaded) each stand down, named in the settings, while Polestar's own matching option is on, and follow that option as soon as you change it. While Polestar sells your greys, only your marked non-grey junk is sold here.
 
 ## [0.11.5] - 2026-10-15
 

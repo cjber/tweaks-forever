@@ -31,7 +31,8 @@ ns.Feature({
 	default = true,
 	conflicts = {
 		{ addon = "Questie", when = QuestieOption("enableTooltips") },
-		{ addon = "Polestar", title = "Polestar", polestar = "qol.questTooltips" },
+		-- Polestar draws these only once its load-on-demand quest database is in.
+		{ addon = "Polestar_QuestDB", polestar = "qol.questTooltips" },
 	},
 	needs = NEEDS,
 })
@@ -46,7 +47,7 @@ ns.Feature({
 	default = true,
 	conflicts = {
 		{ addon = "Questie", when = QuestieOption("nameplateEnabled") },
-		{ addon = "Polestar", title = "Polestar", polestar = "qol.nameplateIcons" },
+		{ addon = "Polestar_QuestDB", polestar = "qol.nameplateIcons" },
 	},
 	needs = NEEDS,
 })

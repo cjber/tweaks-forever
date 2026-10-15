@@ -237,8 +237,9 @@ TweaksForeverDB = nil
 ---@type TFCharacterDatabase
 TweaksForeverCharDB = nil
 
+-- `addon` may be left out of a `polestar` conflict: ns.Feature fills in "Polestar".
 ---@class TFConflict
----@field addon string
+---@field addon? string
 ---@field title? string
 ---@field when? fun(): boolean?
 ---@field polestar? string
@@ -318,6 +319,7 @@ TweaksForeverCharDB = nil
 ---@field WhatsNew TFWhatsNew
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
+---@field PolestarOn fun(path: string): boolean
 ---@field ConflictOf fun(key: string): string?
 ---@field MissingOf fun(key: string): string?
 ---@field Active fun(key: string): boolean

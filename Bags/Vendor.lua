@@ -15,7 +15,7 @@ ns.Feature({
 				return LeaPlusDB and LeaPlusDB.AutoRepairGear == "On"
 			end,
 		},
-		{ addon = "Polestar", title = "Polestar", polestar = "qol.autoRepair" },
+		{ polestar = "qol.autoRepair" },
 	},
 })
 

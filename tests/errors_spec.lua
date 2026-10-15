@@ -37,7 +37,7 @@ assert(features.quietErrors.default == true and #initializers == 1)
 
 local function PolestarPath(feature)
 	for _, conflict in ipairs(feature.conflicts) do
-		if conflict.addon == "Polestar" then
+		if conflict.polestar then
 			return conflict.polestar
 		end
 	end

@@ -32,7 +32,7 @@ ns.Feature({
 			end,
 		},
 		-- "off", "on" or "tint": either of the last two reveals the map.
-		{ addon = "Polestar", title = "Polestar", polestar = "maps.reveal" },
+		{ polestar = "maps.reveal" },
 	},
 })
 

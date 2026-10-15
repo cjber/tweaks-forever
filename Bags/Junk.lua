@@ -101,7 +101,7 @@ local function OtherSellsGreys()
 	if C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On" then
 		return true
 	end
-	return C_AddOns.IsAddOnLoaded("Polestar") and Polestar and Polestar.Get and Polestar.Get("qol.sellJunk") == true
+	return ns.PolestarOn("qol.sellJunk")
 end
 
 local icons = {}

@@ -67,7 +67,7 @@ local polestar = {
 for key, paths in pairs(polestar) do
 	local found = {}
 	for _, conflict in ipairs(features[key].conflicts) do
-		if conflict.addon == "Polestar" then
+		if conflict.polestar then
 			found[#found + 1] = conflict.polestar
 		end
 	end

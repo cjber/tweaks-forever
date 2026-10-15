@@ -60,6 +60,10 @@ local function Client(slots, db)
 			return not not c.db[key]
 		end,
 		ConflictOf = function() end,
+		-- Core's check of a Polestar setting, which also covers Polestar being loaded.
+		PolestarOn = function(path)
+			return c.polestar == path
+		end,
 		Print = function(message)
 			c.printed[#c.printed + 1] = message
 		end,
@@ -139,7 +143,7 @@ local function Client(slots, db)
 		},
 		C_AddOns = {
 			IsAddOnLoaded = function(addon)
-				return (addon == "Leatrix_Plus" and c.leatrix ~= nil) or (addon == "Polestar" and c.polestar ~= nil)
+				return addon == "Leatrix_Plus" and c.leatrix ~= nil
 			end,
 		},
 		C_MerchantFrame = {
@@ -580,30 +584,17 @@ do -- Leatrix owns greys only when its auto-sell is on.
 	same(c.nativeCalls, 1, "Leatrix with auto-sell off leaves native selling here")
 end
 
-do -- Polestar owns greys only when its own junk selling is on, read through Polestar.Get.
-	local function Polestar(on)
-		return {
-			Get = function(path)
-				return path == "qol.sellJunk" and on or nil
-			end,
-		}
-	end
+do -- Polestar owns greys only while its own junk selling is on.
 	local c = Client({ grey(1), green(2) }, { markJunk = true, junk = { [2] = true } })
-	c.polestar, c.env.Polestar = true, Polestar(true)
+	c.polestar = "qol.sellJunk"
 	c.visit()
 	same(c.nativeCalls, nil, "Polestar sells the greys")
 	same(c.sold(), "2", "marked non-grey items still sell")
 	assert(c.slots[1])
 
 	c = Client({ grey(1) })
-	c.polestar, c.env.Polestar = true, Polestar(false)
 	c.visit()
 	same(c.nativeCalls, 1, "Polestar with junk selling off leaves native selling here")
-
-	c = Client({ grey(1) })
-	c.env.Polestar = Polestar(true)
-	c.visit()
-	same(c.nativeCalls, 1, "a stale Polestar global without the addon loaded changes nothing")
 end
 
 do -- Sell All Junk, once confirmed, also sells the marked non-grey stacks; Blizzard sells the greys.

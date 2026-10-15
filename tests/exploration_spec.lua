@@ -13,7 +13,7 @@ assert(features.exploration.default == false)
 
 local function PolestarPath(feature)
 	for _, conflict in ipairs(feature.conflicts) do
-		if conflict.addon == "Polestar" then
+		if conflict.polestar then
 			return conflict.polestar
 		end
 	end
@@ -22,7 +22,8 @@ assert(PolestarPath(features.exploration) == "maps.reveal", 'Polestar\'s reveal,
 
 local predicates = {}
 for _, conflict in ipairs(features.exploration.conflicts) do
-	predicates[conflict.addon] = conflict.when
+	-- Core names a Polestar setting's addon; here only the others are keyed.
+	predicates[conflict.addon or "Polestar"] = conflict.when
 	assert(conflict.addon ~= "Magnify", "zoom alone is not an exploration conflict")
 end
 assert(predicates.LegacyForever())
