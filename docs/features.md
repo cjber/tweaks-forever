@@ -12,7 +12,8 @@ All off until you turn them on, except faster auto loot.
 - Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time. It waits out the game's delay after dying again soon, and Shift leaves it to you.
 - Their popups close only once the game has taken your answer.
 - Release your spirit in battlegrounds unless you can resurrect yourself or hold Shift.
-- Decline duels.
+- Decline duels, optionally except from friends, Battle.net friends and guild.
+- Accept party invites from friends, Battle.net friends and guild, not while queued for a battleground; decline invites from anyone else.
 - Invite from whispers (off by default). Someone who whispers you the keyword you pick, as their whole message, is invited to your group, as long as you can invite: you are ungrouped, the group leader or a raid assistant. The keyword is **inv**, **invite** or **group**. Nothing is sent until such a whisper arrives.
 - Skip loot confirmations (off by default). The game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on Pickup item, is confirmed for you. Only the warnings your own clicks raise; nothing rolls or loots by itself.
 - Faster auto loot: everything at once instead of waiting for the loot window.
@@ -84,7 +85,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Quest log
 
-**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
+**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. **In quest dialogs too** adds the level in front of each quest in the quest greeting list (an NPC or board offering only quests) and in front of the title on the quest's detail and reward pages, where the game knows it. The gossip window's quest list is left as it is. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
 
 **Highlight new Forever quests** marks quests added since Classic Era with a soft gold background in the log and quest text.
 
@@ -122,6 +123,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Hide macro names | Dominos, Bartender4, ElvUI |
 | Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
 | Best-selling quest reward | Polestar, while its reward highlight is on |
+| Quest levels in quest dialogs | Polestar, while its quest levels are on |
 | Item level in the auction house | TradeSkillMaster, Auctioneer |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
