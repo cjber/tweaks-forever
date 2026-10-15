@@ -20,7 +20,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Vendors
 
-- Hold Shift as you open a merchant to skip the automatic repair and junk selling for that visit.
+- Hold Shift while a merchant opens to skip the automatic repair and junk selling for that visit. Chat says what the repair would have cost.
 - Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat. If you are short, it repairs once what you sell to that merchant, such as your junk, covers the cost.
 - Sell grey junk automatically through the game when its bulk sale is available, plus up to 12 manually marked non-grey stacks per visit.
 - Grey items show the game's junk coin in your bags all the time, not only at a merchant.

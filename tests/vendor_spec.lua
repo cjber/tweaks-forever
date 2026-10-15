@@ -142,8 +142,24 @@ shift = true
 handlers.MERCHANT_SHOW()
 shift = false
 handlers.PLAYER_MONEY()
-assert(#repairs == 0 and #printed == 0, "Shift skips the repair for this visit")
+assert(#repairs == 0 and printed[1] == "repair skipped (100c).", "Shift skips the repair for this visit, saying so")
 handlers.MERCHANT_CLOSED()
 handlers.MERCHANT_SHOW()
 assert(repairs[1] == "own", "the next visit repairs as usual")
+Reset(0, 100)
+db.repairGuild = true
+env.IsInGuild = function()
+	return true
+end
+env.CanGuildBankRepair = function()
+	return true
+end
+env.GetGuildBankWithdrawMoney = function()
+	return -1
+end
+shift = true
+handlers.MERCHANT_SHOW()
+shift = false
+assert(#repairs == 0, "Shift skips a guild-funded repair too")
+db.repairGuild = false
 print("vendor: ok")
