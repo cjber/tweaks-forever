@@ -18,7 +18,8 @@ ns.Feature({
 	category = "Automation",
 	name = "Accept and turn in quests",
 	tooltip = "Quests are accepted and turned in for you as you talk to an NPC. Hold Shift while talking to skip "
-		.. "it. A quest with a choice of rewards is left for you to pick.",
+		.. "it. A quest with a choice of rewards is left for you to pick, and so is one that flags you for PvP or "
+		.. "costs gold to hand in.",
 	default = false,
 	conflicts = {
 		Leatrix("AutomateQuests"),
@@ -30,6 +31,8 @@ ns.Feature({
 			end,
 		},
 		{ addon = "AutoTurnIn" },
+		{ polestar = "behavior.autoAccept" },
+		{ polestar = "behavior.autoTurnin" },
 	},
 })
 
@@ -39,7 +42,7 @@ ns.Feature({
 	name = "Skip single-option gossip",
 	tooltip = "Goes straight to the only thing an NPC offers, or a flight master's flight map. Hold Shift to see it.",
 	default = false,
-	conflicts = { Leatrix("AutomateGossip") },
+	conflicts = { Leatrix("AutomateGossip"), { polestar = "qol.skipGossip" } },
 })
 
 ns.Feature({
@@ -48,7 +51,7 @@ ns.Feature({
 	name = "Accept summons",
 	tooltip = "Not while you are in combat.",
 	default = false,
-	conflicts = { Leatrix("AutoAcceptSummon") },
+	conflicts = { Leatrix("AutoAcceptSummon"), { polestar = "qol.acceptSummon" } },
 })
 
 ns.Feature({
@@ -57,7 +60,7 @@ ns.Feature({
 	name = "Accept resurrections",
 	tooltip = "From your group, and not from someone in combat, so a battle resurrection is still yours to time.",
 	default = false,
-	conflicts = { Leatrix("AutoAcceptRes") },
+	conflicts = { Leatrix("AutoAcceptRes"), { polestar = "qol.acceptResurrect" } },
 })
 
 ns.Feature({
@@ -67,7 +70,7 @@ ns.Feature({
 	tooltip = "Releases your spirit as soon as you die in a battleground, unless you can resurrect yourself (a "
 		.. "soulstone or Reincarnation).",
 	default = false,
-	conflicts = { Leatrix("AutoReleasePvP") },
+	conflicts = { Leatrix("AutoReleasePvP"), { polestar = "qol.autoReleasePvP" } },
 })
 
 ns.Feature({
@@ -75,7 +78,7 @@ ns.Feature({
 	category = "Automation",
 	name = "Decline duels",
 	default = false,
-	conflicts = { Leatrix("NoDuelRequests") },
+	conflicts = { Leatrix("NoDuelRequests"), { polestar = "qol.declineDuels" } },
 })
 
 ns.Feature({
@@ -84,12 +87,21 @@ ns.Feature({
 	name = "Faster auto loot",
 	tooltip = "Takes everything at once instead of waiting for the loot window. Only while auto loot applies.",
 	default = true,
-	conflicts = { Leatrix("FasterLooting"), { addon = "SpeedyAutoLoot" }, { addon = "AutoLootPlus" } },
+	conflicts = {
+		Leatrix("FasterLooting"),
+		{ addon = "SpeedyAutoLoot" },
+		{ addon = "AutoLootPlus" },
+		{ polestar = "qol.fastLoot" },
+	},
 })
 
 local function Quests()
 	return ns.Active("quests") and not IsShiftKeyDown()
 end
+
+-- Quests left open this session because they flag you for PvP, by quest ID, so the NPC's list goes on to the next
+-- quest instead of opening the same one again.
+local leftForYou = {}
 
 -- Completed quests first, then new ones, one per window: each pick reopens the NPC's list.
 local function PickGossipQuest()
@@ -100,7 +112,7 @@ local function PickGossipQuest()
 		end
 	end
 	for _, quest in ipairs(C_GossipInfo.GetAvailableQuests()) do
-		if not quest.isTrivial then
+		if not quest.isTrivial and not leftForYou[quest.questID] then
 			C_GossipInfo.SelectAvailableQuest(quest.questID)
 			return true
 		end
@@ -159,8 +171,8 @@ ns.On("QUEST_GREETING", function()
 		end
 	end
 	for index = 1, GetNumAvailableQuests() do
-		local isTrivial = GetAvailableQuestInfo(index)
-		if not isTrivial then
+		local isTrivial, _, _, _, questID = GetAvailableQuestInfo(index)
+		if not isTrivial and not leftForYou[questID] then
 			-- Forever's quest greeting takes an index; Ketho's legacy signature omits it.
 			---@diagnostic disable-next-line: redundant-parameter
 			SelectAvailableQuest(index)
@@ -169,8 +181,20 @@ ns.On("QUEST_GREETING", function()
 	end
 end)
 
+-- One the server has already accepted (an item that starts a quest) only needs acknowledging; Blizzard closes an
+-- area's own and offers it in a popup. A quest that flags you for PvP waits for you to accept it. The auto-accept
+-- calls are guarded: Ketho lists them for retail only.
 ns.On("QUEST_DETAIL", function()
-	if Quests() then
+	if not Quests() then
+		return
+	end
+	if QuestGetAutoAccept and QuestGetAutoAccept() then
+		if AcknowledgeAutoAcceptQuest and not (QuestIsFromAreaTrigger and QuestIsFromAreaTrigger()) then
+			AcknowledgeAutoAcceptQuest()
+		end
+	elseif QuestFlagsPVP() then
+		leftForYou[GetQuestID()] = true
+	else
 		AcceptQuest()
 	end
 end)
@@ -189,9 +213,10 @@ ns.On("QUEST_PROGRESS", function()
 	end
 end)
 
+-- A hand-in that costs gold waits for you to pay it.
 ns.On("QUEST_COMPLETE", function()
 	local choices = GetNumQuestChoices()
-	if Quests() and choices <= 1 then
+	if Quests() and choices <= 1 and (GetQuestMoneyToGet() or 0) <= 0 then
 		GetQuestReward(choices)
 	end
 end)

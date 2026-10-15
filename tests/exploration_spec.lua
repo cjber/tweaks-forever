@@ -11,9 +11,19 @@ setfenv(assert(loadfile("Map/Exploration.lua")), env)("TweaksForever", ns)
 local Model = ns.Exploration
 assert(features.exploration.default == false)
 
+local function PolestarPath(feature)
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.polestar then
+			return conflict.polestar
+		end
+	end
+end
+assert(PolestarPath(features.exploration) == "maps.reveal", 'Polestar\'s reveal, unless it is "off"')
+
 local predicates = {}
 for _, conflict in ipairs(features.exploration.conflicts) do
-	predicates[conflict.addon] = conflict.when
+	-- Core names a Polestar setting's addon; here only the others are keyed.
+	predicates[conflict.addon or "Polestar"] = conflict.when
 	assert(conflict.addon ~= "Magnify", "zoom alone is not an exploration conflict")
 end
 assert(predicates.LegacyForever())

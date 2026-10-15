@@ -6,7 +6,7 @@ The README keeps one line per feature; this is the detail. Every feature can be 
 
 All off until you turn them on, except faster auto loot.
 
-- Accept and turn in quests. Hold Shift to talk normally. A quest with a choice of rewards is left to you.
+- Accept and turn in quests. Hold Shift to talk normally. A quest with a choice of rewards, one that flags you for PvP and a hand-in that costs gold are left to you.
 - Skip gossip when an NPC offers only one thing (vendor, trainer), and go straight to the flight map at a flight master, whatever else they offer, unless they have a quest for you. Hold Shift to see it.
 - Accept summons, but not in combat.
 - Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time.
@@ -18,7 +18,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Vendors
 
-- Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat.
+- Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat. If you are short, it repairs once what you sell to that merchant, such as your junk, covers the cost.
 - Sell grey junk automatically through the game when its bulk sale is available, plus up to 12 manually marked non-grey stacks per visit.
 - Grey items show the game's junk coin in your bags all the time, not only at a merchant.
 - Mark any bag item as junk with **Alt+Right-click** (off by default). Marked items get the game's junk coin and a tooltip line, and they are sold with your greys, by the merchant's Sell All Junk button too. Marks are account-wide.
@@ -92,15 +92,15 @@ All off until you turn them on, except faster auto loot.
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie and Legacy Forever, it steps aside only while that addon's matching option is on.
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever and Polestar, it steps aside only while that addon's matching option is on.
 
 | Feature | Addons |
 |---|---|
-| Quests | Leatrix Plus, Questie, AutoTurnIn |
+| Quests | Leatrix Plus, Questie, AutoTurnIn, Polestar |
 | Nearest quests first | Questie, while its tracker is on |
-| Quest progress on tooltips | Questie, while its tooltips are on |
-| Quest icons on nameplates | Questie, while its nameplate icons are on |
-| Other automations, repairs, quiet errors | Leatrix Plus |
+| Quest progress on tooltips | Questie, while its tooltips are on; Polestar, once its quest database has loaded |
+| Quest icons on nameplates | Questie, while its nameplate icons are on; Polestar, once its quest database has loaded |
+| Other automations, repairs, quiet errors | Leatrix Plus, Polestar |
 | Invite from whispers | Leatrix Plus |
 | Skip loot confirmations | Leatrix Plus |
 | Maximum camera zoom | Leatrix Plus |
@@ -108,10 +108,10 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Quest item sparkles | Forever Loot Sparkles |
 | Train all button | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
-| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
+| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus, Polestar |
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
-| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster |
-| Zone level ranges | Leatrix Maps |
+| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar |
+| Zone level ranges | Leatrix Maps, Polestar |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
