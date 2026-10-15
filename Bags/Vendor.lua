@@ -6,7 +6,8 @@ ns.Feature({
 	key = "repair",
 	category = "Vendors",
 	name = "Repair automatically",
-	tooltip = "At any merchant who repairs, with the cost shown in chat.",
+	tooltip = "At any merchant who repairs, with the cost shown in chat. If you are short, it repairs once what "
+		.. "you sell there covers the cost.",
 	default = true,
 	conflicts = {
 		{
@@ -44,10 +45,10 @@ local owed = false
 -- Repair everything if the guild or your money covers it. `quiet` leaves a shortfall unannounced, for retries.
 ---@param quiet boolean?
 local function Repair(quiet)
-	owed = false
 	if not (ns.Active("repair") and CanMerchantRepair()) then
 		return
 	end
+	owed = false
 	local cost, canRepair = GetRepairAllCost()
 	if not canRepair or cost == 0 then
 		return

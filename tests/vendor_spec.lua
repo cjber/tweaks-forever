@@ -95,6 +95,32 @@ money = 500
 handlers.PLAYER_MONEY()
 assert(#repairs == 0, "turning repairs off stops the retry")
 db.repair = true
+handlers.PLAYER_MONEY()
+assert(repairs[1] == "own", "turned back on during the visit, the next sale still pays")
+
+-- Guild funds pay at once when the guild allows it and the limit covers the cost; otherwise your own money does.
+db.repairGuild = true
+env.IsInGuild = function()
+	return true
+end
+env.CanGuildBankRepair = function()
+	return true
+end
+local limit = -1
+env.GetGuildBankWithdrawMoney = function()
+	return limit
+end
+Reset(0, 100)
+handlers.MERCHANT_SHOW()
+assert(repairs[1] == "guild" and printed[1] == "repaired for 100c from guild funds.", "unlimited guild funds")
+limit = 50
+Reset(10, 100)
+handlers.MERCHANT_SHOW()
+assert(#repairs == 0 and printed[1] == "not enough money to repair (100c).", "a low limit falls back to your money")
+money = 150
+handlers.PLAYER_MONEY()
+assert(repairs[1] == "own", "and the sale that covers it pays")
+db.repairGuild = false
 
 Reset(10, 100)
 merchantRepairs = false
