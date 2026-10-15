@@ -30,6 +30,7 @@ UI\Keys.lua
 Features\Automation.lua
 Features\WhisperInvite.lua
 Features\LootConfirm.lua
+Features\RareAlerts.lua
 Bags\Vendor.lua
 Core\Modes.lua
 Bags\Junk.lua

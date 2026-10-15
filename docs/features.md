@@ -36,7 +36,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Maps
 
-- Reveal unexplored areas on zone maps, tinted blue so explored ground still stands out (off by default).
+- Reveal unexplored areas on zone maps, in the world map and the small zone map (Shift+M), tinted blue so explored ground still stands out (off by default).
 - Point at a zone on the world map to see its level range after the name, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Forever's map data has no ranges of its own, so the original zones show the original game's, and Zephras Isle and Riverglades show the span of their subzones' exploration levels. Cities, battlegrounds, and Forever zones whose subzones carry no level show none.
 - Your position and the cursor's, as map coordinates, along the bottom of the world map.
 - Mark every dungeon and raid entrance on zone and continent maps with retail's icons; point at one for its name, and left-click it to travel there: Shortest Path Forever plans the journey when it is installed, and otherwise the map's own waypoint marks the entrance. Without Shortest Path Forever, a grey line in the tooltip says where to get it (or to switch it on, when it is installed but off). Instances sharing a way in, such as Blackrock Mountain, share one pin that lists them. The map's own **Show instance entrances** filter turns them off, and an entrance steps aside where a flight master or Shortest Path Forever portal or dock already marks the spot; Legacy Forever draws the same portal with its shield on the corner where a Legacy step is left there. Forever's new instances (Dalaran, the Ruins of Lordaeron, the Hall of Thanes and the Wetlands excavation) have no entrance in the game's data yet, so they have no pin.
@@ -47,6 +47,7 @@ All off until you turn them on, except faster auto loot.
 
 - Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
+- Rare alerts (off by default). A chat line and the raid warning sound when a rare creature's nameplate, or its marker on the map where the game shows one, appears near you. Never in combat, once per rare for ten minutes, and never for a creature whose name the game keeps hidden.
 - XP per hour on the experience bar's tooltip: your rate over the last 15 minutes (after the first five), the time to level at that pace, and about how many kills or quests that is, from the XP your recent kills and hand-ins gave.
 - Maximum camera zoom (off by default). The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch it off.
 - Show quest item sparkles (off by default). Uses the same five graphics settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) for the game's own sparkles on lootable quest objects. Normal and raid outlines stay off while enabled, even after changing graphics presets. Your previous settings are saved across reloads and restored when switched off. Removing sparkles needs a full game restart, because the client retains the effect through `/reload`.
@@ -119,6 +120,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
 | Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar |
 | Zone level ranges | Leatrix Maps, Polestar |
+| Rare alerts | RareScanner, Nova Rares, Polestar while its rare alerts are on |
 | XP per hour | XToLevel, Polestar while its XP tracker is on |
 | Coordinates on the world map | Leatrix Maps, Mapster and Polestar while their coordinates are on; Coordinates |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
