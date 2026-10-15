@@ -60,17 +60,26 @@ end
 local made, marker = 0, nil
 local items, cached = {}, {}
 local panel = Region()
+function panel:IsVisible()
+	return self.shown
+end
+local REWARD, LOG = {}, {}
 local buttons = {}
 local env = setmetatable({
 	QuestFrameRewardPanel = panel,
 	QuestInfoRewardsFrame = { RewardButtons = buttons },
+	QUEST_TEMPLATE_REWARD = REWARD,
 	CreateFrame = function()
 		made = made + 1
 		marker = Region()
 		return marker
 	end,
-	hooksecurefunc = function(name, fn)
-		hooks[name] = fn
+	hooksecurefunc = function(target, name, fn)
+		if type(target) == "table" then
+			hooks[name] = fn
+		else
+			hooks[target] = name
+		end
 	end,
 	GetNumQuestChoices = function()
 		return #items
@@ -134,20 +143,31 @@ local function Show(list)
 	local fixed = Region()
 	fixed.type = "reward"
 	buttons[1] = fixed
-	for index = 1, #list do
-		buttons[index + 1] = Button(index, true)
+	-- Blizzard numbers item and currency choices separately, so IDs repeat.
+	local itemID, currencyID = 0, 0
+	for index, item in ipairs(list) do
+		if item.currency then
+			currencyID = currencyID + 1
+			buttons[index + 1] = Button(currencyID, true)
+		else
+			itemID = itemID + 1
+			buttons[index + 1] = Button(itemID, true)
+		end
 	end
-	hooks.QuestInfo_Display()
+	hooks.QuestInfo_Display(REWARD)
 end
 -- The button the coin sits on, or nil when none shows.
 local function Marked()
 	if not (marker and marker.shown) then
 		return nil
 	end
-	local anchor = marker.points[1][2]
+	local anchor, nth = marker.points[1][2], 0
 	for _, button in ipairs(buttons) do
-		if button == anchor or button.Icon == anchor then
-			return button:GetID()
+		if button.type == "choice" then
+			nth = nth + 1
+			if button == anchor or button.Icon == anchor then
+				return nth
+			end
 		end
 	end
 end
@@ -180,14 +200,39 @@ Show({ { link = "item:1", price = 100 } })
 assert(Marked() == nil, "a lone reward is no choice")
 
 Show({ { link = "item:1", price = 100 }, { link = "item:2", price = 300 } })
-panel.shown = false
-hooks.QuestInfo_Display()
+hooks.QuestInfo_Display(LOG)
 assert(Marked() == nil, "the quest log's details aren't the reward panel")
+cached["item:2"] = false
+hooks.QuestInfo_Display(REWARD)
+hooks.QuestInfo_Display(LOG)
+cached["item:2"] = nil
+handlers.GET_ITEM_INFO_RECEIVED()
+assert(Marked() == nil, "a price arriving while the log shows marks nothing")
+panel.shown = false
+hooks.QuestInfo_Display(REWARD)
+assert(Marked() == nil, "a hidden reward panel shows no coin")
 panel.shown = true
 
-hooks.QuestInfo_Display()
+hooks.QuestInfo_Display(REWARD)
 assert(Marked() == 2)
 db.bestReward = false
 settingCallbacks.bestReward()
 assert(Marked() == nil, "turning it off hides the coin at once")
+db.bestReward = true
+hooks.QuestInfo_Display(REWARD)
+assert(Marked() == 2)
+db.bestReward = false
+hooks.RefreshConflicts()
+assert(Marked() == nil, "a conflict appearing hides the coin at once")
+db.bestReward = true
+
+-- A currency choice sells for nothing rather than waiting forever; choices are matched in order, not by ID.
+env.GetQuestItemInfoLootType = function(_, index)
+	return index == 1 and 1 or 0
+end
+Show({ { currency = true }, { link = "item:2", price = 10 }, { link = "item:3", price = 40 } })
+assert(Marked() == 3, "the currency choice doesn't block the mark")
+env.GetQuestItemInfoLootType = nil
+handlers.QUEST_FINISHED()
+assert(Marked() == nil, "closing the quest frame hides it")
 print("bestreward: ok")

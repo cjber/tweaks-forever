@@ -48,9 +48,13 @@ function Model.Best(choices)
 	return best, false
 end
 
+-- A choice's sell value, nil while unknown. A currency choice (loot type 1) sells for nothing.
 ---@param index integer
 ---@return number?
 local function Value(index)
+	if GetQuestItemInfoLootType and GetQuestItemInfoLootType("choice", index) == 1 then
+		return 0
+	end
 	local link = GetQuestItemLink("choice", index)
 	if not link then
 		return nil
@@ -62,13 +66,13 @@ end
 
 ---@type Frame?
 local marker
----@type boolean
-local waiting = false
+-- The reward panel is the quest display on screen; a price is still loading.
+local onReward, waiting = false, false
 
 ---@return Frame
 local function Marker()
 	if not marker then
-		marker = CreateFrame("Frame", nil, QuestFrameRewardPanel)
+		marker = CreateFrame("Frame", nil, QuestInfoRewardsFrame)
 		marker:SetSize(COIN_SIZE, COIN_SIZE)
 		local coin = marker:CreateTexture(nil, "OVERLAY")
 		coin:SetTexture(COIN) -- art-ok: the game's square gold coin file, drawn square
@@ -77,19 +81,22 @@ local function Marker()
 	return marker
 end
 
--- The quest frame's shown choice buttons by choice index. Read only: Blizzard sets each button's type and ID as it
--- lays out the rewards.
----@return table<integer, TFRewardButton>
-local function ChoiceButtons()
-	local buttons = {}
+-- The quest frame's `nth` shown choice button. Read only: Blizzard lays out the choices in order, after any fixed
+-- rewards, and marks each with type "choice".
+---@param nth integer
+---@return TFRewardButton?
+local function ChoiceButton(nth)
+	local seen = 0
 	for _, button in
 		ipairs((QuestInfoRewardsFrame.RewardButtons or {}) --[[@as TFRewardButton[] ]])
 	do
 		if button:IsShown() and button.type == "choice" then
-			buttons[button:GetID()] = button
+			seen = seen + 1
+			if seen == nth then
+				return button
+			end
 		end
 	end
-	return buttons
 end
 
 local function Update()
@@ -97,7 +104,7 @@ local function Update()
 	if marker then
 		marker:Hide()
 	end
-	if not (ns.Active(KEY) and QuestFrameRewardPanel:IsShown()) then
+	if not (onReward and ns.Active(KEY) and QuestFrameRewardPanel:IsVisible()) then
 		return
 	end
 	local count = GetNumQuestChoices()
@@ -110,10 +117,10 @@ local function Update()
 	end
 	local best, pending = Model.Best(choices)
 	waiting = pending
-	local button = best and ChoiceButtons()[best]
+	local button = best and ChoiceButton(best)
 	if button then
 		local frame = Marker()
-		frame:SetParent(QuestFrameRewardPanel)
+		-- In the rewards frame, so the scroll frame clips and scrolls it with the button.
 		frame:SetFrameLevel(button:GetFrameLevel() + 2)
 		frame:ClearAllPoints()
 		frame:SetPoint("CENTER", button.Icon or button, "TOPRIGHT", -2, -2)
@@ -121,13 +128,30 @@ local function Update()
 	end
 end
 
+-- Laid out after Blizzard's QuestInfo_Display; the quest log's own display shares the rewards frame, so only the
+-- reward template counts.
+---@param template table?
+local function Displayed(template)
+	onReward = template == QUEST_TEMPLATE_REWARD
+	Update()
+end
+
+local function Retry()
+	if waiting then
+		Update()
+	end
+end
+
 ns.Init(function()
-	-- After Blizzard has laid out the reward panel's buttons.
-	hooksecurefunc("QuestInfo_Display", Update)
-	ns.On("GET_ITEM_INFO_RECEIVED", function()
-		if waiting then
-			Update()
-		end
+	hooksecurefunc("QuestInfo_Display", Displayed)
+	ns.On("GET_ITEM_INFO_RECEIVED", Retry)
+	-- A choice's item arriving re-lays the rewards without QuestInfo_Display.
+	ns.On("QUEST_ITEM_UPDATE", Retry)
+	ns.On("QUEST_FINISHED", function()
+		onReward = false
+		Update()
 	end)
 	ns.OnSettingChanged(KEY, Update)
+	-- Polestar's matching option changes take effect at once too.
+	hooksecurefunc(ns, "RefreshConflicts", Update)
 end)
