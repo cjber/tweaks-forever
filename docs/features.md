@@ -8,9 +8,10 @@ All off until you turn them on, except faster auto loot.
 
 - Accept and turn in quests. Hold Shift to talk normally. A quest with a choice of rewards, one that flags you for PvP and a hand-in that costs gold are left to you.
 - Skip gossip when an NPC offers only one thing (vendor, trainer), and go straight to the flight map at a flight master, whatever else they offer, unless they have a quest for you. Hold Shift to see it.
-- Accept summons, but not in combat.
-- Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time.
-- Release your spirit in battlegrounds unless you can resurrect yourself.
+- Accept summons, but not in combat or where you can't teleport from. Hold Shift to answer yourself.
+- Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time. It waits out the game's delay after dying again soon, and Shift leaves it to you.
+- Their popups close only once the game has taken your answer.
+- Release your spirit in battlegrounds unless you can resurrect yourself or hold Shift.
 - Decline duels.
 - Invite from whispers (off by default). Someone who whispers you the keyword you pick, as their whole message, is invited to your group, as long as you can invite: you are ungrouped, the group leader or a raid assistant. The keyword is **inv**, **invite** or **group**. Nothing is sent until such a whisper arrives.
 - Skip loot confirmations (off by default). The game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on Pickup item, is confirmed for you. Only the warnings your own clicks raise; nothing rolls or loots by itself.
