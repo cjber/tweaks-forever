@@ -217,6 +217,7 @@ read_globals = {
 	"PROFESSIONS_BUTTON",
 	"QuestFlagsPVP",
 	"QuestGetAutoAccept",
+	"QuestIsFromAreaTrigger",
 	"Questie",
 	"QuestieLoader",
 	"QuestObjectiveTracker",

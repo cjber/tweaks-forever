@@ -92,6 +92,10 @@ local function Quests()
 	return ns.Active("quests") and not IsShiftKeyDown()
 end
 
+-- Quests left open this session because they flag you for PvP, by quest ID, so the NPC's list goes on to the next
+-- quest instead of opening the same one again.
+local leftForYou = {}
+
 -- Completed quests first, then new ones, one per window: each pick reopens the NPC's list.
 local function PickGossipQuest()
 	for _, quest in ipairs(C_GossipInfo.GetActiveQuests()) do
@@ -101,7 +105,7 @@ local function PickGossipQuest()
 		end
 	end
 	for _, quest in ipairs(C_GossipInfo.GetAvailableQuests()) do
-		if not quest.isTrivial then
+		if not quest.isTrivial and not leftForYou[quest.questID] then
 			C_GossipInfo.SelectAvailableQuest(quest.questID)
 			return true
 		end
@@ -160,8 +164,8 @@ ns.On("QUEST_GREETING", function()
 		end
 	end
 	for index = 1, GetNumAvailableQuests() do
-		local isTrivial = GetAvailableQuestInfo(index)
-		if not isTrivial then
+		local isTrivial, _, _, _, questID = GetAvailableQuestInfo(index)
+		if not isTrivial and not leftForYou[questID] then
 			-- Forever's quest greeting takes an index; Ketho's legacy signature omits it.
 			---@diagnostic disable-next-line: redundant-parameter
 			SelectAvailableQuest(index)
@@ -170,14 +174,19 @@ ns.On("QUEST_GREETING", function()
 	end
 end)
 
--- A quest that flags you for PvP waits for you to accept it. One the server has already accepted (an item or
--- area that starts a quest) only needs acknowledging.
+-- One the server has already accepted (an item that starts a quest) only needs acknowledging; Blizzard closes an
+-- area's own and offers it in a popup. A quest that flags you for PvP waits for you to accept it. The auto-accept
+-- calls are guarded: Ketho lists them for retail only.
 ns.On("QUEST_DETAIL", function()
-	if not Quests() or QuestFlagsPVP() then
+	if not Quests() then
 		return
 	end
-	if QuestGetAutoAccept() then
-		AcknowledgeAutoAcceptQuest()
+	if QuestGetAutoAccept and QuestGetAutoAccept() then
+		if AcknowledgeAutoAcceptQuest and not (QuestIsFromAreaTrigger and QuestIsFromAreaTrigger()) then
+			AcknowledgeAutoAcceptQuest()
+		end
+	elseif QuestFlagsPVP() then
+		leftForYou[GetQuestID()] = true
 	else
 		AcceptQuest()
 	end
@@ -200,7 +209,7 @@ end)
 -- A hand-in that costs gold waits for you to pay it.
 ns.On("QUEST_COMPLETE", function()
 	local choices = GetNumQuestChoices()
-	if Quests() and choices <= 1 and GetQuestMoneyToGet() == 0 then
+	if Quests() and choices <= 1 and not ((GetQuestMoneyToGet() or 0) > 0) then
 		GetQuestReward(choices)
 	end
 end)

@@ -125,9 +125,15 @@ assert(#looted == 0, "the toggle disables fast looting immediately")
 
 -- The quest frame: a PvP-flagging quest and a hand-in that costs gold wait for the player.
 local calls = {}
-local pvp, autoAccepted, cost, choices = false, false, 0, 0
+local pvp, autoAccepted, areaTrigger, cost, choices = false, false, false, 0, 0
 env.QuestFlagsPVP = function()
 	return pvp
+end
+env.QuestIsFromAreaTrigger = function()
+	return areaTrigger
+end
+env.GetQuestID = function()
+	return 99
 end
 env.QuestGetAutoAccept = function()
 	return autoAccepted
@@ -154,22 +160,59 @@ end
 
 db.quests = true
 assert(Quest("QUEST_DETAIL") == "AcceptQuest", "an ordinary quest is accepted")
+autoAccepted = true
+assert(Quest("QUEST_DETAIL") == "AcknowledgeAutoAcceptQuest", "a quest the server accepted is acknowledged")
+pvp = true
+assert(Quest("QUEST_DETAIL") == "AcknowledgeAutoAcceptQuest", "even one that flags for PvP: it is already yours")
+pvp, areaTrigger = false, true
+assert(Quest("QUEST_DETAIL") == "", "an area's quest is Blizzard's popup to answer")
+autoAccepted, areaTrigger = false, false
+local Ack = env.AcknowledgeAutoAcceptQuest
+env.QuestGetAutoAccept, env.AcknowledgeAutoAcceptQuest = nil, nil
+assert(Quest("QUEST_DETAIL") == "AcceptQuest", "a client without the auto-accept calls still accepts")
+env.QuestGetAutoAccept = function()
+	return autoAccepted
+end
+env.AcknowledgeAutoAcceptQuest = Ack
+
+-- A PvP-flagging quest is left open, and the NPC's list moves past it on the next visit.
 pvp = true
 assert(Quest("QUEST_DETAIL") == "", "a quest that flags you for PvP is left to accept")
-pvp, autoAccepted = false, true
-assert(Quest("QUEST_DETAIL") == "AcknowledgeAutoAcceptQuest", "a quest the server accepted is acknowledged")
-autoAccepted = false
-assert(Quest("QUEST_PROGRESS") == "CompleteQuest")
+pvp = false
+available = { { questID = 99, isTrivial = false }, { questID = 100, isTrivial = false } }
+assert(talk({}) == "quest 100", "the gossip list skips the quest left for you")
+available = {}
+env.GetNumActiveQuests = function()
+	return 0
+end
+env.GetNumAvailableQuests = function()
+	return 2
+end
+env.GetAvailableQuestInfo = function(index)
+	return false, 0, false, false, index == 1 and 99 or 100
+end
+env.SelectAvailableQuest = function(index)
+	calls[#calls + 1] = "select " .. index
+end
+assert(Quest("QUEST_GREETING") == "select 2", "the greeting list skips it too")
+
+assert(Quest("QUEST_PROGRESS") == "CompleteQuest", "a completable quest moves on to its reward")
 assert(Quest("QUEST_COMPLETE") == "GetQuestReward(0)", "a quest with no reward choice is handed in")
 choices = 1
 assert(Quest("QUEST_COMPLETE") == "GetQuestReward(1)", "a lone reward is taken")
 cost = 500
 assert(Quest("QUEST_COMPLETE") == "", "a hand-in that costs gold waits for you to pay")
+choices = 0
+assert(Quest("QUEST_COMPLETE") == "", "with no reward choice too")
+cost = nil
+assert(Quest("QUEST_COMPLETE") == "GetQuestReward(0)", "no cost reported is no cost")
 cost, choices = 0, 2
 assert(Quest("QUEST_COMPLETE") == "", "a choice of rewards is yours")
 choices = 0
 shift = true
+autoAccepted = true
 assert(Quest("QUEST_DETAIL") == "" and Quest("QUEST_COMPLETE") == "", "Shift skips the quest frame too")
+autoAccepted = false
 shift = false
 db.quests = false
 assert(Quest("QUEST_DETAIL") == "" and Quest("QUEST_COMPLETE") == "", "off leaves the quest frame alone")
