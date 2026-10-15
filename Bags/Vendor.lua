@@ -7,7 +7,7 @@ ns.Feature({
 	category = "Vendors",
 	name = "Repair automatically",
 	tooltip = "At any merchant who repairs, with the cost shown in chat. If you are short, it repairs once what "
-		.. "you sell there covers the cost.",
+		.. "you sell there covers the cost. Hold Shift while a merchant opens to skip it there.",
 	default = true,
 	conflicts = {
 		{
@@ -67,8 +67,17 @@ local function Repair(quiet)
 	end
 end
 
+-- Shift held as the merchant opens skips the repair for this visit, saying so when there was one to do.
 ns.On("MERCHANT_SHOW", function()
-	Repair()
+	if not IsShiftKeyDown() then
+		Repair()
+		return
+	end
+	owed = false
+	local cost, canRepair = GetRepairAllCost()
+	if ns.Active("repair") and CanMerchantRepair() and canRepair and cost > 0 then
+		ns.Print(L["repair skipped (%s)."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
+	end
 end)
 
 -- Selling junk (ours, the game's or another addon's) starts after the repair, so try again as the money comes in.
