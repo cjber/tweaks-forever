@@ -37,6 +37,17 @@ function Art.Fit(texture, atlas, width, height)
 	return w, h
 end
 
+-- A file icon, square as every one is, `size` across and whole: a texture that drew an atlas before keeps that
+-- atlas's crop until it is reset.
+---@param texture Texture
+---@param file string|integer
+---@param size number
+function Art.Icon(texture, file, size)
+	texture:SetTexCoord(0, 1, 0, 1)
+	texture:SetTexture(file)
+	texture:SetSize(size, size)
+end
+
 -- `|A:atlas:height:width|a` with the width from the atlas's aspect.
 ---@param atlas string
 ---@param height number

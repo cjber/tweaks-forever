@@ -45,6 +45,6 @@ All optional:
 - [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) shades undiscovered areas and pins dungeons that count toward a challenge. Tweaks' unexplored tint and entrance icons step aside for it.
 - [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) shows skill-up chances, costs and levelling routes in the Professions window.
 
-Bug reports and ideas are welcome. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
+Bug reports and ideas are welcome. For a bug, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
 
 Built with AI assistance.

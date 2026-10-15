@@ -7,11 +7,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 Added/Fixed lists.
 
 Each version's entry is also its release notes on GitHub, CurseForge and Wago. Older entries are kept
-verbatim rather than rewritten as the addon moves.
+verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
+optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
 - **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.
+- **`/tweaks report` gives you something to paste into a bug report.** It opens a small window with the text already selected: your addon and game versions, your character, the settings you changed, which features are standing down for another addon, your other addons, and any errors Tweaks caught this session. Press Ctrl+C and paste it.
 
 - **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as what you sell there, such as your junk, brings in enough.
 - **Quest automation leaves the costly ones to you.** A quest that would flag you for PvP is no longer accepted for you, and a hand-in that costs gold is no longer paid without asking. A quest the game has already accepted for you is acknowledged instead of accepted again.
