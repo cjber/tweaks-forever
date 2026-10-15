@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.
 - **`/tweaks report` gives you something to paste into a bug report.** It opens a small window with the text already selected: your addon and game versions, your character, the settings you changed, which features are standing down for another addon, your other addons, and any errors Tweaks caught this session. Press Ctrl+C and paste it.
 
 - **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as what you sell there, such as your junk, brings in enough.
