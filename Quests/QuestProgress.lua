@@ -374,7 +374,7 @@ ns.Init(function()
 	UpdatePlates()
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
-		if tooltip ~= GameTooltip or not ns.Active(TOOLTIP) or Model.HasQuestLines(data) then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active(TOOLTIP) or Model.HasQuestLines(data) then
 			return
 		end
 		local lines = Model.Lines(Model.NpcId(data.guid))

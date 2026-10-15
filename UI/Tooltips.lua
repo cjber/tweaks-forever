@@ -324,10 +324,12 @@ local function UnitLines()
 	local building, className, classFile, race, level, passed, dropped
 
 	TooltipDataProcessor.AddTooltipPreCall(Enum.TooltipDataType.Unit, function(tooltip, data)
-		building = nil
-		if tooltip ~= GameTooltip or not ns.Active(KEY) then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active(KEY) then
+			building = nil
 			return
 		end
+		building = nil
+		-- secret-ok: GetPlayerInfoByGUID takes a secret GUID, and a player's class and race are not secret (above)
 		className, classFile, race = GetPlayerInfoByGUID(data.guid)
 		level = LevelText(tooltip)
 		if classFile then
@@ -336,7 +338,7 @@ local function UnitLines()
 	end)
 
 	TooltipDataProcessor.AddLinePreCall(TooltipDataProcessor.AllTypes, function(tooltip, line)
-		if not building or tooltip ~= GameTooltip or dropped then
+		if not building or tooltip ~= GameTooltip or dropped or not ns.Usable(tooltip) then
 			return
 		end
 		local info = tooltip:GetProcessingTooltipInfo()
@@ -356,7 +358,10 @@ local function UnitLines()
 	end)
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
-		if not building or data ~= building then
+		if not building or data ~= building or not ns.Usable(tooltip) then
+			if data == building then
+				building = nil
+			end
 			return
 		end
 		building = nil
