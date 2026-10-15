@@ -18,6 +18,9 @@ local ns = {
 	Active = function(key)
 		return db[key]
 	end,
+	SafeCall = function(_, fn, ...)
+		return assert(pcall(fn, ...))
+	end,
 }
 -- Quest 1 (far) has an item; quest 2 (near) has an item and wolves and bears to kill; quest 3 (nearest) is done.
 local log = {
@@ -26,7 +29,7 @@ local log = {
 	{ questID = 3, title = "Done" },
 	{ questID = 4, title = "Elsewhere" },
 }
-local distances = { [1] = 900, [2] = 100, [3] = 25 }
+local distances = { [1] = 900, [2] = 100, [3] = 25, [4] = 1600 }
 local items = { [1] = "|cffffffff|Hitem:111::::|h[Far Item]|h|r", [2] = "|cffffffff|Hitem:222::::|h[Near Item]|h|r" }
 local complete = { [3] = true }
 local objectives = {
@@ -35,7 +38,9 @@ local objectives = {
 		{ type = "monster", finished = true, text = "3/3 Boar slain" },
 	},
 }
-local combat = false
+local combat, keyDown = false, true
+-- Quest 4 (no log item) gave item 333 and needs 444 (no use); you carry both.
+local carried = { [333] = 1, [444] = 1 }
 local buttons = {}
 local env = setmetatable({
 	C_QuestLog = {
@@ -61,6 +66,18 @@ local env = setmetatable({
 	InCombatLockdown = function()
 		return combat
 	end,
+	GetCVarBool = function(name)
+		assert(name == "ActionButtonUseKeyDown")
+		return keyDown
+	end,
+	C_Item = {
+		GetItemCount = function(id)
+			return carried[id] or 0
+		end,
+		GetItemSpell = function(id)
+			return id ~= 444 and "Use" or nil
+		end,
+	},
 	CreateFrame = function(_, name, _, template)
 		assert(template == "SecureActionButtonTemplate", "a secure button of our own")
 		local button = { attributes = {}, scripts = {} }
@@ -77,6 +94,11 @@ local env = setmetatable({
 }, { __index = _G })
 ns.QuestieDB = function()
 	return {
+		Quest = {
+			GetAll = function(id)
+				return id == 4 and { 333, { 444 } } or nil
+			end,
+		},
 		Npc = {
 			GetAll = function(id)
 				return { ({ [10] = "Mangy Wolf", [11] = "Timber Wolf", [12] = "Boar" })[id] }
@@ -103,24 +125,38 @@ initializers[1]()
 local item, target = buttons.TweaksForeverQuestItemButton, buttons.TweaksForeverQuestTargetButton
 assert(item.attributes.type == "item" and target.attributes.type == "macro")
 
-item.scripts.PreClick(item)
+-- A key press: down then up; the secure handler acts on the down with ActionButtonUseKeyDown on.
+local function Press(button)
+	button.scripts.PreClick(button, "LeftButton", true)
+	button.scripts.PreClick(button, "LeftButton", false)
+end
+Press(item)
 assert(item.attributes.item == "item:222", "the nearest quest with an item")
-target.scripts.PreClick(target)
+Press(target)
 assert(target.attributes.macrotext == "/targetexact Mangy Wolf", "a creature the nearest unfinished quest needs")
-target.scripts.PreClick(target)
+Press(target)
 assert(target.attributes.macrotext == "/targetexact Timber Wolf", "a different one each press")
-target.scripts.PreClick(target)
+Press(target)
 assert(target.attributes.macrotext == "/targetexact Mangy Wolf", "round again; never the finished boars")
 
 combat = true
 items[2] = nil
-item.scripts.PreClick(item)
+Press(item)
 assert(item.attributes.item == "item:222", "in combat the button keeps what it had")
 combat = false
-item.scripts.PreClick(item)
+Press(item)
 assert(item.attributes.item == "item:111", "out of combat the next nearest")
+items[1] = nil
+Press(item)
+assert(item.attributes.item == "item:333", "else an item QuestieDB says the quest gave you, when it has a use")
+keyDown = false
+target.attributes.macrotext = nil
+target.scripts.PreClick(target, "LeftButton", true)
+assert(target.attributes.macrotext == nil, "with keys acting on release, the down press doesn't pick")
+target.scripts.PreClick(target, "LeftButton", false)
+assert(target.attributes.macrotext ~= nil, "the release does")
 db.questButtons = false
-item.scripts.PreClick(item)
-target.scripts.PreClick(target)
+Press(item)
+Press(target)
 assert(item.attributes.item == nil and target.attributes.macrotext == nil, "switched off, the keys do nothing")
 print("questbuttons: ok")

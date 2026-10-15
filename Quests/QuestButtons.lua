@@ -17,6 +17,7 @@ ns.Feature({
 
 local ITEM, TARGET = "TweaksForeverQuestItemButton", "TweaksForeverQuestTargetButton"
 local NAME_FIELDS = { "name" }
+local ITEM_FIELDS = { "sourceItemId", "requiredSourceItems" }
 
 BINDING_HEADER_TWEAKSFOREVER = "Tweaks Forever"
 _G["BINDING_NAME_CLICK " .. ITEM .. ":LeftButton"] = L["Use the nearest quest item"]
@@ -45,32 +46,64 @@ function Model.Quests()
 	return list
 end
 
--- The nearest of `quests` that `fits`, and what `fits` returned for it.
+-- The nearest of `quests` on this continent that `fits`, and what `fits` returned for it: nearest first, stopping
+-- at the first that fits.
 ---@generic T
 ---@param quests TFQuestEntry[]
 ---@param fits fun(quest: TFQuestEntry): T?
 ---@return T?
 function Model.Nearest(quests, fits)
-	local best, bestDistance
+	local near = {}
 	for _, quest in ipairs(quests) do
-		if quest.distance and (not bestDistance or quest.distance < bestDistance) then
-			local value = fits(quest)
-			if value then
-				best, bestDistance = value, quest.distance
-			end
+		if quest.distance then
+			near[#near + 1] = quest
 		end
 	end
-	return best
+	table.sort(near, function(a, b)
+		return a.distance < b.distance
+	end)
+	for _, quest in ipairs(near) do
+		local value = fits(quest)
+		if value then
+			return value
+		end
+	end
 end
 
--- The quest item of a quest, as "item:ID".
+-- An item you carry that has a use (a spell), as "item:ID".
+---@param id any
+---@return string?
+local function Usable(id)
+	if type(id) == "number" and C_Item.GetItemCount(id) > 0 and C_Item.GetItemSpell(id) then
+		return "item:" .. id
+	end
+end
+
+-- The quest item of a quest: the log's own quest item where it has one, else an item QuestieDB says the quest gave
+-- you or needs, when you carry it and it can be used.
 ---@param quest TFQuestEntry
 ---@return string?
 local function QuestItem(quest)
 	local link = GetQuestLogSpecialItemInfo(quest.index)
 	local id = type(link) == "string" and link:match("item:(%d+)")
-	return id and "item:" .. id or nil
+	if id then
+		return "item:" .. id
+	end
+	local db = ns.QuestieDB()
+	local values = db and db.Quest.GetAll(quest.id, ITEM_FIELDS)
+	if not values then
+		return nil
+	end
+	local found = Usable(values[1])
+	for _, required in ipairs(type(values[2]) == "table" and values[2] or {}) do
+		found = found or Usable(required)
+	end
+	return found
 end
+
+-- [NPC ID] = its QuestieDB name, or false; read once.
+---@type table<integer, string|false>
+local npcNames = {}
 
 -- The names of the creatures a quest still needs killed, by QuestieDB, in a stable order.
 ---@param quest TFQuestEntry
@@ -86,9 +119,13 @@ local function KillNames(quest)
 		local objective = objectives[position]
 		if target.kind == "monster" and objective and objective.type == "monster" and not objective.finished then
 			for npc in pairs(target.npcs) do
-				local values = db.Npc.GetAll(npc, NAME_FIELDS)
-				local name = values and values[1]
-				if type(name) == "string" and not seen[name] then
+				if npcNames[npc] == nil then
+					local values = db.Npc.GetAll(npc, NAME_FIELDS)
+					local name = values and values[1]
+					npcNames[npc] = type(name) == "string" and name or false
+				end
+				local name = npcNames[npc]
+				if name and not seen[name] then
 					seen[name] = true
 					names[#names + 1] = name
 				end
@@ -123,19 +160,28 @@ ns.Init(function()
 	target:SetAttribute("type", "macro")
 	local lastName
 
-	item:SetScript("PreClick", function(self)
-		if InCombatLockdown() then
-			return
+	-- A key press clicks twice (down and up) and the secure handler acts on one, as ActionButtonUseKeyDown says;
+	-- only that one picks, so the target cycle moves once per press.
+	---@param down boolean?
+	---@return boolean
+	local function Acting(down)
+		return not InCombatLockdown() and (not not down) == GetCVarBool("ActionButtonUseKeyDown")
+	end
+	item:SetScript("PreClick", function(self, _, down)
+		if Acting(down) then
+			ns.SafeCall("quest item key", function()
+				local found = ns.Active(KEY) and Model.Nearest(Model.Quests(), QuestItem)
+				self:SetAttribute("item", found or nil)
+			end)
 		end
-		local found = ns.Active(KEY) and Model.Nearest(Model.Quests(), QuestItem)
-		self:SetAttribute("item", found or nil)
 	end)
-	target:SetScript("PreClick", function(self)
-		if InCombatLockdown() then
-			return
+	target:SetScript("PreClick", function(self, _, down)
+		if Acting(down) then
+			ns.SafeCall("quest target key", function()
+				local names = ns.Active(KEY) and Model.Nearest(Model.Quests(), KillNames)
+				lastName = names and Model.Next(names, lastName) or nil
+				self:SetAttribute("macrotext", lastName and "/targetexact " .. lastName or nil)
+			end)
 		end
-		local names = ns.Active(KEY) and Model.Nearest(Model.Quests(), KillNames)
-		lastName = names and Model.Next(names, lastName) or nil
-		self:SetAttribute("macrotext", lastName and "/targetexact " .. lastName or nil)
 	end)
 end)
