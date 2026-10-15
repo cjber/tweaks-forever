@@ -60,9 +60,9 @@ ns.Feature({
 -- Questie maps that list onto the log's by position, moving a kind to the front for the quests it marks: the same
 -- here. The log names each objective's kind, so a position whose kind disagrees is left out rather than guessed.
 local QUEST_FIELDS = { "objectives", "triggerEnd" }
-local ITEM_FIELDS = { "npcDrops" }
+local ITEM_FIELDS = { "npcDrops", "objectDrops" }
 local START_FIELDS = { "startQuest" }
-local NAME_FIELDS = { "name" }
+local STARTED_FIELDS = { "name", "requiredRaces", "requiredClasses", "exclusiveTo" }
 -- QuestieDB's objective groups in its order, with the kind the log gives each and its ObjectiveFirst hint.
 local GROUPS = {
 	{ slot = 1, kind = "monster" },
@@ -87,8 +87,8 @@ local hints = {}
 ---@type table<integer, TFQuestTarget[]>
 local targets = {}
 -- [creature ID] = [questID] = which of that quest's objectives it counts for; the same for items and objects.
----@type table<integer, table<integer, TFQuestLink>>
-local byNpc, byItem, byObject = {}, {}, {}
+---@type table<string, table<integer, table<integer, TFQuestLink>>>
+local byKind = { npc = {}, item = {}, object = {} }
 -- The quests in your log, in its order, with their objectives as of its last change.
 ---@type TFLogQuest[]
 local logQuests = {}
@@ -106,30 +106,32 @@ function Model.Attach()
 	return true
 end
 
--- The object ID in a game object's GUID, or nil for anything else or a GUID addon code can't read.
+-- The ID in a GUID of one of `kinds`, or nil for any other or a GUID addon code can't read.
 ---@param guid any
+---@param kinds table<string, true>
 ---@return integer?
-function Model.ObjectId(guid)
+local function GuidId(guid, kinds)
 	if not canaccessvalue(guid) or type(guid) ~= "string" then
 		return nil
 	end
 	local kind, id = guid:match("^(%a+)%-%d+%-%d+%-%d+%-%d+%-(%d+)%-%x+$")
-	if kind == "GameObject" then
-		return tonumber(id)
-	end
+	return kinds[kind] and tonumber(id) or nil
 end
+
+local CREATURES, OBJECTS = { Creature = true, Vehicle = true }, { GameObject = true }
 
 -- The creature ID in a unit's GUID, or nil for a player, an object or a GUID addon code can't read.
 ---@param guid any
 ---@return integer?
 function Model.NpcId(guid)
-	if not canaccessvalue(guid) or type(guid) ~= "string" then
-		return nil
-	end
-	local kind, id = guid:match("^(%a+)%-%d+%-%d+%-%d+%-%d+%-(%d+)%-%x+$")
-	if kind == "Creature" or kind == "Vehicle" then
-		return tonumber(id)
-	end
+	return GuidId(guid, CREATURES)
+end
+
+-- The object ID in a game object's GUID, or nil for anything else or a GUID addon code can't read.
+---@param guid any
+---@return integer?
+function Model.ObjectId(guid)
+	return GuidId(guid, OBJECTS)
 end
 
 ---@param npcs table<integer, true>
@@ -140,14 +142,15 @@ local function AddAll(npcs, list)
 	end
 end
 
--- The creatures that count toward one QuestieDB objective entry.
+-- The creatures that count toward one QuestieDB objective entry, and the objects that drop its item.
 ---@param group table
 ---@param entry any
----@return table<integer, true>
+---@return table<integer, true> npcs
+---@return table<integer, true> objects
 local function Npcs(group, entry)
-	local npcs = {}
+	local npcs, objects = {}, {}
 	if type(entry) ~= "table" then
-		return npcs
+		return npcs, objects
 	end
 	if group.credit then
 		AddAll(npcs, entry[1])
@@ -159,8 +162,9 @@ local function Npcs(group, entry)
 	elseif group.slot == 3 and items then
 		local values = items.GetAll(entry[1], ITEM_FIELDS)
 		AddAll(npcs, values and values[1])
+		AddAll(objects, values and values[2])
 	end
-	return npcs
+	return npcs, objects
 end
 
 -- A quest's objectives in the order the log lists them; none without QuestieDB.
@@ -181,7 +185,8 @@ function Model.Targets(id)
 			end
 			local first = group.first and hints[group.first] and hints[group.first][id]
 			for _, entry in ipairs(type(entries) == "table" and entries or {}) do
-				local target = { kind = group.kind, npcs = Npcs(group, entry), items = {}, objects = {} }
+				local npcs, objects = Npcs(group, entry)
+				local target = { kind = group.kind, npcs = npcs, items = {}, objects = objects }
 				local thing = type(entry) == "table" and entry[1]
 				if group.slot == 3 and type(thing) == "number" then
 					target.items[thing] = true
@@ -224,7 +229,7 @@ end
 
 -- Read your quest log, and index its quests by the creatures, items and objects that count toward them.
 function Model.Rebuild()
-	logQuests, byNpc, byItem, byObject = {}, {}, {}, {}
+	logQuests, byKind = {}, { npc = {}, item = {}, object = {} }
 	for index = 1, C_QuestLog.GetNumQuestLogEntries() do
 		local info = C_QuestLog.GetInfo(index)
 		if info and not info.isHeader and not info.isHidden and info.questID and info.questID ~= 0 then
@@ -236,25 +241,13 @@ function Model.Rebuild()
 				objectives = C_QuestLog.GetQuestObjectives(id) or {},
 			}
 			for position, target in ipairs(Model.Targets(id)) do
-				Link(byNpc, target.npcs, id, position, target.kind)
-				Link(byItem, target.items, id, position, target.kind)
-				Link(byObject, target.objects, id, position, target.kind)
+				Link(byKind.npc, target.npcs, id, position, target.kind)
+				Link(byKind.item, target.items, id, position, target.kind)
+				Link(byKind.object, target.objects, id, position, target.kind)
 			end
 		end
 	end
 end
-
-local indexes = {
-	npc = function()
-		return byNpc
-	end,
-	item = function()
-		return byItem
-	end,
-	object = function()
-		return byObject
-	end,
-}
 
 -- The quests in your log a creature (or, by `kind`, an item or object) counts for, each with the objectives it
 -- counts for, in log order.
@@ -262,7 +255,7 @@ local indexes = {
 ---@param kind? "npc"|"item"|"object"
 ---@return TFQuestMatch[]
 function Model.Matches(id, kind)
-	local index = indexes[kind or "npc"]()
+	local index = byKind[kind or "npc"] or {}
 	local links = id and index[id] or {}
 	local matches = {}
 	for _, quest in ipairs(logQuests) do
@@ -298,23 +291,57 @@ function Model.Lines(id, kind)
 	return lines
 end
 
--- The quest an item starts, by QuestieDB, while it is neither in your log nor done: its line for the tooltip.
+-- [item ID] = the quest QuestieDB says it starts with what that quest asks of you, or false: read once.
+---@type table<integer, table|false>
+local starters = {}
+
+---@param item integer
+---@return table|false
+local function Starter(item)
+	if starters[item] == nil then
+		local values = items and items.GetAll(item, START_FIELDS)
+		local quest = values and values[1]
+		local info = false ---@type table|false
+		if type(quest) == "number" and quest ~= 0 then
+			local fields = quests and quests.GetAll(quest, STARTED_FIELDS) or {}
+			info = { id = quest, name = fields[1], races = fields[2], classes = fields[3], exclusive = fields[4] }
+		end
+		starters[item] = info
+	end
+	return starters[item]
+end
+
+-- Whether a QuestieDB race or class mask lets you in: 0 or none is anyone.
+---@param mask any
+---@param id integer?
+---@return boolean
+local function Allows(mask, id)
+	if type(mask) ~= "number" or mask == 0 or not id then
+		return true
+	end
+	return bit.band(mask, bit.lshift(1, id - 1)) ~= 0
+end
+
+-- The quest an item starts, by QuestieDB, while you can take it: not done, not in your log, not shut out by one you
+-- did instead, and open to your race and class. Its line for the tooltip.
 ---@param item integer?
 ---@return string?
 function Model.Starts(item)
-	local values = item and items and items.GetAll(item, START_FIELDS)
-	local quest = values and values[1]
-	if type(quest) ~= "number" or quest == 0 or C_QuestLog.IsQuestFlaggedCompleted(quest) then
+	local quest = item and Starter(item)
+	if not quest or C_QuestLog.IsQuestFlaggedCompleted(quest.id) or C_QuestLog.IsOnQuest(quest.id) then
 		return nil
 	end
-	for _, logged in ipairs(logQuests) do
-		if logged.id == quest then
+	local _, _, race = UnitRace("player")
+	local _, _, class = UnitClass("player")
+	if not Allows(quest.races, race) or not Allows(quest.classes, class) then
+		return nil
+	end
+	for _, other in ipairs(type(quest.exclusive) == "table" and quest.exclusive or {}) do
+		if C_QuestLog.IsQuestFlaggedCompleted(other) or C_QuestLog.IsOnQuest(other) then
 			return nil
 		end
 	end
-	local names = quests and quests.GetAll(quest, NAME_FIELDS)
-	local name = names and names[1]
-	return L["Starts a quest: %s"]:format(type(name) == "string" and name or tostring(quest))
+	return L["Starts a quest: %s"]:format(type(quest.name) == "string" and quest.name or tostring(quest.id))
 end
 
 -- Whether a creature still counts toward a quest in your log that isn't complete.
@@ -443,11 +470,10 @@ ns.Init(function()
 	Model.Rebuild()
 	UpdatePlates()
 
-	---@param tooltip GameTooltip
 	---@param data TooltipData
 	---@return boolean
 	local function Wanted(tooltip, data)
-		return tooltip == GameTooltip and ns.Usable(tooltip) and ns.Active(TOOLTIP) and not Model.HasQuestLines(data)
+		return tooltip == GameTooltip and ns.Active(TOOLTIP) and not Model.HasQuestLines(data)
 	end
 	---@param tooltip GameTooltip
 	---@param lines [string, number, number, number][]
@@ -459,19 +485,9 @@ ns.Init(function()
 			tooltip:Show()
 		end
 	end
-	local types = Enum.TooltipDataType
-	TooltipDataProcessor.AddTooltipPostCall(types.Unit, function(tooltip, data)
-		if not ns.Usable(tooltip) then
-			return
-		end
-		if Wanted(tooltip, data) then
-			Add(tooltip, Model.Lines(Model.NpcId(data.guid)))
-		end
-	end)
-	TooltipDataProcessor.AddTooltipPostCall(types.Item, function(tooltip, data)
-		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
-			return
-		end
+	---@param tooltip GameTooltip
+	---@param data TooltipData
+	local function Item(tooltip, data)
 		local item = ns.Readable(data.id)
 		local lines = Model.Lines(type(item) == "number" and item or nil, "item")
 		local starts = type(item) == "number" and Model.Starts(item)
@@ -480,16 +496,28 @@ ns.Init(function()
 			lines[#lines + 1] = { starts, color.r, color.g, color.b }
 		end
 		Add(tooltip, lines)
-	end)
-	-- World objects (a chest, a shrine) where the client sends their tooltips this way.
-	if types.Object then
-		TooltipDataProcessor.AddTooltipPostCall(types.Object, function(tooltip, data)
-			if not ns.Usable(tooltip) then
-				return
-			end
-			if Wanted(tooltip, data) then
-				Add(tooltip, Model.Lines(Model.ObjectId(ns.Readable(data.guid)), "object"))
-			end
-		end)
 	end
+	-- Each runs through ns.SafeCall: a QuestieDB read that fails is kept for /tweaks report, never the tooltip's.
+	local types = Enum.TooltipDataType
+	TooltipDataProcessor.AddTooltipPostCall(types.Unit, function(tooltip, data)
+		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
+			return
+		end
+		ns.SafeCall("quest tooltip", Add, tooltip, Model.Lines(Model.NpcId(data.guid)))
+	end)
+	TooltipDataProcessor.AddTooltipPostCall(types.Item, function(tooltip, data)
+		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
+			return
+		end
+		ns.SafeCall("quest item tooltip", Item, tooltip, data)
+	end)
+	-- World objects (a chest, a crate, a shrine), as Map/Campsites.lua reads them.
+	TooltipDataProcessor.AddTooltipPostCall(types.Object, function(tooltip, data)
+		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
+			return
+		end
+		ns.SafeCall("quest object tooltip", function()
+			Add(tooltip, Model.Lines(Model.ObjectId(ns.Readable(data.guid)), "object"))
+		end)
+	end)
 end)

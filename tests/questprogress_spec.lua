@@ -5,6 +5,9 @@ local ns = {
 			return key
 		end,
 	}),
+	SafeCall = function(_, fn, ...)
+		return assert(pcall(fn, ...))
+	end,
 	QuestTitle = function(_, title)
 		return title
 	end,
@@ -26,14 +29,20 @@ local quests = {
 	[5] = { objectives = { nil, { { 701 } } } },
 	[6] = { name = "A Letter for Maybell" },
 	[7] = { name = "Already Done" },
+	[8] = { name = "Horde Only", requiredRaces = 2 },
+	[9] = { name = "Shut Out", exclusiveTo = { 7 } },
+	[10] = { name = "Humans Welcome", requiredRaces = 1, requiredClasses = 0 },
 }
 -- Item 600 starts quest 6; 601 starts one you've done; 602 starts quest 1, already in your log.
 local items = {
-	[500] = { npcDrops = { 10, 11 } },
+	[500] = { npcDrops = { 10, 11 }, objectDrops = { 702 } },
 	[501] = { npcDrops = { 40 } },
 	[600] = { startQuest = 6 },
 	[601] = { startQuest = 7 },
 	[602] = { startQuest = 1 },
+	[603] = { startQuest = 8 },
+	[604] = { startQuest = 9 },
+	[605] = { startQuest = 10 },
 }
 local reads = 0
 local function Entity(rows)
@@ -134,6 +143,9 @@ local env = setmetatable({
 		IsQuestFlaggedCompleted = function(id)
 			return id == 7
 		end,
+		IsOnQuest = function(id)
+			return id >= 1 and id <= 5
+		end,
 	},
 	C_Texture = {
 		GetAtlasInfo = function()
@@ -175,6 +187,13 @@ local env = setmetatable({
 	NORMAL_FONT_COLOR = { r = 1, g = 0.82, b = 0 },
 	HIGHLIGHT_FONT_COLOR = { r = 1, g = 1, b = 1 },
 	GRAY_FONT_COLOR = { r = 0.5, g = 0.5, b = 0.5 },
+	-- A human (race 1) warrior (class 1).
+	UnitRace = function()
+		return "Human", "Human", 1
+	end,
+	UnitClass = function()
+		return "Warrior", "WARRIOR", 1
+	end,
 	canaccessvalue = function(value)
 		return value ~= "secret"
 	end,
@@ -264,6 +283,14 @@ assert(Model.Starts(600) == "Starts a quest: A Letter for Maybell")
 assert(Model.Starts(601) == nil, "not one you've done")
 assert(Model.Starts(602) == nil, "not one in your log")
 assert(Model.Starts(500) == nil and Model.Starts(nil) == nil)
+assert(Model.Starts(603) == nil, "not one your race can take")
+assert(Model.Starts(604) == nil, "not one shut out by a quest you did instead")
+assert(Model.Starts(605) == "Starts a quest: Humans Welcome", "one your race and any class can take")
+before = reads
+Model.Starts(605)
+assert(reads == before, "an item's quest is read once")
+lines = Model.Lines(702, "object")
+assert(#lines == 2 and lines[2][1] == " - 5/5 Wolf Fang", "an object the quest's item drops from")
 
 -- Needed: an unfinished objective in a quest that isn't complete.
 assert(Model.Needed(10) and not Model.Needed(11) and Model.Needed(21) and not Model.Needed(99))
