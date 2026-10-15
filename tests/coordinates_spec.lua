@@ -23,17 +23,18 @@ local ns = {
 
 local function Region()
 	local region = { shown = true }
-	for _, method in ipairs({ "SetPoint", "SetHeight", "SetFrameLevel" }) do
+	for _, method in ipairs({ "SetPoint", "SetSize", "SetFrameLevel" }) do
 		region[method] = function() end
 	end
 	function region:SetText(text)
-		self.text = text
+		self.text, self.sets = text, (self.sets or 0) + 1
 	end
 	function region:SetShown(shown)
 		self.shown = shown
 	end
-	function region:SetScript(_, fn)
-		self.update = fn
+	function region:SetScript(script, fn)
+		self.scripts = self.scripts or {}
+		self.scripts[script] = fn
 	end
 	function region:CreateFontString()
 		local text = Region()
@@ -106,6 +107,7 @@ for _, conflict in ipairs(feature.conflicts) do
 	named[conflict.addon or conflict.polestar] = conflict
 end
 assert(named.Leatrix_Maps and named.Mapster and named.Coordinates and named["maps.coords"], "the coordinate addons")
+assert(named.Leatrix_Maps.when(), "Leatrix Maps shows coordinates by default")
 env.LeaMapsDB = { ShowCoords = "Off" }
 assert(not named.Leatrix_Maps.when(), "Leatrix Maps with its coordinates off")
 env.LeaMapsDB.ShowCoords = "On"
@@ -120,17 +122,23 @@ assert(x == 0.5 and y == 0.5, "the cursor's place on the canvas")
 
 db.mapCoords = true
 initializers[1]()
-local player, cursor = bar.texts[1], bar.texts[2]
-bar.update(bar, 0.2)
-assert(player.text == "Player: 45.2, 60.1" and cursor.text == "Cursor: 50.0, 50.0")
+local text = bar.texts[1]
+bar.scripts.OnShow()
+assert(text.text == "Player: 45.2, 60.1    Cursor: 50.0, 50.0", "filled in as the map opens")
 over = false
-bar.update(bar, 0.05)
-assert(cursor.text == "Cursor: 50.0, 50.0", "updated a few times a second, not every frame")
-bar.update(bar, 0.05)
-assert(cursor.text == "", "no cursor position off the map")
-playerPos = nil
-bar.update(bar, 0.2)
-assert(player.text == "", "no player position where the map has none")
+bar.scripts.OnUpdate(bar, 0.05)
+assert(text.text == "Player: 45.2, 60.1    Cursor: 50.0, 50.0", "updated a few times a second, not every frame")
+bar.scripts.OnUpdate(bar, 0.05)
+assert(text.text == "Player: 45.2, 60.1", "no cursor position off the map")
+local sets = text.sets
+bar.scripts.OnUpdate(bar, 0.2)
+assert(text.sets == sets, "an unchanged line isn't set again")
+playerPos, over = nil, true
+bar.scripts.OnUpdate(bar, 0.2)
+assert(text.text == "Cursor: 50.0, 50.0", "no player position where the map has none")
+over = false
+bar.scripts.OnUpdate(bar, 0.2)
+assert(text.text == "", "neither")
 db.mapCoords = false
 settingCallbacks.mapCoords()
 assert(not bar.shown, "turned off, the bar hides at once")

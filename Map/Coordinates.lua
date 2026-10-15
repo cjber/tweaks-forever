@@ -14,8 +14,9 @@ ns.Feature({
 		{
 			addon = "Leatrix_Maps",
 			title = "Leatrix Maps",
+			-- On by default, so only an explicit "Off" leaves the job to us.
 			when = function()
-				return LeaMapsDB and LeaMapsDB.ShowCoords == "On"
+				return not (LeaMapsDB and LeaMapsDB.ShowCoords == "Off")
 			end,
 		},
 		{
@@ -64,32 +65,49 @@ function Model.Cursor(canvas)
 	return (x / scale - left) / width, (top - y / scale) / height
 end
 
+-- The bar's text: whichever of the player's and cursor's positions there are.
+---@param here string?
+---@param there string?
+---@return string
+function Model.Line(here, there)
+	if here and there then
+		return L["Player: %s    Cursor: %s"]:format(here, there)
+	elseif here then
+		return L["Player: %s"]:format(here)
+	elseif there then
+		return L["Cursor: %s"]:format(there)
+	end
+	return ""
+end
+
 ns.Init(function()
 	local container = WorldMapFrame.ScrollContainer
-	-- Our own frame along the bottom of the map; it runs only while the map shows.
+	-- Our own frame, centred along the bottom of the map, clear of the dungeon map's corner button and above the
+	-- map's pins; it runs only while the map shows.
 	local bar = CreateFrame("Frame", nil, WorldMapFrame)
-	bar:SetPoint("BOTTOMLEFT", container, "BOTTOMLEFT", 8, 6)
-	bar:SetPoint("BOTTOMRIGHT", container, "BOTTOMRIGHT", -8, 6)
-	bar:SetHeight(16)
-	bar:SetFrameLevel(container:GetFrameLevel() + 20)
-	local player = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-	player:SetPoint("LEFT")
-	local cursor = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-	cursor:SetPoint("RIGHT")
+	bar:SetPoint("BOTTOM", container, "BOTTOM", 0, 6)
+	bar:SetSize(320, 16)
+	bar:SetFrameLevel(container:GetFrameLevel() + 500)
+	local text = bar:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+	text:SetPoint("CENTER")
 
-	local elapsed = INTERVAL
+	local elapsed, shown = 0, nil
 	local function Update()
+		elapsed = 0
 		local map = WorldMapFrame:GetMapID()
 		local position = map and C_Map.GetPlayerMapPosition(map, "player")
 		local here = position and Model.Format(position:GetXY()) -- multi-value: x and y
-		player:SetText(here and L["Player: %s"]:format(here) or "")
-		local there = container:IsMouseOver() and Model.Format(Model.Cursor(container.Child)) -- multi-value: x and y
-		cursor:SetText(there and L["Cursor: %s"]:format(there) or "")
+		local there = container:IsMouseOver() and Model.Format(Model.Cursor(container.Child)) or nil -- multi-value: x and y
+		local line = Model.Line(here, there)
+		if line ~= shown then
+			shown = line
+			text:SetText(line)
+		end
 	end
+	bar:SetScript("OnShow", Update)
 	bar:SetScript("OnUpdate", function(_, delta)
 		elapsed = elapsed + delta
 		if elapsed >= INTERVAL then
-			elapsed = 0
 			Update()
 		end
 	end)

@@ -116,7 +116,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
 | Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar |
 | Zone level ranges | Leatrix Maps, Polestar |
-| Coordinates on the world map | Leatrix Maps, Mapster, Coordinates, Polestar, each while its coordinates are on |
+| Coordinates on the world map | Leatrix Maps, Mapster and Polestar while their coordinates are on; Coordinates |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
