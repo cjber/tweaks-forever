@@ -30,6 +30,9 @@ local units = {
 local vignettes = {
 	v1 = { atlasName = "VignetteKill", objectGUID = "Creature-0-1-0-1-100-CCC", name = "Gruff Swiftbite" },
 	v2 = { atlasName = "VignetteLoot", objectGUID = "GameObject-0-1-0-1-5-DDD", name = "Chest" },
+	v3 = { atlasName = "VignetteKill", objectGUID = "Creature-0-1-0-1-101-EEE", name = "Dead One", isDead = true },
+	v4 = { atlasName = "VignetteKill", objectGUID = "Creature-0-1-0-1-102-FFF", name = "Far One", onMinimap = false },
+	v5 = { atlasName = "VignetteKill", objectGUID = "Creature-0-1-0-1-103-GGG", name = "" },
 }
 local env = setmetatable({
 	canaccessvalue = function(value)
@@ -50,6 +53,11 @@ local env = setmetatable({
 	UnitName = function(unit)
 		return units[unit].name
 	end,
+	C_NamePlate = {
+		GetNamePlates = function()
+			return { { namePlateUnitToken = "nameplate1" } }
+		end,
+	},
 	PlaySound = function()
 		sounds = sounds + 1
 	end,
@@ -61,7 +69,7 @@ local env = setmetatable({
 	},
 	C_VignetteInfo = {
 		GetVignettes = function()
-			return { "v1", "v2" }
+			return { "v1", "v2", "v3", "v4", "v5" }
 		end,
 		GetVignetteInfo = function(id)
 			return vignettes[id]
@@ -92,12 +100,15 @@ now = now + 601
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#printed == 2, "again after ten minutes")
 handlers.VIGNETTES_UPDATED()
-assert(printed[3] == "rare nearby: Gruff Swiftbite." and #printed == 3, "a rare's map marker, not a chest")
-handlers.VIGNETTE_MINIMAP_UPDATED()
+assert(printed[3] == "rare nearby: Gruff Swiftbite." and #printed == 3, "a living, near rare's marker only")
+handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
 assert(#printed == 3, "once")
 combat = true
 now = now + 601
 handlers.VIGNETTES_UPDATED()
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#printed == 3, "never in combat")
+combat = false
+handlers.PLAYER_REGEN_ENABLED()
+assert(printed[4] == "rare nearby: Mother Fang." and printed[5] == "rare nearby: Gruff Swiftbite.", "told once it ends")
 print("rarealerts: ok")

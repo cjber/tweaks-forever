@@ -24,19 +24,16 @@ local RARE = { rare = true, rareelite = true }
 -- The map markers the game gives a rare creature.
 local VIGNETTE_ATLAS = { VignetteKill = true, VignetteKillElite = true }
 
----@class TFRareAlerts
-local Model = {}
-ns.RareAlerts = Model
-
--- [GUID] = when it last alerted.
+-- [GUID] = when it last alerted; entries past the quiet time are dropped as it grows.
 ---@type table<string, number>
 local alerted = {}
+local count = 0
 
 -- Whether `guid` should alert now, recording it when so. An unreadable GUID never alerts.
----@param guid string?
+---@param guid any
 ---@param now number
 ---@return boolean
-function Model.Fresh(guid, now)
+local function Fresh(guid, now)
 	if type(guid) ~= "string" then
 		return false
 	end
@@ -44,8 +41,24 @@ function Model.Fresh(guid, now)
 	if last and now - last < QUIET then
 		return false
 	end
+	if not last then
+		count = count + 1
+		if count > 100 then
+			for other, at in pairs(alerted) do
+				if now - at >= QUIET then
+					alerted[other], count = nil, count - 1
+				end
+			end
+		end
+	end
 	alerted[guid] = now
 	return true
+end
+
+---@param name any
+---@return boolean
+local function Named(name)
+	return type(name) == "string" and name ~= ""
 end
 
 ---@param name string
@@ -65,33 +78,65 @@ local function CheckUnit(unit)
 		return
 	end
 	local guid, name = ns.Readable(UnitGUID(unit)), ns.Readable(UnitName(unit)) -- multi-value: Readable keeps the name
-	if type(name) == "string" and Model.Fresh(guid, GetTime()) then
+	if Named(name) and Fresh(guid, GetTime()) then
 		Alert(name)
 	end
 end
 
--- The map's rare markers, where the client has them.
+-- One map marker: a living rare's, shown on the minimap (so near you), with a readable name and GUID.
+---@param id string
+local function CheckVignette(id)
+	local info = C_VignetteInfo.GetVignetteInfo(id)
+	if not info or info.isDead or info.onMinimap == false or not VIGNETTE_ATLAS[info.atlasName or ""] then
+		return
+	end
+	local guid, name = ns.Readable(info.objectGUID), ns.Readable(info.name)
+	if Named(name) and Fresh(guid, GetTime()) then
+		Alert(name)
+	end
+end
+
 local function CheckVignettes()
 	if not Ready() or not C_VignetteInfo then
 		return
 	end
 	for _, id in ipairs(C_VignetteInfo.GetVignettes() or {}) do
-		local info = C_VignetteInfo.GetVignetteInfo(id)
-		local guid, name = info and ns.Readable(info.objectGUID), info and ns.Readable(info.name)
-		if
-			info
-			and VIGNETTE_ATLAS[info.atlasName or ""]
-			and type(name) == "string"
-			and Model.Fresh(guid, GetTime())
-		then
-			Alert(name)
-		end
+		CheckVignette(id)
 	end
 end
 
+-- After a fight, what appeared during it: the nameplates up now and the markers.
+local function AfterCombat()
+	if not ns.Active(KEY) then
+		return
+	end
+	for _, plate in ipairs(C_NamePlate.GetNamePlates()) do
+		local unit = plate.namePlateUnitToken or (plate.UnitFrame and plate.UnitFrame.unit)
+		if unit then
+			CheckUnit(unit)
+		end
+	end
+	CheckVignettes()
+end
+
+---@param event WowEvent
+---@return boolean
+local function Valid(event)
+	return not not (C_EventUtils and C_EventUtils.IsEventValid(event))
+end
+
 ns.On("NAME_PLATE_UNIT_ADDED", CheckUnit)
+ns.On("PLAYER_REGEN_ENABLED", AfterCombat)
 -- Only where the client has map markers; registering an event it doesn't know raises.
-if C_VignetteInfo and C_EventUtils and C_EventUtils.IsEventValid("VIGNETTES_UPDATED") then
-	ns.On("VIGNETTES_UPDATED", CheckVignettes)
-	ns.On("VIGNETTE_MINIMAP_UPDATED", CheckVignettes)
+if C_VignetteInfo then
+	if Valid("VIGNETTES_UPDATED") then
+		ns.On("VIGNETTES_UPDATED", CheckVignettes)
+	end
+	if Valid("VIGNETTE_MINIMAP_UPDATED") then
+		ns.On("VIGNETTE_MINIMAP_UPDATED", function(id, onMinimap)
+			if onMinimap and Ready() then
+				CheckVignette(id)
+			end
+		end)
+	end
 end
