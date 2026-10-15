@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Quest progress on item and object tooltips.** With QuestieDB, a quest item shows the quest it counts for and your progress on its tooltip, as creatures already did, and so do objects you use or loot for a quest. An item that starts a quest you haven't done says "Starts a quest:" and names it.
 - **Coordinates on the world map.** Your position and the cursor's show along the bottom of the world map. Turn it off under Maps; it steps aside for Leatrix Maps, Mapster, Coordinates and Polestar when they show their own.
 - **Quest levels in quest dialogs.** With Show quest levels on, the quest greeting list and a quest's detail and reward titles show its level, such as [12], where the game knows it.
 - **Party invites by who sends them, and duels from friends.** New options, all off until you turn them on: accept party invites from your friends, Battle.net friends and guild (not while you are queued for a battleground), decline invites from anyone else, and let friends and guild still challenge you when duels are declined.
