@@ -49,7 +49,8 @@ ns.Feature({
 	key = "summons",
 	category = "Automation",
 	name = "Accept summons",
-	tooltip = "Not while you are in combat or somewhere you can't teleport from. Hold Shift to answer it yourself.",
+	tooltip = "Not somewhere you can't teleport from, and in combat it waits for the fight to end. Hold Shift to "
+		.. "answer it yourself.",
 	default = false,
 	conflicts = { Leatrix("AutoAcceptSummon"), { polestar = "qol.acceptSummon" } },
 })
@@ -222,52 +223,65 @@ ns.On("QUEST_COMPLETE", function()
 	end
 end)
 
--- An accepted popup goes only once the game has taken the answer, checked every half second for a few seconds; an
--- accept the server refuses leaves the popup for you.
-local SETTLE, TRIES = 0.5, 6
+-- The summon popup goes only once the game has taken the answer, checked every half second for up to ten seconds;
+-- an accept the server refuses leaves it for you.
+local SETTLE, TRIES = 0.5, 20
+local SUMMON_POPUPS = { "CONFIRM_SUMMON", "CONFIRM_SUMMON_STARTING_AREA", "CONFIRM_SUMMON_SCENARIO" }
 
----@param done fun(): boolean
----@param popups string[]
-local function HideOnceDone(done, popups, tries)
+local function HideSummonOnceTaken(tries)
 	tries = tries or TRIES
 	C_Timer.After(SETTLE, function()
-		if done() then
-			for _, popup in ipairs(popups) do
+		if C_SummonInfo.GetSummonConfirmTimeLeft() <= 0 then
+			for _, popup in ipairs(SUMMON_POPUPS) do
 				StaticPopup_Hide(popup)
 			end
 		elseif tries > 1 then
-			HideOnceDone(done, popups, tries - 1)
+			HideSummonOnceTaken(tries - 1)
 		end
 	end)
 end
 
-local function SummonTaken()
-	return C_SummonInfo.GetSummonConfirmTimeLeft() <= 0
-end
-
 -- Not in combat, and not where the game won't let you teleport out. Shift leaves it for you to answer.
-ns.On("CONFIRM_SUMMON", function()
-	if not ns.Active("summons") or IsShiftKeyDown() or UnitAffectingCombat("player") or not PlayerCanTeleport() then
+local function Summon()
+	if
+		not ns.Active("summons")
+		or C_SummonInfo.GetSummonConfirmTimeLeft() <= 0
+		or UnitAffectingCombat("player")
+		or not PlayerCanTeleport()
+	then
 		return
 	end
 	C_SummonInfo.ConfirmSummon()
-	HideOnceDone(SummonTaken, { "CONFIRM_SUMMON" })
+	HideSummonOnceTaken()
+end
+
+-- Set by a summon Shift skipped, so leaving combat doesn't accept it after all.
+local summonSkipped = false
+ns.On("CONFIRM_SUMMON", function()
+	summonSkipped = IsShiftKeyDown()
+	if not summonSkipped then
+		Summon()
+	end
+end)
+-- A summon that arrived in combat is accepted once the fight ends, if it still stands.
+ns.On("PLAYER_REGEN_ENABLED", function()
+	if not summonSkipped then
+		Summon()
+	end
 end)
 
-local RESURRECT_POPUPS = { "RESURRECT", "RESURRECT_NO_SICKNESS", "RESURRECT_NO_TIMER" }
-
-local function Alive()
-	return not UnitIsDeadOrGhost("player")
-end
+-- The latest resurrection waiting out the corpse delay; an older wait gives way to it.
+local resurrectWait = 0
 
 -- The event names the offerer, and a name resolves to a unit only for a group member; anyone else's combat state is
 -- unknown, so their resurrection waits for a click. While the game holds your corpse back (the recovery delay after
--- dying again soon), the accept waits it out, and goes ahead only if the offer still stands.
-local function Resurrect(offerer)
+-- dying again soon), the accept waits it out, and goes ahead only if the same offer still stands. The game closes
+-- its resurrect popups itself once you are alive.
+local function Resurrect(offerer, wait)
 	if
 		not ns.Active("resurrections")
-		or IsShiftKeyDown()
-		or not ResurrectGetOfferer()
+		or (wait and wait ~= resurrectWait)
+		or ResurrectGetOfferer() ~= offerer
 		or not UnitExists(offerer)
 		or UnitAffectingCombat(offerer)
 	then
@@ -275,25 +289,32 @@ local function Resurrect(offerer)
 	end
 	local delay = GetCorpseRecoveryDelay()
 	if delay > 0 then
+		resurrectWait = resurrectWait + 1
+		local token = resurrectWait
 		C_Timer.After(delay + 0.1, function()
-			Resurrect(offerer)
+			Resurrect(offerer, token)
 		end)
 		return
 	end
 	AcceptResurrect()
-	HideOnceDone(Alive, RESURRECT_POPUPS)
 end
-ns.On("RESURRECT_REQUEST", Resurrect)
+ns.On("RESURRECT_REQUEST", function(offerer)
+	resurrectWait = resurrectWait + 1
+	if not IsShiftKeyDown() then
+		Resurrect(offerer)
+	end
+end)
 
 ns.On("PLAYER_DEAD", function()
 	local _, instanceType = IsInInstance()
 	if not (ns.Active("releasePvP") and instanceType == "pvp") then
 		return
 	end
-	-- The release popup and any self-resurrection options arrive just after the event. Shift held then keeps you
-	-- where you fell.
+	-- The release popup and any self-resurrection options arrive just after the event. Shift held as you die, or
+	-- just after, keeps you where you fell.
+	local held = IsShiftKeyDown()
 	C_Timer.After(0.5, function()
-		if UnitIsDead("player") and not IsShiftKeyDown() and #C_DeathInfo.GetSelfResurrectOptions() == 0 then
+		if UnitIsDead("player") and not (held or IsShiftKeyDown()) and #C_DeathInfo.GetSelfResurrectOptions() == 0 then
 			RepopMe()
 		end
 	end)
