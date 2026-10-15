@@ -7,7 +7,7 @@ ns.Feature({
 	category = "Vendors",
 	name = "Repair automatically",
 	tooltip = "At any merchant who repairs, with the cost shown in chat. If you are short, it repairs once what "
-		.. "you sell there covers the cost.",
+		.. "you sell there covers the cost. Hold Shift as you open a merchant to skip it there.",
 	default = true,
 	conflicts = {
 		{
@@ -67,7 +67,12 @@ local function Repair(quiet)
 	end
 end
 
+-- Shift held as the merchant opens skips the repair for this visit.
 ns.On("MERCHANT_SHOW", function()
+	if IsShiftKeyDown() then
+		owed = false
+		return
+	end
 	Repair()
 end)
 

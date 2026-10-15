@@ -22,8 +22,11 @@ local ns = {
 	end,
 }
 
-local money, cost, repairs, merchantRepairs = 0, 0, {}, true
+local money, cost, repairs, merchantRepairs, shift = 0, 0, {}, true, false
 local env = setmetatable({
+	IsShiftKeyDown = function()
+		return shift
+	end,
 	CanMerchantRepair = function()
 		return merchantRepairs
 	end,
@@ -133,4 +136,14 @@ merchantRepairs = true
 Reset(0, 0)
 handlers.MERCHANT_SHOW()
 assert(#repairs == 0 and #printed == 0, "nothing to repair says nothing")
+-- Shift held as the merchant opens skips the repair there, sales included.
+Reset(500, 100)
+shift = true
+handlers.MERCHANT_SHOW()
+shift = false
+handlers.PLAYER_MONEY()
+assert(#repairs == 0 and #printed == 0, "Shift skips the repair for this visit")
+handlers.MERCHANT_CLOSED()
+handlers.MERCHANT_SHOW()
+assert(repairs[1] == "own", "the next visit repairs as usual")
 print("vendor: ok")

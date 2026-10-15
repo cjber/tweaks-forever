@@ -31,7 +31,9 @@ ns.Feature({
 		BATCH_SIZE
 	)
 		.. " "
-		.. L["With Leatrix Plus or Polestar selling junk, only marked non-grey items are sold here."],
+		.. L["With Leatrix Plus or Polestar selling junk, only marked non-grey items are sold here."]
+		.. " "
+		.. L["Hold Shift as you open a merchant to skip it there."],
 	default = true,
 	-- Leatrix and Polestar sell only greys; disabling this feature entirely would strand our marks.
 	conflicts = conflicts,
@@ -417,7 +419,8 @@ ns.Init(function()
 		index = index + 1
 	end
 	ns.On("MERCHANT_SHOW", function()
-		merchant = { remaining = BATCH_SIZE }
+		-- Shift held as the merchant opens skips automatic selling for this visit; Sell All Junk still works.
+		merchant = { remaining = IsShiftKeyDown() and 0 or BATCH_SIZE }
 		local visit = merchant
 		C_Timer.After(0.2, function()
 			if merchant == visit then
