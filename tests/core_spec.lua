@@ -22,6 +22,12 @@ local function Load(saved)
 			frames[#frames + 1] = frame
 			return frame
 		end,
+		strtrim = function(text)
+			return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+		end,
+		GetTime = function()
+			return 0
+		end,
 		geterrorhandler = function()
 			return function(message)
 				errors[#errors + 1] = message
@@ -29,6 +35,7 @@ local function Load(saved)
 		end,
 	}, { __index = _G })
 	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "enabled", default = true })
 	ns.Feature({ key = "disabled", default = false })
@@ -40,9 +47,14 @@ local function Load(saved)
 	ns.Feature({ key = "needsMissing", default = true, needs = { title = "Missing", check = function() end } })
 	ns.Feature({ key = "needsBroken", default = true, needs = { title = "Broken", check = error } })
 	-- A setting callback names the variable UI/Settings.lua registers, and only for a declared feature.
-	local changed = function() end
+	local seen
+	local changed = function(_, _, value)
+		seen = value
+	end
 	ns.OnSettingChanged("gearMark", changed)
-	assert(callbacks.TweaksForever_gearMark == changed and ns.SettingVariable("gearMark") == "TweaksForever_gearMark")
+	assert(ns.SettingVariable("gearMark") == "TweaksForever_gearMark")
+	callbacks.TweaksForever_gearMark(nil, nil, "dots")
+	assert(seen == "dots", "the callback runs with the setting's arguments")
 	assert(not pcall(ns.OnSettingChanged, "gearMarks", changed), "a misspelt key fails loudly")
 	local ran = false
 	ns.Init(function()
@@ -79,6 +91,12 @@ do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but 
 	local loaded, settings = {}, {}
 	local frames = {}
 	local env = setmetatable({
+		strtrim = function(text)
+			return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+		end,
+		GetTime = function()
+			return 0
+		end,
 		geterrorhandler = function()
 			return error
 		end,
@@ -102,6 +120,7 @@ do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but 
 		end,
 	}, { __index = _G })
 	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	local listeners = {}
 	env.Polestar.On = function(message, fn)
@@ -172,6 +191,7 @@ do -- Loaded at login, Polestar's own setting changes refresh the conflicts at o
 		end,
 	}, { __index = _G })
 	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "fastLoot", default = true, conflicts = { { polestar = "qol.fastLoot" } } })
 	assert(ns.features[1].conflicts[1].addon == "Polestar" and ns.features[1].conflicts[1].title == "Polestar")

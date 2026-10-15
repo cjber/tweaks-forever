@@ -86,6 +86,8 @@ All off until you turn them on, except faster auto loot.
 
 **Highlight new Forever quests** marks quests added since Classic Era with a soft gold background in the log and quest text.
 
+**Mark the best-selling quest reward** puts a gold coin on the reward choice that sells to a merchant for the most, counting stacks. A tie, or nothing worth selling, marks none, and it never picks for you.
+
 **Abandon multiple quests** adds an Abandon quests button to the quest log. Select individual quests or Select all, then click Abandon selected and Confirm abandon. Progress and associated quest items are lost. Hidden and non-abandonable quests are excluded; combat prevents abandoning.
 
 **Native quest map icons** replaces Questie’s quest-marker artwork with stock pickup, turn-in and objective symbols at readable map/minimap sizes. It keeps Questie’s full marker coverage and tooltips, and leaves its saved settings untouched. Off restores its appearance. QuestieDB is read automatically when installed; the database alone does not draw these markers.
@@ -116,6 +118,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
 | Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
+| Best-selling quest reward | Polestar, while its reward highlight is on |
 | Item level in the auction house | TradeSkillMaster, Auctioneer |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
