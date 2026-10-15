@@ -135,6 +135,8 @@
 ---@class TFQuestTarget
 ---@field kind string
 ---@field npcs table<integer, true>
+---@field items table<integer, true> quest items it asks you to collect
+---@field objects table<integer, true> objects it asks you to use
 
 -- Which objectives of one quest a creature counts for by QuestieDB's IDs: [position in the log] = the kind there.
 ---@alias TFQuestLink table<integer, string>
@@ -156,8 +158,10 @@
 ---@field NpcId fun(guid: any): integer?
 ---@field Targets fun(id: integer): TFQuestTarget[]
 ---@field Rebuild fun()
----@field Matches fun(npc: integer?): TFQuestMatch[]
----@field Lines fun(npc: integer?): [string, number, number, number][]
+---@field Matches fun(id: integer?, kind?: "npc"|"item"|"object"): TFQuestMatch[]
+---@field Lines fun(id: integer?, kind?: "npc"|"item"|"object"): [string, number, number, number][]
+---@field Starts fun(item: integer?): string?
+---@field ObjectId fun(guid: any): integer?
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
@@ -319,6 +323,7 @@ TweaksForeverCharDB = nil
 ---@field WhatsNew TFWhatsNew
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
+---@field Coordinates TFCoordinates
 ---@field BestReward TFBestReward
 ---@field SafeCall fun(label: string, fn: function, ...: any): boolean, ... run fn as pcall does, keeping a failure for the report and passing it to the error handler (Core/SafeCall.lua)
 ---@field RecordError fun(label: string, message: any, stack?: string) keep an error caught some other way for the report

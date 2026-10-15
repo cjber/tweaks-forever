@@ -39,13 +39,13 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on.
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Each item shows a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
-- **Map extras.** Unexplored areas in a blue tint (off until you turn it on), each zone's level range coloured like quest levels, and every dungeon and raid entrance marked with retail's icons.
+- **Map extras.** Unexplored areas in a blue tint (off until you turn it on), each zone's level range coloured like quest levels, your and the cursor's coordinates, and every dungeon and raid entrance marked with retail's icons.
 - **Dungeon maps.** Inside a dungeon, the world map opens on the dungeon's own floor map and legend, with a button for the floor and a Back to map button. Needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Classic WoW maps, read from your install.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout.
 - **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
 - **Spell reach.** A small icon for each attack you track on every enemy nameplate: full colour in reach, solid red out of it. Off until you turn it on.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
-- **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's tooltip with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
+- **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet. With Combine Bags on, the reagent bag joins the combined bag.
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.

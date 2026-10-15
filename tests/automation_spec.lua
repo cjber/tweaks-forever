@@ -127,9 +127,12 @@ active = {}
 db.gossip = false
 assert(talk(flightMaster) == nil, "the setting off leaves every option alone")
 assert(features.fastLoot.default == true, "fast looting starts on")
-local looted = {}
+local looted, now, slots = {}, 100, 3
+env.GetTime = function()
+	return now
+end
 env.GetNumLootItems = function()
-	return 3
+	return slots
 end
 env.LootSlot = function(slot)
 	looted[#looted + 1] = slot
@@ -138,6 +141,22 @@ db.fastLoot = features.fastLoot.default
 handlers.LOOT_READY(true)
 assert(table.concat(looted, ",") == "3,2,1", "auto loot takes every slot")
 looted = {}
+now = now + 0.5
+handlers.LOOT_READY(true)
+assert(#looted == 0, "a repeat for the same window asks for nothing twice")
+handlers.LOOT_CLOSED()
+now, slots = now + 0.05, 1
+handlers.LOOT_READY(true)
+assert(table.concat(looted, ",") == "1", "the next window loots at once, however soon")
+slots = 3
+handlers.LOOT_READY(true)
+assert(table.concat(looted, ",") == "1,3,2", "a repeat takes the slots that came late")
+looted = {}
+now = now + 5
+handlers.LOOT_READY(true)
+assert(#looted == 3, "a window that never closed ends after a quiet second")
+looted = {}
+handlers.LOOT_CLOSED()
 handlers.LOOT_READY(false)
 handlers.LOOT_READY(nil)
 assert(#looted == 0, "manual or modified-click looting remains manual")

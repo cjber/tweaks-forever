@@ -155,6 +155,7 @@ read_globals = {
 	"GetBindingKey",
 	"GetBuildInfo",
 	"GetCorpseRecoveryDelay",
+	"GetCursorPosition",
 	"GetCVar",
 	"GetCVarBool",
 	"geterrorhandler",
