@@ -26,7 +26,7 @@ Nameplates in retail's own frame, with your target outlined.
 - **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, and unexplored areas are revealed in a blue tint. Inside a dungeon, the map shows its floors and legend (needs Atlas [Classic WoW]).
 - **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Optional spell reach icons show which attacks can reach each enemy.
 - **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
-- **Quests and camps**: quest levels on the map and tracker, Abandon quests with one confirmation, and the tracker sorted nearest first. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures you need show your progress.
+- **Quests and camps**: quest levels on the map and tracker, a coin on the best-selling reward choice, Abandon quests with one confirmation, and the tracker sorted nearest first. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures you need show your progress.
 - **Spellbook, trainer and bags**: the spellbook lists spells you haven't learned yet, Train all buys what you can afford, and the reagent bag joins the combined bag.
 - **Fishing and auctions**: double right-click to cast or apply a lure, and a sortable iLvl column.
 - **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default. Turns outlines off while enabled and restores your graphics settings when disabled. Removing sparkles needs a game restart.
