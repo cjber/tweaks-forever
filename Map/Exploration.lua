@@ -138,19 +138,6 @@ function Model.Unexplored(areas, explored)
 	return result
 end
 
--- Keep only the viewed art decoded; the source strings stay compact at login.
-local cachedArt, cachedLayers
----@param art integer
----@param layer integer
----@return TFOverlay[]
-local function Areas(art, layer)
-	if cachedArt ~= art then
-		cachedArt = art
-		cachedLayers = ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
-	end
-	return cachedLayers[layer] or {}
-end
-
 -- Draw the tint on one map canvas: the world map, or the zone map (BattlefieldMapFrame). Returns its redraw.
 ---@param map MapCanvasMixin
 ---@return fun()
@@ -162,6 +149,19 @@ local function Attach(map)
 	local pool, poolPin
 	-- [texture] = whether it carries the map's mask.
 	local masked = {}
+
+	-- Keep only this map's viewed art decoded; the source strings stay compact at login.
+	local cachedArt, cachedLayers
+	---@param art integer
+	---@param layer integer
+	---@return TFOverlay[]
+	local function Areas(art, layer)
+		if cachedArt ~= art then
+			cachedArt = art
+			cachedLayers = ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
+		end
+		return cachedLayers[layer] or {}
+	end
 
 	---@return Frame?
 	local function ExplorationPin()
@@ -229,7 +229,14 @@ local function Attach(map)
 	Provider.RefreshAllData = Draw
 	Provider.OnCanvasScaleChanged = Draw
 	map:AddDataProvider(Provider)
-	return Draw
+	-- A hidden map redraws through its provider when it next opens.
+	return function()
+		if
+			(map --[[@as Frame]]):IsShown()
+		then
+			Draw()
+		end
+	end
 end
 
 ns.Init(function()
@@ -241,20 +248,20 @@ ns.Init(function()
 		end
 	end
 	-- The zone map (Shift+M) loads on demand.
-	local zoneMap = false
 	local function AttachZoneMap()
-		if not zoneMap and BattlefieldMapFrame then
-			zoneMap = true
-			redraws[#redraws + 1] = Attach(BattlefieldMapFrame)
-		end
+		redraws[#redraws + 1] = Attach(BattlefieldMapFrame)
 	end
-	AttachZoneMap()
-	ns.On("ADDON_LOADED", function(addon)
-		if addon == "Blizzard_BattlefieldMap" then
-			AttachZoneMap()
-		end
-	end)
-	-- Discovering an area clears its tint at once, and the setting applies at once.
+	if C_AddOns.IsAddOnLoaded("Blizzard_BattlefieldMap") then
+		AttachZoneMap()
+	else
+		ns.On("ADDON_LOADED", function(addon)
+			if addon == "Blizzard_BattlefieldMap" then
+				AttachZoneMap()
+			end
+		end)
+	end
+	-- Discovering an area clears its tint at once, and the setting and conflicts apply at once.
 	ns.On("MAP_EXPLORATION_UPDATED", RedrawAll)
 	ns.OnSettingChanged("exploration", RedrawAll)
+	hooksecurefunc(ns, "RefreshConflicts", RedrawAll)
 end)

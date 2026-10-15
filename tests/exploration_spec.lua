@@ -101,7 +101,7 @@ end
 assert(arts == 84 and areas == 1073 and files == 1739, "pinned build coverage changed")
 
 -- Wired to the world map and to the zone map once it loads, redrawn when an area is discovered.
-local handlers, settingChanged = {}, nil
+local handlers, settingChanged, hooks = {}, nil, {}
 ns.On = function(event, fn)
 	handlers[event] = fn
 end
@@ -112,8 +112,11 @@ ns.Active = function()
 	return true
 end
 local function Canvas()
-	local canvas = { providers = {}, draws = 0 }
+	local canvas = { providers = {}, draws = 0, shown = true }
 	canvas.GetMapID = function() end
+	function canvas:IsShown()
+		return self.shown
+	end
 	function canvas:AddDataProvider(provider)
 		self.providers[#self.providers + 1] = provider
 	end
@@ -123,6 +126,15 @@ local function Canvas()
 		return function() end
 	end
 	return canvas
+end
+local loaded = false
+env.C_AddOns = {
+	IsAddOnLoaded = function()
+		return loaded
+	end,
+}
+env.hooksecurefunc = function(_, name, fn)
+	hooks[name] = fn
 end
 env.MapCanvasDataProviderMixin = {}
 env.CreateFromMixins = function()
@@ -134,10 +146,20 @@ assert(#env.WorldMapFrame.providers == 1, "the world map has our provider")
 env.BattlefieldMapFrame = Canvas()
 handlers.ADDON_LOADED("Blizzard_BattlefieldMap")
 assert(#env.BattlefieldMapFrame.providers == 1, "and the zone map once it loads")
-handlers.ADDON_LOADED("Blizzard_BattlefieldMap")
-assert(#env.BattlefieldMapFrame.providers == 1, "once")
 handlers.MAP_EXPLORATION_UPDATED()
 assert(env.WorldMapFrame.draws == 1 and env.BattlefieldMapFrame.draws == 1, "a discovery redraws both")
 settingChanged()
-assert(env.WorldMapFrame.draws == 2 and env.BattlefieldMapFrame.draws == 2, "so does the setting")
+hooks.RefreshConflicts()
+assert(env.WorldMapFrame.draws == 3 and env.BattlefieldMapFrame.draws == 3, "so do the setting and conflicts")
+env.BattlefieldMapFrame.shown = false
+handlers.MAP_EXPLORATION_UPDATED()
+assert(env.BattlefieldMapFrame.draws == 3, "a hidden map waits until it opens")
+
+-- Already loaded at login (the zone map left open): attached at once.
+handlers = {}
+loaded = true
+env.WorldMapFrame, env.BattlefieldMapFrame = Canvas(), Canvas()
+init()
+assert(#env.BattlefieldMapFrame.providers == 1 and not handlers.ADDON_LOADED, "attached at login")
+
 print("exploration_spec: ok")
