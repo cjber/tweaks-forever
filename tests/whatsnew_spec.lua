@@ -27,6 +27,7 @@ local function Login(saved, version, on, packaged)
 	}, { __index = _G })
 	local ns = {}
 	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	local source = assert(io.open("UI/WhatsNew.lua")):read("*a")
 	if packaged then

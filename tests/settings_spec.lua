@@ -36,8 +36,14 @@ local function Initializer(kind, setting)
 end
 
 local function Category(name)
-	return { name = name }, Layout()
+	return {
+		name = name,
+		GetID = function()
+			return name
+		end,
+	}, Layout()
 end
+local opened
 
 local env = setmetatable({
 	Settings = {
@@ -74,6 +80,9 @@ local env = setmetatable({
 			registered[#registered + 1] = { category = category, initializer = initializer }
 		end,
 		RegisterAddOnCategory = function() end,
+		OpenToCategory = function(id)
+			opened = id
+		end,
 	},
 	CreateSettingsButtonInitializer = function(name, _, _, _, addSearchTags)
 		assert(addSearchTags == false, "index buttons stay out of search")
@@ -87,6 +96,9 @@ local env = setmetatable({
 		end,
 	},
 	SlashCmdList = {},
+	strtrim = function(text)
+		return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+	end,
 }, { __index = _G })
 
 local ns
@@ -116,6 +128,21 @@ ns = {
 	end,
 	Active = function(key)
 		return ns.db[key] ~= false
+	end,
+	SafeCall = function(_, fn, ...)
+		return pcall(fn, ...)
+	end,
+	ReportLines = function()
+		return { "own line" }
+	end,
+}
+local reported
+ns.Report = {
+	Text = function(lines)
+		return "report: " .. lines[1]
+	end,
+	Show = function(text)
+		reported = text
 	end,
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
@@ -162,4 +189,18 @@ assert(
 	"a slider is a number setting"
 )
 assert(size.options.min == 50 and size.options.max == 200 and size.options.step == 5, "the slider takes its bounds")
+
+-- /tweaks opens the settings; /tweaks report shows the report instead.
+env.SlashCmdList.TWEAKSFOREVER("")
+assert(opened == "Tweaks Forever" and reported == nil, "/tweaks opens the settings")
+opened = nil
+env.SlashCmdList.TWEAKSFOREVER("  Report ")
+assert(reported == "report: own line" and opened == nil, "/tweaks report shows the report")
+env.SlashCmdList.TWEAKSFOREVER("anything")
+assert(opened == "Tweaks Forever", "anything else opens the settings")
+ns.ReportLines = function()
+	error("lines broke", 0)
+end
+env.SlashCmdList.TWEAKSFOREVER("report")
+assert(reported == "report: Report lines failed: lines broke", "failing lines still open the report, saying so")
 print("settings: ok")
