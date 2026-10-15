@@ -83,7 +83,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Quest log
 
-**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
+**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. **In quest dialogs too** adds the level in front of each quest in an NPC's greeting list and in front of the title on the quest's detail and reward pages, where the game knows it. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
 
 **Highlight new Forever quests** marks quests added since Classic Era with a soft gold background in the log and quest text.
 
@@ -120,6 +120,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Hide macro names | Dominos, Bartender4, ElvUI |
 | Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
 | Best-selling quest reward | Polestar, while its reward highlight is on |
+| Quest levels in quest dialogs | Polestar, while its quest levels are on |
 | Item level in the auction house | TradeSkillMaster, Auctioneer |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
