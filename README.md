@@ -104,7 +104,7 @@ python3 tools/screenshots.py                    # regenerate docs/screenshots fr
 
 ## Licence
 
-GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0).
+GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0). The bundled LibAHTab is plusmouse's (MIT) and LibStub is public domain. Every input, its pin and licence, and what ships: [THIRD_PARTY.md](THIRD_PARTY.md).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
 
