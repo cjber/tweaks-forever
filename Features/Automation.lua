@@ -474,25 +474,29 @@ ns.On("PARTY_INVITE_REQUEST", function(inviter, tank, healer, damage, _, _, guid
 	end
 end)
 
--- The game can send LOOT_READY again for the same loot window; a repeat within this many seconds is ignored, so each
--- slot is asked for once. Closing the window ends it, so the next corpse loots at once however soon.
-local LOOT_REPEAT = 0.3
-local lootedAt
+-- The game can send LOOT_READY again for the same loot window, sometimes with slots the first one didn't have yet:
+-- each slot is asked for once per window, and a repeat takes only the slots still unasked. LOOT_CLOSED ends the
+-- window; so does a second's quiet, in case a failed open never closed it.
+local WINDOW = 1
+local requested, requestedAt = {}, nil
 
 ns.On("LOOT_READY", function(autoLoot)
 	if not (ns.Active("fastLoot") and autoLoot) then
 		return
 	end
 	local now = GetTime()
-	if lootedAt and now - lootedAt < LOOT_REPEAT then
-		return
+	if requestedAt and now - requestedAt > WINDOW then
+		requested = {}
 	end
-	lootedAt = now
+	requestedAt = now
 	for slot = GetNumLootItems(), 1, -1 do
-		LootSlot(slot)
+		if not requested[slot] then
+			requested[slot] = true
+			LootSlot(slot)
+		end
 	end
 end)
 
 ns.On("LOOT_CLOSED", function()
-	lootedAt = nil
+	requested, requestedAt = {}, nil
 end)
