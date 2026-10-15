@@ -37,6 +37,7 @@ All off until you turn them on, except faster auto loot.
 
 - Reveal unexplored areas on zone maps, tinted blue so explored ground still stands out (off by default).
 - Point at a zone on the world map to see its level range after the name, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Forever's map data has no ranges of its own, so the original zones show the original game's, and Zephras Isle and Riverglades show the span of their subzones' exploration levels. Cities, battlegrounds, and Forever zones whose subzones carry no level show none.
+- Your position and the cursor's, as map coordinates, along the bottom of the world map.
 - Mark every dungeon and raid entrance on zone and continent maps with retail's icons; point at one for its name, and left-click it to travel there: Shortest Path Forever plans the journey when it is installed, and otherwise the map's own waypoint marks the entrance. Without Shortest Path Forever, a grey line in the tooltip says where to get it (or to switch it on, when it is installed but off). Instances sharing a way in, such as Blackrock Mountain, share one pin that lists them. The map's own **Show instance entrances** filter turns them off, and an entrance steps aside where a flight master or Shortest Path Forever portal or dock already marks the spot; Legacy Forever draws the same portal with its shield on the corner where a Legacy step is left there. Forever's new instances (Dalaran, the Ruins of Lordaeron, the Hall of Thanes and the Wetlands excavation) have no entrance in the game's data yet, so they have no pin.
 
 - Inside a five-player dungeon, opening the world map on the zone you are in shows the dungeon's own floor map and its legend over the map, with a button that opens a list of the floors and wings and a **Back to map** button that steps aside to the stock map; a **Dungeon map** button on the map's corner brings it back. Your floor choice is kept for the session. It needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Atlas [Classic WoW] maps, which Tweaks Forever reads from your install and never copies; without them the setting is greyed out and says what to install. It adds no pins to the outdoor map and is on by default.
@@ -116,6 +117,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
 | Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar |
 | Zone level ranges | Leatrix Maps, Polestar |
+| Coordinates on the world map | Leatrix Maps, Mapster and Polestar while their coordinates are on; Coordinates |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
