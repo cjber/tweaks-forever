@@ -3,6 +3,7 @@ max_line_length = 120
 exclude_files = { "tools/.cache/**", ".release/**", ".types/**", "types/**", ".claude/**" }
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
+	"BINDING_HEADER_TWEAKSFOREVER",
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER2",
 	"SLASH_TWEAKSFOREVER_RELOAD1",
@@ -180,6 +181,7 @@ read_globals = {
 	"GetProfessions",
 	"GetQuestDifficultyColor",
 	"GetQuestItemInfo",
+	"GetQuestLogSpecialItemInfo",
 	"GetQuestItemInfoLootType",
 	"GetQuestItemLink",
 	"GetQuestMoneyToGet",

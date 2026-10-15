@@ -45,6 +45,7 @@ Quests\QuestiePins.lua
 Quests\QuestDistance.lua
 Quests\QuestGivers.lua
 Quests\QuestProgress.lua
+Quests\QuestButtons.lua
 Quests\QuestLog.lua
 Quests\BestReward.lua
 UI\Tooltips.lua

@@ -324,6 +324,7 @@ TweaksForeverCharDB = nil
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
 ---@field XPRate TFXPRate
+---@field QuestButtons TFQuestButtons
 ---@field Coordinates TFCoordinates
 ---@field BestReward TFBestReward
 ---@field SafeCall fun(label: string, fn: function, ...: any): boolean, ... run fn as pcall does, keeping a failure for the report and passing it to the error handler (Core/SafeCall.lua)
