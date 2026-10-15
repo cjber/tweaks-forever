@@ -138,21 +138,10 @@ function Model.Unexplored(areas, explored)
 	return result
 end
 
--- Keep only the viewed art decoded; the source strings stay compact at login.
-local cachedArt, cachedLayers
----@param art integer
----@param layer integer
----@return TFOverlay[]
-local function Areas(art, layer)
-	if cachedArt ~= art then
-		cachedArt = art
-		cachedLayers = ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
-	end
-	return cachedLayers[layer] or {}
-end
-
-ns.Init(function()
-	local map = WorldMapFrame
+-- Draw the tint on one map canvas: the world map, or the zone map (BattlefieldMapFrame). Returns its redraw.
+---@param map MapCanvasMixin
+---@return fun()
+local function Attach(map)
 	-- Drawn on Blizzard's exploration pin, below its explored textures, so overlapping edges retain Blizzard's
 	-- normal artwork. Everything else is ours: a data provider of our own redraws them, and the map's mask is
 	-- applied here. Hooking the pin's methods or listing textures in the map's tables made Blizzard's own map code
@@ -160,6 +149,19 @@ ns.Init(function()
 	local pool, poolPin
 	-- [texture] = whether it carries the map's mask.
 	local masked = {}
+
+	-- Keep only this map's viewed art decoded; the source strings stay compact at login.
+	local cachedArt, cachedLayers
+	---@param art integer
+	---@param layer integer
+	---@return TFOverlay[]
+	local function Areas(art, layer)
+		if cachedArt ~= art then
+			cachedArt = art
+			cachedLayers = ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
+		end
+		return cachedLayers[layer] or {}
+	end
 
 	---@return Frame?
 	local function ExplorationPin()
@@ -227,4 +229,39 @@ ns.Init(function()
 	Provider.RefreshAllData = Draw
 	Provider.OnCanvasScaleChanged = Draw
 	map:AddDataProvider(Provider)
+	-- A hidden map redraws through its provider when it next opens.
+	return function()
+		if
+			(map --[[@as Frame]]):IsShown()
+		then
+			Draw()
+		end
+	end
+end
+
+ns.Init(function()
+	---@type fun()[]
+	local redraws = { Attach(WorldMapFrame) }
+	local function RedrawAll()
+		for _, Redraw in ipairs(redraws) do
+			Redraw()
+		end
+	end
+	-- The zone map (Shift+M) loads on demand.
+	local function AttachZoneMap()
+		redraws[#redraws + 1] = Attach(BattlefieldMapFrame)
+	end
+	if C_AddOns.IsAddOnLoaded("Blizzard_BattlefieldMap") then
+		AttachZoneMap()
+	else
+		ns.On("ADDON_LOADED", function(addon)
+			if addon == "Blizzard_BattlefieldMap" then
+				AttachZoneMap()
+			end
+		end)
+	end
+	-- Discovering an area clears its tint at once, and the setting and conflicts apply at once.
+	ns.On("MAP_EXPLORATION_UPDATED", RedrawAll)
+	ns.OnSettingChanged("exploration", RedrawAll)
+	hooksecurefunc(ns, "RefreshConflicts", RedrawAll)
 end)

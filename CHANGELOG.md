@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Unexplored areas show on the zone map too.** With Reveal unexplored areas on, the small zone map (Shift+M) gets the same blue tint as the world map, and an area you discover loses its tint at once.
 - **Hold Shift to skip repairs and junk selling at one merchant.** Holding Shift while a merchant opens skips Tweaks' repair (chat says what it would have cost) and its junk selling for that visit; the Sell All Junk button still works.
 - **Faster auto loot asks for each item once.** When the game repeats its loot-ready signal for the same window, only items it hadn't asked for yet are taken.
 - **Quest progress on item and object tooltips.** With QuestieDB, a quest item shows the quest it counts for and your progress on its tooltip, as creatures already did, and so do objects you use or loot for a quest. An item that starts a quest you haven't done says "Starts a quest:" and names it.
