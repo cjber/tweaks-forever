@@ -120,7 +120,17 @@ ns.Init(function()
 	end
 	SLASH_TWEAKSFOREVER1 = "/tweaks"
 	SLASH_TWEAKSFOREVER2 = "/tweaksforever"
-	SlashCmdList.TWEAKSFOREVER = Open
+	-- `/tweaks report` shows the report to copy into a bug report; anything else opens the settings.
+	local function Slash(message)
+		if strtrim(message or ""):lower() == "report" then
+			ns.Report.Show(ns.Report.Text(ns.ReportLines()))
+		else
+			Open()
+		end
+	end
+	SlashCmdList.TWEAKSFOREVER = function(message)
+		ns.SafeCall("slash command", Slash, message)
+	end
 	-- The minimap's addon compartment calls this by name (## AddonCompartmentFunc).
 	TweaksForever_OnAddonCompartmentClick = Open
 end)

@@ -29,6 +29,7 @@ local function Load(saved)
 		end,
 	}, { __index = _G })
 	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "enabled", default = true })
 	ns.Feature({ key = "disabled", default = false })
@@ -102,6 +103,7 @@ do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but 
 		end,
 	}, { __index = _G })
 	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	local listeners = {}
 	env.Polestar.On = function(message, fn)
@@ -172,6 +174,7 @@ do -- Loaded at login, Polestar's own setting changes refresh the conflicts at o
 		end,
 	}, { __index = _G })
 	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "fastLoot", default = true, conflicts = { { polestar = "qol.fastLoot" } } })
 	assert(ns.features[1].conflicts[1].addon == "Polestar" and ns.features[1].conflicts[1].title == "Polestar")

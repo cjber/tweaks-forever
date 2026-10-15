@@ -79,6 +79,7 @@ Download the zip from [Releases](https://github.com/cjber/tweaks-forever/release
 ## Usage
 
 - `/tweaks` or `/tweaksforever` opens the settings, also under **Options → AddOns → Tweaks Forever** or from the addon compartment on the minimap.
+- `/tweaks report` shows a report to copy into a bug report: versions, what you changed, what stands down for another addon, and any errors Tweaks caught.
 - `/rl` reloads the interface.
 
 Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you tick it. Translations are welcome as a pull request or an issue on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated shows in English.

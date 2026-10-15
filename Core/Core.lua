@@ -16,9 +16,11 @@ local conflicted = {}
 local missing = {}
 local pending, ready = {}, false
 
+-- Run fn, keeping a failure for /tweaks report and passing it on to the game's error handler (Core/SafeCall.lua).
+---@param label string
 ---@param fn fun()
-local function Start(fn)
-	xpcall(fn, geterrorhandler())
+local function Start(label, fn)
+	ns.SafeCall(label, fn)
 end
 
 ---@param message string
@@ -197,7 +199,7 @@ local events = CreateFrame("Frame")
 events:SetScript("OnEvent", function(_, event, ...)
 	local args, count = { ... }, select("#", ...)
 	for _, fn in ipairs(handlers[event]) do
-		Start(function()
+		Start(event, function()
 			fn(unpack(args, 1, count))
 		end)
 	end
@@ -275,7 +277,7 @@ end
 ---@param fn fun()
 function ns.Init(fn)
 	if ready then
-		Start(fn)
+		Start("startup", fn)
 	else
 		pending[#pending + 1] = fn
 	end
@@ -308,7 +310,7 @@ login:SetScript("OnEvent", function()
 	end
 	ready = true
 	for _, fn in ipairs(pending) do
-		Start(fn)
+		Start("startup", fn)
 	end
 	pending = nil
 end)

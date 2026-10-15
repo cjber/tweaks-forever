@@ -21,8 +21,10 @@ Data\ZoneLevels.lua
 Data\DungeonEntrances.lua
 Data\ClassSpells.lua
 Data\ForeverQuests.lua
+Core\SafeCall.lua
 Core\Core.lua
 UI\Art.lua
+UI\Report.lua
 UI\Keys.lua
 Features\Automation.lua
 Features\WhisperInvite.lua
@@ -65,5 +67,6 @@ Features\Fishing.lua
 UI\Reload.lua
 UI\WhatsNew.lua
 Integrations\Companions.lua
+Core\Report.lua
 UI\Settings.lua
 Core\API.lua
