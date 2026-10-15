@@ -69,4 +69,57 @@ local saved = { enabled = false, junk = { [42] = true }, gearMark = "dots" }
 assert(Load(saved) == saved, "existing settings keep their identity and player choices")
 assert(not saved.enabled and saved.junk[42] and saved.gearMark == "dots")
 assert(Load({}).junk, "older settings receive the junk table before initializers")
+
+do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but "off", while Polestar is loaded.
+	local loaded, settings = {}, {}
+	local frames = {}
+	local env = setmetatable({
+		C_AddOns = {
+			IsAddOnLoaded = function(addon)
+				return loaded[addon] == true
+			end,
+		},
+		Polestar = {
+			Get = function(path)
+				return settings[path]
+			end,
+		},
+		CreateFrame = function()
+			local frame = { RegisterEvent = function() end }
+			function frame:SetScript(_, fn)
+				self.callback = fn
+			end
+			frames[#frames + 1] = frame
+			return frame
+		end,
+	}, { __index = _G })
+	local ns = {}
+	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
+	local function Polestar(path)
+		return { addon = "Polestar", title = "Polestar", polestar = path }
+	end
+	ns.Feature({ key = "repair", default = true, conflicts = { Polestar("qol.autoRepair") } })
+	ns.Feature({ key = "reveal", default = false, conflicts = { Polestar("maps.reveal") } })
+	frames[2].callback()
+	settings["qol.autoRepair"], settings["maps.reveal"] = true, "tint"
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("repair"), "Polestar's settings count only while Polestar is loaded")
+	loaded.Polestar = true
+	ns.RefreshConflicts()
+	assert(ns.ConflictOf("repair") == "Polestar" and ns.ConflictOf("reveal") == "Polestar")
+	assert(not ns.Active("repair"), "a conflicted feature stands down")
+	settings["qol.autoRepair"], settings["maps.reveal"] = false, "off"
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("repair") and not ns.ConflictOf("reveal"), 'off and "off" leave the job here')
+	settings["maps.reveal"] = "on"
+	ns.RefreshConflicts()
+	assert(ns.ConflictOf("reveal") == "Polestar")
+	env.Polestar = nil
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("reveal"), "a Polestar without its namespace is no conflict")
+	env.Polestar = { Get = error }
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("reveal"), "a failing Polestar.Get is no conflict")
+end
+
 print("core: ok")

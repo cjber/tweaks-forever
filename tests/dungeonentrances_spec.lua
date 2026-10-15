@@ -26,6 +26,15 @@ setfenv(assert(loadfile("Map/DungeonEntrances.lua")), env)("TweaksForever", ns)
 local Model = ns.Entrances
 assert(features.dungeonEntrances.default == true)
 
+local function PolestarPath(feature)
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.addon == "Polestar" then
+			return conflict.polestar
+		end
+	end
+end
+assert(PolestarPath(features.dungeonEntrances) == "maps.dungeonPins")
+
 -- Leatrix Maps draws entrances with its points of interest unless that option is explicitly off.
 local leatrix = features.dungeonEntrances.conflicts[1]
 assert(leatrix.addon == "Leatrix_Maps" and leatrix.when())

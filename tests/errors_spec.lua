@@ -34,6 +34,15 @@ env.UIErrorsFrame = {
 env._G = env
 setfenv(assert(loadfile("UI/Errors.lua")), env)("TweaksForever", ns)
 assert(features.quietErrors.default == true and #initializers == 1)
+
+local function PolestarPath(feature)
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.addon == "Polestar" then
+			return conflict.polestar
+		end
+	end
+end
+assert(PolestarPath(features.quietErrors) == "qol.hideErrors")
 local hidden = env.BLACK_LISTED_MESSAGE_TYPES
 db.quietErrors = true
 initializers[1]()

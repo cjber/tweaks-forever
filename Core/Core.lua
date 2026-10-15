@@ -93,7 +93,8 @@ function ns.OnTooltip(dataType, getters, fn)
 end
 
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
--- addon's own setting }; with no `when`, the addon being loaded is the conflict.
+-- addon's own setting }; with no `when`, the addon being loaded is the conflict. `polestar` = a setting path
+-- read through Polestar's own Polestar.Get stands in for `when`: on (true, or any choice but "off") is the conflict.
 ---@param feature TFFeature
 function ns.Feature(feature)
 	assert(not byKey[feature.key], "duplicate feature " .. feature.key)
@@ -102,11 +103,28 @@ function ns.Feature(feature)
 	byKey[feature.key] = feature
 end
 
+-- Whether a Polestar setting is switched on. Its settings are true/false, or a choice where "off" is off.
+---@param path string
+---@return boolean
+local function PolestarOn(path)
+	local value = Polestar and Polestar.Get and Polestar.Get(path)
+	return value ~= nil and value ~= false and value ~= "off"
+end
+
+---@param conflict TFConflict
+---@return boolean?
+local function Applies(conflict)
+	if conflict.polestar then
+		return PolestarOn(conflict.polestar)
+	end
+	return not conflict.when or conflict.when()
+end
+
 ---@param feature TFFeature
 ---@return string?
 local function FindConflict(feature)
 	for _, conflict in ipairs(feature.conflicts) do
-		if C_AddOns.IsAddOnLoaded(conflict.addon) and (not conflict.when or conflict.when()) then
+		if C_AddOns.IsAddOnLoaded(conflict.addon) and Applies(conflict) then
 			return conflict.title or C_AddOns.GetAddOnMetadata(conflict.addon, "Title") or conflict.addon
 		end
 	end

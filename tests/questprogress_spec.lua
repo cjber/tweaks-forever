@@ -163,6 +163,16 @@ setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestProgress.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestProgress
 assert(features.questTooltips.default == true and features.questPlates.default == true)
+
+local function PolestarPath(feature)
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.addon == "Polestar" then
+			return conflict.polestar
+		end
+	end
+end
+assert(PolestarPath(features.questTooltips) == "qol.questTooltips")
+assert(PolestarPath(features.questPlates) == "qol.nameplateIcons")
 assert(#initializers == 1)
 
 -- Questie's own options stand in for these while they are on.

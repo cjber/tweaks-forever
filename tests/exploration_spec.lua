@@ -11,6 +11,15 @@ setfenv(assert(loadfile("Map/Exploration.lua")), env)("TweaksForever", ns)
 local Model = ns.Exploration
 assert(features.exploration.default == false)
 
+local function PolestarPath(feature)
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.addon == "Polestar" then
+			return conflict.polestar
+		end
+	end
+end
+assert(PolestarPath(features.exploration) == "maps.reveal", 'Polestar\'s reveal, unless it is "off"')
+
 local predicates = {}
 for _, conflict in ipairs(features.exploration.conflicts) do
 	predicates[conflict.addon] = conflict.when

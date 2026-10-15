@@ -22,6 +22,15 @@ setfenv(assert(loadfile("Map/ZoneLevels.lua")), env)("TweaksForever", ns)
 local Model = ns.ZoneLevels
 assert(features.zoneLevels.default == true)
 
+local function PolestarPath(feature)
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.addon == "Polestar" then
+			return conflict.polestar
+		end
+	end
+end
+assert(PolestarPath(features.zoneLevels) == "maps.zoneLevels")
+
 -- Leatrix Maps shows zone levels unless its option is explicitly off.
 local leatrix = features.zoneLevels.conflicts[1]
 assert(leatrix.addon == "Leatrix_Maps" and leatrix.when())

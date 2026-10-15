@@ -13,6 +13,10 @@ local function Leatrix(key)
 	}
 end
 
+local function Polestar(path)
+	return { addon = "Polestar", title = "Polestar", polestar = path }
+end
+
 ns.Feature({
 	key = "quests",
 	category = "Automation",
@@ -30,6 +34,8 @@ ns.Feature({
 			end,
 		},
 		{ addon = "AutoTurnIn" },
+		Polestar("behavior.autoAccept"),
+		Polestar("behavior.autoTurnin"),
 	},
 })
 
@@ -39,7 +45,7 @@ ns.Feature({
 	name = "Skip single-option gossip",
 	tooltip = "Goes straight to the only thing an NPC offers, or a flight master's flight map. Hold Shift to see it.",
 	default = false,
-	conflicts = { Leatrix("AutomateGossip") },
+	conflicts = { Leatrix("AutomateGossip"), Polestar("qol.skipGossip") },
 })
 
 ns.Feature({
@@ -48,7 +54,7 @@ ns.Feature({
 	name = "Accept summons",
 	tooltip = "Not while you are in combat.",
 	default = false,
-	conflicts = { Leatrix("AutoAcceptSummon") },
+	conflicts = { Leatrix("AutoAcceptSummon"), Polestar("qol.acceptSummon") },
 })
 
 ns.Feature({
@@ -57,7 +63,7 @@ ns.Feature({
 	name = "Accept resurrections",
 	tooltip = "From your group, and not from someone in combat, so a battle resurrection is still yours to time.",
 	default = false,
-	conflicts = { Leatrix("AutoAcceptRes") },
+	conflicts = { Leatrix("AutoAcceptRes"), Polestar("qol.acceptResurrect") },
 })
 
 ns.Feature({
@@ -67,7 +73,7 @@ ns.Feature({
 	tooltip = "Releases your spirit as soon as you die in a battleground, unless you can resurrect yourself (a "
 		.. "soulstone or Reincarnation).",
 	default = false,
-	conflicts = { Leatrix("AutoReleasePvP") },
+	conflicts = { Leatrix("AutoReleasePvP"), Polestar("qol.autoReleasePvP") },
 })
 
 ns.Feature({
@@ -75,7 +81,7 @@ ns.Feature({
 	category = "Automation",
 	name = "Decline duels",
 	default = false,
-	conflicts = { Leatrix("NoDuelRequests") },
+	conflicts = { Leatrix("NoDuelRequests"), Polestar("qol.declineDuels") },
 })
 
 ns.Feature({
@@ -84,7 +90,12 @@ ns.Feature({
 	name = "Faster auto loot",
 	tooltip = "Takes everything at once instead of waiting for the loot window. Only while auto loot applies.",
 	default = true,
-	conflicts = { Leatrix("FasterLooting"), { addon = "SpeedyAutoLoot" }, { addon = "AutoLootPlus" } },
+	conflicts = {
+		Leatrix("FasterLooting"),
+		{ addon = "SpeedyAutoLoot" },
+		{ addon = "AutoLootPlus" },
+		Polestar("qol.fastLoot"),
+	},
 })
 
 local function Quests()

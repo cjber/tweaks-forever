@@ -17,6 +17,7 @@ ns.Feature({
 				return not (LeaMapsDB and LeaMapsDB.ShowZoneLevels == "Off")
 			end,
 		},
+		{ addon = "Polestar", title = "Polestar", polestar = "maps.zoneLevels" },
 	},
 })
 

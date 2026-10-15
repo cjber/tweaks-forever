@@ -18,6 +18,7 @@ ns.Feature({
 				return not (LeaMapsDB and LeaMapsDB.ShowPointsOfInterest == "Off")
 			end,
 		},
+		{ addon = "Polestar", title = "Polestar", polestar = "maps.dungeonPins" },
 	},
 })
 

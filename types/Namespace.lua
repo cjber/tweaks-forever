@@ -241,6 +241,7 @@ TweaksForeverCharDB = nil
 ---@field addon string
 ---@field title? string
 ---@field when? fun(): boolean?
+---@field polestar? string
 
 ---@class TFFeature
 ---@field key string

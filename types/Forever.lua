@@ -7,6 +7,8 @@ LeaPlusDB = nil
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
+---@type {Get: fun(path: string): any}?
+Polestar = nil
 ---@type {API: {RegisterOnReady: fun(callback: fun())?}?, usedIcons: table<integer, string>?, db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
 Questie = nil
 
