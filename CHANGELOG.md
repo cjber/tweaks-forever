@@ -12,7 +12,6 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- **Tooltips leave protected and hidden units alone.** The quest, camp, class colour and minimap tooltip lines now skip a tooltip the game protects, and a unit whose identity the game hides in combat, instead of risking an error there.
 - **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.
 - **`/tweaks report` gives you something to paste into a bug report.** It opens a small window with the text already selected: your addon and game versions, your character, the settings you changed, which features are standing down for another addon, your other addons, and any errors Tweaks caught this session. Press Ctrl+C and paste it.
 

@@ -13,8 +13,12 @@ except ModuleNotFoundError:
     from forever_tools import readable as secret
     from typecheck_coverage import runtime_files
 
-POLICY = secret.DEFAULT_POLICY
-check = secret.check
+# Model.NpcId (Quests/QuestProgress.lua) returns nil for a GUID canaccessvalue refuses, so it guards its argument.
+POLICY = secret.Policy(guards=frozenset({"Readable", "NpcId"}))
+
+
+def check(source: str) -> list[tuple[int, str]]:
+    return secret.check(source, POLICY)
 
 
 def main() -> int:

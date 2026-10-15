@@ -329,11 +329,8 @@ local function UnitLines()
 			return
 		end
 		building = nil
-		local guid = ns.Readable(data.guid)
-		if not guid then
-			return
-		end
-		className, classFile, race = GetPlayerInfoByGUID(guid)
+		-- secret-ok: GetPlayerInfoByGUID takes a secret GUID, and a player's class and race are not secret (above)
+		className, classFile, race = GetPlayerInfoByGUID(data.guid)
 		level = LevelText(tooltip)
 		if classFile then
 			building, passed, dropped = data, false, false
@@ -362,6 +359,9 @@ local function UnitLines()
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
 		if not building or data ~= building or not ns.Usable(tooltip) then
+			if data == building then
+				building = nil
+			end
 			return
 		end
 		building = nil

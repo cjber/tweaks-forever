@@ -164,18 +164,11 @@ assert(built[2].text == "<Night Elf Lovers>", "the guild named after a race is t
 assert(built[3].text == "Level 60 Night Elf Warrior (Player)", built[3].text)
 assert(built[4].color and built[4].color[3] == 1, "the faction takes its colour")
 
--- A forbidden tooltip, or a player whose GUID is secret, is left exactly as the client wrote it.
+-- A forbidden tooltip is left exactly as the client wrote it.
 forbidden = true
 built = Build("GetWorldCursor", nil, { "Sellene", "Level 60 Night Elf (Player)", "Warrior", "Alliance" })
 assert(#built == 4 and built[2].text == "Level 60 Night Elf (Player)", "a forbidden tooltip is not touched")
 forbidden = false
-local canaccessvalue = env.canaccessvalue
-env.canaccessvalue = function()
-	return false
-end
-built = Build("GetWorldCursor", nil, { "Sellene", "Level 60 Night Elf (Player)", "Warrior", "Alliance" })
-assert(#built == 4 and built[2].text == "Level 60 Night Elf (Player)", "a secret GUID leaves the lines alone")
-env.canaccessvalue = canaccessvalue
 
 -- A unit far above you shows ??, and its level is read from the token the tooltip was given.
 built = Build("GetUnit", { "target", n = 1 }, {
