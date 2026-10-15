@@ -37,7 +37,13 @@ local function GuildCovers(cost)
 	return limit == -1 or limit >= cost
 end
 
-ns.On("MERCHANT_SHOW", function()
+-- Set while a merchant is open and the repair is still waiting for money: junk sold here can pay for it.
+local owed = false
+
+-- Repair everything if the guild or your money covers it. `quiet` leaves a shortfall unannounced, for retries.
+---@param quiet boolean?
+local function Repair(quiet)
+	owed = false
 	if not (ns.Active("repair") and CanMerchantRepair()) then
 		return
 	end
@@ -52,6 +58,24 @@ ns.On("MERCHANT_SHOW", function()
 		RepairAllItems()
 		ns.Print(L["repaired for %s."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
 	else
-		ns.Print(L["not enough money to repair (%s)."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
+		owed = true
+		if not quiet then
+			ns.Print(L["not enough money to repair (%s)."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
+		end
 	end
+end
+
+ns.On("MERCHANT_SHOW", function()
+	Repair()
+end)
+
+-- Selling junk (ours, the game's or another addon's) starts after the repair, so try again as the money comes in.
+ns.On("PLAYER_MONEY", function()
+	if owed then
+		Repair(true)
+	end
+end)
+
+ns.On("MERCHANT_CLOSED", function()
+	owed = false
 end)

@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves.
 
 ## [Unreleased]
 
+- **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as selling your junk there brings in enough.
+
 ## [0.11.5] - 2026-10-15
 
 - **Data checked against Forever 1.60.1.70374.** The bundled game data is unchanged.
