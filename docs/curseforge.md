@@ -1,6 +1,6 @@
 Tweaks Forever adds options for quest automation, repairs, junk selling, gear groups, maps and fishing to the game’s settings.
 
-If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or similar, the overlapping option greys out and names the addon that has it, so the two never fight. Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you turn it on.
+If you already run Leatrix Plus, Questie, BlizzMove, Peddler, FishingBuddy or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you turn it on.
 
 ![Dungeon entrances, nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
@@ -20,31 +20,30 @@ Nameplates in retail's own frame, with your target outlined.
 
 ## Features
 
-- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), accept party invites from friends or decline strangers'. All off by default, except faster auto loot.
-- **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk once you turn that on.
+- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), accept party invites from friends or decline strangers'. All off by default.
+- **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk once you turn that on. Hold Shift as a merchant opens to skip both.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a coloured group such as DPS, then equip the whole group in one click.
-- **Maps**: every dungeon and raid entrance gets retail's icon; click one to travel there. Zones show their level range, the map shows your and the cursor's coordinates, and unexplored areas are revealed in a blue tint. Inside a dungeon, the map shows its floors and legend (needs Atlas [Classic WoW]).
+- **Maps**: every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows your and the cursor's coordinates, and unexplored areas are revealed in a blue tint on the world and zone maps. Inside a dungeon, the map shows its floors and legend (needs Atlas [Classic WoW]).
 - **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Optional spell reach icons show which attacks can reach each enemy.
 - **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
-- **Quests and camps**: quest levels on the map and tracker, a coin on the best-selling reward choice, Abandon quests with one confirmation, and the tracker sorted nearest first. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
+- **Quests and camps**: quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
+- **Levelling**: XP per hour and time to level on the experience bar's tooltip, and optional rare alerts in chat.
 - **Spellbook, trainer and bags**: the spellbook lists spells you haven't learned yet, Train all buys what you can afford, and the reagent bag joins the combined bag.
 - **Fishing and auctions**: double right-click to cast or apply a lure, and a sortable iLvl column.
-- **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default. Turns outlines off while enabled and restores your graphics settings when disabled. Removing sparkles needs a game restart.
+- **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default. Turns outlines off while enabled; removing sparkles needs a game restart.
 - **Also**: camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names and `/rl`.
 
 ## Usage
 
-Everything is under Options → AddOns → Tweaks Forever. `/tweaks`, `/tweaksforever` or the addon compartment on the minimap opens it. Translations are welcome as a pull request or an issue on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales).
+Everything is under Options → AddOns → Tweaks Forever. `/tweaks`, `/tweaksforever` or the addon compartment on the minimap opens it.
 
 ## With my other Forever addons
 
-All optional:
-
 - [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) plans the way when you click a dungeon or raid entrance.
-- [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders. The Windows option moves and scales its guide window.
-- [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) shades undiscovered areas and pins dungeons that count toward a challenge. Tweaks' unexplored tint and entrance icons step aside for it.
-- [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) shows skill-up chances, costs and levelling routes in the Professions window.
+- [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders.
+- [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) tracks Legacy challenges. Tweaks' unexplored tint and entrance icons step aside for it.
+- [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) helps with profession levelling.
 
-Bug reports and ideas are welcome. For a bug, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
+For a bug report, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
 
 Built with AI assistance.

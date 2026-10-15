@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Fail when a screenshot is older than what it shows (WFA-9, forever_tools.screens).
 
-tools/screenshots.py draws every scene itself from wowmock, reading the frame layout in UI/Frames.lua and the
+tools/screenshots.py draws every scene itself from wowmock, reading the frame layout in UI/Frames.lua, the
+coordinates bar it copies from Map/Coordinates.lua and the
 tooltip border the addon ships. Each image's dump is those files' hashes, so a change to any of them needs a fresh
 render. Generated `Data/` is left out: the daily data refresh moves it and cannot render, and the release re-renders
 every image (the release skill). docs/screenshots/scenes.sha256 holds each image's hash beside its dump's; After a
@@ -25,6 +26,7 @@ OUT = ROOT / "docs/screenshots"
 SOURCES = (
     "tools/screenshots.py",
     "UI/Frames.lua",
+    "Map/Coordinates.lua",
     "media/TooltipBorderModern.tga",
 )
 SCENES = {

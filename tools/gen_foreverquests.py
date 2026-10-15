@@ -14,7 +14,7 @@ from forever_tools.fsio import atomic_write
 from gen_classspells import db2
 
 BUILD = "1.60.1.70374"
-ERA_BUILD = "1.15.9.69722"
+ERA_BUILD = "1.15.9.70003"
 
 
 def ids(path):

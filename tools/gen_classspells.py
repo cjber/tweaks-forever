@@ -36,8 +36,8 @@ except ModuleNotFoundError:
 
 BUILD = "1.60.1.70374"
 # Forever's client leaves out the trainers' teaching spells; Classic Era keeps them, with the same IDs.
-TEACH_BUILD = "1.15.9.69722"
-CLASSICDB_COMMIT = "22b51464f1625f6ef6275771de1f5466c6f5d19e"
+TEACH_BUILD = "1.15.9.70003"
+CLASSICDB_COMMIT = "ec4f596146be6467ea93c57397858e329e2db852"
 CLASSICDB_URL = (
     f"https://raw.githubusercontent.com/cmangos/classic-db/{CLASSICDB_COMMIT}/Full_DB/ClassicDB_1_12_1_z2815.sql.gz"
 )

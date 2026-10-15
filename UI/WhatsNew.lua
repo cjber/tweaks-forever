@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.11.5"
-ns.WHATS_NEW = L["Data checked against Forever 1.60.1.70374."]
+ns.WHATS_NEW_VERSION = "0.12.0"
+ns.WHATS_NEW = L["Coordinates on the world map, XP per hour, and a coin on the quest reward that sells for most."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
