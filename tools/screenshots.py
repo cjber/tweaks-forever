@@ -4,21 +4,25 @@
 
 Needs Pillow and the wowmock library (env WOWMOCK, default ~/.claude/skills/wow-mock-screenshots). Assets
 are fetched from wago.tools once and cached under ~/.cache/wowmock/<build>/. The dungeon map scene reads Atlas's
-pinned release from WoWInterface, fetched once into tools/.cache/ and never committed.
+pinned release from WoWInterface, fetched once into ~/.cache/wowmock/atlas/ and never committed.
 """
 
+import functools
 import hashlib
 import io
 import math
 import os
 import re
-import shutil
 import sys
-import urllib.request
 import zipfile
 from pathlib import Path
 
 from PIL import Image  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
+
+try:
+    from tools.forever_tools import wago
+except ModuleNotFoundError:
+    from forever_tools import wago
 
 WOWMOCK = Path(os.environ.get("WOWMOCK", Path.home() / ".claude" / "skills" / "wow-mock-screenshots"))
 if not (WOWMOCK / "wowmock.py").exists():
@@ -176,17 +180,21 @@ COORDS_FONT = FONTS["GameFontHighlightSmall"]
 LAKESHIRE = (REDRIDGE, 0.270, 0.452)
 
 
+def coords_format(point):
+    """Model.Format: a 0-1 point as the map's own coordinates, or None off the map (and at exactly 0, 0)."""
+    if not point or not all(0 <= v <= 1 for v in point) or point == (0, 0):
+        return None
+    return f"{point[0] * 100:.1f}, {point[1] * 100:.1f}"
+
+
 def coords_line(here=None, there=None):
-    """Model.Line: whichever of the player's and cursor's 0-1 positions there are, each Model.Format'ed."""
-
-    def fmt(point):
-        return f"{point[0] * 100:.1f}, {point[1] * 100:.1f}"
-
+    """Model.Line: whichever of the player's and cursor's positions there are."""
+    here, there = coords_format(here), coords_format(there)
     if here and there:
-        return f"Player: {fmt(here)}    Cursor: {fmt(there)}"
+        return f"Player: {here}    Cursor: {there}"
     if here:
-        return f"Player: {fmt(here)}"
-    return f"Cursor: {fmt(there)}" if there else ""
+        return f"Player: {here}"
+    return f"Cursor: {there}" if there else ""
 
 
 def draw_coords(frame, rects, here=None, there=None):
@@ -196,17 +204,20 @@ def draw_coords(frame, rects, here=None, there=None):
     frame.text(cx + (cw - width) / 2, top, coords_line(here, there), COORDS_FONT, justify="CENTER", width=width)
 
 
+@functools.cache
+def map_bounds(ui, ui_map):
+    """A map's world rectangle (x0, y0, x1, y1) from its first UiMapAssignment row."""
+    for row in ui.table("UiMapAssignment").values():
+        if row["UiMapID"] == str(ui_map) and row["OrderIndex"] == "0":
+            return float(row["Region_0"]), float(row["Region_1"]), float(row["Region_3"]), float(row["Region_4"])
+    raise KeyError(f"no UiMapAssignment row for map {ui_map}")
+
+
 def on_map(ui, child, zone, x, y):
     """A 0-1 point on `zone` as a 0-1 point on its continent `child`, through both maps' UiMapAssignment rows."""
-    rows = {r["UiMapID"]: r for r in ui.table("UiMapAssignment").values() if r["OrderIndex"] == "0"}
-
-    def bounds(ui_map):
-        r = rows[str(ui_map)]
-        return float(r["Region_0"]), float(r["Region_1"]), float(r["Region_3"]), float(r["Region_4"])
-
-    x0, y0, x1, y1 = bounds(zone)
+    x0, y0, x1, y1 = map_bounds(ui, zone)
     world_x, world_y = x1 - y * (x1 - x0), y1 - x * (y1 - y0)
-    x0, y0, x1, y1 = bounds(child)
+    x0, y0, x1, y1 = map_bounds(ui, child)
     return (y1 - world_y) / (y1 - y0), (x1 - world_x) / (x1 - x0)
 
 
@@ -353,42 +364,48 @@ def dungeon_layers(ui):
     return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
 
 
-# Atlas and Atlas [Classic WoW] as released on WoWInterface (files 3896 and 20513), each pinned by its zip's sha256.
-# Only the dungeon map screenshot uses them; nothing of theirs is committed.
+# Atlas and Atlas [Classic WoW] as released on WoWInterface (files 3896 and 20513): each version keeps its own zip
+# URL, pinned here by its sha256. Only the dungeon map screenshot reads them, straight from the zips, which are cached
+# beside wowmock's art and never committed. To move to a newer Atlas, change ATLAS_VERSION and both hashes.
 ATLAS_VERSION = "v1.54.00"
 ATLAS_ZIPS = {
-    "Atlas": (
-        "https://cdn.wowinterface.com/downloads/getfile.php?id=3896&d=1792047175",
-        "9296376bc05aea7577a1046111cd1ef2e434b5ae582a1b558bbc9d19bfe63d1c",
-    ),
-    "Atlas_ClassicWoW": (
-        "https://cdn.wowinterface.com/downloads/getfile.php?id=20513&d=1792047142",
-        "20fe0a7835498aa121304f5096f08f34d13adabfb57cdd9599fb1cb9f5f6379f",
-    ),
+    "Atlas": (3896, "9296376bc05aea7577a1046111cd1ef2e434b5ae582a1b558bbc9d19bfe63d1c"),
+    "Atlas_ClassicWoW": (20513, "20fe0a7835498aa121304f5096f08f34d13adabfb57cdd9599fb1cb9f5f6379f"),
 }
-ATLAS = ROOT / "tools" / ".cache" / f"atlas-{ATLAS_VERSION}"
+ATLAS_CACHE = Path.home() / ".cache" / "wowmock" / "atlas"
 
 
-def fetch_atlas():
-    """Unpack each pinned Atlas zip into ATLAS once, refusing a download whose hash moved."""
-    for name, (url, digest) in ATLAS_ZIPS.items():
-        if (ATLAS / name).is_dir():
-            continue
-        request = urllib.request.Request(url, headers={"User-Agent": "TweaksForever/1.0"})
-        with urllib.request.urlopen(request, timeout=120) as response:
-            data = response.read()
+@functools.cache
+def atlas_zip(name):
+    """One pinned Atlas folder's zip, downloaded once and checked against its sha256."""
+    file_id, digest = ATLAS_ZIPS[name]
+    filename = f"{name}-{ATLAS_VERSION}.zip"
+
+    def pinned(data):
         if hashlib.sha256(data).hexdigest() != digest:
-            sys.exit(f"{name} {ATLAS_VERSION} from {url} no longer matches its pinned sha256")
-        # Unpacked beside its final place and moved in whole, so an interrupted run leaves nothing half-written.
-        staging = ATLAS / f".{name}.partial"
-        shutil.rmtree(staging, ignore_errors=True)
-        with zipfile.ZipFile(io.BytesIO(data)) as archive:
-            for member in archive.namelist():
-                if member.startswith("/") or ".." in Path(member).parts or Path(member).parts[0] != name:
-                    sys.exit(f"{name} zip holds an unexpected path: {member}")
-            archive.extractall(staging)
-        (staging / name).rename(ATLAS / name)
-        staging.rmdir()
+            raise SystemExit(f"{filename} does not match its pinned sha256 in tools/screenshots.py")
+
+    data = wago.fetch(
+        f"https://cdn.wowinterface.com/downloads/file{file_id}/{filename}",
+        ATLAS_CACHE / filename,
+        user_agent="TweaksForever/1.0",
+        timeout=120,
+        validate=pinned,
+    )
+    return zipfile.ZipFile(io.BytesIO(data))
+
+
+def atlas_file(path):
+    """The bytes of `path`, "<folder>/...", from that Atlas folder's pinned zip."""
+    try:
+        return atlas_zip(path.split("/", 1)[0]).read(path)
+    except KeyError:
+        sys.exit(f"Atlas {ATLAS_VERSION} has no {path}")
+
+
+def atlas_text(path):
+    """A text file from the Atlas zips, with the newlines Python's text mode would give (they ship CRLF)."""
+    return atlas_file(path).decode().replace("\r\n", "\n")
 
 
 # Map/DungeonMaps.lua over the map's canvas: PAD, HEADER, the picker and Back to map sizes, the sheet's 0.58 share.
@@ -399,21 +416,24 @@ LEGEND_FONT = FONTS["GameFontHighlight"]
 
 def atlas_strings(path):
     """The `L["key"] = "value"` lines of one of Atlas's enUS locale files."""
-    return dict(re.findall(r'L\["([^"]+)"\]\s*=\s*"([^"]*)"', path.read_text()))
+    return dict(re.findall(r'L\["([^"]+)"\]\s*=\s*"([^"]*)"', atlas_text(path)))
 
 
 def atlas_floor(key):
     """(title, legend lines) of one Atlas_ClassicWoW record from the Forever data file the client loads, its Lua
     concatenations resolved as the addon's enUS locale files do: colour constants, local ALC[...] aliases, L[...],
     ALC[...], BZ[...] and getBossName(...)."""
-    source = (ATLAS / "Atlas_ClassicWoW/Data/Data-ClassicForever.lua").read_text()
-    words = atlas_strings(ATLAS / "Atlas/Locale/Atlas-enUS.lua")
-    own = atlas_strings(ATLAS / "Atlas_ClassicWoW/Locale/Atlas_ClassicWoW-enUS.lua")
-    labels = re.search(r"\blabels = \{\n(.*?)\n\t\},", (ATLAS / "Atlas/Data/Constants.lua").read_text(), re.S)
+    source = atlas_text("Atlas_ClassicWoW/Data/Data-ClassicForever.lua")
+    words = atlas_strings("Atlas/Locale/Atlas-enUS.lua")
+    own = atlas_strings("Atlas_ClassicWoW/Locale/Atlas_ClassicWoW-enUS.lua")
+    labels = re.search(r"\blabels = \{\n(.*?)\n\t\},", atlas_text("Atlas/Data/Constants.lua"), re.S)
     if not labels:
         sys.exit("Atlas has no label colours")
     constants = dict(re.findall(r'^\s*(\w+) = "([^"]*)"', labels.group(1), re.M))
-    constants |= {name: words[alias] for name, alias in re.findall(r'^local (\w+) = ALC\["([^"]+)"\]', source, re.M)}
+    for name, alias in re.findall(r'^local (\w+) = ALC\["([^"]+)"\]', source, re.M):
+        if alias not in words:
+            sys.exit(f"Atlas {key}: no enUS text for ALC[{alias!r}]")
+        constants[name] = words[alias]
     found = re.search(rf"^\t{key} = \{{\n(.*?)\n\t\}},", source, re.M | re.S)
     if not found:
         sys.exit(f"Atlas has no record {key}")
@@ -440,10 +460,8 @@ def atlas_floor(key):
     names = re.search(r"ZoneName = \{ (.*?) \},\n", record)
     if not names:
         sys.exit(f"Atlas {key} has no ZoneName")
-    legend = [
-        line.rsplit(", ", 1)[0] if re.search(r", \d+$", line) else line
-        for line in re.findall(r"^\t\t\{ (.*?) \},(?:\s*--.*)?$", record, re.M)
-    ]
+    # Each legend row is { text, optional ID },; the ID and any trailing comment are not shown.
+    legend = re.findall(r"^\t\t\{ (.*?)(?:, \d+)? \},(?:\s*--.*)?$", record, re.M)
     return resolve(names.group(1)), [resolve(line) for line in legend]
 
 
@@ -451,9 +469,8 @@ def dungeon_map(ui):
     """The world map opened inside Blackfathom Deeps: Map/DungeonMaps.lua's host over the map's canvas, laid out by
     its Layout (the largest square at 58% of the width, the legend in a column beside it), the heading, the floor
     picker (a UIPanelButtonTemplate showing the floor) and Back to map, with Atlas's own sheet and legend."""
-    fetch_atlas()
     title, legend = atlas_floor(DUNGEON_FLOOR)
-    sheet = Image.open(ATLAS / "Atlas_ClassicWoW/Images" / f"{DUNGEON_FLOOR}.blp").convert("RGBA")
+    sheet = Image.open(io.BytesIO(atlas_file(f"Atlas_ClassicWoW/Images/{DUNGEON_FLOOR}.blp"))).convert("RGBA")
     nav = ("World", "Kalimdor", "Ashenvale")
     frame, rects = world_map_frame(ui, map_art(ui, ASHENVALE), nav, arrows=nav[1:])
     cx, cy, cw, ch = rects["container"]
