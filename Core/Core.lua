@@ -81,7 +81,7 @@ end
 ---@param fn fun(tooltip: GameTooltip, getter: string, ...: any)
 function ns.OnTooltip(dataType, getters, fn)
 	TooltipDataProcessor.AddTooltipPostCall(dataType, function(tooltip)
-		if tooltip ~= GameTooltip then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) then
 			return
 		end
 		local info = tooltip:GetProcessingTooltipInfo()

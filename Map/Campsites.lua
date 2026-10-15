@@ -374,7 +374,7 @@ local function InitTooltips()
 	end
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Object, function(tooltip, data)
-		if tooltip ~= GameTooltip or not ns.Active("campTooltips") then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active("campTooltips") then
 			return
 		end
 		local aura = AuraOf(data)
@@ -393,7 +393,7 @@ local function InitTooltips()
 
 	-- Only your own buffs: the lines are about your auras.
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.UnitAura, function(tooltip, data)
-		if tooltip ~= GameTooltip or not ns.Active("campTooltips") or AurasSecret() then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active("campTooltips") or AurasSecret() then
 			return
 		end
 		-- A spell flagged always-secret keeps its id secret even outside restrictions, and on a restricted map

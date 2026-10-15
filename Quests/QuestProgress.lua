@@ -308,7 +308,7 @@ local function Plates()
 		if not plate then
 			return
 		end
-		local need = ns.Active(PLATES) and Model.Needed(Model.NpcId(UnitGUID(unit)))
+		local need = ns.Active(PLATES) and Model.Needed(Model.NpcId(ns.Readable(UnitGUID(unit))))
 		if need then
 			Icon(plate):Show()
 		elseif icons[plate] then
@@ -374,10 +374,10 @@ ns.Init(function()
 	UpdatePlates()
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
-		if tooltip ~= GameTooltip or not ns.Active(TOOLTIP) or Model.HasQuestLines(data) then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active(TOOLTIP) or Model.HasQuestLines(data) then
 			return
 		end
-		local lines = Model.Lines(Model.NpcId(data.guid))
+		local lines = Model.Lines(Model.NpcId(ns.Readable(data.guid)))
 		for _, line in ipairs(lines) do
 			tooltip:AddLine(line[1], line[2], line[3], line[4])
 		end

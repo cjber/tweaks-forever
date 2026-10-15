@@ -21,6 +21,7 @@ Data\ZoneLevels.lua
 Data\DungeonEntrances.lua
 Data\ClassSpells.lua
 Data\ForeverQuests.lua
+Core\Secret.lua
 Core\Core.lua
 UI\Art.lua
 UI\Keys.lua

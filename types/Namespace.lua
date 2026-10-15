@@ -329,6 +329,8 @@ TweaksForeverCharDB = nil
 ---@field Init fun(fn: fun())
 ---@field BagSize fun(container: ContainerFrameTemplate|ContainerFrameCombinedBags): integer
 ---@field BagItems fun(container: ContainerFrameTemplate|ContainerFrameCombinedBags): (fun(): integer?, ContainerFrameItemButtonTemplate?)
+---@field Readable fun(value: any): any
+---@field Usable fun(frame?: Frame): boolean
 ---@field OnTooltip fun(dataType: Enum.TooltipDataType, getters: table<string, true>, fn: fun(tooltip: GameTooltip, getter: string, ...: any))
 ---@field ContainerFrames fun(): (fun(): ContainerFrameTemplate|ContainerFrameCombinedBags?)
 ---@field ForEachBagButton fun(fn: fun(button: ContainerFrameItemButtonTemplate))

@@ -374,7 +374,7 @@ ns.Init(function()
 	ns.On("PLAYER_LEVEL_UP", Stale)
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.MinimapMouseover, function(tooltip, data)
-		if tooltip ~= GameTooltip or not ns.Active(KEY) then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active(KEY) then
 			return
 		end
 		local names = Model.Names(data)

@@ -324,11 +324,16 @@ local function UnitLines()
 	local building, className, classFile, race, level, passed, dropped
 
 	TooltipDataProcessor.AddTooltipPreCall(Enum.TooltipDataType.Unit, function(tooltip, data)
-		building = nil
-		if tooltip ~= GameTooltip or not ns.Active(KEY) then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active(KEY) then
+			building = nil
 			return
 		end
-		className, classFile, race = GetPlayerInfoByGUID(data.guid)
+		building = nil
+		local guid = ns.Readable(data.guid)
+		if not guid then
+			return
+		end
+		className, classFile, race = GetPlayerInfoByGUID(guid)
 		level = LevelText(tooltip)
 		if classFile then
 			building, passed, dropped = data, false, false
@@ -336,7 +341,7 @@ local function UnitLines()
 	end)
 
 	TooltipDataProcessor.AddLinePreCall(TooltipDataProcessor.AllTypes, function(tooltip, line)
-		if not building or tooltip ~= GameTooltip or dropped then
+		if not building or tooltip ~= GameTooltip or dropped or not ns.Usable(tooltip) then
 			return
 		end
 		local info = tooltip:GetProcessingTooltipInfo()
@@ -356,7 +361,7 @@ local function UnitLines()
 	end)
 
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
-		if not building or data ~= building then
+		if not building or data ~= building or not ns.Usable(tooltip) then
 			return
 		end
 		building = nil
