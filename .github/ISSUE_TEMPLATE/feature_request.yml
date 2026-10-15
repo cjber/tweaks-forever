@@ -6,7 +6,7 @@ body:
     id: addon
     attributes:
       label: Addon
-      placeholder: Tweaks Forever
+      placeholder: Skillup Forever
     validations:
       required: true
   - type: textarea
