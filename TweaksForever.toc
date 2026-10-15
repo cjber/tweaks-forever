@@ -42,6 +42,7 @@ Quests\QuestDistance.lua
 Quests\QuestGivers.lua
 Quests\QuestProgress.lua
 Quests\QuestLog.lua
+Quests\BestReward.lua
 UI\Tooltips.lua
 UI\CursorTooltip.lua
 UI\Nameplates.lua

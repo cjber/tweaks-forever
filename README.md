@@ -34,7 +34,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 Every feature has its own setting; [docs/features.md](docs/features.md) has the detail.
 
-- **Quests.** Quest levels on map tooltips and the tracker, a gold tint on quests added in Forever, **Abandon quests** with one confirmation, and the tracker sorted nearest first with distances.
+- **Quests.** Quest levels on map tooltips and the tracker, a gold tint on quests added in Forever, a coin on the reward choice that sells for the most, **Abandon quests** with one confirmation, and the tracker sorted nearest first with distances.
 - **Automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map, accepts summons and group resurrections, releases in battlegrounds and declines duels. Hold Shift to talk normally. Off until you turn it on, as are invites from a whispered keyword and skipping loot confirmations.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on.

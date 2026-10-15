@@ -319,6 +319,7 @@ TweaksForeverCharDB = nil
 ---@field WhatsNew TFWhatsNew
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
+---@field BestReward TFBestReward
 ---@field PolestarOn fun(path: string): boolean
 ---@field ConflictOf fun(key: string): string?
 ---@field MissingOf fun(key: string): string?
