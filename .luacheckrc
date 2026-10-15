@@ -19,6 +19,7 @@ read_globals = {
 	"AuctionCategories",
 	"AuctionHouseFrame",
 	"AuctionHouseFrameDisplayMode",
+	"BattlefieldMapFrame",
 	"BNET_CLIENT_WOW",
 	"BNGetNumFriends",
 	"C_BattleNet",
