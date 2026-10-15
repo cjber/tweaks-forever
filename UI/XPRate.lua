@@ -16,8 +16,9 @@ ns.Feature({
 
 -- The window the rate is measured over, in seconds, and how many recent kills and quests the averages use.
 local WINDOW, RECENT = 900, 10
--- XP that arrives within this long of combat counts as a kill's.
-local AFTER_COMBAT = 3
+-- XP that arrives within this long of combat counts as a kill's; a quest's XP is expected within QUEST_WAIT of its
+-- hand-in, either side; no rate shows until FIRST seconds of data.
+local AFTER_COMBAT, QUEST_WAIT, FIRST = 3, 2, 300
 
 ---@class TFXPRate
 local Model = {}
@@ -33,7 +34,10 @@ local gains = {}
 ---@type number[], number[]
 local kills, quests = {}, {}
 local started, lastXP, lastMax
-local questXP, combatEnded = 0, nil
+local questXP, questAt, combatEnded = 0, nil, nil
+-- The last gain counted as a kill, in case its quest's hand-in event comes just after it.
+---@type TFXPGain?
+local lastKill
 
 ---@param list number[]
 ---@param value number
@@ -44,17 +48,17 @@ local function Push(list, value)
 	end
 end
 
+-- The middle value, so one odd lump (a discovery mid-fight) doesn't skew it.
 ---@param list number[]
 ---@return number?
-local function Average(list)
+local function Median(list)
 	if #list == 0 then
 		return nil
 	end
-	local sum = 0
-	for _, value in ipairs(list) do
-		sum = sum + value
-	end
-	return sum / #list
+	local sorted = { unpack(list) }
+	table.sort(sorted)
+	local middle = (#sorted + 1) / 2
+	return (sorted[math.floor(middle)] + sorted[math.ceil(middle)]) / 2
 end
 
 -- Start counting from now (login, or a reset in tests).
@@ -63,16 +67,23 @@ end
 ---@param max number
 function Model.Start(now, xp, max)
 	gains, kills, quests = {}, {}, {}
-	started, lastXP, lastMax, questXP, combatEnded = now, xp, max, 0, nil
+	started, lastXP, lastMax, questXP, questAt, combatEnded, lastKill = now, xp, max, 0, nil, nil, nil
 end
 
--- A quest handed in for `xp`: the next XP update is that quest's, not a kill's.
+-- A quest handed in for `xp` at `now`: the next XP update is that quest's, not a kill's. If the XP arrived just
+-- before the hand-in event and was taken for a kill, it is moved back.
 ---@param xp number
-function Model.QuestXP(xp)
-	if xp and xp > 0 then
-		questXP = questXP + xp
-		Push(quests, xp)
+---@param now number
+function Model.QuestXP(xp, now)
+	if not xp or xp <= 0 then
+		return
 	end
+	Push(quests, xp)
+	if lastKill and now - lastKill.at <= QUEST_WAIT and lastKill.xp == xp and kills[#kills] == xp then
+		kills[#kills], lastKill = nil, nil
+		return
+	end
+	questXP, questAt = questXP + xp, now
 end
 
 -- Combat ended at `now`: XP just after it still counts as a kill's.
@@ -95,24 +106,32 @@ function Model.Update(now, xp, max, inCombat)
 	if gain < 0 then
 		gain = (lastMax - lastXP) + xp
 	end
-	lastXP, lastMax = xp, max
+	-- A max that changes alone (the new level's, before the XP moves) keeps the old top for the wrap.
 	if gain <= 0 then
 		return
 	end
+	lastXP, lastMax = xp, max
 	gains[#gains + 1] = { at = now, xp = gain }
+	while gains[1] and now - gains[1].at > WINDOW do
+		table.remove(gains, 1)
+	end
+	if questAt and now - questAt > QUEST_WAIT then
+		questXP, questAt = 0, nil
+	end
 	local fromQuest = math.min(gain, questXP)
 	questXP = questXP - fromQuest
 	local rest = gain - fromQuest
 	if rest > 0 and (inCombat or (combatEnded and now - combatEnded <= AFTER_COMBAT)) then
 		Push(kills, rest)
+		lastKill = { at = now, xp = rest }
 	end
 end
 
--- XP per hour over the window (or since login, when that is shorter); nil before a minute has passed.
+-- XP per hour over the window (or since counting started, when that is shorter); nil for the first five minutes.
 ---@param now number
 ---@return number?
 function Model.Rate(now)
-	if not started or now - started < 60 then
+	if not started or now - started < FIRST then
 		return nil
 	end
 	local sum = 0
@@ -139,7 +158,7 @@ function Model.Lines(now, xp, max)
 		lines[#lines + 1] = L["XP per hour: %s"]:format(BreakUpLargeNumbers(math.floor(rate + 0.5)))
 		lines[#lines + 1] = L["Time to level: %s"]:format(SecondsToTime(math.floor(left / rate * 3600 + 0.5)))
 	end
-	local kill, quest = Average(kills), Average(quests)
+	local kill, quest = Median(kills), Median(quests)
 	if kill and kill > 0 then
 		lines[#lines + 1] = L["Kills to level: about %d"]:format(math.ceil(left / kill))
 	end
@@ -150,20 +169,43 @@ function Model.Lines(now, xp, max)
 end
 
 ns.Init(function()
-	Model.Start(GetTime(), UnitXP("player"), UnitXPMax("player"))
+	local function Restart()
+		Model.Start(GetTime(), UnitXP("player"), UnitXPMax("player"))
+	end
+	Restart()
+	-- Nothing is counted while off or covered by another addon; switching back on starts afresh.
+	local active = ns.Active(KEY)
+	local function Toggled()
+		if ns.Active(KEY) ~= active then
+			active = ns.Active(KEY)
+			Restart()
+		end
+	end
+	ns.OnSettingChanged(KEY, Toggled)
+	hooksecurefunc(ns, "RefreshConflicts", Toggled)
 	ns.On("QUEST_TURNED_IN", function(_, xp)
-		Model.QuestXP(xp)
+		if active then
+			Model.QuestXP(xp, GetTime())
+		end
 	end)
 	ns.On("PLAYER_REGEN_ENABLED", function()
-		Model.CombatEnded(GetTime())
+		if active then
+			Model.CombatEnded(GetTime())
+		end
 	end)
 	ns.On("PLAYER_XP_UPDATE", function()
-		Model.Update(GetTime(), UnitXP("player"), UnitXPMax("player"), UnitAffectingCombat("player"))
+		if active then
+			Model.Update(GetTime(), UnitXP("player"), UnitXPMax("player"), UnitAffectingCombat("player"))
+		end
 	end)
 
-	-- After Blizzard's own experience tooltip, on each container's experience bar (read from its bars, never written).
+	-- After Blizzard's own experience tooltip (anchored to UIParent by GameTooltip_SetDefaultAnchor), on each
+	-- container's experience bar, read from its bars and never written.
 	local function AddLines()
-		if not ns.Active(KEY) or not GameTooltip:IsShown() then
+		if not ns.Usable(GameTooltip) then
+			return
+		end
+		if not ns.Active(KEY) or not GameTooltip:IsShown() or GameTooltip:GetOwner() ~= UIParent then
 			return
 		end
 		local lines = Model.Lines(GetTime(), UnitXP("player"), UnitXPMax("player"))
