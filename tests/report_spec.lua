@@ -186,7 +186,7 @@ local function Report()
 end
 
 do
-	db.repair, db.quests, db.gearMark, db.fastLoot = true, true, "dots", true
+	db.repair, db.quests, db.gearMark, db.fastLoot, db.questTooltips = true, true, "dots", true, true
 	conflicts.fastLoot, missing.questTooltips = "Polestar", "QuestieDB"
 	addons.Questie, addons.Polestar = "9.1.0", "0.4.0"
 	local before = made
@@ -196,7 +196,7 @@ do
 	has(text, "TweaksForever 1.2.3 | WoW 1.60.1 (70374) 16001 | enUS", "versions, build and locale")
 	has(text, "Character: level 18 Orc SHAMAN, Horde", "character, no name")
 	has(text, "Place: map 1413 (The Barrens) 52.0, 30.0", "place")
-	has(text, "Changed from default: quests=on, gearMark=dots", "what the player changed, by key")
+	has(text, "Differs from default: quests=on, gearMark=dots", "what the player changed, by key")
 	lacks(text, "repair=", "a default left alone is not listed")
 	has(text, "Standing down for: fastLoot (Polestar)", "conflicts")
 	has(text, "Missing an addon: questTooltips (QuestieDB)", "missing addons")
@@ -230,11 +230,16 @@ do
 	for key in pairs(db) do
 		db[key] = nil
 	end
-	conflicts.fastLoot, missing.questTooltips = nil, nil
+	conflicts.fastLoot, missing.questTooltips = "Polestar", "QuestieDB"
+	db.fastLoot, db.questTooltips = false, false
 	local _, text = Report()
-	has(text, "Changed from default: none", "nothing changed")
-	has(text, "Standing down for: none", "nothing stands down")
-	has(text, "Missing an addon: none", "nothing missing")
+	has(text, "Differs from default: fastLoot=off, questTooltips=off", "switched off")
+	has(text, "Standing down for: none", "a switched-off feature isn't standing down")
+	has(text, "Missing an addon: none", "nor missing anything")
+	conflicts.fastLoot, missing.questTooltips = nil, nil
+	db.fastLoot, db.questTooltips = nil, nil
+	_, text = Report()
+	has(text, "Differs from default: none", "nothing changed")
 end
 
 -- ns.SafeCall: pcall's answers, and each failure kept (label, count, short stack) and passed to the error handler.

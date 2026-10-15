@@ -1,8 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
--- Tweaks Forever's own lines in /tweaks report: what the player changed from the defaults, and which features are
--- standing down for another addon or missing one they need. Feature keys rather than their names, so the report
+-- Tweaks Forever's own lines in /tweaks report: settings that differ from today's defaults (a saved value from
+-- before a default changed counts too), and which switched-on features are standing down for another addon or
+-- missing one they need. Feature keys rather than their names, so the report
 -- reads the same in every locale.
 
 ---@param value any
@@ -26,7 +27,8 @@ function ns.ReportLines()
 		if value ~= nil and value ~= feature.default then
 			changed[#changed + 1] = ("%s=%s"):format(key, Show(value))
 		end
-		local conflict, needs = ns.ConflictOf(key), ns.MissingOf(key)
+		local on = value ~= nil and value ~= false
+		local conflict, needs = on and ns.ConflictOf(key), on and ns.MissingOf(key)
 		if conflict then
 			conflicts[#conflicts + 1] = ("%s (%s)"):format(key, conflict)
 		end
@@ -38,7 +40,7 @@ function ns.ReportLines()
 		return ("%s: %s"):format(label, list[1] and table.concat(list, ", ") or "none")
 	end
 	return {
-		Line("Changed from default", changed),
+		Line("Differs from default", changed),
 		Line("Standing down for", conflicts),
 		Line("Missing an addon", missing),
 	}

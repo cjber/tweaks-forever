@@ -16,13 +16,6 @@ local conflicted = {}
 local missing = {}
 local pending, ready = {}, false
 
--- Run fn, keeping a failure for /tweaks report and passing it on to the game's error handler (Core/SafeCall.lua).
----@param label string
----@param fn fun()
-local function Start(label, fn)
-	ns.SafeCall(label, fn)
-end
-
 ---@param message string
 function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
@@ -89,7 +82,13 @@ function ns.OnTooltip(dataType, getters, fn)
 		local info = tooltip:GetProcessingTooltipInfo()
 		local args = info and info.getterArgs
 		if info and getters[info.getterName] then
-			fn(GameTooltip, info.getterName, unpack(args or {}, 1, args and args.n or 0))
+			ns.SafeCall(
+				"tooltip",
+				fn,
+				GameTooltip,
+				info.getterName,
+				unpack(args or {}, 1, args and args.n or 0) -- multi-value: the getter's arguments
+			)
 		end
 	end)
 end
@@ -191,17 +190,18 @@ end
 ---@param key string
 ---@param fn function
 function ns.OnSettingChanged(key, fn)
-	Settings.SetOnValueChangedCallback(ns.SettingVariable(key), fn)
+	Settings.SetOnValueChangedCallback(ns.SettingVariable(key), function(...)
+		ns.SafeCall("setting " .. key, fn, ...)
+	end)
 end
 
 local handlers = {}
 local events = CreateFrame("Frame")
+-- Each handler runs through ns.SafeCall: one that fails is kept for /tweaks report, reaches the game's error
+-- handler, and doesn't stop the rest.
 events:SetScript("OnEvent", function(_, event, ...)
-	local args, count = { ... }, select("#", ...)
 	for _, fn in ipairs(handlers[event]) do
-		Start(event, function()
-			fn(unpack(args, 1, count))
-		end)
+		ns.SafeCall(event, fn, ...)
 	end
 end)
 
@@ -246,14 +246,14 @@ function ns.HookBagButtons(update, click)
 		hooked[button] = true
 		button:HookScript("OnClick", function(self, mouseButton)
 			if IsModifiedBagClick(self, mouseButton) then
-				click(self, mouseButton)
+				ns.SafeCall("bag click", click, self, mouseButton)
 			end
 		end)
 	end
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
 		for _, button in ns.BagItems(container) do
 			Hook(button)
-			update(button)
+			ns.SafeCall("bag update", update, button)
 		end
 	end)
 	for container in ns.ContainerFrames() do
@@ -277,7 +277,7 @@ end
 ---@param fn fun()
 function ns.Init(fn)
 	if ready then
-		Start("startup", fn)
+		ns.SafeCall("startup", fn)
 	else
 		pending[#pending + 1] = fn
 	end
@@ -310,7 +310,7 @@ login:SetScript("OnEvent", function()
 	end
 	ready = true
 	for _, fn in ipairs(pending) do
-		Start("startup", fn)
+		ns.SafeCall("startup", fn)
 	end
 	pending = nil
 end)
