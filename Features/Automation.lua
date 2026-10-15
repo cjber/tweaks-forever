@@ -209,7 +209,7 @@ end)
 -- A hand-in that costs gold waits for you to pay it.
 ns.On("QUEST_COMPLETE", function()
 	local choices = GetNumQuestChoices()
-	if Quests() and choices <= 1 and not ((GetQuestMoneyToGet() or 0) > 0) then
+	if Quests() and choices <= 1 and (GetQuestMoneyToGet() or 0) <= 0 then
 		GetQuestReward(choices)
 	end
 end)
