@@ -1,5 +1,10 @@
 local features, initializers = {}, {}
 local ns = {
+	L = setmetatable({}, {
+		__index = function(_, key)
+			return key
+		end,
+	}),
 	QuestTitle = function(_, title)
 		return title
 	end,
@@ -18,8 +23,18 @@ local quests = {
 	[1] = { objectives = { { { 10 } }, nil, { { 500 } } } },
 	[2] = { objectives = { nil, nil, { { 501 } }, nil, { { { 20, 21 }, 29, "Ghoul slain" } } } },
 	[3] = { objectives = { { { 30 } }, { { 700 } } }, triggerEnd = { "Explore", {} } },
+	[5] = { objectives = { nil, { { 701 } } } },
+	[6] = { name = "A Letter for Maybell" },
+	[7] = { name = "Already Done" },
 }
-local items = { [500] = { npcDrops = { 10, 11 } }, [501] = { npcDrops = { 40 } } }
+-- Item 600 starts quest 6; 601 starts one you've done; 602 starts quest 1, already in your log.
+local items = {
+	[500] = { npcDrops = { 10, 11 } },
+	[501] = { npcDrops = { 40 } },
+	[600] = { startQuest = 6 },
+	[601] = { startQuest = 7 },
+	[602] = { startQuest = 1 },
+}
 local reads = 0
 local function Entity(rows)
 	return {
@@ -50,6 +65,7 @@ local log = {
 	{ questID = 2, title = "Ghoulish" },
 	{ questID = 3, title = "Boars" },
 	{ questID = 4, title = "Kobolds" },
+	{ questID = 5, title = "The Altar" },
 }
 -- Objectives the game wrote for kills, and ones with text of their own.
 local function Kill(name, count, required)
@@ -75,6 +91,7 @@ local objectives = {
 		{ text = "Explore", type = "event", finished = false },
 	},
 	[4] = { Kill("Kobold Vermin", 2, 8) },
+	[5] = { { text = "0/1 Altar of Light used", type = "object", finished = false } },
 }
 local complete = {}
 local postCalls, events, changed, timers = {}, {}, {}, {}
@@ -114,6 +131,9 @@ local env = setmetatable({
 		IsComplete = function(id)
 			return complete[id] or false
 		end,
+		IsQuestFlaggedCompleted = function(id)
+			return id == 7
+		end,
 	},
 	C_Texture = {
 		GetAtlasInfo = function()
@@ -148,7 +168,10 @@ local env = setmetatable({
 			postCalls[kind] = fn
 		end,
 	},
-	Enum = { TooltipDataType = { Unit = 2 }, TooltipDataLineType = { QuestObjective = 8, QuestTitle = 17 } },
+	Enum = {
+		TooltipDataType = { Item = 0, Unit = 2, Object = 33 },
+		TooltipDataLineType = { QuestObjective = 8, QuestTitle = 17 },
+	},
 	NORMAL_FONT_COLOR = { r = 1, g = 0.82, b = 0 },
 	HIGHLIGHT_FONT_COLOR = { r = 1, g = 1, b = 1 },
 	GRAY_FONT_COLOR = { r = 0.5, g = 0.5, b = 0.5 },
@@ -227,6 +250,21 @@ assert(#Model.Lines(40) == 2, "a hinted item objective is the first")
 assert(#Model.Lines(30) == 0, "a position whose kind disagrees is left out, though the log's text names boars")
 assert(#Model.Lines(99) == 0 and #Model.Lines(nil) == 0)
 
+-- Quest items and objects by their own IDs, and the quest an item starts.
+lines = Model.Lines(500, "item")
+assert(#lines == 2 and lines[1][1] == "Wolves and Fangs" and lines[2][1] == " - 5/5 Wolf Fang", "a quest item")
+assert(Model.Lines(501, "item")[2][1] == " - 0/4 Cursed Bone")
+assert(#Model.Lines(10, "item") == 0, "a creature's ID isn't an item's")
+lines = Model.Lines(701, "object")
+assert(#lines == 2 and lines[2][1] == " - 0/1 Altar of Light used", "an object to use")
+assert(#Model.Lines(700, "object") == 0, "an object whose position disagrees is left out")
+assert(Model.ObjectId("GameObject-0-3113-0-47-701-0000ABCDEF") == 701)
+assert(Model.ObjectId("Creature-0-3113-0-47-701-0000ABCDEF") == nil and Model.ObjectId("secret") == nil)
+assert(Model.Starts(600) == "Starts a quest: A Letter for Maybell")
+assert(Model.Starts(601) == nil, "not one you've done")
+assert(Model.Starts(602) == nil, "not one in your log")
+assert(Model.Starts(500) == nil and Model.Starts(nil) == nil)
+
 -- Needed: an unfinished objective in a quest that isn't complete.
 assert(Model.Needed(10) and not Model.Needed(11) and Model.Needed(21) and not Model.Needed(99))
 complete[1] = true
@@ -271,9 +309,18 @@ postCalls[2](tooltip, { guid = "secret", lines = { { leftText = "Kobold Vermin" 
 assert(#added == 3, "never by name")
 postCalls[2](tooltip, { guid = wolf, lines = { { leftText = "Mangy Wolf" }, { type = 8 } } })
 assert(#added == 3, "the game already listed them")
+postCalls[0](tooltip, { id = 500, lines = {} })
+assert(#added == 5 and added[5] == " - 5/5 Wolf Fang", "a quest item's tooltip")
+postCalls[0](tooltip, { id = 600, lines = {} })
+assert(added[6] == "Starts a quest: A Letter for Maybell", "an item that starts a quest")
+postCalls[33](tooltip, { guid = "GameObject-0-3113-0-47-701-0000ABCDEF", lines = {} })
+assert(added[8] == " - 0/1 Altar of Light used", "an object's tooltip")
+postCalls[0](tooltip, { id = 500, lines = { { type = 17 } } })
+assert(#added == 8, "the game already listed an item's quest")
 ns.db.questTooltips = false
 postCalls[2](tooltip, { guid = wolf, lines = {} })
-assert(#added == 3, "switched off")
+postCalls[0](tooltip, { id = 600, lines = {} })
+assert(#added == 8, "switched off")
 
 local plate = { UnitFrame = { HealthBarsContainer = {} } }
 plates.nameplate1, guids.nameplate1 = plate, wolf

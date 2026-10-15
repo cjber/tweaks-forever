@@ -1,5 +1,6 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
 local TOOLTIP, PLATES = "questTooltips", "questPlates"
 
@@ -27,7 +28,8 @@ ns.Feature({
 	name = "Quest progress on tooltips",
 	tooltip = "Pointing at a creature you need for a quest, to kill or for an item it drops, adds the quest and "
 		.. 'your progress to its tooltip, such as "Mangy Wolf slain: 3/10", in white until it is done and grey '
-		.. "after. Needs Questie, or its QuestieDB addon on its own.",
+		.. "after. Quest items and objects you need show their quest the same way, and an item that starts a quest "
+		.. "says so. Needs Questie, or its QuestieDB addon on its own.",
 	default = true,
 	conflicts = {
 		{ addon = "Questie", when = QuestieOption("enableTooltips") },
@@ -59,6 +61,8 @@ ns.Feature({
 -- here. The log names each objective's kind, so a position whose kind disagrees is left out rather than guessed.
 local QUEST_FIELDS = { "objectives", "triggerEnd" }
 local ITEM_FIELDS = { "npcDrops" }
+local START_FIELDS = { "startQuest" }
+local NAME_FIELDS = { "name" }
 -- QuestieDB's objective groups in its order, with the kind the log gives each and its ObjectiveFirst hint.
 local GROUPS = {
 	{ slot = 1, kind = "monster" },
@@ -82,9 +86,9 @@ local hints = {}
 -- [questID] = its objectives in the log's order by QuestieDB, each { kind, npcs = set of creature IDs }, read once.
 ---@type table<integer, TFQuestTarget[]>
 local targets = {}
--- [creature ID] = [questID] = which of that quest's objectives it counts for.
+-- [creature ID] = [questID] = which of that quest's objectives it counts for; the same for items and objects.
 ---@type table<integer, table<integer, TFQuestLink>>
-local byNpc = {}
+local byNpc, byItem, byObject = {}, {}, {}
 -- The quests in your log, in its order, with their objectives as of its last change.
 ---@type TFLogQuest[]
 local logQuests = {}
@@ -100,6 +104,19 @@ function Model.Attach()
 	end
 	quests, items, hints = db.Quest, db.Item, db.ObjectiveFirst or {}
 	return true
+end
+
+-- The object ID in a game object's GUID, or nil for anything else or a GUID addon code can't read.
+---@param guid any
+---@return integer?
+function Model.ObjectId(guid)
+	if not canaccessvalue(guid) or type(guid) ~= "string" then
+		return nil
+	end
+	local kind, id = guid:match("^(%a+)%-%d+%-%d+%-%d+%-%d+%-(%d+)%-%x+$")
+	if kind == "GameObject" then
+		return tonumber(id)
+	end
 end
 
 -- The creature ID in a unit's GUID, or nil for a player, an object or a GUID addon code can't read.
@@ -164,7 +181,13 @@ function Model.Targets(id)
 			end
 			local first = group.first and hints[group.first] and hints[group.first][id]
 			for _, entry in ipairs(type(entries) == "table" and entries or {}) do
-				local target = { kind = group.kind, npcs = Npcs(group, entry) }
+				local target = { kind = group.kind, npcs = Npcs(group, entry), items = {}, objects = {} }
+				local thing = type(entry) == "table" and entry[1]
+				if group.slot == 3 and type(thing) == "number" then
+					target.items[thing] = true
+				elseif group.slot == 2 and type(thing) == "number" then
+					target.objects[thing] = true
+				end
 				if first then
 					table.insert(list, 1, target)
 				else
@@ -173,7 +196,7 @@ function Model.Targets(id)
 			end
 		end
 		if values[2] ~= nil then
-			local event = { kind = "event", npcs = {} }
+			local event = { kind = "event", npcs = {}, items = {}, objects = {} }
 			if hints.eventObjectiveFirst and hints.eventObjectiveFirst[id] then
 				table.insert(list, 1, event)
 			else
@@ -185,9 +208,23 @@ function Model.Targets(id)
 	return list
 end
 
--- Read your quest log, and index its quests by the creatures that count toward them.
+---@param index table<integer, table<integer, TFQuestLink>>
+---@param ids table<integer, true>
+---@param quest integer
+---@param position integer
+---@param kind string
+local function Link(index, ids, quest, position, kind)
+	for id in pairs(ids) do
+		index[id] = index[id] or {}
+		local link = index[id][quest] or {}
+		index[id][quest] = link
+		link[position] = kind
+	end
+end
+
+-- Read your quest log, and index its quests by the creatures, items and objects that count toward them.
 function Model.Rebuild()
-	logQuests, byNpc = {}, {}
+	logQuests, byNpc, byItem, byObject = {}, {}, {}, {}
 	for index = 1, C_QuestLog.GetNumQuestLogEntries() do
 		local info = C_QuestLog.GetInfo(index)
 		if info and not info.isHeader and not info.isHidden and info.questID and info.questID ~= 0 then
@@ -199,22 +236,34 @@ function Model.Rebuild()
 				objectives = C_QuestLog.GetQuestObjectives(id) or {},
 			}
 			for position, target in ipairs(Model.Targets(id)) do
-				for npc in pairs(target.npcs) do
-					byNpc[npc] = byNpc[npc] or {}
-					local link = byNpc[npc][id] or {}
-					byNpc[npc][id] = link
-					link[position] = target.kind
-				end
+				Link(byNpc, target.npcs, id, position, target.kind)
+				Link(byItem, target.items, id, position, target.kind)
+				Link(byObject, target.objects, id, position, target.kind)
 			end
 		end
 	end
 end
 
--- The quests in your log a creature counts for, each with the objectives it counts for, in log order.
----@param npc integer?
+local indexes = {
+	npc = function()
+		return byNpc
+	end,
+	item = function()
+		return byItem
+	end,
+	object = function()
+		return byObject
+	end,
+}
+
+-- The quests in your log a creature (or, by `kind`, an item or object) counts for, each with the objectives it
+-- counts for, in log order.
+---@param id integer?
+---@param kind? "npc"|"item"|"object"
 ---@return TFQuestMatch[]
-function Model.Matches(npc)
-	local links = npc and byNpc[npc] or {}
+function Model.Matches(id, kind)
+	local index = indexes[kind or "npc"]()
+	local links = id and index[id] or {}
 	local matches = {}
 	for _, quest in ipairs(logQuests) do
 		local link = links[quest.id]
@@ -231,12 +280,14 @@ function Model.Matches(npc)
 	return matches
 end
 
--- A creature's tooltip lines: each quest's title, then its objectives this creature counts for, white until done.
----@param npc integer?
+-- A creature's tooltip lines (or an item's or object's, by `kind`): each quest's title, then its objectives this one
+-- counts for, white until done.
+---@param id integer?
+---@param kind? "npc"|"item"|"object"
 ---@return [string, number, number, number][]
-function Model.Lines(npc)
+function Model.Lines(id, kind)
 	local lines = {}
-	for _, match in ipairs(Model.Matches(npc)) do
+	for _, match in ipairs(Model.Matches(id, kind)) do
 		local title = NORMAL_FONT_COLOR
 		lines[#lines + 1] = { ns.QuestTitle(match.quest.id, match.quest.title), title.r, title.g, title.b }
 		for _, objective in ipairs(match.objectives) do
@@ -245,6 +296,25 @@ function Model.Lines(npc)
 		end
 	end
 	return lines
+end
+
+-- The quest an item starts, by QuestieDB, while it is neither in your log nor done: its line for the tooltip.
+---@param item integer?
+---@return string?
+function Model.Starts(item)
+	local values = item and items and items.GetAll(item, START_FIELDS)
+	local quest = values and values[1]
+	if type(quest) ~= "number" or quest == 0 or C_QuestLog.IsQuestFlaggedCompleted(quest) then
+		return nil
+	end
+	for _, logged in ipairs(logQuests) do
+		if logged.id == quest then
+			return nil
+		end
+	end
+	local names = quests and quests.GetAll(quest, NAME_FIELDS)
+	local name = names and names[1]
+	return L["Starts a quest: %s"]:format(type(name) == "string" and name or tostring(quest))
 end
 
 -- Whether a creature still counts toward a quest in your log that isn't complete.
@@ -373,16 +443,53 @@ ns.Init(function()
 	Model.Rebuild()
 	UpdatePlates()
 
-	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function(tooltip, data)
-		if tooltip ~= GameTooltip or not ns.Usable(tooltip) or not ns.Active(TOOLTIP) or Model.HasQuestLines(data) then
-			return
-		end
-		local lines = Model.Lines(Model.NpcId(data.guid))
+	---@param tooltip GameTooltip
+	---@param data TooltipData
+	---@return boolean
+	local function Wanted(tooltip, data)
+		return tooltip == GameTooltip and ns.Usable(tooltip) and ns.Active(TOOLTIP) and not Model.HasQuestLines(data)
+	end
+	---@param tooltip GameTooltip
+	---@param lines [string, number, number, number][]
+	local function Add(tooltip, lines)
 		for _, line in ipairs(lines) do
 			tooltip:AddLine(line[1], line[2], line[3], line[4])
 		end
 		if #lines > 0 then
 			tooltip:Show()
 		end
+	end
+	local types = Enum.TooltipDataType
+	TooltipDataProcessor.AddTooltipPostCall(types.Unit, function(tooltip, data)
+		if not ns.Usable(tooltip) then
+			return
+		end
+		if Wanted(tooltip, data) then
+			Add(tooltip, Model.Lines(Model.NpcId(data.guid)))
+		end
 	end)
+	TooltipDataProcessor.AddTooltipPostCall(types.Item, function(tooltip, data)
+		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
+			return
+		end
+		local item = ns.Readable(data.id)
+		local lines = Model.Lines(type(item) == "number" and item or nil, "item")
+		local starts = type(item) == "number" and Model.Starts(item)
+		if starts then
+			local color = NORMAL_FONT_COLOR
+			lines[#lines + 1] = { starts, color.r, color.g, color.b }
+		end
+		Add(tooltip, lines)
+	end)
+	-- World objects (a chest, a shrine) where the client sends their tooltips this way.
+	if types.Object then
+		TooltipDataProcessor.AddTooltipPostCall(types.Object, function(tooltip, data)
+			if not ns.Usable(tooltip) then
+				return
+			end
+			if Wanted(tooltip, data) then
+				Add(tooltip, Model.Lines(Model.ObjectId(ns.Readable(data.guid)), "object"))
+			end
+		end)
+	end
 end)
