@@ -122,4 +122,56 @@ assert(#looted == 0, "manual or modified-click looting remains manual")
 db.fastLoot = false
 handlers.LOOT_READY(true)
 assert(#looted == 0, "the toggle disables fast looting immediately")
+
+-- The quest frame: a PvP-flagging quest and a hand-in that costs gold wait for the player.
+local calls = {}
+local pvp, autoAccepted, cost, choices = false, false, 0, 0
+env.QuestFlagsPVP = function()
+	return pvp
+end
+env.QuestGetAutoAccept = function()
+	return autoAccepted
+end
+env.GetQuestMoneyToGet = function()
+	return cost
+end
+env.GetNumQuestChoices = function()
+	return choices
+end
+for _, name in ipairs({ "AcceptQuest", "AcknowledgeAutoAcceptQuest", "GetQuestReward", "CompleteQuest" }) do
+	env[name] = function(...)
+		calls[#calls + 1] = name .. (select("#", ...) > 0 and "(" .. tostring((...)) .. ")" or "")
+	end
+end
+env.IsQuestCompletable = function()
+	return true
+end
+local function Quest(event)
+	calls = {}
+	handlers[event]()
+	return table.concat(calls, ",")
+end
+
+db.quests = true
+assert(Quest("QUEST_DETAIL") == "AcceptQuest", "an ordinary quest is accepted")
+pvp = true
+assert(Quest("QUEST_DETAIL") == "", "a quest that flags you for PvP is left to accept")
+pvp, autoAccepted = false, true
+assert(Quest("QUEST_DETAIL") == "AcknowledgeAutoAcceptQuest", "a quest the server accepted is acknowledged")
+autoAccepted = false
+assert(Quest("QUEST_PROGRESS") == "CompleteQuest")
+assert(Quest("QUEST_COMPLETE") == "GetQuestReward(0)", "a quest with no reward choice is handed in")
+choices = 1
+assert(Quest("QUEST_COMPLETE") == "GetQuestReward(1)", "a lone reward is taken")
+cost = 500
+assert(Quest("QUEST_COMPLETE") == "", "a hand-in that costs gold waits for you to pay")
+cost, choices = 0, 2
+assert(Quest("QUEST_COMPLETE") == "", "a choice of rewards is yours")
+choices = 0
+shift = true
+assert(Quest("QUEST_DETAIL") == "" and Quest("QUEST_COMPLETE") == "", "Shift skips the quest frame too")
+shift = false
+db.quests = false
+assert(Quest("QUEST_DETAIL") == "" and Quest("QUEST_COMPLETE") == "", "off leaves the quest frame alone")
+
 print("automation: ok")

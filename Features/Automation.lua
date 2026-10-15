@@ -18,7 +18,8 @@ ns.Feature({
 	category = "Automation",
 	name = "Accept and turn in quests",
 	tooltip = "Quests are accepted and turned in for you as you talk to an NPC. Hold Shift while talking to skip "
-		.. "it. A quest with a choice of rewards is left for you to pick.",
+		.. "it. A quest with a choice of rewards is left for you to pick, and so is one that flags you for PvP or "
+		.. "costs gold to hand in.",
 	default = false,
 	conflicts = {
 		Leatrix("AutomateQuests"),
@@ -169,8 +170,15 @@ ns.On("QUEST_GREETING", function()
 	end
 end)
 
+-- A quest that flags you for PvP waits for you to accept it. One the server has already accepted (an item or
+-- area that starts a quest) only needs acknowledging.
 ns.On("QUEST_DETAIL", function()
-	if Quests() then
+	if not Quests() or QuestFlagsPVP() then
+		return
+	end
+	if QuestGetAutoAccept() then
+		AcknowledgeAutoAcceptQuest()
+	else
 		AcceptQuest()
 	end
 end)
@@ -189,9 +197,10 @@ ns.On("QUEST_PROGRESS", function()
 	end
 end)
 
+-- A hand-in that costs gold waits for you to pay it.
 ns.On("QUEST_COMPLETE", function()
 	local choices = GetNumQuestChoices()
-	if Quests() and choices <= 1 then
+	if Quests() and choices <= 1 and GetQuestMoneyToGet() == 0 then
 		GetQuestReward(choices)
 	end
 end)
