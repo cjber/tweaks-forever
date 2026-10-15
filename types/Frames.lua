@@ -69,3 +69,8 @@
 ---@class TFClickOverlay : Button
 ---@field UpdateTooltip fun(overlay: TFClickOverlay)
 ---@field GetParent fun(self: TFClickOverlay): ContainerFrameItemButtonTemplate
+
+-- A quest reward button as Blizzard's QuestInfo lays it out: `type` is "choice" for a reward you choose.
+---@class TFRewardButton : Button
+---@field type string?
+---@field Icon Texture?

@@ -237,4 +237,163 @@ shift = false
 db.quests = false
 assert(Quest("QUEST_DETAIL") == "" and Quest("QUEST_COMPLETE") == "", "off leaves the quest frame alone")
 
+-- Summons, resurrections and battleground release: guarded, and a popup hidden only once the accept took.
+local timers, hidden = {}, {}
+env.C_Timer = {
+	After = function(delay, fn)
+		timers[#timers + 1] = { delay = delay, fn = fn }
+	end,
+}
+env.StaticPopup_Hide = function(name)
+	hidden[#hidden + 1] = name
+end
+local function Tick()
+	local due = timers
+	timers = {}
+	for _, timer in ipairs(due) do
+		timer.fn()
+	end
+	return due
+end
+local summonLeft, canTeleport, combat, summoned = 60, true, false, 0
+env.C_SummonInfo = {
+	ConfirmSummon = function()
+		summoned = summoned + 1
+	end,
+	GetSummonConfirmTimeLeft = function()
+		return summonLeft
+	end,
+}
+env.PlayerCanTeleport = function()
+	return canTeleport
+end
+env.UnitAffectingCombat = function()
+	return combat
+end
+
+db.summons = true
+handlers.CONFIRM_SUMMON()
+assert(summoned == 1, "a summon is accepted")
+Tick()
+assert(#hidden == 0, "the popup stays while the game still holds the summon")
+summonLeft = 0
+Tick()
+assert(
+	table.concat(hidden, ",") == "CONFIRM_SUMMON,CONFIRM_SUMMON_STARTING_AREA,CONFIRM_SUMMON_SCENARIO",
+	"and goes once the summon is taken, whichever summon popup the game showed"
+)
+hidden, summonLeft, summoned = {}, 60, 0
+handlers.CONFIRM_SUMMON()
+local ticks = 0
+while #timers > 0 do
+	Tick()
+	ticks = ticks + 1
+end
+assert(summoned == 1 and #hidden == 0, "a refused accept leaves the popup for you")
+assert(ticks == 20, "checked for ten seconds, then left")
+summoned = 0
+canTeleport = false
+handlers.CONFIRM_SUMMON()
+assert(summoned == 0, "not where you can't teleport from")
+canTeleport, combat = true, true
+handlers.CONFIRM_SUMMON()
+assert(summoned == 0, "not in combat")
+combat = false
+handlers.PLAYER_REGEN_ENABLED()
+assert(summoned == 1, "accepted once the fight ends, if it still stands")
+timers, summoned = {}, 0
+summonLeft = 0
+handlers.PLAYER_REGEN_ENABLED()
+assert(summoned == 0, "no summon pending, nothing to accept")
+summonLeft, shift = 60, true
+handlers.CONFIRM_SUMMON()
+shift = false
+handlers.PLAYER_REGEN_ENABLED()
+assert(summoned == 0, "Shift leaves it to you, even after a fight")
+db.summons = false
+
+local offer, delay, offererCombat, resurrected = "Ally", 0, false, 0
+env.ResurrectGetOfferer = function()
+	return offer
+end
+env.GetCorpseRecoveryDelay = function()
+	return delay
+end
+env.UnitExists = function(unit)
+	return unit == "Ally" or unit == "Other"
+end
+env.UnitAffectingCombat = function(unit)
+	return unit == "Ally" and offererCombat
+end
+env.AcceptResurrect = function()
+	resurrected = resurrected + 1
+end
+db.resurrections = true
+timers, hidden = {}, {}
+handlers.RESURRECT_REQUEST("Ally")
+assert(resurrected == 1 and #hidden == 0, "a group member's resurrection is accepted; the game closes its popups")
+resurrected = 0
+delay = 5
+handlers.RESURRECT_REQUEST("Ally")
+assert(resurrected == 0 and timers[1].delay > 5, "the corpse recovery delay is waited out")
+delay = 0
+shift = true
+Tick()
+shift = false
+assert(resurrected == 1, "then accepted, Shift then no matter")
+timers, resurrected = {}, 0
+delay = 5
+handlers.RESURRECT_REQUEST("Ally")
+offer, delay = "Stranger", 0
+Tick()
+assert(resurrected == 0, "a different offer standing when the delay ends is not accepted")
+offer, delay = "Ally", 5
+handlers.RESURRECT_REQUEST("Ally")
+offer = "Other"
+handlers.RESURRECT_REQUEST("Other")
+delay = 0
+Tick()
+assert(resurrected == 1, "a newer offer replaces the older wait: one accept")
+timers, resurrected, offer = {}, 0, "Stranger"
+handlers.RESURRECT_REQUEST("Stranger")
+assert(resurrected == 0, "not from outside the group")
+offer, offererCombat = "Ally", true
+handlers.RESURRECT_REQUEST("Ally")
+assert(resurrected == 0, "not from someone in combat")
+offererCombat, shift = false, true
+handlers.RESURRECT_REQUEST("Ally")
+assert(resurrected == 0, "Shift leaves it to you")
+shift = false
+db.resurrections = false
+
+local released = 0
+env.IsInInstance = function()
+	return true, "pvp"
+end
+env.UnitIsDead = function()
+	return true
+end
+env.C_DeathInfo = {
+	GetSelfResurrectOptions = function()
+		return {}
+	end,
+}
+env.RepopMe = function()
+	released = released + 1
+end
+db.releasePvP = true
+timers = {}
+handlers.PLAYER_DEAD()
+Tick()
+assert(released == 1, "released in a battleground")
+handlers.PLAYER_DEAD()
+shift = true
+Tick()
+assert(released == 1, "Shift held just after dying keeps you where you fell")
+handlers.PLAYER_DEAD()
+shift = false
+Tick()
+assert(released == 1, "so does Shift held as you die")
+shift = false
+
 print("automation: ok")

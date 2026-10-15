@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Summons and resurrections are accepted more carefully.** A summon isn't accepted where the game won't let you teleport out, and one that arrives in a fight is accepted when it ends, a resurrection waits out the delay after dying again soon, and Shift leaves either one, or a battleground release, to you. Their popups now close only once the game has taken the answer, so one it refuses stays up.
+- **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.
+- **`/tweaks report` gives you something to paste into a bug report.** It opens a small window with the text already selected: your addon and game versions, your character, the settings you changed, which features are standing down for another addon, your other addons, and any errors Tweaks caught this session. Press Ctrl+C and paste it.
+
 - **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as what you sell there, such as your junk, brings in enough.
 - **Quest automation leaves the costly ones to you.** A quest that would flag you for PvP is no longer accepted for you, and a hand-in that costs gold is no longer paid without asking. A quest the game has already accepted for you is acknowledged instead of accepted again.
 - **Polestar is respected like the other addons.** With Polestar loaded, auto repair, quest and gossip automation, summons, resurrections, battleground release, duel declines, faster auto loot, quiet errors, revealed maps, zone level ranges, and quest tooltips and nameplate icons (once its quest database has loaded) each stand down, named in the settings, while Polestar's own matching option is on, and follow that option as soon as you change it. While Polestar sells your greys, only your marked non-grey junk is sold here.
