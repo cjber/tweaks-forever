@@ -52,6 +52,7 @@ UI\Nameplates.lua
 UI\SpellReach.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua
+Map\Coordinates.lua
 Integrations\Navigate.lua
 Map\DungeonEntrances.lua
 Map\DungeonEntrances.xml

@@ -13,6 +13,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 
 - **Quest progress on item and object tooltips.** With QuestieDB, a quest item shows the quest it counts for and your progress on its tooltip, as creatures already did, and so do objects you use or loot for a quest. An item that starts a quest you haven't done says "Starts a quest:" and names it.
+- **Coordinates on the world map.** Your position and the cursor's show along the bottom of the world map. Turn it off under Maps; it steps aside for Leatrix Maps, Mapster, Coordinates and Polestar when they show their own.
+- **Quest levels in quest dialogs.** With Show quest levels on, the quest greeting list and a quest's detail and reward titles show its level, such as [12], where the game knows it.
 - **Party invites by who sends them, and duels from friends.** New options, all off until you turn them on: accept party invites from your friends, Battle.net friends and guild (not while you are queued for a battleground), decline invites from anyone else, and let friends and guild still challenge you when duels are declined.
 - **Summons and resurrections are accepted more carefully.** A summon isn't accepted where the game won't let you teleport out, and one that arrives in a fight is accepted when it ends, a resurrection waits out the delay after dying again soon, and Shift leaves either one, or a battleground release, to you. Their popups now close only once the game has taken the answer, so one it refuses stays up.
 - **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.

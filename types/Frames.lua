@@ -74,3 +74,8 @@
 ---@class TFRewardButton : Button
 ---@field type string?
 ---@field Icon Texture?
+
+-- A quest button on the quest greeting panel, from Blizzard's own pool: `isActive` is 1 for a quest in your log.
+---@class TFGreetingButton : Button
+---@field isActive number?
+---@field Icon Texture?
