@@ -93,21 +93,50 @@ function ns.OnTooltip(dataType, getters, fn)
 end
 
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
--- addon's own setting }; with no `when`, the addon being loaded is the conflict.
+-- addon's own setting }; with no `when`, the addon being loaded is the conflict. { polestar = setting path } is
+-- Polestar's own setting, on (ns.PolestarOn) while Polestar is loaded; `addon` can name another of its addons that
+-- must be loaded too.
 ---@param feature TFFeature
 function ns.Feature(feature)
 	assert(not byKey[feature.key], "duplicate feature " .. feature.key)
 	feature.conflicts = feature.conflicts or {}
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.polestar then
+			conflict.addon, conflict.title = conflict.addon or "Polestar", "Polestar"
+		end
+	end
 	ns.features[#ns.features + 1] = feature
 	byKey[feature.key] = feature
+end
+
+-- Whether Polestar is loaded with one of its settings on, read through its own Polestar.Get. Its settings are
+-- true/false, or a choice where "off" is off. Anything unreadable counts as off.
+---@param path string
+---@return boolean
+function ns.PolestarOn(path)
+	if not (C_AddOns.IsAddOnLoaded("Polestar") and Polestar and Polestar.Get) then
+		return false
+	end
+	local ok, value = pcall(Polestar.Get, path)
+	return ok and value ~= nil and value ~= false and value ~= "off"
+end
+
+---@param conflict TFConflict
+---@return boolean?
+local function Applies(conflict)
+	if conflict.polestar then
+		return ns.PolestarOn(conflict.polestar)
+	end
+	return not conflict.when or conflict.when()
 end
 
 ---@param feature TFFeature
 ---@return string?
 local function FindConflict(feature)
 	for _, conflict in ipairs(feature.conflicts) do
-		if C_AddOns.IsAddOnLoaded(conflict.addon) and (not conflict.when or conflict.when()) then
-			return conflict.title or C_AddOns.GetAddOnMetadata(conflict.addon, "Title") or conflict.addon
+		local addon = conflict.addon --[[@as string]]
+		if C_AddOns.IsAddOnLoaded(addon) and Applies(conflict) then
+			return conflict.title or C_AddOns.GetAddOnMetadata(addon, "Title") or addon
 		end
 	end
 end
@@ -254,6 +283,12 @@ end
 
 local login = CreateFrame("Frame")
 login:RegisterEvent("PLAYER_LOGIN")
+-- A load-on-demand addon (Polestar's quest database) can become a conflict after login.
+ns.On("ADDON_LOADED", function()
+	if ready then
+		ns.RefreshConflicts()
+	end
+end)
 login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
@@ -265,6 +300,12 @@ login:SetScript("OnEvent", function()
 	TweaksForeverDB, ns.db = db, db
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	ns.RefreshConflicts()
+	-- Polestar applies its settings at once, so its matching features here follow them at once too.
+	if Polestar and type(Polestar.On) == "function" and C_AddOns.IsAddOnLoaded("Polestar") then
+		pcall(Polestar.On, "SETTING_CHANGED", function()
+			ns.RefreshConflicts()
+		end)
+	end
 	ready = true
 	for _, fn in ipairs(pending) do
 		Start(fn)

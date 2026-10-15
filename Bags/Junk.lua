@@ -31,9 +31,9 @@ ns.Feature({
 		BATCH_SIZE
 	)
 		.. " "
-		.. L["With Leatrix Plus auto-selling, only marked non-grey items are sold here."],
+		.. L["With Leatrix Plus or Polestar selling junk, only marked non-grey items are sold here."],
 	default = true,
-	-- Leatrix owns only greys; disabling this feature entirely would strand our marks.
+	-- Leatrix and Polestar sell only greys; disabling this feature entirely would strand our marks.
 	conflicts = conflicts,
 })
 
@@ -96,8 +96,12 @@ local function Marks()
 	return ns.Active("markJunk") and ns.db.junk or emptyMarks
 end
 
-local function LeatrixSellsGreys()
-	return C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On"
+-- Another addon selling the greys at each merchant, so the game's Sell All Junk would race it.
+local function OtherSellsGreys()
+	if C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On" then
+		return true
+	end
+	return ns.PolestarOn("qol.sellJunk")
 end
 
 local icons = {}
@@ -346,7 +350,7 @@ Start = function(manual)
 	if
 		not manual
 		and not merchant.native
-		and not LeatrixSellsGreys()
+		and not OtherSellsGreys()
 		and C_MerchantFrame.IsSellAllJunkEnabled()
 		and count > 0
 	then

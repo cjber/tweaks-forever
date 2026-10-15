@@ -51,6 +51,11 @@ local env = setmetatable({
 }, { __index = _G })
 setfenv(assert(loadfile("Bags/Vendor.lua")), env)("TweaksForever", ns)
 assert(features.repair.default == true, "repairs start on")
+local polestar
+for _, conflict in ipairs(features.repair.conflicts) do
+	polestar = polestar or conflict.polestar
+end
+assert(polestar == "qol.autoRepair", "Polestar's own auto repair is a conflict")
 
 local function Reset(newMoney, newCost)
 	money, cost, repairs, printed = newMoney, newCost, {}, {}

@@ -12,6 +12,7 @@ verbatim rather than rewritten as the addon moves.
 ## [Unreleased]
 
 - **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as selling your junk there brings in enough.
+- **Polestar is respected like the other addons.** With Polestar loaded, auto repair, quest and gossip automation, summons, resurrections, battleground release, duel declines, faster auto loot, quiet errors, revealed maps, zone level ranges, and quest tooltips and nameplate icons (once its quest database has loaded) each stand down, named in the settings, while Polestar's own matching option is on, and follow that option as soon as you change it. While Polestar sells your greys, only your marked non-grey junk is sold here.
 
 ## [0.11.5] - 2026-10-15
 

@@ -7,6 +7,13 @@ LeaPlusDB = nil
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
+-- Polestar's namespace: its settings by path, and its message bus (SETTING_CHANGED as a setting changes).
+---@class PolestarNamespace
+---@field Get fun(path: string): any
+---@field On? fun(message: string, fn: function)
+
+---@type PolestarNamespace?
+Polestar = nil
 ---@type {API: {RegisterOnReady: fun(callback: fun())?}?, usedIcons: table<integer, string>?, db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
 Questie = nil
 
