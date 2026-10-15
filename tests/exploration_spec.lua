@@ -1,9 +1,11 @@
-local features = {}
+local features, init = {}, nil
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,
-	Init = function() end,
+	Init = function(fn)
+		init = fn
+	end,
 }
 local env = setmetatable({}, { __index = _G })
 assert(loadfile("Data/Overlays.lua"))("TweaksForever", ns)
@@ -97,4 +99,45 @@ for art, encoded in pairs(ns.Overlays) do
 	end
 end
 assert(arts == 84 and areas == 1073 and files == 1739, "pinned build coverage changed")
+
+-- Wired to the world map and to the zone map once it loads, redrawn when an area is discovered.
+local handlers, settingChanged = {}, nil
+ns.On = function(event, fn)
+	handlers[event] = fn
+end
+ns.OnSettingChanged = function(_, fn)
+	settingChanged = fn
+end
+ns.Active = function()
+	return true
+end
+local function Canvas()
+	local canvas = { providers = {}, draws = 0 }
+	canvas.GetMapID = function() end
+	function canvas:AddDataProvider(provider)
+		self.providers[#self.providers + 1] = provider
+	end
+	-- No exploration pin yet: each draw stops after looking for it.
+	function canvas:EnumeratePinsByTemplate()
+		self.draws = self.draws + 1
+		return function() end
+	end
+	return canvas
+end
+env.MapCanvasDataProviderMixin = {}
+env.CreateFromMixins = function()
+	return {}
+end
+env.WorldMapFrame = Canvas()
+init()
+assert(#env.WorldMapFrame.providers == 1, "the world map has our provider")
+env.BattlefieldMapFrame = Canvas()
+handlers.ADDON_LOADED("Blizzard_BattlefieldMap")
+assert(#env.BattlefieldMapFrame.providers == 1, "and the zone map once it loads")
+handlers.ADDON_LOADED("Blizzard_BattlefieldMap")
+assert(#env.BattlefieldMapFrame.providers == 1, "once")
+handlers.MAP_EXPLORATION_UPDATED()
+assert(env.WorldMapFrame.draws == 1 and env.BattlefieldMapFrame.draws == 1, "a discovery redraws both")
+settingChanged()
+assert(env.WorldMapFrame.draws == 2 and env.BattlefieldMapFrame.draws == 2, "so does the setting")
 print("exploration_spec: ok")

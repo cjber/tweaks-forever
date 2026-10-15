@@ -151,8 +151,10 @@ local function Areas(art, layer)
 	return cachedLayers[layer] or {}
 end
 
-ns.Init(function()
-	local map = WorldMapFrame
+-- Draw the tint on one map canvas: the world map, or the zone map (BattlefieldMapFrame). Returns its redraw.
+---@param map MapCanvasMixin
+---@return fun()
+local function Attach(map)
 	-- Drawn on Blizzard's exploration pin, below its explored textures, so overlapping edges retain Blizzard's
 	-- normal artwork. Everything else is ours: a data provider of our own redraws them, and the map's mask is
 	-- applied here. Hooking the pin's methods or listing textures in the map's tables made Blizzard's own map code
@@ -227,4 +229,32 @@ ns.Init(function()
 	Provider.RefreshAllData = Draw
 	Provider.OnCanvasScaleChanged = Draw
 	map:AddDataProvider(Provider)
+	return Draw
+end
+
+ns.Init(function()
+	---@type fun()[]
+	local redraws = { Attach(WorldMapFrame) }
+	local function RedrawAll()
+		for _, Redraw in ipairs(redraws) do
+			Redraw()
+		end
+	end
+	-- The zone map (Shift+M) loads on demand.
+	local zoneMap = false
+	local function AttachZoneMap()
+		if not zoneMap and BattlefieldMapFrame then
+			zoneMap = true
+			redraws[#redraws + 1] = Attach(BattlefieldMapFrame)
+		end
+	end
+	AttachZoneMap()
+	ns.On("ADDON_LOADED", function(addon)
+		if addon == "Blizzard_BattlefieldMap" then
+			AttachZoneMap()
+		end
+	end)
+	-- Discovering an area clears its tint at once, and the setting applies at once.
+	ns.On("MAP_EXPLORATION_UPDATED", RedrawAll)
+	ns.OnSettingChanged("exploration", RedrawAll)
 end)
