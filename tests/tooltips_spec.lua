@@ -59,6 +59,10 @@ GameTooltip.NineSlice = Stub()
 function GameTooltip.GetProcessingTooltipInfo()
 	return processing
 end
+local forbidden = false
+function GameTooltip.IsForbidden()
+	return forbidden
+end
 function GameTooltip.NumLines()
 	return #lines
 end
@@ -111,6 +115,7 @@ local env = setmetatable({
 	PLAYER_FACTION_COLORS = { [0] = { r = 1, g = 0, b = 0 }, [1] = { r = 0, g = 0, b = 1 } },
 }, { __index = _G })
 env._G = env
+setfenv(assert(loadfile("Core/Secret.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("UI/Tooltips.lua")), env)("TweaksForever", ns)
 local Model = ns.Tooltips
 assert(features.retailTooltips.default == true)
@@ -158,6 +163,12 @@ assert(#built == 4, "the class line is dropped")
 assert(built[2].text == "<Night Elf Lovers>", "the guild named after a race is the guild: " .. built[2].text)
 assert(built[3].text == "Level 60 Night Elf Warrior (Player)", built[3].text)
 assert(built[4].color and built[4].color[3] == 1, "the faction takes its colour")
+
+-- A forbidden tooltip is left exactly as the client wrote it.
+forbidden = true
+built = Build("GetWorldCursor", nil, { "Sellene", "Level 60 Night Elf (Player)", "Warrior", "Alliance" })
+assert(#built == 4 and built[2].text == "Level 60 Night Elf (Player)", "a forbidden tooltip is not touched")
+forbidden = false
 
 -- A unit far above you shows ??, and its level is read from the token the tooltip was given.
 built = Build("GetUnit", { "target", n = 1 }, {

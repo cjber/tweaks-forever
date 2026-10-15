@@ -160,6 +160,7 @@ ns.QuestieDB = function()
 	return env.LibQuestieDB
 end
 setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Core/Secret.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestProgress.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestProgress
 assert(features.questTooltips.default == true and features.questPlates.default == true)
