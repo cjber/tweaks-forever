@@ -216,13 +216,13 @@ ns.ReportLines = function()
 end
 env.SlashCmdList.TWEAKSFOREVER("report")
 assert(reported == "report: Report lines failed: lines broke", "failing lines still open the report, saying so")
--- #168: opening the settings re-reads conflicts, except with the gamepad UI on, where the panel is left alone.
+-- #168: opening the settings re-reads conflicts, except with the gamepad UI on.
 assert(panelScripts.OnShow, "the settings panel's OnShow is hooked")
 panelScripts.OnShow()
 assert(refreshes == 1, "opening the settings re-reads conflicts")
 gamepad = true
 panelScripts.OnShow()
-assert(refreshes == 1, "with the gamepad UI on, opening the settings runs none of our code")
+assert(refreshes == 1, "with the gamepad UI on, opening the settings skips the conflict check")
 gamepad = false
 
 print("settings: ok")

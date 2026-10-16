@@ -23,6 +23,7 @@ local function Run(installed, early, fromEditor)
 		"ShowHighlighted",
 		"ShowSelected",
 		"Init",
+		"StopMovingOrSizing",
 	}) do
 		methods[key] = noop
 	end
@@ -317,16 +318,21 @@ local function Run(installed, early, fromEditor)
 	fire("PLAYER_REGEN_ENABLED")
 	flush()
 	assert(guide.scale == 1.2, "placement resumes after combat")
-	-- #168: with the gamepad UI on, a moved window goes back to the game's placement and is left there.
+	-- #168: with the gamepad UI on, the feature stands down: a moved window goes back to the game's placement as soon
+	-- as the gamepad UI turns on, and nothing moves it while it stays on.
 	gamepad = true
-	fire("AdventureGuideForever.WindowLayoutChanged", guide)
+	fire("CVAR_UPDATE", "GamePadEnable")
 	flush()
-	assert(guide.scale == 1 and guide.points[1][1] == "TOPLEFT", "gamepad UI leaves windows where the game puts them")
+	assert(guide.scale == 1 and guide.points[1][1] == "TOPLEFT", "gamepad UI puts windows back where the game puts them")
 	guide:Show()
-	flush()
-	assert(guide.scale == 1, "showing a window under the gamepad UI does not move it")
-	gamepad = false
 	fire("AdventureGuideForever.WindowLayoutChanged", guide)
+	flush()
+	assert(#pending == 0 and guide.scale == 1 and guide.points[1][1] == "TOPLEFT", "nothing runs under the gamepad UI")
+	local created = #frames
+	fire("EditMode.Enter")
+	assert(#frames == created, "Edit Mode builds no Windows tab under the gamepad UI")
+	gamepad = false
+	fire("CVAR_UPDATE", "GamePadEnable")
 	flush()
 	assert(guide.scale == 1.2, "placement returns when the gamepad UI is off")
 	fire("EditMode.Enter")

@@ -12,7 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- **Tweaks keeps out of the way of the gamepad UI.** With the gamepad UI on, Move and scale windows leaves Blizzard's windows where the game puts them, and opening the settings no longer runs Tweaks' conflict check. Backing out of the AddOns settings with a gamepad has been reported to break the game's gamepad interact button, so this keeps Tweaks out of that path while we find out more.
+- **Tweaks keeps out of the way of the gamepad UI.** With the gamepad UI on, Move and scale windows stands down: windows open where the game puts them and Edit Mode has no Windows tab. Opening the settings no longer runs Tweaks' conflict check either. Backing out of the AddOns settings with a gamepad has been reported to break the game's gamepad interact button, so this keeps Tweaks out of that path while we find out more.
 
 ## [0.12.0] - 2026-10-15
 
