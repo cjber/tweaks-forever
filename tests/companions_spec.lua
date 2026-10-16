@@ -1,36 +1,67 @@
+-- Tweaks' Forever family hints (Integrations/Companions.lua) on the shared module (UI/ForeverFamily.lua).
 local loaded, exists = {}, {}
 local env = setmetatable({
 	C_AddOns = {
 		IsAddOnLoaded = function(addon)
-			return loaded[addon]
+			return loaded[addon] == true
 		end,
 		DoesAddOnExist = function(addon)
-			return exists[addon]
+			return exists[addon] == true
 		end,
 	},
 }, { __index = _G })
-local ns = { db = { companionHints = true } }
--- Core's Active, reduced to the setting: no conflict or missing addon applies to the hints.
-function ns.Feature() end
-function ns.Active(key)
-	return ns.db[key]
-end
+local initializers = {}
+local ns = {
+	L = setmetatable({}, {
+		__index = function(_, key)
+			return key
+		end,
+	}),
+	Init = function(fn)
+		initializers[#initializers + 1] = fn
+	end,
+}
+setfenv(assert(loadfile("UI/ForeverFamily.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Integrations/Companions.lua")), env)("TweaksForever", ns)
+assert(ns.Family and env.ForeverFamily == ns.Family, "the shared module is ns.Family")
 
-local function Hint()
-	return ns.Suggestion("ShortestPathForever", "Install it.", "Enable it.")
-end
+local MISSING = "With Shortest Path Forever, click to plan the way there."
+local ENABLE = "Enable Shortest Path Forever for walked routes and boat times."
 
--- Not installed: install it.
-assert(Hint() == "Install it.")
--- Installed but switched off, so not loaded: enable it.
+assert(ns.EntranceHint() == nil, "nothing before the saved variables load")
+ns.db = {}
+initializers[1]()
+-- Not installed: what it would add, with the setting on by default.
+assert(ns.EntranceHint() == MISSING)
+-- Installed but switched off: why the click only sets a waypoint.
 exists.ShortestPathForever = true
-assert(Hint() == "Enable it.")
--- Loaded: nothing to suggest.
+assert(ns.EntranceHint() == ENABLE)
+-- Loaded: nothing to say.
 loaded.ShortestPathForever = true
-assert(Hint() == nil)
--- With the setting off, never a hint.
-loaded.ShortestPathForever, exists.ShortestPathForever, ns.db.companionHints = nil, nil, false
-assert(Hint() == nil)
+assert(ns.EntranceHint() == nil)
+-- With the shared setting off, neither line.
+loaded.ShortestPathForever, ns.db.suggestFamily = nil, false
+assert(ns.EntranceHint() == nil, "installed but off, setting off")
+exists.ShortestPathForever = nil
+assert(ns.EntranceHint() == nil, "missing, setting off")
+-- Dismissed from the link window: the missing line stays away.
+ns.db.suggestFamily, ns.db.familyDismissed = nil, { ["TweaksForever.entrance"] = true }
+assert(ns.EntranceHint() == nil, "dismissed")
+ns.db.familyDismissed = nil
+assert(ns.EntranceHint() == MISSING)
+
+-- The old setting turned off carries over once; turned on, or never set, the shared one keeps its default.
+ns.db = { companionHints = false }
+initializers[1]()
+assert(ns.db.suggestFamily == false and ns.db.companionHints == nil, "an old off turns the shared setting off")
+ns.db.suggestFamily = true
+initializers[1]()
+assert(ns.db.suggestFamily == true, "the migration runs once: turning it back on sticks")
+ns.db = { companionHints = true }
+initializers[1]()
+assert(ns.db.suggestFamily == nil and ns.db.companionHints == nil, "an old on leaves the default")
+ns.db = { companionHints = false, suggestFamily = true }
+initializers[1]()
+assert(ns.db.suggestFamily == true, "a shared setting already chosen wins")
 
 print("companions: ok")

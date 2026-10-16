@@ -45,6 +45,7 @@ local function Category(name)
 	}, Layout()
 end
 local opened
+local canvas
 
 local env = setmetatable({
 	Settings = {
@@ -53,6 +54,11 @@ local env = setmetatable({
 			return Category(name)
 		end,
 		RegisterVerticalLayoutSubcategory = function(_, name)
+			return Category(name)
+		end,
+		-- The Forever addons page: the shared module's own frame, on a canvas subpage.
+		RegisterCanvasLayoutSubcategory = function(parent, frame, name)
+			canvas = { parent = parent, frame = frame, name = name }
 			return Category(name)
 		end,
 		RegisterAddOnSetting = function(category, variable, key, _, varType, name)
@@ -148,6 +154,11 @@ ns = {
 	ReportLines = function()
 		return { "own line" }
 	end,
+	Family = {
+		CreatePanel = function(parent, db, current)
+			return { kind = "family panel", parent = parent, db = db, current = current }
+		end,
+	},
 }
 local reported
 ns.Report = {
@@ -171,10 +182,14 @@ end
 assert(
 	table.concat(kinds, " ")
 		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever "
-			.. "slider@Interface button@Tweaks Forever",
+			.. "slider@Interface button@Tweaks Forever button@Tweaks Forever",
 	table.concat(kinds, " ")
 )
 local repair, guildRepair = registered[1].initializer, registered[2].initializer
+-- The Forever addons page, last: the shared panel on our saved variables, with this addon's row named.
+assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Tweaks Forever")
+assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
+assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
 assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
 assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")
 local function Modifiable(initializer)

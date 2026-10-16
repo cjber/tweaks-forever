@@ -1,24 +1,37 @@
 ---@type string, TFNamespace
 local _, ns = ...
+local L = ns.L
 
-ns.Feature({
-	key = "companionHints",
-	category = "Interface",
-	name = "Suggest companion addons",
-	tooltip = "Where another Forever addon would help, such as Shortest Path Forever on a dungeon entrance, a grey "
-		.. "line in the tooltip says so.",
-	default = true,
-})
+-- Tweaks' hints for my other Forever addons, behind the shared "Suggest my other Forever addons" setting
+-- (db.suggestFamily, on the Forever addons page that UI/ForeverFamily.lua draws).
 
--- A grey hint line for a companion addon: `install` while it isn't there, `enable` while it is but hasn't loaded,
--- nothing once it has or with the setting off. Whole sentences, so each reads right in any language.
----@param addon string its folder name
----@param install string
----@param enable string
+local SPF = "ShortestPathForever"
+-- Family.Hint keys are shared by all five addons, so each starts with this addon's folder.
+local ENTRANCE_KEY = "TweaksForever.entrance"
+
+-- The grey line on a dungeon entrance's tooltip. Without Shortest Path Forever installed: what it would add,
+-- through Family.Hint (on, not dismissed). Installed but switched off: why clicking only sets a waypoint, which
+-- explains a missing feature rather than suggesting an addon, so only the setting turns it off.
 ---@return string?
-function ns.Suggestion(addon, install, enable)
-	if not ns.Active("companionHints") or C_AddOns.IsAddOnLoaded(addon) then
+function ns.EntranceHint()
+	local Family, db = ns.Family, ns.db
+	if not (Family and db) then
 		return nil
 	end
-	return C_AddOns.DoesAddOnExist(addon) and enable or install
+	local state = Family.State(SPF)
+	if state == "missing" then
+		return Family.Hint(db, ENTRANCE_KEY, SPF) and L["With Shortest Path Forever, click to plan the way there."]
+			or nil
+	elseif state == "off" and db.suggestFamily ~= false then
+		return L["Enable Shortest Path Forever for walked routes and boat times."]
+	end
 end
+
+-- The old "Suggest companion addons" setting becomes the shared one: turned off, it turns suggestFamily off once.
+ns.Init(function()
+	local db = ns.db
+	if db.companionHints == false and db.suggestFamily == nil then
+		db.suggestFamily = false
+	end
+	db.companionHints = nil
+end)
