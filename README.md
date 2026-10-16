@@ -119,9 +119,13 @@ python3 tools/screenshots.py                    # regenerate docs/screenshots fr
 
 [tools/README.md](tools/README.md) covers the `Data/` generators and [AGENTS.md](AGENTS.md) the rest, including releasing and contributing. Report security problems privately, as [SECURITY.md](https://github.com/cjber/.github/blob/main/SECURITY.md) describes.
 
+## Credits
+
+LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by svengabr. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts; no code was copied. Fitz is welcome to use our code. Thanks to Sojiro84 and everyone who reported a bug.
+
 ## Licence
 
-GPL-3.0-or-later. Map overlay, camp benefit, dungeon entrance and new zone level data come from the game's own files via [wago.tools](https://wago.tools); the original zones' level ranges are the original game's, as listed on [warcraft.wiki.gg](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Class trainer lists come from [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0). The bundled LibAHTab is adapted from plusmouse's (MIT) and LibStub is public domain. Every input, its pin and licence, and what ships: [THIRD_PARTY.md](THIRD_PARTY.md).
+GPL-3.0-or-later. The bundled LibAHTab is MIT and LibStub is public domain. Every input and its licence: [THIRD_PARTY.md](THIRD_PARTY.md).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
 
