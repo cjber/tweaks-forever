@@ -67,7 +67,6 @@ UI\XPRate.lua
 UI\LootSparkles.lua
 UI\TrainAll.lua
 UI\MacroNames.lua
-UI\AuctionHouse.lua
 UI\Spellbook.lua
 Features\Fishing.lua
 UI\Reload.lua

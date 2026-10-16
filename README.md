@@ -50,7 +50,6 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet. With Combine Bags on, the reagent bag joins the combined bag.
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.
-- **Auction house.** A sortable **iLvl** column for weapons and armour.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and a warning when you have none.
 - **Quest item sparkles.** The game's own sparkles make lootable quest objects easier to spot, as in [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles). Off by default. Outlines are turned off while enabled; your previous graphics settings return when disabled. Removing sparkles needs a game restart.
 - **Small things.** Quiet repeated macro errors, companion hints in tooltips and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
