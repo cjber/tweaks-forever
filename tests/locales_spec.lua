@@ -1,5 +1,6 @@
 -- Every translation the TOC loads, loaded the way the client does with GetLocale stubbed: it fills ns.L only for
--- its own locale, keys only phrases.txt's phrases, and every format string formats with sample arguments.
+-- its own locale, keys only phrases.txt's phrases, and every format string keeps English's placeholders in order and
+-- formats with sample arguments.
 
 -- The translations, in TOC order after the English file.
 local files = {}
@@ -38,20 +39,20 @@ do
 end
 assert(next(phrases), "phrases.txt holds no phrase")
 
--- Sample arguments for each placeholder in `text`, or nil when it is not a format string.
+-- Each placeholder's conversion in `text`, in order, or nil when it is not a format string (a literal "100% "
+-- has none).
 local SAMPLES = { d = 3, i = 3, s = "Elwynn Forest", f = 1.5, g = 1.5 }
-local function Samples(text)
-	local args = {}
+local function Conversions(text)
+	local found = {}
 	for spec in text:gmatch("%%[-+ #0]*%d*%.?%d*(%a?%%?)") do
 		if spec ~= "%" then
-			local sample = SAMPLES[spec]
-			if sample == nil then
+			if SAMPLES[spec] == nil then
 				return nil
 			end
-			args[#args + 1] = sample
+			found[#found + 1] = spec
 		end
 	end
-	return #args > 0 and args or nil
+	return #found > 0 and found or nil
 end
 
 for _, code in ipairs(files) do
@@ -62,8 +63,15 @@ for _, code in ipairs(files) do
 		count = count + 1
 		assert(phrases[key], code .. ": not in phrases.txt: " .. key)
 		assert(type(value) == "string" and value ~= "", code .. ": empty line for " .. key)
-		local args = Samples(key)
-		if args then
+		local want = Conversions(key)
+		if want then
+			-- The same placeholders as English, in the same order, so the code's arguments land where they belong.
+			local have = Conversions(value) or {}
+			assert(table.concat(have, " ") == table.concat(want, " "), code .. ": placeholders differ in " .. value)
+			local args = {}
+			for index, conversion in ipairs(want) do
+				args[index] = SAMPLES[conversion]
+			end
 			local ok, result = pcall(string.format, value, unpack(args))
 			assert(ok, code .. ": " .. key .. " -> " .. value .. ": " .. tostring(result))
 			assert(not result:find("%%[%a]"), code .. ": left a placeholder in " .. result)
