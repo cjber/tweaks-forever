@@ -23,7 +23,8 @@ local ns = {
 }
 setfenv(assert(loadfile("UI/ForeverFamily.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Integrations/Companions.lua")), env)("TweaksForever", ns)
-assert(env.ForeverFamily and ns.Family and ns.Family.Hint, "ns.Family is the shared module, bound to our L")
+assert(env.ForeverFamily and ns.Family and ns.Family.Hint, "ns.Family is the shared module")
+assert(ns.Family ~= env.ForeverFamily, "a view bound to our L (ForeverFamily.For), not the shared table itself")
 
 local MISSING = "With Shortest Path Forever, click to plan the way there."
 local ENABLE = "Enable Shortest Path Forever for walked routes and boat times."
