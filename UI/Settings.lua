@@ -117,7 +117,7 @@ ns.Init(function()
 	ns.SafeCall("Forever addons page", function()
 		local family = Settings.RegisterCanvasLayoutSubcategory(
 			category,
-			ns.Family.CreatePanel(nil, ns.db, addonName, L),
+			ns.Family.CreatePanel(nil, ns.db, addonName),
 			L["Forever addons"]
 		)
 		Settings.RegisterInitializer(
