@@ -121,7 +121,7 @@ python3 tools/screenshots.py                    # regenerate docs/screenshots fr
 
 ## Credits
 
-LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab) (MIT). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts; no code was copied. Fitz is welcome to use our code. Thanks to Sojiro84 and everyone who reported a bug.
+LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab) (MIT). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts; no code was copied. Fitz is welcome to use our code. Thanks to Sojiro84, Mouchoir and everyone who reported a bug.
 
 ## Licence
 

@@ -56,6 +56,14 @@ local function Load(saved)
 	callbacks.TweaksForever_gearMark(nil, nil, "dots")
 	assert(seen == "dots", "the callback runs with the setting's arguments")
 	assert(not pcall(ns.OnSettingChanged, "gearMarks", changed), "a misspelt key fails loudly")
+	-- An event can reach a feature while the world loads, before PLAYER_LOGIN has read the saved settings
+	-- (VIGNETTES_UPDATED through Rare alerts, #202): the feature is off until then, never an error.
+	local early
+	ns.On("VIGNETTES_UPDATED", function()
+		early = ns.Active("enabled")
+	end)
+	frames[1].callback(frames[1], "VIGNETTES_UPDATED")
+	assert(early == false and #errors == 0, "a feature is off before login: " .. tostring(errors[1]))
 	local ran = false
 	ns.Init(function()
 		ran = true
@@ -63,6 +71,7 @@ local function Load(saved)
 		assert(ns.db.junk and ns.db.gearMark)
 		assert(ns.Active("enabled") == (ns.db.enabled == true))
 		assert(ns.Active("disabled") == false)
+		assert(early == false, "the early answer was off, not the saved value")
 		-- A feature missing an addon it needs is off whatever its setting, and names that addon.
 		assert(ns.Active("needsPresent") == (ns.db.needsPresent == true) and not ns.MissingOf("needsPresent"))
 		assert(not ns.Active("needsMissing") and ns.MissingOf("needsMissing") == "Missing")
