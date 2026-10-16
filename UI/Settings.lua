@@ -112,8 +112,15 @@ ns.Init(function()
 		)
 	end
 	Settings.RegisterAddOnCategory(category)
-	-- Another addon's settings may have changed since login.
-	SettingsPanel:HookScript("OnShow", ns.RefreshConflicts)
+	-- Another addon's settings may have changed since login. Not with the gamepad UI on (#168): its navigation
+	-- pushes and pops input bindings as this panel and its rows show and hide, and a blocked
+	-- SetPreferredGamepadInteractTarget has been reported after backing out of the AddOns settings. Keeping our
+	-- code out of that path is the cheap isolation; conflicts are still read at login and as addons load.
+	SettingsPanel:HookScript("OnShow", function()
+		if not InputUtil.IsGamepadUIEnabled() then
+			ns.RefreshConflicts()
+		end
+	end)
 
 	local function Open()
 		Settings.OpenToCategory(category:GetID())

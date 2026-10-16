@@ -296,8 +296,10 @@ local function Apply(record)
 		if not record.applied or frame:GetScale() ~= record.placedScale then
 			record.scale = frame:GetScale()
 		end
-		-- Read the current layout and toggle on execution, never a stale combat-time position.
-		local position = Active() and Position(record)
+		-- Read the current layout and toggle on execution, never a stale combat-time position. With the gamepad UI
+		-- on, Blizzard's gamepad navigation tracks these windows as they open and close, so they are left where the
+		-- game puts them (#168: a blocked gamepad interact call reported after backing out of the settings).
+		local position = Active() and not InputUtil.IsGamepadUIEnabled() and Position(record)
 		if
 			record.name == "WorldMapFrame" and (frame --[[@as WorldMapFrame]]):IsMaximized()
 		then

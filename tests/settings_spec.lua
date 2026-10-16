@@ -6,6 +6,7 @@
 local registered = {}
 -- [key] = the addon a feature needs and can't find.
 local missing = {}
+local panelScripts, refreshes, gamepad = {}, 0, false
 
 local function Layout()
 	return {
@@ -88,7 +89,16 @@ local env = setmetatable({
 		assert(addSearchTags == false, "index buttons stay out of search")
 		return { kind = "button", name = name }
 	end,
-	SettingsPanel = { HookScript = function() end },
+	SettingsPanel = {
+		HookScript = function(_, script, fn)
+			panelScripts[script] = fn
+		end,
+	},
+	InputUtil = {
+		IsGamepadUIEnabled = function()
+			return gamepad
+		end,
+	},
 	MinimalSliderWithSteppersMixin = { Label = { Right = "Right" } },
 	RED_FONT_COLOR = {
 		WrapTextInColorCode = function(_, text)
@@ -120,6 +130,9 @@ ns = {
 		fn()
 	end,
 	ConflictOf = function() end,
+	RefreshConflicts = function()
+		refreshes = refreshes + 1
+	end,
 	SettingVariable = function(key)
 		return "TweaksForever_" .. key
 	end,
@@ -203,4 +216,13 @@ ns.ReportLines = function()
 end
 env.SlashCmdList.TWEAKSFOREVER("report")
 assert(reported == "report: Report lines failed: lines broke", "failing lines still open the report, saying so")
+-- #168: opening the settings re-reads conflicts, except with the gamepad UI on, where the panel is left alone.
+assert(panelScripts.OnShow, "the settings panel's OnShow is hooked")
+panelScripts.OnShow()
+assert(refreshes == 1, "opening the settings re-reads conflicts")
+gamepad = true
+panelScripts.OnShow()
+assert(refreshes == 1, "with the gamepad UI on, opening the settings runs none of our code")
+gamepad = false
+
 print("settings: ok")
