@@ -15,7 +15,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [0.12.1] - 2026-10-16
 
 - **The auction house item level column is gone.** It worked by writing into the game's own auction category list, which the auction house reads when it lays out search results. That can get buying blocked and blamed on Tweaks, so it isn't worth the risk. The game still shows each item's level after its name; you just can't sort by it.
-- **Tweaks keeps out of the gamepad UI's way.** Backing out of the AddOns settings with a gamepad has been reported to break the game's interact button. With the gamepad UI on, Move and scale windows now stands down (windows open where the game puts them and Edit Mode has no Windows tab), and opening the settings no longer runs Tweaks' conflict check. If it still happens with only Tweaks enabled, say so on GitHub issue #168.
+- **Tweaks keeps out of the gamepad UI's way.** Backing out of the AddOns settings with a gamepad has been reported to break the game's interact button. With the gamepad UI on, Move and scale windows now stands down (windows open where the game puts them and Edit Mode has no Windows tab), and opening the settings no longer re-checks your other addons, so a change to one of them shows in Tweaks' settings after a /reload. If it still happens with only Tweaks enabled, say so on [issue #168](https://github.com/cjber/tweaks-forever/issues/168).
 - **Data checked against Forever 1.60.1.70425.** Four more quests are known as added in Forever. Camp benefits, class trainer spells, dungeon entrances, map overlays and zone levels are unchanged.
 
 ## [0.12.0] - 2026-10-15
