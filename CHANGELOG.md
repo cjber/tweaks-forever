@@ -14,7 +14,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [0.14.0] - 2026-10-16
 
-- **In your language.** Tweaks Forever is now in German, French, Spanish (Spain and Latin America), Korean, Brazilian Portuguese, Russian, and Simplified and Traditional Chinese, using the game's own words for settings such as Auto Loot, Combine Bags and Max Camera Distance. These are machine translated; corrections are welcome through the [translation issue form](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml). Buttons such as Train all and Abandon quests widen to fit a longer label. Camp benefit names and effects are still in English ([#210](https://github.com/cjber/tweaks-forever/issues/210)). There's no Italian, because the WoW: Forever client has none.
+- **In your language.** Tweaks Forever is now in German, French, Spanish (Spain and Latin America), Korean, Brazilian Portuguese, Russian, and Simplified and Traditional Chinese, using the game's own words for settings such as Auto Loot, Combine Bags and Max Camera Distance. These are machine translated; corrections are welcome through the [translation issue form](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml). There's no Italian, because the WoW: Forever client has none.
+- **Buttons fit their labels.** Train all, the Abandon quests buttons and the dungeon map's Back to map and Dungeon map buttons widen when a translated label is longer than the English.
+- **Camp benefits are still in English.** Their names and effects come from a table that only has English so far, so on a translated client a camp line mixes the two ([#210](https://github.com/cjber/tweaks-forever/issues/210)).
 
 ## [0.13.1] - 2026-10-16
 

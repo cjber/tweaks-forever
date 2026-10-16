@@ -14,7 +14,7 @@ ns.Feature({
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
 ns.WHATS_NEW_VERSION = "0.14.0"
 ns.WHATS_NEW =
-	L["Now in German, French, Spanish, Korean, Brazilian Portuguese, Russian and Chinese (machine translated)."]
+	L["In your language, machine translated. New in 0.13.0: a Forever addons page; map extras give way to OpenMap."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
