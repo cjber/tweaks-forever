@@ -37,12 +37,23 @@ Nameplates in retail's own frame, with your target outlined.
 
 Everything is under Options → AddOns → Tweaks Forever, or type `/tweaks`.
 
-## With my other Forever addons
+<!-- forever-family:start -->
 
-- [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) plans the way when you click a dungeon or raid entrance.
-- [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders.
-- [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) tracks Legacy challenges. Tweaks' unexplored tint and entrance icons step aside for it.
-- [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) helps with profession levelling.
+## My other Forever addons
+
+Each one works on its own, and they work together when you install more than one.
+
+| Addon | What it does |
+|---|---|
+| [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) | Plans journeys on foot, by air, by sea and through portals, with directions in the tracker. |
+| [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) | Suggests quests for your level and routes you from one to the next. |
+| [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) | Shows skill-up chances, recipe costs and levelling routes in the Professions window. |
+| [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) | Shows your unfinished Legacy challenges on the world map and tracks the ones you choose. |
+| [Tweaks Forever](https://www.curseforge.com/wow/addons/tweaks-forever) | Adds quest automation, rare alerts and merchant options to the game's settings. |
+
+<!-- forever-family:end -->
+
+With Shortest Path Forever, clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for Legacy Forever.
 
 For a bug report, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
 
