@@ -8,7 +8,7 @@ Small quality-of-life tweaks for WoW: Forever that look like they came with the 
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-Tweaks Forever accepts and turns in quests, standing down while Polestar does. It names rares near you in chat, and repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
+Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 

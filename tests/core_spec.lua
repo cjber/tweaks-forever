@@ -217,8 +217,20 @@ do -- An `openmap` conflict reads OpenMap's world map option while OpenMap is lo
 	ns.RefreshConflicts()
 	assert(not ns.ConflictOf("coords") and not ns.ConflictOf("reveal"), "its world map turned off runs none of them")
 	assert(ns.Active("coords"))
+	-- Once it has started, its module's own flag says whether the world map runs: turning it off in OpenMap's
+	-- options takes a reload there, and a world map that failed to start draws nothing.
+	env.OpenMap = { modules = { worldmap = { enabled = true } } }
+	ns.RefreshConflicts()
+	assert(ns.ConflictOf("coords") == "OpenMap", "still running until OpenMap reloads")
+	env.OpenMap.modules.worldmap.enabled = false
+	env.OpenMapDB.worldmap.enabled = true
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("coords"), "a world map that failed to start leaves ours")
+	env.OpenMap = nil
 	env.OpenMapDB = { worldmap = "broken" }
 	assert(ns.OpenMapOn("coords"), "an unreadable table is its defaults")
+	loaded.OpenMap = false
+	assert(not ns.OpenMapOn("coords"), "nothing is on while OpenMap is not loaded")
 end
 
 do -- Loaded at login, Polestar's own setting changes refresh the conflicts at once.

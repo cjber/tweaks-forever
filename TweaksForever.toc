@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Tweaks Forever
-## Notes: Accepts and turns in quests, standing down while Polestar does. Names rares near you, and repairs and sells junk at merchants.
+## Notes: Options to accept and turn in quests (standing down for Polestar), name rares near you, and repair and sell junk at merchants.
 ## Author: cjber
 ## Version: @project-version@
 ## Category: Quality of Life

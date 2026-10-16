@@ -1,4 +1,4 @@
-Tweaks Forever accepts and turns in quests, standing down while Polestar does. It names rares near you in chat, and repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
+Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
 If you already run Polestar, Leatrix Plus, Questie, BlizzMove, Peddler or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
 
@@ -20,15 +20,15 @@ Nameplates in retail's own frame, with your target outlined.
 
 ## Features
 
-- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (except friends and guild), accept party invites from friends or decline strangers'. All off by default.
-- **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk. Hold Shift as a merchant opens to skip both.
+- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, go straight to the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), accept party invites from friends or decline strangers'. All off by default.
+- **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk once you turn that on. Hold Shift as a merchant opens to skip both.
 - **Rares and levelling**: optional rare alerts in chat, and XP per hour and time to level on the experience bar.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a coloured group, then equip the whole group in one click.
 - **Maps**: every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Inside a dungeon, the map shows its floors and legend (needs Atlas [Classic WoW]).
 - **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Optional spell reach icons show which attacks reach each enemy.
-- **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout (not with the gamepad UI).
+- **Windows**: move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
 - **Quests and camps**: quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
-- **Spellbook, trainer and bags**: the spellbook lists spells you haven't learned yet, Train all buys what you can afford, and the reagent bag joins the combined bag.
+- **Spellbook, trainer and bags**: unlearned spells in the spellbook, Train all for what you can afford, and the reagent bag in the combined bag.
 - **Fishing**: double right-click to cast or apply a lure, with a warning when you have none.
 - **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default; turns outlines off, and removing sparkles needs a restart.
 - **Also**: camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names and `/rl`.

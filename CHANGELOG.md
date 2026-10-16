@@ -12,7 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- **Map extras step aside for OpenMap.** With [OpenMap](https://www.curseforge.com/wow/addons/openmap) loaded, its coordinates, zone level ranges, unexplored areas and dungeon icons take over from Tweaks' own, each only while its matching option is on there. Turn one off in OpenMap and Tweaks' own comes back the next time you open the settings, or after a /reload. With OpenMap's unexplored areas set to Hide, Tweaks' blue tint can run.
+- **Map extras step aside for OpenMap.** With [OpenMap](https://www.curseforge.com/wow/addons/openmap) loaded, its coordinates, zone level ranges, unexplored areas and dungeon icons take over from Tweaks' own, each only while its matching option is on there. A change to one of those options in OpenMap reaches Tweaks the next time you open its settings, or after a /reload. With OpenMap's unexplored areas set to Hide, Tweaks' blue tint can run.
 
 ## [0.12.1] - 2026-10-16
 

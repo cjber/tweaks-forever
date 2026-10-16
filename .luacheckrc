@@ -240,6 +240,7 @@ read_globals = {
 	"NORMAL_FONT_COLOR",
 	"NUM_TOTAL_EQUIPPED_BAG_SLOTS",
 	"ObjectiveTrackerFrame",
+	"OpenMap",
 	"OpenMapDB",
 	"PAGE_NUMBER_WITH_MAX",
 	"PagedContentFrameBaseMixin",
