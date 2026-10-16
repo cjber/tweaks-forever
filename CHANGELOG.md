@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **In your language.** Tweaks Forever is now in German, French, Spanish (Spain and Latin America), Korean, Brazilian Portuguese, Russian, and Simplified and Traditional Chinese, using the game's own words for settings such as Auto Loot, Combine Bags and Max Camera Distance. These are machine translated; corrections are welcome through the [translation issue form](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml). There's no Italian, because the WoW: Forever client has none.
+
 ## [0.13.1] - 2026-10-16
 
 - **No more Lua error at login.** A map marker update can arrive before Tweaks has read your settings, and Rare alerts then failed with "attempt to index field 'db'", even with Rare alerts off. Every feature now stays off until the settings are read, and Rare alerts then looks once for a rare already nearby. Thanks to Mouchoir for the report and fix.
