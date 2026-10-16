@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.13.1] - 2026-10-16
+
 - **No more Lua error at login.** A map marker update can arrive before Tweaks has read your settings, and Rare alerts then failed with "attempt to index field 'db'", even with Rare alerts off. Every feature now stays off until the settings are read, and Rare alerts then looks once for a rare already nearby. Thanks to Mouchoir for the report and fix.
 
 ## [0.13.0] - 2026-10-16
