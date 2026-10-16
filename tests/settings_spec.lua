@@ -155,8 +155,8 @@ ns = {
 		return { "own line" }
 	end,
 	Family = {
-		CreatePanel = function(parent, db, current)
-			return { kind = "family panel", parent = parent, db = db, current = current }
+		CreatePanel = function(parent, db, current, L)
+			return { kind = "family panel", parent = parent, db = db, current = current, L = L }
 		end,
 	},
 }
@@ -189,6 +189,7 @@ local repair, guildRepair = registered[1].initializer, registered[2].initializer
 -- The Forever addons page, last: the shared panel on our saved variables, with this addon's row named.
 assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Tweaks Forever")
 assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
+assert(canvas.frame.L == ns.L, "the page reads Tweaks' own translations")
 assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
 
 -- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
