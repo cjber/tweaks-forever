@@ -94,7 +94,7 @@ A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questi
 
 <!-- forever-family:start -->
 
-## My other Forever addons
+## The Forever addons
 
 Each one works on its own, and they work together when you install more than one.
 
