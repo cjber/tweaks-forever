@@ -26,6 +26,7 @@ local units = {
 	nameplate1 = { class = "rare", guid = "Creature-0-1-0-1-61-AAA", name = "Mother Fang" },
 	nameplate2 = { class = "normal", guid = "Creature-0-1-0-1-299-BBB", name = "Young Wolf" },
 	nameplate3 = { class = "rareelite", guid = "secret", name = "Hidden" },
+	nameplate4 = { class = "rare", guid = "Creature-0-1-0-1-105-III", name = "Snort the Heckler" },
 }
 local vignettes = {
 	v1 = { atlasName = "VignetteKill", objectGUID = "Creature-0-1-0-1-100-CCC", name = "Gruff Swiftbite" },
@@ -58,10 +59,11 @@ local env = setmetatable({
 			return { { namePlateUnitToken = "nameplate1" } }
 		end,
 	},
-	PlaySound = function()
+	PlaySoundFile = function(file, channel)
+		assert(file == 893809 and channel == "Master", "the map marker chime on the Master channel")
 		sounds = sounds + 1
+		return true
 	end,
-	SOUNDKIT = { RAID_WARNING = 8959 },
 	C_EventUtils = {
 		IsEventValid = function()
 			return true
@@ -98,17 +100,30 @@ handlers.NAME_PLATE_UNIT_ADDED("nameplate3")
 assert(#printed == 1, "not a normal creature, nor a secret one")
 now = now + 601
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(#printed == 2, "again after ten minutes")
+assert(#printed == 2 and sounds == 2, "again after ten minutes")
+handlers.NAME_PLATE_UNIT_ADDED("nameplate4")
+assert(#printed == 3 and sounds == 2, "a second rare within two seconds: its line, no stacked chime")
+now = now + 2
 handlers.VIGNETTES_UPDATED()
-assert(printed[3] == "rare nearby: Gruff Swiftbite." and #printed == 3, "a living, near rare's marker only")
+assert(printed[4] == "rare nearby: Gruff Swiftbite." and #printed == 4, "a living, near rare's marker only")
+assert(sounds == 3, "a marker chimes too")
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
-assert(#printed == 3, "once")
+assert(#printed == 4 and sounds == 3, "once")
 combat = true
 now = now + 601
 handlers.VIGNETTES_UPDATED()
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(#printed == 3, "never in combat")
+assert(#printed == 4 and sounds == 3, "never in combat")
 combat = false
 handlers.PLAYER_REGEN_ENABLED()
-assert(printed[4] == "rare nearby: Mother Fang." and printed[5] == "rare nearby: Gruff Swiftbite.", "told once it ends")
+assert(printed[5] == "rare nearby: Mother Fang." and printed[6] == "rare nearby: Gruff Swiftbite.", "told once it ends")
+assert(sounds == 4, "two rares found together chime once")
+-- Two rares' markers in one update: two lines, one chime; then a marker reaching the minimap chimes on its own.
+now = now + 601
+vignettes.v2 = { atlasName = "VignetteKillElite", objectGUID = "Creature-0-1-0-1-104-HHH", name = "Second Rare" }
+handlers.VIGNETTES_UPDATED()
+assert(#printed == 8 and sounds == 5, "two markers in one update chime once")
+now = now + 601
+handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
+assert(printed[9] == "rare nearby: Gruff Swiftbite." and sounds == 6, "a marker reaching the minimap")
 print("rarealerts: ok")
