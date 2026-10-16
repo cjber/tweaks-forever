@@ -146,6 +146,9 @@ end
 
 ns.On("NAME_PLATE_UNIT_ADDED", CheckUnit)
 ns.On("PLAYER_REGEN_ENABLED", AfterCombat)
+-- Nameplates and markers that appeared while the world loaded, before the settings did (#202): a nameplate is
+-- announced only once, so look again as soon as the settings are read.
+ns.Init(AfterCombat)
 -- Only where the client has map markers; registering an event it doesn't know raises.
 if C_VignetteInfo then
 	if Valid("VIGNETTES_UPDATED") then

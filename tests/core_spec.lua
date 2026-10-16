@@ -71,7 +71,6 @@ local function Load(saved)
 		assert(ns.db.junk and ns.db.gearMark)
 		assert(ns.Active("enabled") == (ns.db.enabled == true))
 		assert(ns.Active("disabled") == false)
-		assert(early == false, "the early answer was off, not the saved value")
 		-- A feature missing an addon it needs is off whatever its setting, and names that addon.
 		assert(ns.Active("needsPresent") == (ns.db.needsPresent == true) and not ns.MissingOf("needsPresent"))
 		assert(not ns.Active("needsMissing") and ns.MissingOf("needsMissing") == "Missing")
@@ -81,6 +80,8 @@ local function Load(saved)
 	assert(not ran)
 	frames[2].callback()
 	assert(ran and #errors == 0)
+	frames[1].callback(frames[1], "VIGNETTES_UPDATED")
+	assert(early == (ns.db.enabled == true), "after login the same event reads the saved setting")
 	local ready = false
 	ns.Init(function()
 		ready = true
