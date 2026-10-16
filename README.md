@@ -121,11 +121,11 @@ python3 tools/screenshots.py                    # regenerate docs/screenshots fr
 
 ## Credits
 
-LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by svengabr. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts; no code was copied. Fitz is welcome to use our code. Thanks to Sojiro84 and everyone who reported a bug.
+LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab) (MIT). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts; no code was copied. Fitz is welcome to use our code. Thanks to Sojiro84 and everyone who reported a bug.
 
 ## Licence
 
-GPL-3.0-or-later. The bundled LibAHTab is MIT and LibStub is public domain. Every input and its licence: [THIRD_PARTY.md](THIRD_PARTY.md).
+GPL-3.0-or-later. The bundled LibStub is public domain. Every input and its licence: [THIRD_PARTY.md](THIRD_PARTY.md).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
 
