@@ -25,6 +25,7 @@ Core\Secret.lua
 Core\SafeCall.lua
 Core\Core.lua
 UI\Art.lua
+UI\ForeverFamily.lua
 UI\Report.lua
 UI\Keys.lua
 Features\Automation.lua

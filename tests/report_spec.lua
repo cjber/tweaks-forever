@@ -247,6 +247,11 @@ do
 	db.fastLoot, db.questTooltips = nil, nil
 	_, text = Report()
 	has(text, "Differs from default: none", "nothing changed")
+	-- The Forever addons setting and dismissed hints live outside ns.features but still show.
+	db.suggestFamily, db.familyDismissed = false, { ["TweaksForever.entrance"] = true, ["Other.key"] = false }
+	_, text = Report()
+	has(text, "Differs from default: suggestFamily=off, familyDismissed=TweaksForever.entrance", "family settings")
+	db.suggestFamily, db.familyDismissed = nil, nil
 end
 
 -- ns.SafeCall: pcall's answers, and each failure kept (label, count, short stack) and passed to the error handler.

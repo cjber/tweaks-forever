@@ -36,6 +36,23 @@ function ns.ReportLines()
 			missing[#missing + 1] = ("%s (%s)"):format(key, needs)
 		end
 	end
+	-- The Forever addons page's setting and dismissed hints (ForeverFamilyDB), kept outside ns.features.
+	if ns.db and ns.db.suggestFamily == false then
+		changed[#changed + 1] = "suggestFamily=off"
+	end
+	local dismissed = ns.db and ns.db.familyDismissed
+	if type(dismissed) == "table" then
+		local keys = {}
+		for key, on in pairs(dismissed) do
+			if on then
+				keys[#keys + 1] = key
+			end
+		end
+		table.sort(keys)
+		for _, key in ipairs(keys) do
+			changed[#changed + 1] = ("familyDismissed=%s"):format(key)
+		end
+	end
 	local function Line(label, list)
 		return ("%s: %s"):format(label, list[1] and table.concat(list, ", ") or "none")
 	end

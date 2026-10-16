@@ -4,6 +4,7 @@ exclude_files = { "tools/.cache/**", ".release/**", ".types/**", "types/**", ".c
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
 	"BINDING_HEADER_TWEAKSFOREVER",
+	"ForeverFamily",
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER2",
 	"SLASH_TWEAKSFOREVER_RELOAD1",

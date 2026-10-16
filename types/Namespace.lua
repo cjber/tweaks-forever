@@ -218,7 +218,8 @@
 ---@field Icons fun(ids: integer[], known: TFSpellKnown, reaches: TFSpellReaches): TFReachIcon[]
 ---@field Size fun(barHeight: number, percent: number?): integer
 
----@class TFDatabase
+---@class TFDatabase : ForeverFamilyDB
+---@field companionHints? boolean the old hint setting, read once to carry a player's "off" over to suggestFamily
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
 ---@field savedSounds? table<string, string>
@@ -318,7 +319,8 @@ TweaksForeverCharDB = nil
 ---@field EscapeCloses fun(frame: Frame)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(): string
----@field Suggestion fun(addon: string, install: string, enable: string): string?
+---@field EntranceHint fun(): string? the grey line about Shortest Path Forever on a dungeon entrance (Integrations/Companions.lua)
+---@field Family ForeverFamilyAPI the shared Forever addons module (UI/ForeverFamily.lua)
 ---@field WHATS_NEW string
 ---@field WHATS_NEW_VERSION string
 ---@field WhatsNew TFWhatsNew
