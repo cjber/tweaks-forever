@@ -42,11 +42,11 @@ CI tools (StyLua, ruff, ty, luacheck, lua-language-server, actionlint, zizmor, g
 
 ## Ideas and contributors
 
-Credit for the ideas, translations and reports behind the addon.
+Credit for the ideas and reports behind the addon.
 
 | Who | What | Notes |
 |---|---|---|
-| [Polestar](https://github.com/fitzforge/polestar) by Fitz | The ideas for not paying quest gold or taking PvP quests unasked (#153), retrying a repair after junk sales (#154), friend and guild exceptions and party invites (#155), stronger summon, resurrection and release guards (#156), marking the best reward (#157), quest progress on item and object tooltips (#158), bindable quest buttons (#159), world map coordinates (#160), a calmer fast loot (#161), unexplored areas on the zone map (#162), Shift to skip the merchant (#163), rare alerts (#165), quest levels in greetings (#166) and XP per hour (#167); `/tweaks report` and the shared tooling's zip check, `tools/doctor.py`, stale-screenshot check and `.editorconfig`, plus this file, the issue forms and the "For addon authors" changelog subsection (cjber/adventure-guide-forever#156-#158, #160-#163, #165) | GPL-3.0. Inspired only; no code was copied. Fitz is welcome to use our code. |
+| [Polestar](https://github.com/fitzforge/polestar) by Fitz | The ideas for not paying quest gold or taking PvP quests unasked (#153), retrying a repair after junk sales (#154), friend and guild exceptions and party invites (#155), stronger summon, resurrection and release guards (#156), marking the best reward (#157), quest progress on item and object tooltips (#158), bindable quest buttons (#159), world map coordinates (#160), a calmer fast loot (#161), unexplored areas on the zone map (#162), Shift to skip the merchant (#163), rare alerts (#165), quest levels in greetings (#166) and XP per hour (#167). From cjber/adventure-guide-forever's issues: `/tweaks report` with its copy box and caught errors (#156), the issue forms (#157), the zip check (#158), `tools/doctor.py` (#160), the stale-screenshot check (#161), this file (#162), the "For addon authors" changelog subsection (#163) and `.editorconfig` (#165). | GPL-3.0. Inspired only; no code was copied. Fitz is welcome to use our code. |
 | [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior (svengabr) | Quest item sparkles set the same five graphics settings it sets | GPL-3.0. The settings are the client's; no code was copied |
 | Sojiro84 | Asked for tooltips anchored to the cursor (#108) and found the Abandon quests button showing inside a quest (#109) | |
 
