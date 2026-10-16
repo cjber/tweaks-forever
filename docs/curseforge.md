@@ -25,7 +25,7 @@ Nameplates in retail's own frame, with your target outlined.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a coloured group such as DPS, then equip the whole group in one click.
 - **Maps**: every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows your and the cursor's coordinates, and unexplored areas are revealed in a blue tint on the world and zone maps. Inside a dungeon, the map shows its floors and legend (needs Atlas [Classic WoW]).
 - **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Optional spell reach icons show which attacks can reach each enemy.
-- **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout.
+- **Windows**: move and scale Blizzard windows from Edit Mode, saved per layout (not with the gamepad UI).
 - **Quests and camps**: quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
 - **Levelling**: XP per hour and time to level on the experience bar's tooltip, and optional rare alerts in chat.
 - **Spellbook, trainer and bags**: the spellbook lists spells you haven't learned yet, Train all buys what you can afford, and the reagent bag joins the combined bag.

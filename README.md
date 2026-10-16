@@ -41,7 +41,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Each item shows a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
 - **Map extras.** Unexplored areas in a blue tint on the world and zone maps (off until you turn it on), each zone's level range coloured like quest levels, your and the cursor's coordinates, and every dungeon and raid entrance marked with retail's icons.
 - **Dungeon maps.** Inside a dungeon, the world map opens on the dungeon's own floor map and legend, with a button for the floor and a Back to map button. Needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Classic WoW maps, read from your install.
-- **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout.
+- **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout (not with the gamepad UI).
 - **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
 - **Spell reach.** A small icon for each attack you track on every enemy nameplate: full colour in reach, solid red out of it. Off until you turn it on.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.

@@ -12,8 +12,9 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.12.0"
-ns.WHATS_NEW = L["Coordinates on the world map, XP per hour, and a coin on the quest reward that sells for most."]
+ns.WHATS_NEW_VERSION = "0.12.1"
+ns.WHATS_NEW =
+	L["The auction house item level column is gone, and Move and scale windows is off while the gamepad UI is on."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

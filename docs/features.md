@@ -45,7 +45,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Interface
 
-- Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
+- Move and scale Blizzard windows in **Edit Mode** (not while the gamepad UI is on). The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
 - Rare alerts (off by default). A chat line and a map marker chime from the game's own sounds when a rare creature's nameplate, or its marker on the map where the game shows one, appears near you. Never in combat, once per rare for ten minutes, and never for a creature whose name the game keeps hidden.
 - XP per hour on the experience bar's tooltip: your rate over the last 15 minutes (after the first five), the time to level at that pace, and about how many kills or quests that is, from the XP your recent kills and hand-ins gave.
