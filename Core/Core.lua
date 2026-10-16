@@ -200,12 +200,13 @@ function ns.ConflictOf(key)
 end
 
 -- Switched on, not already handled by another addon and not missing one it needs. Checked when the feature acts,
--- so toggles apply at once.
+-- so toggles apply at once. Off until PLAYER_LOGIN has read the saved settings: some events (map markers,
+-- nameplates) reach a feature while the world loads, before then (#202).
 ---@param key string
 ---@return boolean
 function ns.Active(key)
 	assert(byKey[key], "unknown feature " .. key)
-	return not not ns.db[key] and not conflicted[key] and not missing[key]
+	return ns.db ~= nil and not not ns.db[key] and not conflicted[key] and not missing[key]
 end
 
 -- The Settings variable a feature's setting is registered under.

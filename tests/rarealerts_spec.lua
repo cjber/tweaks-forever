@@ -1,6 +1,6 @@
 -- Rare alerts (Features/RareAlerts.lua): a chat line and a sound when a rare's nameplate or map marker appears,
 -- off by default, never in combat, once per rare for ten minutes, and never from a secret GUID or name.
-local features, handlers, db, printed, sounds = {}, {}, {}, {}, 0
+local features, handlers, db, printed, sounds, initializers = {}, {}, {}, {}, 0, {}
 local ns = {
 	L = setmetatable({}, {
 		__index = function(_, key)
@@ -12,6 +12,9 @@ local ns = {
 	end,
 	On = function(event, fn)
 		handlers[event] = fn
+	end,
+	Init = function(fn)
+		initializers[#initializers + 1] = fn
 	end,
 	Active = function(key)
 		return db[key]
@@ -126,4 +129,15 @@ assert(#printed == 8 and sounds == 5, "two markers in one update chime once")
 now = now + 601
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
 assert(printed[9] == "rare nearby: Gruff Swiftbite." and sounds == 6, "a marker reaching the minimap")
+-- A rare already near when the settings load (its nameplate came up during the loading screen) is told then.
+now = now + 601
+local before = #printed
+assert(#initializers == 1)
+initializers[1]()
+assert(printed[before + 1] == "rare nearby: Mother Fang.", "the nameplates up at login")
+db.rareAlerts = false
+now = now + 601
+before = #printed
+initializers[1]()
+assert(#printed == before, "and nothing with Rare alerts off")
 print("rarealerts: ok")
