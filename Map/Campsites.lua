@@ -74,7 +74,8 @@ for _, feature in ipairs(FEATURES) do
 	end
 end
 
--- Every camp benefit as { benefit, left, points }, the ones you have first, each group in the game's order.
+-- Every camp benefit as { benefit, left, points }, the ones you have first, each group in Data/CampBenefits.lua's
+-- order (the tent, then the game's Camp Benefits template).
 -- `remaining` gives seconds left on an aura, 0 for no expiry, nil without it, and then the aura's values.
 ---@param remaining fun(aura: integer): number?, number[]?
 ---@return TFCampRow[]

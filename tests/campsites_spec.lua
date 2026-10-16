@@ -50,7 +50,7 @@ setfenv(assert(loadfile("Data/CampBenefits.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/Campsites.lua")), env)("TweaksForever", ns)
 local Camp = ns.Camp
 
--- The list: benefits you have first, then the rest, each in the game's order.
+-- The list: benefits you have first, then the rest, each in the data's order (the tent, then the game's).
 local TENT, MANA_WELL, FIRST_AID, BANNER = 1229451, 1230587, 1230124, 1229718
 local FISH_BOWL, LUTE, CHAIR = 1230098, 1230653, 1229519
 local have = { [FIRST_AID] = 1200, [TENT] = 0 }
@@ -58,7 +58,7 @@ local rows = Camp.Listing(function(aura)
 	return have[aura]
 end)
 assert(#rows == #ns.CampBenefits)
-assert(rows[1].benefit[1] == TENT and rows[1].left == 0, "the tent comes first in the game's order")
+assert(rows[1].benefit[1] == TENT and rows[1].left == 0, "the tent comes first")
 assert(rows[2].benefit[1] == FIRST_AID and rows[2].left == 1200)
 assert(rows[3].benefit[1] == MANA_WELL and rows[3].left == nil, "then what you don't have")
 assert(rows[#rows].benefit[1] == BANNER)
