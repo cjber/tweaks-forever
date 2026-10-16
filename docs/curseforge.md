@@ -29,7 +29,7 @@ Nameplates in retail's own frame, with your target outlined.
 - **Quests and camps**: quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
 - **Levelling**: XP per hour and time to level on the experience bar's tooltip, and optional rare alerts in chat.
 - **Spellbook, trainer and bags**: the spellbook lists spells you haven't learned yet, Train all buys what you can afford, and the reagent bag joins the combined bag.
-- **Fishing and auctions**: double right-click to cast or apply a lure, and a sortable iLvl column.
+- **Fishing**: double right-click to cast or apply a lure, and a warning when you have none.
 - **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default. Turns outlines off while enabled; removing sparkles needs a game restart.
 - **Also**: camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names and `/rl`.
 

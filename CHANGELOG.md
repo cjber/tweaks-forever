@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **The auction house item level column is gone.** It worked by writing into the game's own auction category list, which the auction house reads when it lays out search results. That can get buying blocked and blamed on Tweaks, so it isn't worth the risk. The game still shows each item's level after its name; you just can't sort by it.
+
 ## [0.12.0] - 2026-10-15
 
 - **Coordinates on the world map.** Your position and the cursor's show along the bottom of the world map. Turn it off under Maps; it steps aside for Leatrix Maps, Mapster, Coordinates and Polestar when they show their own.
