@@ -141,7 +141,9 @@ assignment, operator or non-final argument already consumes one value.
 `python3 -m tools.lint_taint` checks the same files for code that taints Blizzard's UI on Forever:
 `hooksecurefunc` on an object rather than a function name or a table the file built itself, a field
 written or method defined on a global the addon does not own, and calls to Blizzard's bag, panel and
-nameplate layout, its lazy bag caches, `SetModuleContainer`, `SetParentInitializer` and `AddMaskableTexture`. AGENTS.md lists what to
+nameplate layout, its lazy bag caches, `SetModuleContainer`, `SetParentInitializer` and `AddMaskableTexture`. Tweaks adds its own rule on
+top: a `Set*` method called on an entry of one of Blizzard's data tables (`AuctionCategories`), reached through
+the global, a local bound from it or a loop over it, and `SetDetailColumnString` on any receiver (#169). AGENTS.md lists what to
 use instead. A deliberate exception takes a trailing `-- taint-ok: reason` on the flagged line.
 
 `python3 tools/lint_art.py` checks the same files and the shipped XML for art that could be stretched: a raw

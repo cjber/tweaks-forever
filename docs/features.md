@@ -58,7 +58,6 @@ All off until you turn them on, except faster auto loot.
 - What's new after an update. The first time you log in after Tweaks Forever updates, one line in chat says what changed. On by default.
 - Suggest companion addons. Where another Forever addon would help, such as Shortest Path Forever on a dungeon entrance, a grey line in the tooltip says so, and goes once it is loaded. On by default.
 - Hide macro names (off by default). Macros on your action bars show just their icon, without the name across the bottom.
-- Sort gear by item level on the auction house's Browse tab. Weapons and armour get an iLvl column between Name and Available, sorted by clicking its header like the game's own columns, and the item level no longer repeats after the name. On by default.
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Quests on minimap givers. Needs [QuestieDB](https://github.com/Questie/QuestieDB): the QuestieDB addon on its own is enough, Questie itself isn't needed. Pointing at a quest giver on the minimap lists the quests they have for you, such as "[15] Dry Times", coloured by level, and the next few levels' in grey with the level they open at. A giver you owe a quest to lists it with a gold ? once it is ready to hand in.
 - Quest progress on tooltips. Needs [QuestieDB](https://github.com/Questie/QuestieDB), on its own or with Questie. Pointing at a creature you need for a quest in your log, to kill or for an item it drops, adds the quest's title and your progress under its tooltip, as the retail game does: " - Mangy Wolf slain: 3/10", in white until that objective is done and grey after. A quest item you need, and an object you use or loot for one, shows its quest and progress the same way, and an item that starts a quest you haven't done says "Starts a quest:" and names it. QuestieDB says which creatures, items and objects count, by their IDs; your progress is the quest log's own. On by default, and greyed out without QuestieDB.
@@ -130,7 +129,6 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
 | Best-selling quest reward | Polestar, while its reward highlight is on |
 | Quest levels in quest dialogs | Polestar, while its quest levels are on |
-| Item level in the auction house | TradeSkillMaster, Auctioneer |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |

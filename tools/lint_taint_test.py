@@ -60,23 +60,24 @@ class TaintTest(unittest.TestCase):
 
     def test_blizzard_data_table_setters(self):
         # #169: a Blizzard setter on an auction category stores the addon's value where Browse reads it.
-        flagged = [
-            "AuctionCategories[1]:SetDetailColumnString(ITEM_LEVEL_ABBR)",
-            "local c = AuctionCategories[1]\nc:SetDetailColumnString(x)",
-            "for _, category in ipairs(AuctionCategories) do category:SetFlag(x) end",
-            "local cats = AuctionCategories\nfor _, c in pairs(cats) do c:SetSubCategories(t) end",
-            "local c = AuctionCategories[2]\nc.subCategories[1]:SetName(x)",
-            "entry.category:SetDetailColumnString(on and ITEM_LEVEL_ABBR or entry.detail)",
-        ]
-        for source in flagged:
+        write, call = "taint-blizzard-write", "taint-blizzard-call"
+        flagged = {
+            "AuctionCategories[1]:SetDetailColumnString(ITEM_LEVEL_ABBR)": call,
+            'AuctionCategories[1]:SetDetailColumnString"iLvl"': call,
+            "local c = AuctionCategories[1]\nc:SetDetailColumnString(x)": call,
+            "entry.category:SetDetailColumnString(on and ITEM_LEVEL_ABBR or entry.detail)": call,
+            "for _, category in ipairs(AuctionCategories) do category:SetFlag(x) end": write,
+            "for _, c in next, AuctionCategories do c:SetFlag(x) end": write,
+            "local cats = AuctionCategories\nfor _, c in pairs(cats) do c:SetSubCategories(t) end": write,
+            "local c = AuctionCategories[2]\nc.subCategories[1]:SetName(x)": write,
+            "AuctionCategories[1]:SetSubCategories{}": write,
+            "_G.AuctionCategories[1]:SetFlag(x)": write,
+        }
+        for source, code in flagged.items():
             with self.subTest(source=source):
                 findings = check(source)
                 self.assertEqual(len(findings), 1, findings)
-                self.assertTrue(
-                    findings[0][1].startswith("taint-blizzard-write:")
-                    or findings[0][1].startswith("taint-blizzard-call:"),
-                    findings,
-                )
+                self.assertTrue(findings[0][1].startswith(code + ":"), findings)
         clean = [
             "local n = #AuctionCategories",
             "local t = {}\nfor i in ipairs(AuctionCategories) do t[i] = true end",

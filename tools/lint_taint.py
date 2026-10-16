@@ -32,6 +32,7 @@ DATA_SETTERS = {
 POLICY = taint.Policy(calls={**taint.CALLS, **DATA_SETTERS})
 
 SETTER = re.compile(r"Set[A-Z]\w*")
+CALL_OPENERS = frozenset({"(", "{"})
 ITERATORS = frozenset({"ipairs", "pairs", "next"})
 
 
@@ -52,10 +53,17 @@ def receiver_root(tokens: list[Token], index: int) -> str | None:
         if tokens[cursor].kind != "name":
             return None
         if cursor >= 2 and tokens[cursor - 1].text in {".", ":"}:
+            if tokens[cursor - 2].text == "_G" and tokens[cursor - 1].text == ".":
+                return tokens[cursor].text
             cursor -= 2
             continue
         return tokens[cursor].text
     return None
+
+
+def is_call(token: Token) -> bool:
+    """Whether `token`, just after a method name, opens a call: `(`, or Lua's `f"s"` and `f{}` forms."""
+    return token.text in CALL_OPENERS or token.kind == "string"
 
 
 def data_bound(tokens: list[Token]) -> set[str]:
@@ -82,7 +90,8 @@ def data_bound(tokens: list[Token]) -> set[str]:
                 if rest[1].kind == "name" and rest[1].text in sources and texts[2:3] != ["("]:
                     bound.add(names[0])
             elif token.text == "for" and texts[:1] == ["in"]:
-                if texts[1] in ITERATORS and texts[2] == "(" and texts[3] in sources:
+                # `in ipairs(t)`, `in pairs(t)`, `in next(t)` and `in next, t` all bind t's entries.
+                if texts[1] in ITERATORS and texts[2] in {"(", ","} and texts[3] in sources:
                     bound.update(names[1:])
         if bound == sources:
             return bound - DATA_TABLES
@@ -96,19 +105,25 @@ def data_writes(source: str) -> list[tuple[int, str]]:
         bound = data_bound(tokens)
         findings = []
         for index, token in enumerate(tokens):
-            if (
+            if not (
                 token.kind == "name"
                 and SETTER.fullmatch(token.text)
-                and token.text not in DATA_SETTERS
                 and tokens[index - 1].text in {".", ":"}
-                and tokens[index + 1].text == "("
+                and is_call(tokens[index + 1])
+                and taint.flagged(comments, token.line)
             ):
-                root = receiver_root(tokens, index)
-                if root is not None and (root in DATA_TABLES or root in bound) and taint.flagged(comments, token.line):
-                    table = root if root in DATA_TABLES else "a Blizzard data table"
-                    findings.append(
-                        (token.line, f"taint-blizzard-write: {token.text} on an entry of {table} writes its field")
-                    )
+                continue
+            if token.text in DATA_SETTERS:
+                # The shared rule flags `name(`; the call forms without parentheses are caught here.
+                if tokens[index + 1].text != "(":
+                    findings.append((token.line, f"taint-blizzard-call: {token.text} ({DATA_SETTERS[token.text]})"))
+                continue
+            root = receiver_root(tokens, index)
+            if root is not None and (root in DATA_TABLES or root in bound):
+                table = root if root in DATA_TABLES else "a Blizzard data table"
+                findings.append(
+                    (token.line, f"taint-blizzard-write: {token.text} on an entry of {table} writes its field")
+                )
         return findings
     except IndexError as error:
         raise LuaSyntaxError("unexpected end of file") from error
