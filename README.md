@@ -52,7 +52,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and a warning when you have none.
 - **Quest item sparkles.** The game's own sparkles on lootable quest objects, as in [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles). Off by default. Outlines are off while it's on and come back after; removing sparkles needs a game restart.
-- **Small things.** Quiet repeated macro errors, companion hints in tooltips and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
+- **Small things.** Quiet repeated macro errors, hints for my other Forever addons (with a Forever addons settings page) and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined with a Fireball cast">
