@@ -25,19 +25,21 @@ local function Load(file, client)
 	return ns
 end
 
--- The English phrases, read through the template's own lines.
+-- The English phrases, read through the template's own lines. The release zip leaves the template out, so on the
+-- packaged files only the translations themselves are checked (each key is its English text).
 local phrases
-do
+local template = loadfile("Locales/phrases.txt")
+if template then
 	local ns = { L = {} }
 	local env = setmetatable({
 		GetLocale = function()
 			return "deDE"
 		end,
 	}, { __index = _G })
-	setfenv(assert(loadfile("Locales/phrases.txt")), env)("TweaksForever", ns)
+	setfenv(template, env)("TweaksForever", ns)
 	phrases = ns.L
+	assert(next(phrases), "phrases.txt holds no phrase")
 end
-assert(next(phrases), "phrases.txt holds no phrase")
 
 -- Each placeholder's conversion in `text`, in order, or nil when it is not a format string (a literal "100% "
 -- has none).
@@ -61,7 +63,7 @@ for _, code in ipairs(files) do
 	local count = 0
 	for key, value in pairs(own) do
 		count = count + 1
-		assert(phrases[key], code .. ": not in phrases.txt: " .. key)
+		assert(not phrases or phrases[key], code .. ": not in phrases.txt: " .. key)
 		assert(type(value) == "string" and value ~= "", code .. ": empty line for " .. key)
 		local want = Conversions(key)
 		if want then
