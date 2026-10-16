@@ -104,9 +104,10 @@ local feature = features.mapCoords
 assert(feature.default == true, "a display, not an automation")
 local named = {}
 for _, conflict in ipairs(feature.conflicts) do
-	named[conflict.addon or conflict.polestar] = conflict
+	named[conflict.addon or conflict.polestar or conflict.openmap] = conflict
 end
 assert(named.Leatrix_Maps and named.Mapster and named.Coordinates and named["maps.coords"], "the coordinate addons")
+assert(named.coords and named.coords.openmap == "coords", "OpenMap's own coordinates bar")
 assert(named.Leatrix_Maps.when(), "Leatrix Maps shows coordinates by default")
 env.LeaMapsDB = { ShowCoords = "Off" }
 assert(not named.Leatrix_Maps.when(), "Leatrix Maps with its coordinates off")

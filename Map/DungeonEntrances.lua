@@ -18,6 +18,8 @@ ns.Feature({
 				return not (LeaMapsDB and LeaMapsDB.ShowPointsOfInterest == "Off")
 			end,
 		},
+		-- Its "Dungeons, travel and more" icons: every entrance, with its level range.
+		{ openmap = "icons" },
 	},
 })
 

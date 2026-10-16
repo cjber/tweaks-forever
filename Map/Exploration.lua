@@ -33,6 +33,8 @@ ns.Feature({
 		},
 		-- "off", "on" or "tint": either of the last two reveals the map.
 		{ polestar = "maps.reveal" },
+		-- "show" or "dim" reveals its map; "hide" leaves unexplored areas blank.
+		{ openmap = "unexplored" },
 	},
 })
 

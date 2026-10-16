@@ -241,12 +241,14 @@ TweaksForeverDB = nil
 ---@type TFCharacterDatabase
 TweaksForeverCharDB = nil
 
--- `addon` may be left out of a `polestar` conflict: ns.Feature fills in "Polestar".
+-- `addon` may be left out of a `polestar` conflict: ns.Feature fills in "Polestar". An `openmap` conflict is
+-- one of OpenMap's world map options; ns.Feature fills in its addon and title.
 ---@class TFConflict
 ---@field addon? string
 ---@field title? string
 ---@field when? fun(): boolean?
 ---@field polestar? string
+---@field openmap? string
 
 ---@class TFFeature
 ---@field key string
@@ -333,6 +335,7 @@ TweaksForeverCharDB = nil
 ---@field Report TFReportModule the report window (UI/Report.lua)
 ---@field ReportLines fun(): string[] Tweaks Forever's own lines in the report (Core/Report.lua)
 ---@field PolestarOn fun(path: string): boolean
+---@field OpenMapOn fun(option: string): boolean
 ---@field ConflictOf fun(key: string): string?
 ---@field MissingOf fun(key: string): string?
 ---@field Active fun(key: string): boolean
