@@ -8,7 +8,7 @@ ns.Feature({
 	key = KEY,
 	category = "Interface",
 	name = "Rare alerts",
-	tooltip = "A chat line and a warning sound when a rare creature's nameplate or map marker appears near you. "
+	tooltip = "A chat line and a sound when a rare creature's nameplate or map marker appears near you. "
 		.. "Not in combat, and once per rare for ten minutes.",
 	default = false,
 	conflicts = {
@@ -21,6 +21,9 @@ ns.Feature({
 -- The same rare (by GUID) alerts again only after this long, in seconds.
 local QUIET = 600
 local RARE = { rare = true, rareelite = true }
+-- The game has no sound of its own for a rare. This is its cue for a map marker (vignette) event, SoundKit 45142
+-- (SOUNDKIT.UI_BONUS_EVENT_SYSTEM_VIGNETTES): sound/interface/ui_bonuseventsystemvignettes_01.ogg.
+local SOUND = 1053670
 -- The map markers the game gives a rare creature.
 local VIGNETTE_ATLAS = { VignetteKill = true, VignetteKillElite = true }
 
@@ -64,7 +67,7 @@ end
 ---@param name string
 local function Alert(name)
 	ns.Print(L["rare nearby: %s."]:format(name))
-	PlaySound(SOUNDKIT.RAID_WARNING, "Master")
+	PlaySoundFile(SOUND, "Master")
 end
 
 local function Ready()

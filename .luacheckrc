@@ -252,6 +252,7 @@ read_globals = {
 	"PlayerCanTeleport",
 	"PlayerSpellsFrame",
 	"PlaySound",
+	"PlaySoundFile",
 	"Polestar",
 	"PROFESSIONS_BUTTON",
 	"QuestFlagsPVP",

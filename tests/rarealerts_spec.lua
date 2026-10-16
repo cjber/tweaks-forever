@@ -58,10 +58,10 @@ local env = setmetatable({
 			return { { namePlateUnitToken = "nameplate1" } }
 		end,
 	},
-	PlaySound = function()
+	PlaySoundFile = function(file, channel)
+		assert(file == 1053670 and channel == "Master", "the map marker sound on the Master channel")
 		sounds = sounds + 1
 	end,
-	SOUNDKIT = { RAID_WARNING = 8959 },
 	C_EventUtils = {
 		IsEventValid = function()
 			return true
@@ -98,7 +98,7 @@ handlers.NAME_PLATE_UNIT_ADDED("nameplate3")
 assert(#printed == 1, "not a normal creature, nor a secret one")
 now = now + 601
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(#printed == 2, "again after ten minutes")
+assert(#printed == 2 and sounds == 2, "again after ten minutes")
 handlers.VIGNETTES_UPDATED()
 assert(printed[3] == "rare nearby: Gruff Swiftbite." and #printed == 3, "a living, near rare's marker only")
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
