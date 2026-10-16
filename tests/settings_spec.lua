@@ -190,6 +190,28 @@ local repair, guildRepair = registered[1].initializer, registered[2].initializer
 assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Tweaks Forever")
 assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
 assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
+
+-- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
+do
+	local before, family = #registered, ns.Family
+	local addOnCategories = 0
+	env.Settings.RegisterAddOnCategory = function()
+		addOnCategories = addOnCategories + 1
+	end
+	ns.Family = {
+		CreatePanel = function()
+			error("broken copy")
+		end,
+	}
+	env.SLASH_TWEAKSFOREVER1 = nil
+	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
+	assert(addOnCategories == 1, "the category still registers")
+	assert(env.SLASH_TWEAKSFOREVER1 == "/tweaks", "and /tweaks still works")
+	for index = before + 1, #registered do
+		assert(registered[index].initializer.name ~= "Forever addons", "no index button for a page that failed")
+	end
+	ns.Family = family
+end
 assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
 assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")
 local function Modifiable(initializer)

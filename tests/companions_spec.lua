@@ -39,11 +39,21 @@ assert(ns.EntranceHint() == ENABLE)
 -- Loaded: nothing to say.
 loaded.ShortestPathForever = true
 assert(ns.EntranceHint() == nil)
--- With the shared setting off, neither line.
+-- The shared setting covers only addons you don't have: off, it hides the suggestion but not the enable line.
 loaded.ShortestPathForever, ns.db.suggestFamily = nil, false
-assert(ns.EntranceHint() == nil, "installed but off, setting off")
+assert(ns.EntranceHint() == ENABLE, "installed but off explains the click, whatever the setting")
 exists.ShortestPathForever = nil
 assert(ns.EntranceHint() == nil, "missing, setting off")
+-- A client that won't say whether it exists reads as "off" in the module; that is no reason to tell anyone to
+-- enable it.
+ns.db.suggestFamily = nil
+env.C_AddOns.DoesAddOnExist = function()
+	error("secret")
+end
+assert(ns.EntranceHint() == nil, "an unreadable answer shows nothing")
+env.C_AddOns.DoesAddOnExist = function(addon)
+	return exists[addon] == true
+end
 -- Dismissed from the link window: the missing line stays away.
 ns.db.suggestFamily, ns.db.familyDismissed = nil, { ["TweaksForever.entrance"] = true }
 assert(ns.EntranceHint() == nil, "dismissed")

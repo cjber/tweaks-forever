@@ -112,18 +112,21 @@ ns.Init(function()
 		)
 	end
 	-- The Forever addons page is shared by all five addons (UI/ForeverFamily.lua), with the hint setting on it. It
-	-- is our own canvas frame, so nothing of ours goes into the settings search.
-	local family = Settings.RegisterCanvasLayoutSubcategory(
-		category,
-		ns.Family.CreatePanel(nil, ns.db, addonName),
-		L["Forever addons"]
-	)
-	Settings.RegisterInitializer(
-		category,
-		CreateSettingsButtonInitializer(L["Forever addons"], L["Open"], function()
-			Settings.OpenToCategory(family:GetID())
-		end, nil, false)
-	)
+	-- is our own canvas frame, so nothing of ours goes into the settings search. The copy in use may be another
+	-- addon's newer one, so a failure there is caught and leaves the rest of the settings and /tweaks working.
+	ns.SafeCall("Forever addons page", function()
+		local family = Settings.RegisterCanvasLayoutSubcategory(
+			category,
+			ns.Family.CreatePanel(nil, ns.db, addonName),
+			L["Forever addons"]
+		)
+		Settings.RegisterInitializer(
+			category,
+			CreateSettingsButtonInitializer(L["Forever addons"], L["Open"], function()
+				Settings.OpenToCategory(family:GetID())
+			end, nil, false)
+		)
+	end)
 	Settings.RegisterAddOnCategory(category)
 	-- Another addon's settings may have changed since login. Not with the gamepad UI on (#168): its navigation
 	-- pushes and pops input bindings as this panel and its rows show and hide, and a blocked

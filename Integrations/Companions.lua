@@ -10,20 +10,24 @@ local SPF = "ShortestPathForever"
 local ENTRANCE_KEY = "TweaksForever.entrance"
 
 -- The grey line on a dungeon entrance's tooltip. Without Shortest Path Forever installed: what it would add,
--- through Family.Hint (on, not dismissed). Installed but switched off: why clicking only sets a waypoint, which
--- explains a missing feature rather than suggesting an addon, so only the setting turns it off.
+-- through Family.Hint (the shared setting on, not dismissed). Installed but switched off: why a click only sets
+-- a waypoint. That explains a missing feature rather than suggesting an addon, so the setting ("only for addons
+-- you don't have") leaves it alone; it needs the client to say plainly that the addon exists, since the module
+-- reads an answer it can't get as "off".
 ---@return string?
 function ns.EntranceHint()
 	local Family, db = ns.Family, ns.db
 	if not (Family and db) then
 		return nil
 	end
-	local state = Family.State(SPF)
-	if state == "missing" then
-		return Family.Hint(db, ENTRANCE_KEY, SPF) and L["With Shortest Path Forever, click to plan the way there."]
-			or nil
-	elseif state == "off" and db.suggestFamily ~= false then
-		return L["Enable Shortest Path Forever for walked routes and boat times."]
+	if Family.Hint(db, ENTRANCE_KEY, SPF) then
+		return L["With Shortest Path Forever, click to plan the way there."]
+	end
+	if Family.State(SPF) == "off" then
+		local ok, exists = pcall(C_AddOns.DoesAddOnExist, SPF)
+		if ok and exists == true then
+			return L["Enable Shortest Path Forever for walked routes and boat times."]
+		end
 	end
 end
 
