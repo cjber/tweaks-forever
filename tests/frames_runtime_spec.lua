@@ -323,7 +323,10 @@ local function Run(installed, early, fromEditor)
 	gamepad = true
 	fire("CVAR_UPDATE", "GamePadEnable")
 	flush()
-	assert(guide.scale == 1 and guide.points[1][1] == "TOPLEFT", "gamepad UI puts windows back where the game puts them")
+	assert(
+		guide.scale == 1 and guide.points[1][1] == "TOPLEFT",
+		"gamepad UI puts windows back where the game puts them"
+	)
 	guide:Show()
 	fire("AdventureGuideForever.WindowLayoutChanged", guide)
 	flush()
