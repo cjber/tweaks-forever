@@ -12,9 +12,9 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.13.1"
+ns.WHATS_NEW_VERSION = "0.14.0"
 ns.WHATS_NEW =
-	L["No more Lua error at login. New in 0.13.0: a Forever addons page, and map extras give way to OpenMap."]
+	L["In your language, machine translated. New in 0.13.0: a Forever addons page; map extras give way to OpenMap."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
