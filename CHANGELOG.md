@@ -13,6 +13,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 
 - **Tweaks keeps out of the way of the gamepad UI.** With the gamepad UI on, Move and scale windows stands down: windows open where the game puts them and Edit Mode has no Windows tab. Opening the settings no longer runs Tweaks' conflict check either. Backing out of the AddOns settings with a gamepad has been reported to break the game's gamepad interact button, so this keeps Tweaks out of that path while we find out more.
+- **The auction house item level column is gone.** It worked by writing into the game's own auction category list, which the auction house reads when it lays out search results. That can get buying blocked and blamed on Tweaks, so it isn't worth the risk. The game still shows each item's level after its name; you just can't sort by it.
 
 ## [0.12.0] - 2026-10-15
 

@@ -285,7 +285,6 @@ TweaksForeverCharDB = nil
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
 ---@field SpellReach TFSpellReach
----@field AuctionHouse TFAuctionHouse
 ---@field Tooltips TFTooltips
 ---@field WhisperInvite TFWhisperInvite
 ---@field Exploration TFExploration
