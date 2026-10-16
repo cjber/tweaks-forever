@@ -22,8 +22,8 @@ ns.Feature({
 local QUIET = 600
 local RARE = { rare = true, rareelite = true }
 -- The game has no sound for a rare as such. This is its own map marker (vignette) chime,
--- sound/interface/ui_vignette_mapping_01.ogg (retail's sound kit 37881); Forever's client ships the file without
--- that kit, so it is played by file.
+-- sound/interface/ui_vignette_mapping_01.ogg (sound kit 37881 in retail's SoundKitEntry); Forever's client ships the
+-- file without that kit, so it is played by file.
 local SOUND = 893809
 -- The map markers the game gives a rare creature.
 local VIGNETTE_ATLAS = { VignetteKill = true, VignetteKillElite = true }
@@ -65,16 +65,22 @@ local function Named(name)
 	return type(name) == "string" and name ~= ""
 end
 
--- When the sound last played: rares found together (after a fight, or in one marker update) chime once, not stacked.
+-- Rares found within this many seconds of a chime (after a fight, in one marker update, or plates a frame apart)
+-- each get their chat line but no chime of their own, so the sound never stacks.
+local CHIME_GAP = 2
+-- When the sound last played.
+---@type number?
 local chimed
 
 ---@param name string
-local function Alert(name)
+---@param now number
+local function Alert(name, now)
 	ns.Print(L["rare nearby: %s."]:format(name))
-	local now = GetTime()
-	if chimed ~= now then
-		chimed = now
-		PlaySoundFile(SOUND, "Master")
+	if not chimed or now - chimed >= CHIME_GAP then
+		-- A sound the client refuses to play leaves the next rare free to try.
+		if PlaySoundFile(SOUND, "Master") ~= false then
+			chimed = now
+		end
 	end
 end
 
@@ -89,8 +95,9 @@ local function CheckUnit(unit)
 		return
 	end
 	local guid, name = ns.Readable(UnitGUID(unit)), ns.Readable(UnitName(unit)) -- multi-value: Readable keeps the name
-	if Named(name) and Fresh(guid, GetTime()) then
-		Alert(name)
+	local now = GetTime()
+	if Named(name) and Fresh(guid, now) then
+		Alert(name, now)
 	end
 end
 
@@ -102,8 +109,9 @@ local function CheckVignette(id)
 		return
 	end
 	local guid, name = ns.Readable(info.objectGUID), ns.Readable(info.name)
-	if Named(name) and Fresh(guid, GetTime()) then
-		Alert(name)
+	local now = GetTime()
+	if Named(name) and Fresh(guid, now) then
+		Alert(name, now)
 	end
 end
 
