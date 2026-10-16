@@ -16,7 +16,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 - **Map extras step aside for OpenMap.** With [OpenMap](https://www.curseforge.com/wow/addons/openmap) loaded, its coordinates, zone level ranges, unexplored areas and dungeon icons take over from Tweaks' own, each only while its matching option is on there. Change one of those options in OpenMap and Tweaks follows the next time you open its settings, or after a /reload. With OpenMap's unexplored areas set to Hide, Tweaks' blue tint can still run.
 - **A Forever addons page in the settings.** Under Tweaks Forever, a new page lists my five Forever addons with what each does, whether you have it, and a Copy link button for its CurseForge page. *Suggest my other Forever addons* lives there now, replacing Suggest companion addons. If you had that off, it stays off.
-- **A plainer dungeon entrance hint.** Without Shortest Path Forever, an entrance's tooltip now ends "With Shortest Path Forever, click to plan the way there."
+- **A plainer dungeon entrance hint.** Without Shortest Path Forever, an entrance's tooltip now ends "With Shortest Path Forever, click to plan the way there." while *Suggest my other Forever addons* is on.
 
 ## [0.12.1] - 2026-10-16
 

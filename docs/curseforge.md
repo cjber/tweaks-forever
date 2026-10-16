@@ -1,6 +1,6 @@
 Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
-If you already run Polestar, Leatrix Plus, Questie, BlizzMove, Peddler or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
+If you already run Polestar, Leatrix Plus, OpenMap, Questie, BlizzMove, Peddler or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
 
 ![Dungeon entrances, nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
@@ -31,7 +31,7 @@ Nameplates in retail's own frame, with your target outlined.
 - **Spellbook, trainer and bags**: unlearned spells in the spellbook, Train all for what you can afford, and the reagent bag in the combined bag.
 - **Fishing**: double right-click to cast or apply a lure, with a warning when you have none.
 - **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default; turns outlines off, and removing sparkles needs a restart.
-- **Also**: a Forever addons page listing my other addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names and `/rl`.
+- **Also**: a page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names and `/rl`.
 
 ## Usage
 
