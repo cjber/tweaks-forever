@@ -90,7 +90,23 @@ Repairs, selling junk and faster auto loot start on; everything else that acts f
 
 ## Works alongside
 
-A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever, Polestar, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window. [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) covers Legacy challenges and [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) profession levelling.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever, Polestar, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
+
+<!-- forever-family:start -->
+
+## My other Forever addons
+
+Each one works on its own, and they work together when you install more than one.
+
+| Addon | What it does |
+|---|---|
+| [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) | Plans journeys on foot, by air, by sea and through portals, with directions in the tracker. |
+| [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) | Suggests quests for your level and routes you from one to the next. |
+| [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) | Shows skill-up chances, recipe costs and levelling routes in the Professions window. |
+| [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) | Shows your unfinished Legacy challenges on the world map and tracks the ones you choose. |
+| [Tweaks Forever](https://www.curseforge.com/wow/addons/tweaks-forever) | Adds quest automation, rare alerts and merchant options to the game's settings. |
+
+<!-- forever-family:end -->
 
 ## Development
 
