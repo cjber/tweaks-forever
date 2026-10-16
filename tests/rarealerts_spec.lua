@@ -59,7 +59,7 @@ local env = setmetatable({
 		end,
 	},
 	PlaySoundFile = function(file, channel)
-		assert(file == 1053670 and channel == "Master", "the map marker sound on the Master channel")
+		assert(file == 893809 and channel == "Master", "the map marker chime on the Master channel")
 		sounds = sounds + 1
 	end,
 	C_EventUtils = {
@@ -99,8 +99,10 @@ assert(#printed == 1, "not a normal creature, nor a secret one")
 now = now + 601
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#printed == 2 and sounds == 2, "again after ten minutes")
+now = now + 1
 handlers.VIGNETTES_UPDATED()
 assert(printed[3] == "rare nearby: Gruff Swiftbite." and #printed == 3, "a living, near rare's marker only")
+assert(sounds == 3, "a marker chimes too")
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
 assert(#printed == 3, "once")
 combat = true
@@ -111,4 +113,5 @@ assert(#printed == 3, "never in combat")
 combat = false
 handlers.PLAYER_REGEN_ENABLED()
 assert(printed[4] == "rare nearby: Mother Fang." and printed[5] == "rare nearby: Gruff Swiftbite.", "told once it ends")
+assert(sounds == 4, "two rares found together chime once")
 print("rarealerts: ok")

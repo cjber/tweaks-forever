@@ -21,9 +21,10 @@ ns.Feature({
 -- The same rare (by GUID) alerts again only after this long, in seconds.
 local QUIET = 600
 local RARE = { rare = true, rareelite = true }
--- The game has no sound of its own for a rare. This is its cue for a map marker (vignette) event, SoundKit 45142
--- (SOUNDKIT.UI_BONUS_EVENT_SYSTEM_VIGNETTES): sound/interface/ui_bonuseventsystemvignettes_01.ogg.
-local SOUND = 1053670
+-- The game has no sound for a rare as such. This is its own map marker (vignette) chime,
+-- sound/interface/ui_vignette_mapping_01.ogg (retail's sound kit 37881); Forever's client ships the file without
+-- that kit, so it is played by file.
+local SOUND = 893809
 -- The map markers the game gives a rare creature.
 local VIGNETTE_ATLAS = { VignetteKill = true, VignetteKillElite = true }
 
@@ -64,10 +65,17 @@ local function Named(name)
 	return type(name) == "string" and name ~= ""
 end
 
+-- When the sound last played: rares found together (after a fight, or in one marker update) chime once, not stacked.
+local chimed
+
 ---@param name string
 local function Alert(name)
 	ns.Print(L["rare nearby: %s."]:format(name))
-	PlaySoundFile(SOUND, "Master")
+	local now = GetTime()
+	if chimed ~= now then
+		chimed = now
+		PlaySoundFile(SOUND, "Master")
+	end
 end
 
 local function Ready()
