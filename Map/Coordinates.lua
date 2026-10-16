@@ -30,6 +30,7 @@ ns.Feature({
 		},
 		{ addon = "Coordinates" },
 		{ polestar = "maps.coords" },
+		{ openmap = "coords" },
 	},
 })
 

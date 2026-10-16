@@ -96,7 +96,8 @@ end
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
 -- addon's own setting }; with no `when`, the addon being loaded is the conflict. { polestar = setting path } is
 -- Polestar's own setting, on (ns.PolestarOn) while Polestar is loaded; `addon` can name another of its addons that
--- must be loaded too.
+-- must be loaded too. { openmap = option } is one of OpenMap's world map options, on (ns.OpenMapOn) while OpenMap
+-- is loaded.
 ---@param feature TFFeature
 function ns.Feature(feature)
 	assert(not byKey[feature.key], "duplicate feature " .. feature.key)
@@ -104,6 +105,9 @@ function ns.Feature(feature)
 	for _, conflict in ipairs(feature.conflicts) do
 		if conflict.polestar then
 			conflict.addon, conflict.title = conflict.addon or "Polestar", "Polestar"
+		elseif conflict.openmap then
+			-- Its TOC title is colour-coded, so name it plainly.
+			conflict.addon, conflict.title = conflict.addon or "OpenMap", "OpenMap"
 		end
 	end
 	ns.features[#ns.features + 1] = feature
@@ -122,11 +126,37 @@ function ns.PolestarOn(path)
 	return ok and value ~= nil and value ~= false and value ~= "off"
 end
 
+-- Whether OpenMap is loaded and its world map runs with one of its options on. It keeps them in
+-- OpenMapDB.worldmap, filled from its defaults as it loads: a missing table or option is its default, and every
+-- option it shares with a feature here starts on. Its options are true/false, or a choice where "hide" is off
+-- (unexplored areas hidden, as the game's own map does). Whether the world map runs is its module's own flag once
+-- it has started (false when it failed to start; switching it in OpenMap's options takes a reload there too), and
+-- its saved setting before then.
+---@param option string
+---@return boolean
+function ns.OpenMapOn(option)
+	if not C_AddOns.IsAddOnLoaded("OpenMap") then
+		return false
+	end
+	local db = type(OpenMapDB) == "table" and OpenMapDB.worldmap
+	db = type(db) == "table" and db or {}
+	local modules = type(OpenMap) == "table" and OpenMap.modules
+	local worldmap = type(modules) == "table" and modules.worldmap
+	local running = db.enabled ~= false
+	if type(worldmap) == "table" and type(worldmap.enabled) == "boolean" then
+		running = worldmap.enabled
+	end
+	local value = db[option]
+	return running == true and value ~= false and value ~= "hide"
+end
+
 ---@param conflict TFConflict
 ---@return boolean?
 local function Applies(conflict)
 	if conflict.polestar then
 		return ns.PolestarOn(conflict.polestar)
+	elseif conflict.openmap then
+		return ns.OpenMapOn(conflict.openmap)
 	end
 	return not conflict.when or conflict.when()
 end

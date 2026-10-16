@@ -8,7 +8,7 @@ Small quality-of-life tweaks for WoW: Forever that look like they came with the 
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
 </p>
 
-Tweaks Forever adds options for quest automation, repairs, junk selling, gear groups, maps and fishing to the game’s settings.
+Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
@@ -16,7 +16,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Dungeon entrances, nameplates and a junk coin">
 </p>
 
-<p align="center">Dungeon entrances on the map, nameplates, and the junk coin in your bags.</p>
+<p align="center">The junk coin marks what sells with your greys at a merchant. Also dungeon entrances and nameplates.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png" width="768" alt="The world map inside Blackfathom Deeps, showing the dungeon's floor and legend">
@@ -38,7 +38,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Automation.** Accepts and turns in quests, skips one-option gossip, opens the flight map, accepts summons and group resurrections, releases in battlegrounds, declines duels (friends and guild can be let through), and accepts party invites from friends or declines strangers'. Hold Shift to talk normally. Off until you turn it on, as are invites from a whispered keyword and skipping loot confirmations.
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on. Hold Shift as a merchant opens to skip both for that visit.
-- **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Each item shows a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
+- **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Items show a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
 - **Map extras.** Unexplored areas in a blue tint on the world and zone maps (off until you turn it on), each zone's level range coloured like quest levels, your and the cursor's coordinates, and every dungeon and raid entrance marked with retail's icons.
 - **Dungeon maps.** Inside a dungeon, the world map opens on the dungeon's own floor map and legend, with a button for the floor and a Back to map button. Needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Classic WoW maps, read from your install.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout (not with the gamepad UI).
@@ -46,12 +46,12 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Spell reach.** A small icon for each attack you track on every enemy nameplate: full colour in reach, solid red out of it. Off until you turn it on.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
 - **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
-- **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Rare alerts (off by default) name a rare near you in chat.
+- **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Rare alerts (off by default) name nearby rares in chat.
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet. With Combine Bags on, the reagent bag joins the combined bag.
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and a warning when you have none.
-- **Quest item sparkles.** The game's own sparkles make lootable quest objects easier to spot, as in [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles). Off by default. Outlines are turned off while enabled; your previous graphics settings return when disabled. Removing sparkles needs a game restart.
+- **Quest item sparkles.** The game's own sparkles on lootable quest objects, as in [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles). Off by default. Outlines are off while it's on and come back after; removing sparkles needs a game restart.
 - **Small things.** Quiet repeated macro errors, companion hints in tooltips and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
 
 <p align="center">
@@ -82,7 +82,7 @@ Download the zip from [Releases](https://github.com/cjber/tweaks-forever/release
 - `/tweaks report` shows a report to copy into a bug report: versions, what you changed, what stands down for another addon, and any errors Tweaks caught.
 - `/rl` reloads the interface.
 
-Repairs, selling junk and faster auto loot start on; everything else that acts for you is off until you tick it. Translations are welcome as a pull request or an issue on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated shows in English.
+Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off. Translations are welcome as a pull request or an issue on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated shows in English.
 
 ## For addon authors
 
@@ -90,7 +90,7 @@ Repairs, selling junk and faster auto loot start on; everything else that acts f
 
 ## Works alongside
 
-A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever, Polestar, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window. [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) covers Legacy challenges and [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) profession levelling.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window. [Legacy Forever](https://www.curseforge.com/wow/addons/legacy-forever) covers Legacy challenges and [SkillUp Forever](https://www.curseforge.com/wow/addons/skillup-forever) profession levelling.
 
 ## Development
 
