@@ -32,9 +32,10 @@ with no tiles are counted and skipped.
 game's own words and numbers. The Camp Benefits aura's description (`Spell`) is a
 template with one `$?a<aura>[Feature: effect][]` branch per feature aura; the
 script takes each branch and fills in `$w` (effect base points, `SpellEffect`), `$t`
-(effect period) and `$d` (`SpellMisc` duration index into `SpellDuration`). The tent's
-branch only says rest was received, so its entry uses the Camp Tent aura's own
-description instead. Each entry also lists the base points it put in for `$w`, in effect
+(effect period) and `$d` (`SpellMisc` duration index into `SpellDuration`). Since
+1.60.1.70425 the template has no tent branch, so the tent's entry comes first from the
+Camp Tent spell's own description, and the script requires exactly the nine other
+branches and that its rest lockout aura is still the Camp Tent's. Each entry also lists the base points it put in for `$w`, in effect
 order, so the addon can put in the values the aura you get actually carries. It refuses to write a number that depends on level, stats or
 content tuning, and fails on any token it can't resolve. Same cache and flags as
 `gen_overlays.py`.

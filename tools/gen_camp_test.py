@@ -15,6 +15,7 @@ class FakeSpells:
         self.texts = {
             CAMP_BENEFITS: "Gained the following camp benefits:\r\n\r\n" + "".join(branches),
             TENT: "Increases Rested Experience after $d spent resting near the tent.",
+            TENT_AURA: "You cannot gain more rested experience from a Camp Tent for $d.",
         }
 
     def description(self, spell):
@@ -42,14 +43,21 @@ class CampTest(unittest.TestCase):
         self.assertEqual(rows[1], (FIRST, f"Feature {FIRST}", "Stat increased by 87", 3600, ["87"]))
 
     def test_a_changed_summary_fails(self):
-        for auras in (
-            features(FEATURES - 1),
-            features(FEATURES + 1),
-            [TENT_AURA, *features(FEATURES - 1)],
-        ):
+        cases = [
+            ("features, not 9", features(FEATURES - 1)),
+            ("features, not 9", features(FEATURES + 1)),
+            ("the tent again", [TENT_AURA, *features(FEATURES - 1)]),
+        ]
+        for message, auras in cases:
             with self.subTest(count=len(auras), tent=TENT_AURA in auras):
-                with self.assertRaisesRegex(ValueError, "the template changed"):
+                with self.assertRaisesRegex(ValueError, message):
                     benefits(FakeSpells(auras))
+
+    def test_a_renumbered_tent_lockout_fails(self):
+        spells = FakeSpells(features(FEATURES))
+        spells.texts[TENT_AURA] = "Something else."
+        with self.assertRaisesRegex(ValueError, "rest lockout"):
+            benefits(spells)
 
 
 if __name__ == "__main__":

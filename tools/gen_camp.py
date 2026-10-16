@@ -116,8 +116,12 @@ def benefits(spells):
     branches = re.findall(r"\$\?a(\d+)\[(.*?)\]\[\]", template, re.S)
     # Since 1.60.1.70425 the summary no longer has a Tent branch; the tent is still a camp feature, explained by
     # its own spell, and its rest lockout aura is unchanged. It comes first, where the summary used to list it.
-    if len(branches) != FEATURES or any(int(aura) == TENT_AURA for aura, _ in branches):
-        raise ValueError(f"Camp Benefits lists {len(branches)} features; the template changed")
+    if any(int(aura) == TENT_AURA for aura, _ in branches):
+        raise ValueError("Camp Benefits lists the tent again; take its row from the template")
+    if len(branches) != FEATURES:
+        raise ValueError(f"Camp Benefits lists {len(branches)} features, not {FEATURES}; the template changed")
+    if "Camp Tent" not in spells.description(TENT_AURA):
+        raise ValueError(f"spell {TENT_AURA} is no longer the Camp Tent's rest lockout")
     out = [(TENT_AURA, "Tent", resolve(spells, spells.description(TENT), TENT)[0], None, [])]
     for aura, body in branches:
         aura = int(aura)
