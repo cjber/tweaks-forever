@@ -16,13 +16,14 @@ try:
 except ModuleNotFoundError:
     from forever_tools import wago
 
-BUILD = "1.60.1.70374"
+BUILD = "1.60.1.70425"
 USER_AGENT = "TweaksForever/1.0"
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / ".cache"
 OUTPUT = ROOT / "Data" / "CampBenefits.lua"
 CAMP_BENEFITS = 1229741  # its aura description lists every feature aura, one $?a branch each
 TENT_AURA, TENT = 1229451, 1229487  # the rest lockout the tent grants, and the tent's own explanation
+FEATURES = 9  # the summary's $?a branches: every camp feature but the tent
 # SpellEffect columns that make a value depend on level, stats or group size; all must be zero to ship a number.
 SCALING = (
     "Coefficient",
@@ -113,18 +114,16 @@ def resolve(spells, text, own):
 def benefits(spells):
     template = spells.description(CAMP_BENEFITS)
     branches = re.findall(r"\$\?a(\d+)\[(.*?)\]\[\]", template, re.S)
-    if len(branches) < 10:
+    # Since 1.60.1.70425 the summary no longer has a Tent branch; the tent is still a camp feature, explained by
+    # its own spell, and its rest lockout aura is unchanged. It comes first, where the summary used to list it.
+    if len(branches) != FEATURES or any(int(aura) == TENT_AURA for aura, _ in branches):
         raise ValueError(f"Camp Benefits lists {len(branches)} features; the template changed")
-    out = []
+    out = [(TENT_AURA, "Tent", resolve(spells, spells.description(TENT), TENT)[0], None, [])]
     for aura, body in branches:
         aura = int(aura)
         feature, effect = body.strip().split(": ", 1)
-        if aura == TENT_AURA:
-            # The benefit's own line only says rest was received; the tent says how to get it.
-            out.append((aura, feature, resolve(spells, spells.description(TENT), TENT)[0], None, []))
-        else:
-            text, bases = resolve(spells, effect, aura)
-            out.append((aura, feature, text.rstrip("."), spells.seconds(aura), bases))
+        text, bases = resolve(spells, effect, aura)
+        out.append((aura, feature, text.rstrip("."), spells.seconds(aura), bases))
     return out
 
 
