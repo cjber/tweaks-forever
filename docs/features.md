@@ -100,7 +100,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie, Legacy Forever and Polestar, it steps aside only while that addon's matching option is on.
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever and Polestar, it steps aside only while that addon's matching option is on.
 
 | Feature | Addons |
 |---|---|
@@ -118,12 +118,12 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
 | Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus, Polestar |
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
-| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar |
-| Zone level ranges | Leatrix Maps, Polestar |
+| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar; OpenMap unless its unexplored areas are hidden |
+| Zone level ranges | Leatrix Maps, Polestar, OpenMap |
 | Rare alerts | RareScanner, Nova Rares, Polestar while its rare alerts are on |
 | XP per hour | XToLevel, Polestar while its XP tracker is on |
-| Coordinates on the world map | Leatrix Maps, Mapster and Polestar while their coordinates are on; Coordinates |
-| Dungeon entrances | Leatrix Maps, while its points of interest are on |
+| Coordinates on the world map | Leatrix Maps, Mapster, Polestar and OpenMap while their coordinates are on; Coordinates |
+| Dungeon entrances | Leatrix Maps, while its points of interest are on; OpenMap, while its dungeon icons are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
 | Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |

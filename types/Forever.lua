@@ -7,6 +7,9 @@ LeaPlusDB = nil
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
+-- OpenMap's account settings, one table per module; only its world map options are read.
+---@type {worldmap: table<string, boolean|string|number>?}?
+OpenMapDB = nil
 -- Polestar's namespace: its settings by path, and its message bus (SETTING_CHANGED as a setting changes).
 ---@class PolestarNamespace
 ---@field Get fun(path: string): any

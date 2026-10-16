@@ -22,12 +22,14 @@ local function PolestarPath(feature)
 end
 assert(PolestarPath(features.exploration) == "maps.reveal", 'Polestar\'s reveal, unless it is "off"')
 
-local predicates = {}
+local predicates, openmapOption = {}, nil
 for _, conflict in ipairs(features.exploration.conflicts) do
-	-- Core names a Polestar setting's addon; here only the others are keyed.
-	predicates[conflict.addon or "Polestar"] = conflict.when
+	-- Core names a Polestar or OpenMap setting's addon; here only the others are keyed.
+	predicates[conflict.addon or (conflict.openmap and "OpenMap") or "Polestar"] = conflict.when
+	openmapOption = conflict.openmap or openmapOption
 	assert(conflict.addon ~= "Magnify", "zoom alone is not an exploration conflict")
 end
+assert(openmapOption == "unexplored", "OpenMap's unexplored areas option")
 assert(predicates.LegacyForever())
 env.LegacyForeverDB = { showAreas = false }
 assert(not predicates.LegacyForever())

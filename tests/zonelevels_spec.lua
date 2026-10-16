@@ -30,6 +30,12 @@ local function PolestarPath(feature)
 	end
 end
 assert(PolestarPath(features.zoneLevels) == "maps.zoneLevels")
+for _, conflict in ipairs(features.zoneLevels.conflicts) do
+	if conflict.openmap then
+		assert(conflict.openmap == "zoneLevels", "OpenMap's hover label adds the same ranges")
+	end
+end
+assert(#features.zoneLevels.conflicts == 3, "Leatrix Maps, Polestar and OpenMap")
 
 -- Leatrix Maps shows zone levels unless its option is explicitly off.
 local leatrix = features.zoneLevels.conflicts[1]

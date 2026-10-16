@@ -165,6 +165,62 @@ do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but 
 	assert(not ns.ConflictOf("reveal"), "a failing Polestar.Get is no conflict")
 end
 
+do -- An `openmap` conflict reads OpenMap's world map option while OpenMap is loaded; its defaults are on.
+	local loaded = {}
+	local env = setmetatable({
+		strtrim = function(text)
+			return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+		end,
+		GetTime = function()
+			return 0
+		end,
+		geterrorhandler = function()
+			return error
+		end,
+		C_AddOns = {
+			IsAddOnLoaded = function(addon)
+				return loaded[addon] == true
+			end,
+			GetAddOnMetadata = function()
+				return "|cffe6b85cOpen|rMap"
+			end,
+		},
+		CreateFrame = function()
+			local frame = { RegisterEvent = function() end }
+			function frame:SetScript(_, fn)
+				self.callback = fn
+			end
+			return frame
+		end,
+	}, { __index = _G })
+	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
+	ns.db = { coords = true, reveal = true }
+	ns.Feature({ key = "coords", default = true, conflicts = { { openmap = "coords" } } })
+	ns.Feature({ key = "reveal", default = false, conflicts = { { openmap = "unexplored" } } })
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("coords"), "OpenMap's settings count only while OpenMap is loaded")
+	loaded.OpenMap = true
+	ns.RefreshConflicts()
+	assert(ns.ConflictOf("coords") == "OpenMap", "no saved settings yet: its defaults, which are on")
+	assert(ns.ConflictOf("reveal") == "OpenMap", "named plainly, not by its colour-coded title")
+	assert(not ns.Active("coords"), "a conflicted feature stands down")
+	env.OpenMapDB = { worldmap = { enabled = true, coords = true, unexplored = "dim" } }
+	ns.RefreshConflicts()
+	assert(ns.ConflictOf("coords") and ns.ConflictOf("reveal"), '"dim" still reveals the map')
+	env.OpenMapDB.worldmap.coords, env.OpenMapDB.worldmap.unexplored = false, "hide"
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("coords"), "its coordinates off leave ours")
+	assert(not ns.ConflictOf("reveal"), '"hide" leaves unexplored areas blank, so ours may reveal them')
+	env.OpenMapDB.worldmap = { enabled = false, coords = true, unexplored = "show" }
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("coords") and not ns.ConflictOf("reveal"), "its world map turned off runs none of them")
+	assert(ns.Active("coords"))
+	env.OpenMapDB = { worldmap = "broken" }
+	assert(ns.OpenMapOn("coords"), "an unreadable table is its defaults")
+end
+
 do -- Loaded at login, Polestar's own setting changes refresh the conflicts at once.
 	local settings, frames, listeners = { ["qol.fastLoot"] = false }, {}, {}
 	local env = setmetatable({
