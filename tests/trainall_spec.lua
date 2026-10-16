@@ -22,6 +22,9 @@ local ns = {
 		end,
 	}),
 	db = db,
+	FitButton = function(button, width)
+		button.fitted = width
+	end,
 }
 
 local function FakeButton()
@@ -110,6 +113,7 @@ assert(made == nil, "off by default, the trainer keeps the stock buttons alone")
 db.trainAll = true
 db.changed()
 assert(made and made.shown and made.text == "Train all", "the button appears with the feature on")
+assert(made.fitted == 80, "the button widens to a longer translated label")
 
 services = {
 	{ kind = "available", cost = 100 },

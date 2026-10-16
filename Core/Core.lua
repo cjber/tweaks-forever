@@ -21,6 +21,14 @@ function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
 end
 
+-- Widens a button to its label, never below `width`: a translated label can run past the width chosen for the
+-- English, and UIPanelButtonTemplate neither shrinks nor wraps its text. Call it after each SetText.
+---@param button Button
+---@param width number
+function ns.FitButton(button, width)
+	button:SetWidth(math.max(width, math.ceil(button:GetTextWidth()) + 24))
+end
+
 -- The bag frames, read straight from the container. ContainerFrameUtil_EnumerateContainerFrames builds Blizzard's
 -- cached list on its first call, so calling it first from here left that list tainted and the bank blocked.
 ---@return fun(): ContainerFrameTemplate|ContainerFrameCombinedBags?

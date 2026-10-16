@@ -139,20 +139,24 @@ ns.Init(function()
 		button:SetSize(width, 24)
 		button:SetPoint("TOPLEFT", x, y)
 		button:SetText(text)
+		ns.FitButton(button, width)
 		button:SetScript("OnClick", click)
 		return button
 	end
-	Button(L["Select all"], 16, -34, 110, function()
+	local selectAll = Button(L["Select all"], 16, -34, 110, function()
 		for _, info in ipairs(Model.Entries()) do
 			selected[info.questID] = Model.CanAbandon(info.questID)
 		end
 		pending = nil
 		Refresh()
 	end)
-	Button(L["Clear selection"], 132, -34, 130, function()
+	local clear = Button(L["Clear selection"], 132, -34, 130, function()
 		selected, pending = {}, nil
 		Refresh()
 	end)
+	-- Beside Select all, however wide its label made it.
+	clear:ClearAllPoints()
+	clear:SetPoint("LEFT", selectAll, "RIGHT", 6, 0)
 	local note = panel:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 	note:SetPoint("TOPLEFT", 18, -368)
 	note:SetSize(344, 42)
@@ -219,6 +223,7 @@ ns.Init(function()
 		abandon:SetText(
 			pending and L["Confirm abandon (%d)"]:format(#pending) or L["Abandon selected (%d)"]:format(#ids)
 		)
+		ns.FitButton(abandon, 210)
 		note:SetText(
 			pending and L["Abandon these quests? Their progress and associated quest items will be lost."]
 				or L["Choose quests to abandon. Nothing is removed until you confirm."]
@@ -235,6 +240,7 @@ ns.Init(function()
 	open:SetSize(140, 22)
 	open:SetPoint("BOTTOM", 0, 4)
 	open:SetText(L["Abandon quests"])
+	ns.FitButton(open, 140)
 	open:SetScript("OnClick", function()
 		panel:SetShown(not panel:IsShown())
 	end)

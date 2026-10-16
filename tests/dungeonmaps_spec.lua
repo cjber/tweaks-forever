@@ -1,6 +1,9 @@
 local features, initializers, events, handlers = {}, {}, {}, {}
 local active = true
 local ns = {
+	FitButton = function(button, width)
+		button.fitted = width
+	end,
 	L = setmetatable({}, {
 		__index = function(_, key)
 			return key
@@ -283,6 +286,7 @@ end
 host = frames[1] -- the first frame built is the one over the map's canvas
 assert(host and host.shown and scroll and back and reopen and picker and popup)
 assert(reopen.text == "Dungeon map" and not reopen.shown)
+assert(back.fitted == 112 and reopen.fitted == 112, "both buttons widen to a longer translated label")
 local heading, legendText = fontStrings[1], fontStrings[2]
 local art = textures[2]
 assert(heading.text == "The Deadmines" and legendText.text == "A) Entrance\n1) Rhahk'Zor")

@@ -283,4 +283,27 @@ do -- Loaded at login, Polestar's own setting changes refresh the conflicts at o
 	assert(ns.Active("fastLoot"), "turned off in Polestar, back on here")
 end
 
+-- A button widens to its label (a translation can run longer than the English) and never shrinks below its width.
+do
+	local ns = {}
+	local env = setmetatable({
+		CreateFrame = function()
+			return { RegisterEvent = function() end, SetScript = function() end }
+		end,
+	}, { __index = _G })
+	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
+	local button = { text = 40 }
+	function button:GetTextWidth()
+		return self.text
+	end
+	function button:SetWidth(width)
+		self.width = width
+	end
+	ns.FitButton(button, 80)
+	assert(button.width == 80, "a short label keeps the button's own width")
+	button.text = 101.5
+	ns.FitButton(button, 80)
+	assert(button.width == 126, "a long label widens the button with room either side")
+end
+
 print("core: ok")

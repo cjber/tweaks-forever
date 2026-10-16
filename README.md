@@ -82,7 +82,9 @@ Download the zip from [Releases](https://github.com/cjber/tweaks-forever/release
 - `/tweaks report` shows a report to copy into a bug report: versions, what you changed, what stands down for another addon, and any errors Tweaks caught.
 - `/rl` reloads the interface.
 
-Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off. Translations are welcome as a pull request or an issue on [GitHub](https://github.com/cjber/tweaks-forever/tree/main/Locales); anything not translated shows in English.
+Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
+
+Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian and Chinese (machine translated; corrections welcome through the [translation form](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml)).
 
 ## For addon authors
 
