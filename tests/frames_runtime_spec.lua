@@ -1,7 +1,7 @@
 -- Exercise UI/Frames.lua's real installation, lazy addon discovery and Edit Mode controls.
 local function Run(installed, early, fromEditor)
 	local callbacks, events, initializers, pending, frames = {}, {}, {}, {}, {}
-	local combat = false
+	local combat, gamepad = false, false
 	local methods = {}
 	local function noop() end
 	local function frame(parent, template)
@@ -23,6 +23,7 @@ local function Run(installed, early, fromEditor)
 		"ShowHighlighted",
 		"ShowSelected",
 		"Init",
+		"StopMovingOrSizing",
 	}) do
 		methods[key] = noop
 	end
@@ -195,6 +196,11 @@ local function Run(installed, early, fromEditor)
 		InCombatLockdown = function()
 			return combat
 		end,
+		InputUtil = {
+			IsGamepadUIEnabled = function()
+				return gamepad
+			end,
+		},
 		UnitGUID = function()
 			return "Player-1"
 		end,
@@ -312,6 +318,26 @@ local function Run(installed, early, fromEditor)
 	fire("PLAYER_REGEN_ENABLED")
 	flush()
 	assert(guide.scale == 1.2, "placement resumes after combat")
+	-- #168: with the gamepad UI on, the feature stands down: a moved window goes back to the game's placement as soon
+	-- as the gamepad UI turns on, and nothing moves it while it stays on.
+	gamepad = true
+	fire("CVAR_UPDATE", "GamePadEnable")
+	flush()
+	assert(
+		guide.scale == 1 and guide.points[1][1] == "TOPLEFT",
+		"gamepad UI puts windows back where the game puts them"
+	)
+	guide:Show()
+	fire("AdventureGuideForever.WindowLayoutChanged", guide)
+	flush()
+	assert(#pending == 0 and guide.scale == 1 and guide.points[1][1] == "TOPLEFT", "nothing runs under the gamepad UI")
+	local created = #frames
+	fire("EditMode.Enter")
+	assert(#frames == created, "Edit Mode builds no Windows tab under the gamepad UI")
+	gamepad = false
+	fire("CVAR_UPDATE", "GamePadEnable")
+	flush()
+	assert(guide.scale == 1.2, "placement returns when the gamepad UI is off")
 	fire("EditMode.Enter")
 	local checkbox, slider, reset
 	for _, item in ipairs(frames) do
