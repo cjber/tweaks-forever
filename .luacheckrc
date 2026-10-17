@@ -5,6 +5,7 @@ ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
 	"BINDING_HEADER_TWEAKSFOREVER",
 	"ForeverFamily",
+	"ForeverMapMarkers",
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER2",
 	"SLASH_TWEAKSFOREVER_RELOAD1",
@@ -13,9 +14,14 @@ globals = {
 	"TweaksForever_OnAddonCompartmentClick",
 	"TweaksForeverCharDB",
 	"TweaksForeverDB",
-	"TweaksForeverDungeonEntrancePinMixin",
 }
 read_globals = {
+	"C_InputInterfaceStyle",
+	"GameTooltip_AddInstructionLine",
+	"Lerp",
+	"Mixin",
+	"Saturate",
+	"SoftCursor",
 	"AcceptGroup",
 	"AtlasMaps",
 	"AuctionHouseFrame",
@@ -60,7 +66,6 @@ read_globals = {
 	"ActionBarButtonEventsFrame",
 	"AreaLabelDataProviderMixin",
 	"BANK",
-	"BaseMapPoiPinMixin",
 	"bit",
 	"BLACK_LISTED_MESSAGE_TYPES",
 	"BreakUpLargeNumbers",
@@ -227,7 +232,6 @@ read_globals = {
 	"LibStub",
 	"LootSlot",
 	"MainStatusTrackingBarContainer",
-	"MapCanvasDataProviderMixin",
 	"Menu",
 	"MenuResponse",
 	"MERCHANT",
@@ -339,6 +343,26 @@ files["Locales/*.lua"] = { max_line_length = false }
 files["LibAHTab/LibStub/LibStub.lua"] =
 	{ read_globals = { "strmatch" }, max_line_length = 140 }
 files["LibAHTab/LibAHTab.lua"] = { ignore = { "212/self" } }
+files["tests/map_canvas_spec.lua"] = {
+	globals = {
+		"BattlefieldMapFrame",
+		"C_AddOns",
+		"C_InputInterfaceStyle",
+		"C_Map",
+		"C_MapExplorationInfo",
+		"Enum",
+		"GameTooltip_AddDisabledLine",
+		"GameTooltip_AddInstructionLine",
+		"GameTooltip_AddNormalLine",
+		"GameTooltip_SetTitle",
+		"GetAppropriateTooltip",
+		"GetCVarBool",
+		"GetRealZoneText",
+		"hooksecurefunc",
+		"SoftCursor",
+		"WorldMapFrame",
+	},
+}
 files["tests/auctionator_spec.lua"] = {
 	globals = {
 		"strmatch",

@@ -12,6 +12,12 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Gamepad interface: the maps are only read.** Instance entrances, the unexplored-area tint, the dungeon interior and the coordinates bar are now drawn on frames of Tweaks' own over the world map and the zone map, so the game's maps no longer hold any of the addon's pins or data. With the gamepad interface on, the map walks its own pins from secure code every frame, and an addon's pins in that walk are a likely cause of the crash some controller players reported. Entrances work as before: their tooltip, a click to travel there, right-click to zoom out, and stepping aside for a flight master or another Forever addon's marker. Under the gamepad interface, an entrance under the map cursor shows its tooltip. Thanks to the CurseForge player who reported it, and to Polestar for the idea.
+
+### For addon authors
+
+- **`ForeverMapMarkers`.** The entrance pins aren't the map's own any more, so `WorldMapFrame:EnumeratePinsByTemplate` no longer finds them. `ForeverMapMarkers.TweaksForever(WorldMapFrame)` returns the shown entrances as `{x, y, kind = "entrance"}` map fractions on the map being viewed, and Tweaks reads the other Forever addons' markers the same way.
+
 ## [0.14.1] - 2026-10-17
 
 - **Data checked against Forever 1.60.1.70450.** Two more quests are known as added in Forever. Camp benefits, class trainer spells, dungeon entrances, map overlays and zone levels are unchanged.

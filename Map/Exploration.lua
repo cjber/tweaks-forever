@@ -144,11 +144,15 @@ end
 ---@param map MapCanvasMixin
 ---@return fun()
 local function Attach(map)
-	-- Drawn on Blizzard's exploration pin, below its explored textures, so overlapping edges retain Blizzard's
-	-- normal artwork. Everything else is ours: a data provider of our own redraws them, and the map's mask is
-	-- applied here. Hooking the pin's methods or listing textures in the map's tables made Blizzard's own map code
-	-- fail with "attempt to call a nil value".
-	local pool, poolPin
+	-- Drawn on a frame of our own on the map's canvas (Map/MapCanvas.lua), at the frame level the map gives its
+	-- exploration pin, with the map's mask applied here. Never on Blizzard's pin, through a data provider or in the
+	-- map's tables: the gamepad interface's secure code walks those, and hooking the pin's methods once made
+	-- Blizzard's own map code fail with "attempt to call a nil value".
+	local view = ns.MapCanvas.Watch(map)
+	local tint = ns.MapCanvas.FrameUnder("Frame", view.host)
+	tint:SetAllPoints(view.host)
+	tint:EnableMouse(false)
+	local pool = CreateTexturePool(tint, "ARTWORK")
 	-- [texture] = whether it carries the map's mask.
 	local masked = {}
 
@@ -165,29 +169,17 @@ local function Attach(map)
 		return cachedLayers[layer] or {}
 	end
 
-	---@return Frame?
-	local function ExplorationPin()
-		for pin in map:EnumeratePinsByTemplate("MapExplorationPinTemplate") do -- luacheck: ignore 512 (first only)
-			return pin
-		end
-	end
-
 	local function Draw()
-		if pool then
-			pool:ReleaseAll()
-		end
+		pool:ReleaseAll()
 		if not ns.Active("exploration") then
 			return
 		end
-		local pin = ExplorationPin()
 		local mapID = map:GetMapID()
 		local info = mapID and C_Map.GetMapInfo(mapID)
-		if not pin or not info or info.mapType ~= Enum.UIMapType.Zone then
+		if not info or info.mapType ~= Enum.UIMapType.Zone then
 			return
 		end
-		if poolPin ~= pin then
-			pool, poolPin = CreateTexturePool(pin, "ARTWORK", -1), pin
-		end
+		tint:SetFrameLevel(view:Level("PIN_FRAME_LEVEL_MAP_EXPLORATION"))
 		local art = C_Map.GetMapArtID(mapID)
 		local index = map:GetCanvasContainer():GetCurrentLayerIndex()
 		local layers = C_Map.GetMapArtLayers(mapID)
@@ -221,17 +213,13 @@ local function Attach(map)
 		end
 	end
 
-	-- The base provider redraws on every map change as well; a zoom can change the art layer.
-	local Provider = CreateFromMixins(MapCanvasDataProviderMixin)
-	function Provider.RemoveAllData()
-		if pool then
-			pool:ReleaseAll()
+	-- Every map opened, turned to or resized redraws; a zoom can change the art layer.
+	ns.MapCanvas.Watch(map, function(_, what)
+		if what ~= "hide" then
+			Draw()
 		end
-	end
-	Provider.RefreshAllData = Draw
-	Provider.OnCanvasScaleChanged = Draw
-	map:AddDataProvider(Provider)
-	-- A hidden map redraws through its provider when it next opens.
+	end)
+	-- A hidden map redraws when it next opens.
 	return function()
 		if
 			(map --[[@as Frame]]):IsShown()

@@ -23,7 +23,7 @@ local ns = {
 
 local function Region()
 	local region = { shown = true }
-	for _, method in ipairs({ "SetPoint", "SetSize", "SetFrameLevel" }) do
+	for _, method in ipairs({ "SetPoint", "SetSize", "SetFrameLevel", "SetParent" }) do
 		region[method] = function() end
 	end
 	function region:SetText(text)
@@ -79,7 +79,8 @@ local env = setmetatable({
 			return 1431
 		end,
 	},
-	CreateFrame = function()
+	CreateFrame = function(_, _, parent)
+		assert(parent == nil, "the bar is made with no parent, then set on the map (Map/MapCanvas.lua)")
 		bar = Region()
 		return bar
 	end,
@@ -99,6 +100,7 @@ local env = setmetatable({
 		hooks[name] = fn
 	end,
 }, { __index = _G })
+setfenv(assert(loadfile("Map/MapCanvas.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/Coordinates.lua")), env)("TweaksForever", ns)
 local feature = features.mapCoords
 assert(feature.default == true, "a display, not an automation")

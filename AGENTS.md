@@ -61,11 +61,15 @@ publishes that entry as its notes.
 - Never touch Blizzard's Lua state. Forever runs its UI through secure delegates, so an addon hook, write or
   first call there makes Blizzard's own code fail or be blocked, blamed on this addon. React through
   `HookScript`, events, `EventRegistry` or an object's own `RegisterCallback`, `TooltipDataProcessor`
-  (`ns.OnTooltip`), a map data provider of our own, or `hooksecurefunc("GlobalFunction", …)`; draw on our own
-  textures and frames; lay Blizzard frames out with engine calls (points, sizes, alpha) after Blizzard has.
-  Never `hooksecurefunc(object, …)`, a replaced method, a field written on a Blizzard table, or a call into
-  Blizzard's layout or lazy caches. `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a
-  deliberate exception carries a trailing `-- taint-ok: reason`.
+  (`ns.OnTooltip`), or `hooksecurefunc("GlobalFunction", …)`; draw on our own textures and frames; lay Blizzard
+  frames out with engine calls (points, sizes, alpha) after Blizzard has. Never `hooksecurefunc(object, …)`, a
+  replaced method, a field written on a Blizzard table, or a call into Blizzard's layout or lazy caches.
+  `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a deliberate exception carries a trailing
+  `-- taint-ok: reason`.
+- On a map, draw only through `Map/MapCanvas.lua`: frames of our own on the canvas, made with no parent and then
+  set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`, `AddOverlayFrame` or a
+  `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure code (#168).
+  `tests/map_canvas_spec.lua` runs the map files against maps that fail on any write.
 - Player-visible text goes through `L["whole sentence"]` (a whole format string, never joined fragments), or a
   Blizzard GlobalString that says exactly the same; `ns.Feature`/`ns.ClickMode` text stays plain English.
 - Commits are signed (`git commit -S`) with the personal email.
