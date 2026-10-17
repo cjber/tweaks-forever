@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.14.1] - 2026-10-17
+
+- **Data checked against Forever 1.60.1.70450.** Two more quests are known as added in Forever. Camp benefits, class trainer spells, dungeon entrances, map overlays and zone levels are unchanged.
+
 ## [0.14.0] - 2026-10-16
 
 - **In your language.** Tweaks Forever is now in German, French, Spanish (Spain and Latin America), Korean, Brazilian Portuguese, Russian, and Simplified and Traditional Chinese, using the game's own words for settings such as Auto Loot, Combine Bags and Max Camera Distance. These are machine translated; corrections are welcome through the [translation issue form](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml). There's no Italian, because the WoW: Forever client has none.
