@@ -264,15 +264,6 @@ function MapCanvas.Watch(map, listener)
 	return view
 end
 
--- Runs the view's check now, as its next frame would.
----@param map TFMapCanvas
-function MapCanvas.Update(map)
-	local view = views[map]
-	if view then
-		Update(view)
-	end
-end
-
 -- Shows or hides every pin of ours on `map`: combat hides them.
 ---@param map TFMapCanvas
 ---@param shown boolean
