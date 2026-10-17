@@ -51,7 +51,6 @@ local CURSOR_REACH = 12
 ---@field scale number
 ---@field zoom number
 ---@field pinScale number
----@field gamepad boolean
 ---@field listeners fun(view: TFCanvasView, what: string)[]
 ---@field pools TFCanvasPool[]
 local View = {}
@@ -61,6 +60,8 @@ View.__index = View
 local views = {}
 ---@type TFCanvasPin?, TFCanvasPin?, string?
 local hovered, pressed, pressedButton
+-- Whether the gamepad's map cursor, not the mouse, hovered the pin.
+local hoveredByCursor = false
 ---@type Frame
 local clicks
 
@@ -164,7 +165,6 @@ local function Update(view)
 		mapID, width, height, scale, zoom, pinScale
 	if first then
 		view.shown = true
-		view.gamepad = MapCanvas.Gamepad()
 		clicks:RegisterEvent("GLOBAL_MOUSE_DOWN")
 		clicks:RegisterEvent("GLOBAL_MOUSE_UP")
 		Fire(view, "show")
@@ -175,10 +175,12 @@ local function Update(view)
 	elseif scaled then
 		Fire(view, "scale")
 	end
-	if view.gamepad then
+	-- Under the gamepad interface the map cursor hovers the pin nearest it; it never takes over one the mouse is on.
+	if MapCanvas.Gamepad() and not (hovered and not hoveredByCursor) then
 		local pin = PinAtCursor(view)
 		if pin or (hovered and hovered.view == view) then
 			SetHovered(pin)
+			hoveredByCursor = pin ~= nil
 		end
 	end
 end
@@ -231,7 +233,6 @@ function MapCanvas.Watch(map, listener)
 			scale = 1,
 			zoom = 0,
 			pinScale = 1,
-			gamepad = false,
 			listeners = {},
 			pools = {},
 		}, View)
@@ -294,7 +295,6 @@ end
 ---@field levelType? string
 ---@field takesMouse? boolean
 ---@field clicks? boolean whether a left click acts; the right button always goes through to the canvas
----@field marker? string the kind ForeverMapMarkers reports this pin as
 ---@field OnMouseClickAction? fun(self: TFCanvasPin, button: string)
 local Pin = {}
 MapCanvas.PinMixin = Pin
@@ -391,6 +391,7 @@ Pool.__index = Pool
 
 local function OnEnter(pin)
 	SetHovered(pin)
+	hoveredByCursor = false
 end
 
 local function OnLeave(pin)
@@ -405,7 +406,7 @@ function Pool:Acquire(...)
 	if not pin then
 		pin = MapCanvas.FrameUnder("Frame", self.view.layer, self.template) --[[@as TFCanvasPin]]
 		Mixin(pin, self.mixin)
-		pin.view, pin.marker = self.view, self.marker
+		pin.view = self.view
 		pin:OnLoad()
 		pin:EnableMouse(pin.takesMouse == true)
 		if pin.takesMouse then
@@ -500,15 +501,15 @@ end)
 -- function under its folder name:
 --   ForeverMapMarkers[addonName] = function(map) -> { { x = number, y = number, kind = string }... }
 -- x and y are the shown markers' fractions on map:GetMapID(), in a fresh table; it never errors.
-local registry = ForeverMapMarkers or {}
-ForeverMapMarkers = registry -- taint-ok: addon-owned registry shared by the Forever addons
+-- Published as a copy with our entry added, never a field written into the table another addon made; readers look
+-- the global up each time, since a later addon replaces it.
 
 -- Every other Forever addon's shown markers on `map`, by the registry: one that errors is left out.
 ---@param map Frame
 ---@return {x: number, y: number, kind: string}[]
 function MapCanvas.OtherMarkers(map)
 	local all = {}
-	for addon, markers in pairs(registry) do
+	for addon, markers in pairs(ForeverMapMarkers or {}) do
 		if addon ~= "TweaksForever" and type(markers) == "function" then
 			local ok, list = pcall(markers, map)
 			if ok and type(list) == "table" then
@@ -521,9 +522,10 @@ function MapCanvas.OtherMarkers(map)
 	return all
 end
 
-registry.TweaksForever = function(map)
+local function OurMarkers(map)
 	local markers, view = {}, views[map]
-	if not (view and view.shown and view.layer:IsShown()) then
+	-- Shown, not hidden for combat, and drawn for the map it shows now (a map just turned redraws on its next frame).
+	if not (view and view.shown and view.layer:IsShown() and view.mapID == map:GetMapID()) then
 		return markers
 	end
 	for _, pool in ipairs(view.pools) do
@@ -538,3 +540,10 @@ registry.TweaksForever = function(map)
 	end
 	return markers
 end
+
+local published = {}
+for addon, markers in pairs(ForeverMapMarkers or {}) do
+	published[addon] = markers
+end
+published.TweaksForever = OurMarkers
+ForeverMapMarkers = published

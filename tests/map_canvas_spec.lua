@@ -180,21 +180,30 @@ for _ = 1, 20 do
 end
 check(#Entrances() == 0, "a flight master on the entrance hides it")
 world.pins.FlightPointPinTemplate[1] = nil
-ForeverMapMarkers.ShortestPathForever = function()
-	return { { x = entry.x + 0.001, y = entry.y, kind = "portal" } }
+-- Another addon publishes its own copy of the registry, as each does.
+local function Publish(fn)
+	local copy = {}
+	for name, markers in pairs(ForeverMapMarkers) do
+		copy[name] = markers
+	end
+	copy.ShortestPathForever = fn
+	ForeverMapMarkers = copy
 end
+Publish(function()
+	return { { x = entry.x + 0.001, y = entry.y, kind = "portal" } }
+end)
 for _ = 1, 20 do
 	Kit.Tick()
 end
 check(#Entrances() == 0, "another Forever addon's marker on it hides it too")
-ForeverMapMarkers.ShortestPathForever = function()
+Publish(function()
 	error("a broken addon")
-end
+end)
 for _ = 1, 20 do
 	Kit.Tick()
 end
 check(#Entrances() == 1, "an addon's failing list is left out, never raised")
-ForeverMapMarkers.ShortestPathForever = nil
+Publish(nil)
 local listed = ForeverMapMarkers.TweaksForever(WorldMapFrame)
 check(#listed == 1 and listed[1].kind == "entrance", "the entrances are listed for the other Forever addons")
 
@@ -291,5 +300,11 @@ SoftCursor.GetRect = function()
 end
 Kit.Tick()
 check(tooltip.owner == nil, "moving the cursor away leaves it")
+pins[1]:Run("OnEnter")
+Kit.Tick()
+check(tooltip.owner == pins[1], "the map cursor never takes away an entrance the mouse is on")
+pins[1]:Run("OnLeave")
+world.mapID = 1429
+check(#ForeverMapMarkers.TweaksForever(WorldMapFrame) == 0, "a map just turned to lists nothing until it is drawn")
 
 print(("map_canvas: %d checks passed"):format(checks))
