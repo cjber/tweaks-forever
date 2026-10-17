@@ -309,6 +309,7 @@ TweaksForeverCharDB = nil
 ---@field InstanceEntrances table<integer, TFDungeonEntrance> by instance Map.ID, before pin clustering
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
+---@field MapCanvas TFMapCanvasModule the views of our own on the maps (Map/MapCanvas.lua)
 ---@field DungeonMaps TFDungeonMaps
 ---@field Art TFArt
 ---@field QuestGivers TFQuestGivers
