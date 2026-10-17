@@ -69,7 +69,7 @@ publishes that entry as its notes.
 - On a map, draw only through `Map/MapCanvas.lua`: frames of our own on the canvas, made with no parent and then
   set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`, `AddOverlayFrame` or a
   `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure code (#168).
-  `tests/map_canvas_spec.lua` runs the map files against maps that fail on any write.
+  `tests/map_canvas_spec.lua` runs the files that draw on a map against maps that fail on any write.
 - Player-visible text goes through `L["whole sentence"]` (a whole format string, never joined fragments), or a
   Blizzard GlobalString that says exactly the same; `ns.Feature`/`ns.ClickMode` text stays plain English.
 - Commits are signed (`git commit -S`) with the personal email.

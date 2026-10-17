@@ -169,8 +169,11 @@ local function Attach(map)
 		return cachedLayers[layer] or {}
 	end
 
+	-- The art layer last drawn: the tint is in canvas units, so a zoom redraws only when it changes the layer.
+	local drawnLayer
 	local function Draw()
 		pool:ReleaseAll()
+		drawnLayer = nil
 		if not ns.Active("exploration") then
 			return
 		end
@@ -179,9 +182,11 @@ local function Attach(map)
 		if not info or info.mapType ~= Enum.UIMapType.Zone then
 			return
 		end
-		tint:SetFrameLevel(view:Level("PIN_FRAME_LEVEL_MAP_EXPLORATION"))
+		-- Just under the map's exploration pin, so its explored textures keep their edges over the tint.
+		tint:SetFrameLevel(view:Level("PIN_FRAME_LEVEL_MAP_EXPLORATION") - 1)
 		local art = C_Map.GetMapArtID(mapID)
 		local index = map:GetCanvasContainer():GetCurrentLayerIndex()
+		drawnLayer = index
 		local layers = C_Map.GetMapArtLayers(mapID)
 		local layer = layers and layers[index]
 		if not art or not layer then
@@ -213,9 +218,13 @@ local function Attach(map)
 		end
 	end
 
-	-- Every map opened, turned to or resized redraws; a zoom can change the art layer.
+	-- Every map opened, turned to or resized redraws, and a zoom that changes the art layer.
 	ns.MapCanvas.Watch(map, function(_, what)
-		if what ~= "hide" then
+		if what == "scale" then
+			if drawnLayer and drawnLayer ~= map:GetCanvasContainer():GetCurrentLayerIndex() then
+				Draw()
+			end
+		elseif what ~= "hide" then
 			Draw()
 		end
 	end)

@@ -176,7 +176,12 @@ local function Update(view)
 		Fire(view, "scale")
 	end
 	-- Under the gamepad interface the map cursor hovers the pin nearest it; it never takes over one the mouse is on.
-	if MapCanvas.Gamepad() and not (hovered and not hoveredByCursor) then
+	-- A pin the mouse is really over stays its own.
+	local mouseHolds = hovered and not hoveredByCursor and hovered:IsMouseOver()
+	if not mouseHolds and hovered and hovered.view == view and hoveredByCursor and not MapCanvas.Gamepad() then
+		SetHovered(nil)
+		hoveredByCursor = false
+	elseif not mouseHolds and MapCanvas.Gamepad() then
 		local pin = PinAtCursor(view)
 		if pin or (hovered and hovered.view == view) then
 			SetHovered(pin)
@@ -190,7 +195,9 @@ local function Hide(view)
 	if hovered and hovered.view == view then
 		SetHovered(nil)
 	end
-	pressed = nil
+	if pressed and pressed.view == view then
+		pressed = nil
+	end
 	local open = false
 	for _, other in pairs(views) do
 		open = open or (other ~= view and other.shown)
@@ -504,7 +511,8 @@ end)
 -- Published as a copy with our entry added, never a field written into the table another addon made; readers look
 -- the global up each time, since a later addon replaces it.
 
--- Every other Forever addon's shown markers on `map`, by the registry: one that errors is left out.
+-- Every other Forever addon's shown markers on `map`, by the registry: one that errors, or a marker without a place,
+-- is left out.
 ---@param map Frame
 ---@return {x: number, y: number, kind: string}[]
 function MapCanvas.OtherMarkers(map)
@@ -514,7 +522,9 @@ function MapCanvas.OtherMarkers(map)
 			local ok, list = pcall(markers, map)
 			if ok and type(list) == "table" then
 				for _, marker in ipairs(list) do
-					all[#all + 1] = marker
+					if type(marker) == "table" and type(marker.x) == "number" and type(marker.y) == "number" then
+						all[#all + 1] = marker
+					end
 				end
 			end
 		end

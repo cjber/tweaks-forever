@@ -137,7 +137,7 @@ end
 local function Tint(state)
 	for _, frame in ipairs(Kit.frames) do
 		local host = frame.parent and frame.parent.parent == state.canvas
-		if host and frame.scripts.OnUpdate == nil and frame.level == 20 then
+		if host and frame.scripts.OnUpdate == nil and frame.level == 19 then
 			return frame
 		end
 	end
@@ -238,14 +238,32 @@ local tint = Tint(world)
 check(tint and tint.mouse == false, "the tint is a frame of ours that never takes the mouse")
 active.exploration = true
 events.MAP_EXPLORATION_UPDATED()
-check(tint.level == 20, "the tint sits at the map's exploration level")
+check(tint.level == 19, "the tint sits just under the map's exploration pin")
+
+-- A zoom redraws the tint only when it changes the art layer: the tiles are in canvas units.
+local mapInfos = 0
+local GetMapInfo = C_Map.GetMapInfo
+C_Map.GetMapInfo = function(...)
+	mapInfos = mapInfos + 1
+	return GetMapInfo(...)
+end
+world.zoom = 0.5
+Kit.Tick()
+check(mapInfos == 0, "a zoom within the art layer leaves the tint alone")
+world.layer = 2
+world.zoom = 1
+Kit.Tick()
+check(mapInfos == 1, "a zoom onto another art layer redraws it")
+world.zoom, world.layer = 0, 1
+Kit.Tick()
+C_Map.GetMapInfo = GetMapInfo
 
 -- The zone map loads later and gets a view of its own.
 BattlefieldMapFrame = Kit.NewMap(zone)
 events.ADDON_LOADED("Blizzard_BattlefieldMap")
 zone.visible = true
 Kit.Tick()
-check(Tint(zone) and Tint(zone).level == 20, "the zone map gets its own tint")
+check(Tint(zone) ~= nil, "the zone map gets its own tint")
 check(#Entrances() == 1, "and the world map keeps its entrances")
 
 -- Nothing of ours is made inside an open window, each canvas holds one frame of ours, and no pin has a click script
@@ -300,10 +318,23 @@ SoftCursor.GetRect = function()
 end
 Kit.Tick()
 check(tooltip.owner == nil, "moving the cursor away leaves it")
+Kit.mouseOver = pins[1]
 pins[1]:Run("OnEnter")
 Kit.Tick()
 check(tooltip.owner == pins[1], "the map cursor never takes away an entrance the mouse is on")
+Kit.mouseOver = nil
 pins[1]:Run("OnLeave")
+-- Leaving the gamepad interface lets go of the entrance the map cursor pointed at.
+SoftCursor.GetRect = function()
+	return 95, 95, 10, 10
+end
+Kit.Tick()
+check(tooltip.owner == pins[1], "the cursor points at it again")
+C_InputInterfaceStyle.GetCurrentStyle = function()
+	return 0
+end
+Kit.Tick()
+check(tooltip.owner == nil, "turning the gamepad interface off lets go of the cursor's entrance")
 world.mapID = 1429
 check(#ForeverMapMarkers.TweaksForever(WorldMapFrame) == 0, "a map just turned to lists nothing until it is drawn")
 

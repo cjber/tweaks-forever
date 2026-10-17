@@ -23,9 +23,16 @@ ns.Feature({
 })
 
 local TEMPLATE = "TweaksForeverDungeonEntrancePinTemplate"
--- Blizzard's own markers of a place, found through the map's pins (a read). The other Forever addons draw on frames of
--- their own and list theirs through ForeverMapMarkers (Map/MapCanvas.lua). An entrance either sits on steps aside.
-local NATIVE_MARKERS = { "FlightPointPinTemplate" }
+-- Markers of a place found through the map's pins (a read): Blizzard's flight points, and the pins of Forever addons
+-- from before they drew on frames of their own. Those that do list theirs through ForeverMapMarkers
+-- (Map/MapCanvas.lua). An entrance either sits on steps aside.
+local NATIVE_MARKERS = {
+	"FlightPointPinTemplate",
+	"LegacyForeverPinTemplate",
+	"ShortestPathForeverDockPinTemplate",
+	"ShortestPathForeverFlightPinTemplate",
+	"ShortestPathForeverPortalPinTemplate",
+}
 -- Seconds between re-checks of which entrances a marker covers while the map is open.
 local SETTLE_INTERVAL = 0.25
 -- Half the solid part of the 32-unit icon, in UI units: a marker nearer than this covers the entrance.
