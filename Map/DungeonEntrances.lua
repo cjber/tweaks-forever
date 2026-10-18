@@ -29,9 +29,6 @@ local TEMPLATE = "TweaksForeverDungeonEntrancePinTemplate"
 local NATIVE_MARKERS = {
 	"FlightPointPinTemplate",
 	"LegacyForeverPinTemplate",
-	"ShortestPathForeverDockPinTemplate",
-	"ShortestPathForeverFlightPinTemplate",
-	"ShortestPathForeverPortalPinTemplate",
 }
 -- Seconds between re-checks of which entrances a marker covers while the map is open.
 local SETTLE_INTERVAL = 0.25
@@ -113,7 +110,7 @@ ns.Init(function()
 		return markers
 	end
 
-	---@param pin TFEntrancePin
+	---@param pin TFCanvasPin
 	---@param markers {x: number, y: number}[]
 	local function Covered(pin, markers, halfX, halfY)
 		local x, y = pin:GetPosition()

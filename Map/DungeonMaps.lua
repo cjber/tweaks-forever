@@ -227,7 +227,7 @@ ns.Init(function()
 		art = host:CreateTexture(nil, "ARTWORK")
 		art:SetPoint("TOPLEFT", PAD, -HEADER)
 
-		scroll = ns.MapCanvas.FrameUnder("ScrollFrame", host, "ScrollFrameTemplate")
+		scroll = ns.MapCanvas.FrameUnder("ScrollFrame", host, "ScrollFrameTemplate") --[[@as ScrollFrame]]
 		scroll:SetPoint("TOPLEFT", art, "TOPRIGHT", PAD, 0)
 		scroll:SetPoint("BOTTOMRIGHT", -PAD * 2, PAD)
 		legendBody = ns.MapCanvas.FrameUnder("Frame", scroll)
@@ -238,13 +238,13 @@ ns.Init(function()
 		legend:SetWordWrap(true)
 		scroll:SetScript("OnSizeChanged", FitLegend)
 
-		back = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate")
+		back = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate") --[[@as Button]]
 		back:SetSize(112, 22)
 		back:SetPoint("TOPRIGHT", -PAD, -PAD)
 		back:SetText(L["Back to map"])
 		ns.FitButton(back, 112)
 		-- The map's own frames are untouched: the interior steps aside and a button on the canvas brings it back.
-		reopen = ns.MapCanvas.FrameUnder("Button", canvas, "UIPanelButtonTemplate")
+		reopen = ns.MapCanvas.FrameUnder("Button", canvas, "UIPanelButtonTemplate") --[[@as Button]]
 		reopen:SetSize(112, 22)
 		reopen:SetPoint("BOTTOMLEFT", PAD, PAD)
 		reopen:SetFrameLevel(host:GetFrameLevel() + 1)

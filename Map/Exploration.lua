@@ -141,7 +141,7 @@ function Model.Unexplored(areas, explored)
 end
 
 -- Draw the tint on one map canvas: the world map, or the zone map (BattlefieldMapFrame). Returns its redraw.
----@param map MapCanvasMixin
+---@param map TFMapCanvas
 ---@return fun()
 local function Attach(map)
 	-- Drawn on a frame of our own on the map's canvas (Map/MapCanvas.lua), at the frame level the map gives its
@@ -240,7 +240,9 @@ end
 
 ns.Init(function()
 	---@type fun()[]
-	local redraws = { Attach(WorldMapFrame) }
+	local redraws = {
+		Attach(WorldMapFrame --[[@as TFMapCanvas]]),
+	}
 	local function RedrawAll()
 		for _, Redraw in ipairs(redraws) do
 			Redraw()
@@ -248,7 +250,7 @@ ns.Init(function()
 	end
 	-- The zone map (Shift+M) loads on demand.
 	local function AttachZoneMap()
-		redraws[#redraws + 1] = Attach(BattlefieldMapFrame)
+		redraws[#redraws + 1] = Attach(BattlefieldMapFrame --[[@as TFMapCanvas]])
 	end
 	if C_AddOns.IsAddOnLoaded("Blizzard_BattlefieldMap") then
 		AttachZoneMap()

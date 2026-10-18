@@ -30,7 +30,7 @@ local _, ns = ...
 -- GLOBAL_MOUSE_DOWN and GLOBAL_MOUSE_UP on a frame of ours. The right button goes through to the canvas (zoom out), as
 -- on the map's own pins. Under the gamepad interface the pin nearest the map's cursor shows its tooltip.
 
----@alias TFMapCanvas WorldMapFrame the world map, or the zone map (BattlefieldMapFrame), which shares its canvas code
+---@alias TFMapCanvas MapCanvasFrameTemplate the world map, or the zone map (BattlefieldMapFrame)
 
 ---@class TFMapCanvasModule
 local MapCanvas = {}
@@ -298,7 +298,9 @@ local Pin = {}
 MapCanvas.PinMixin = Pin
 
 function Pin.OnLoad() end
-function Pin.OnAcquired() end
+---@param ... any
+-- luacheck: ignore 212 -- Each pin mixin defines its own acquired arguments.
+function Pin.OnAcquired(...) end
 function Pin.OnReleased() end
 function Pin.OnMouseEnter() end
 function Pin.OnMouseLeave() end
