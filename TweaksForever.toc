@@ -62,6 +62,7 @@ UI\Tooltips.lua
 UI\CursorTooltip.lua
 UI\Nameplates.lua
 UI\SpellReach.lua
+Map\MapCanvas.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua
 Map\Coordinates.lua

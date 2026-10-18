@@ -167,7 +167,7 @@ ns.Init(function()
 		for index, floor in ipairs(floors) do
 			local choice = choices[index]
 			if not choice then
-				choice = CreateFrame("Button", nil, popup, "UIPanelButtonTemplate")
+				choice = ns.MapCanvas.FrameUnder("Button", popup, "UIPanelButtonTemplate")
 				choice:SetSize(PICKER_WIDTH - 12, 24)
 				choice:SetPoint("TOPLEFT", 6, -6 - (index - 1) * 26)
 				choice:SetScript("OnClick", function()
@@ -213,7 +213,7 @@ ns.Init(function()
 	-- Our own frames over the map's canvas, so the map's own frames and Lua state are left alone.
 	local function Build()
 		local canvas = map.ScrollContainer
-		host = CreateFrame("Frame", nil, canvas)
+		host = ns.MapCanvas.FrameUnder("Frame", canvas)
 		host:SetAllPoints(canvas)
 		host:SetFrameLevel(canvas:GetFrameLevel() + 100)
 		host:EnableMouse(true)
@@ -227,10 +227,10 @@ ns.Init(function()
 		art = host:CreateTexture(nil, "ARTWORK")
 		art:SetPoint("TOPLEFT", PAD, -HEADER)
 
-		scroll = CreateFrame("ScrollFrame", nil, host, "ScrollFrameTemplate")
+		scroll = ns.MapCanvas.FrameUnder("ScrollFrame", host, "ScrollFrameTemplate") --[[@as ScrollFrame]]
 		scroll:SetPoint("TOPLEFT", art, "TOPRIGHT", PAD, 0)
 		scroll:SetPoint("BOTTOMRIGHT", -PAD * 2, PAD)
-		legendBody = CreateFrame("Frame", nil, scroll)
+		legendBody = ns.MapCanvas.FrameUnder("Frame", scroll)
 		scroll:SetScrollChild(legendBody)
 		legend = legendBody:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
 		legend:SetPoint("TOPLEFT")
@@ -238,13 +238,13 @@ ns.Init(function()
 		legend:SetWordWrap(true)
 		scroll:SetScript("OnSizeChanged", FitLegend)
 
-		back = CreateFrame("Button", nil, host, "UIPanelButtonTemplate")
+		back = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate") --[[@as Button]]
 		back:SetSize(112, 22)
 		back:SetPoint("TOPRIGHT", -PAD, -PAD)
 		back:SetText(L["Back to map"])
 		ns.FitButton(back, 112)
 		-- The map's own frames are untouched: the interior steps aside and a button on the canvas brings it back.
-		reopen = CreateFrame("Button", nil, canvas, "UIPanelButtonTemplate")
+		reopen = ns.MapCanvas.FrameUnder("Button", canvas, "UIPanelButtonTemplate") --[[@as Button]]
 		reopen:SetSize(112, 22)
 		reopen:SetPoint("BOTTOMLEFT", PAD, PAD)
 		reopen:SetFrameLevel(host:GetFrameLevel() + 1)
@@ -262,10 +262,10 @@ ns.Init(function()
 
 		-- The floor picker is a button over a popup of choices, all our own frames: the game's menu pool
 		-- (GenerateMenu) asserts in Forever build 70009 when it opens.
-		picker = CreateFrame("Button", nil, host, "UIPanelButtonTemplate")
+		picker = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate")
 		picker:SetSize(PICKER_WIDTH, 24)
 		picker:SetPoint("TOPRIGHT", back, "TOPLEFT", -8, 0)
-		popup = CreateFrame("Frame", nil, picker)
+		popup = ns.MapCanvas.FrameUnder("Frame", picker)
 		popup:SetFrameStrata("DIALOG")
 		popup:SetPoint("TOPRIGHT", picker, "BOTTOMRIGHT", 0, -2)
 		popup:EnableMouse(true)
@@ -330,9 +330,13 @@ ns.Init(function()
 		Draw()
 	end
 
-	local Provider = CreateFromMixins(MapCanvasDataProviderMixin)
-	Provider.RefreshAllData = Refresh
-	map:AddDataProvider(Provider)
+	-- The map turning to another map, seen from a frame of our own (Map/MapCanvas.lua): never a data provider, which
+	-- the gamepad interface's secure code walks.
+	ns.MapCanvas.Watch(map, function(_, what)
+		if what == "map" then
+			Refresh()
+		end
+	end)
 	map:HookScript("OnShow", Refresh)
 	map:HookScript("OnHide", function()
 		if host then

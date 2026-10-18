@@ -113,21 +113,20 @@ end
 ns.Active = function()
 	return true
 end
-local function Canvas()
-	local canvas = { providers = {}, draws = 0, shown = true }
-	canvas.GetMapID = function() end
-	function canvas:IsShown()
-		return self.shown
-	end
-	function canvas:AddDataProvider(provider)
-		self.providers[#self.providers + 1] = provider
-	end
-	-- No exploration pin yet: each draw stops after looking for it.
-	function canvas:EnumeratePinsByTemplate()
-		self.draws = self.draws + 1
-		return function() end
-	end
-	return canvas
+-- The maps fail on any write (tests/strict_map.lua): the tint is a frame of ours, never a provider or a pin.
+local Kit = dofile("tests/strict_map.lua")
+Kit.Install(env)
+local draws = {}
+env.Enum = { UIMapType = { Zone = 3 } }
+env.C_Map = {
+	-- Each draw starts by asking what the shown map is; a continent draws nothing more.
+	GetMapInfo = function(mapID)
+		draws[mapID] = (draws[mapID] or 0) + 1
+		return { mapType = 2 }
+	end,
+}
+local function Canvas(mapID)
+	return Kit.NewMap({ mapID = mapID })
 end
 local loaded = false
 env.C_AddOns = {
@@ -138,30 +137,32 @@ env.C_AddOns = {
 env.hooksecurefunc = function(_, name, fn)
 	hooks[name] = fn
 end
-env.MapCanvasDataProviderMixin = {}
-env.CreateFromMixins = function()
-	return {}
+ns.SafeCall = function(_, fn, ...)
+	return true, fn(...)
 end
-env.WorldMapFrame = Canvas()
+setfenv(assert(loadfile("Map/MapCanvas.lua")), env)("TweaksForever", ns)
+env.WorldMapFrame = Canvas(1)
 init()
-assert(#env.WorldMapFrame.providers == 1, "the world map has our provider")
-env.BattlefieldMapFrame = Canvas()
+env.BattlefieldMapFrame = Canvas(2)
 handlers.ADDON_LOADED("Blizzard_BattlefieldMap")
-assert(#env.BattlefieldMapFrame.providers == 1, "and the zone map once it loads")
 handlers.MAP_EXPLORATION_UPDATED()
-assert(env.WorldMapFrame.draws == 1 and env.BattlefieldMapFrame.draws == 1, "a discovery redraws both")
+assert(draws[1] == 1 and draws[2] == 1, "a discovery redraws both maps")
 settingChanged()
 hooks.RefreshConflicts()
-assert(env.WorldMapFrame.draws == 3 and env.BattlefieldMapFrame.draws == 3, "so do the setting and conflicts")
-env.BattlefieldMapFrame.shown = false
+assert(draws[1] == 3 and draws[2] == 3, "so do the setting and conflicts")
+Kit.Close(env.BattlefieldMapFrame)
 handlers.MAP_EXPLORATION_UPDATED()
-assert(env.BattlefieldMapFrame.draws == 3, "a hidden map waits until it opens")
+assert(draws[2] == 3, "a hidden map waits until it opens")
+Kit.Tick()
+assert(draws[1] == 5 and draws[2] == 3, "the open map's view redraws as it first shows, and only that map")
 
 -- Already loaded at login (the zone map left open): attached at once.
 handlers = {}
 loaded = true
-env.WorldMapFrame, env.BattlefieldMapFrame = Canvas(), Canvas()
+env.WorldMapFrame, env.BattlefieldMapFrame = Canvas(3), Canvas(4)
 init()
-assert(#env.BattlefieldMapFrame.providers == 1 and not handlers.ADDON_LOADED, "attached at login")
+assert(not handlers.ADDON_LOADED, "attached at login")
+Kit.Tick()
+assert(draws[3] == 1 and draws[4] == 1, "both maps draw as they show")
 
 print("exploration_spec: ok")

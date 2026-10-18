@@ -139,9 +139,8 @@ map.shownMap = 1000
 map.GetMapID = function()
 	return map.shownMap
 end
-local provider
-map.AddDataProvider = function(_, value)
-	provider = value
+map.AddDataProvider = function()
+	error("the dungeon map adds no data provider to the world map")
 end
 
 local combat, instanceType, instance, playerMap = false, "party", 36, 1000
@@ -194,7 +193,6 @@ local env = setmetatable({
 	CreateFromMixins = function(mixin)
 		return setmetatable({}, { __index = mixin })
 	end,
-	MapCanvasDataProviderMixin = {},
 	C_Timer = {
 		After = function(_, fn)
 			nextFrame[#nextFrame + 1] = fn
@@ -237,18 +235,37 @@ assert(Model.Inside("party", 36, nil, nil) == nil)
 assert(Model.Inside("raid", 409, 1, 1) == nil and Model.Inside("none", 0, 1, 1) == nil)
 assert(Model.Floor(3, nil) == 1 and Model.Floor(3, 2) == 2 and Model.Floor(3, 9) == 3 and Model.Floor(1, 0) == 1)
 
--- The feature starts from ns.Init and reaches the map only through its data provider and its own hooks.
+-- The feature starts from ns.Init and reaches the map only through a view of our own (Map/MapCanvas.lua, stubbed
+-- here: tests/map_canvas_spec.lua runs it) and its own hooks. Every frame is made with no parent, then set on the
+-- map: the gamepad interface follows frames created inside an open window.
 assert(#initializers == 1)
 local frames = {}
 local factory = env.CreateFrame
 env.CreateFrame = function(kind, _, parent, template)
+	assert(parent == nil, "a frame was made inside the map")
 	local frame = factory(kind)
-	frame.parent, frame.template = parent, template
+	frame.template = template
 	frames[#frames + 1] = frame
 	return frame
 end
+local watched
+ns.MapCanvas = {
+	FrameUnder = function(kind, parent, template)
+		local frame = env.CreateFrame(kind, nil, nil, template)
+		frame.parent = parent
+		return frame
+	end,
+	Watch = function(watchedMap, listener)
+		assert(watchedMap == map)
+		watched = listener
+	end,
+}
+-- The map turning to another map, as the view tells it.
+local function Turned()
+	watched(nil, "map")
+end
 initializers[1]()
-assert(provider and provider.RefreshAllData and map.hooks.OnShow and map.hooks.OnHide and events.PLAYER_ENTERING_WORLD)
+assert(watched and map.hooks.OnShow and map.hooks.OnHide and events.PLAYER_ENTERING_WORLD)
 assert(events.ZONE_CHANGED_NEW_AREA and events.PLAYER_REGEN_ENABLED and handlers.dungeonMaps)
 
 local function Open()
@@ -260,7 +277,7 @@ end
 
 -- Nothing is built until a dungeon map is shown.
 instanceType = "none"
-provider:RefreshAllData()
+Turned()
 Close()
 Open()
 assert(created == 0 and #frames == 0, "an outdoor map built frames")
@@ -373,10 +390,10 @@ instanceType = "party"
 events.ZONE_CHANGED_NEW_AREA()
 assert(host.shown)
 map.shownMap = 1001
-provider:RefreshAllData()
+Turned()
 assert(not host.shown)
 map.shownMap = 1000
-provider:RefreshAllData()
+Turned()
 assert(host.shown)
 picker.scripts.OnClick()
 active = false
