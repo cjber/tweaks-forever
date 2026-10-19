@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.15.1] - 2026-10-19
+
+- **Questie's icon size sliders now move the native quest map icons too.** With Questie's native quest map icons on, changing its icon size sliders left Tweaks' pins at their own size. They now follow the sliders, so the map reads as one set of icons. Thanks to Mouchoir for the fix.
+
 ## [0.15.0] - 2026-10-18
 
 - **Gamepad interface: the maps are only read.** Instance entrances, the unexplored-area tint, the dungeon interior and the coordinates bar are now drawn on frames of Tweaks' own over the world map and the zone map, so the game's maps no longer hold any of the addon's pins or data. With the gamepad interface on, the map walks its own pins from secure code every frame, and an addon's pins in that walk are a likely cause of the crash some controller players reported. Entrances work as before: their tooltip, a mouse click to travel there, right-click to zoom out, and stepping aside for a flight master or another Forever addon's marker. Under the gamepad interface, an entrance under the map cursor shows its tooltip; travelling there still takes a mouse click. Thanks to the CurseForge player who reported it, and to Polestar for the idea.
