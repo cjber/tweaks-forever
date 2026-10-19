@@ -63,7 +63,9 @@ local KIND_SCALES = {
 ---@return number
 local function QuestieSliders(frame)
 	local db = Questie and Questie.db
-	local profile, defaults = db and db.profile, db and db.defaults and db.defaults.profile
+	local profile = db and db.profile
+	---@diagnostic disable-next-line: undefined-field
+	local defaults = db and db.defaults and db.defaults.profile
 	if type(profile) ~= "table" or type(defaults) ~= "table" then
 		return 1
 	end
