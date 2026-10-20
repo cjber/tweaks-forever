@@ -6,6 +6,7 @@
 Small quality-of-life tweaks for WoW: Forever that look like they came with the game.<br>
 <a href="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml"><img src="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
+<a href="https://ko-fi.com/cjber59408"><img src="https://img.shields.io/badge/Ko--fi-tip-ff5e5b?logo=ko-fi&logoColor=white" alt="Ko-fi"></a>
 </p>
 
 Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
@@ -120,6 +121,10 @@ python3 tools/screenshots.py                    # regenerate docs/screenshots fr
 ```
 
 [tools/README.md](tools/README.md) covers the `Data/` generators and [AGENTS.md](AGENTS.md) the rest, including releasing and contributing. Report security problems privately, as [SECURITY.md](https://github.com/cjber/.github/blob/main/SECURITY.md) describes.
+
+## Support
+
+The addon is free and stays GPL-3.0. If it saves you time, you can [buy me a coffee on Ko-fi](https://ko-fi.com/cjber59408); nothing is locked behind it and there is no paid version.
 
 ## Credits
 
