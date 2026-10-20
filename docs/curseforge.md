@@ -59,4 +59,6 @@ With Shortest Path Forever, clicking a dungeon or raid entrance plans the way th
 
 For a bug report, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
 
+The addon is free. If it saves you time, you can [buy me a coffee on Ko-fi](https://ko-fi.com/cjber59408).
+
 Built with AI assistance.
