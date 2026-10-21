@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.15.2] - 2026-10-21
+
+- **Camp benefit names and effects are now in your language.** On a translated client the camp tooltip and the "camp benefit gained" line used to read English, because they came only from a table with nothing but English in it. Names now come from the game's own spell names, and effects from the client's spell text where it has any; the bundled per-language table fills in the auras the client leaves empty, and English keeps the wording it had. Where the client is missing an API the lines fall back to the bundled text rather than going blank. ([#210](https://github.com/cjber/tweaks-forever/issues/210))
+
 ## [0.15.1] - 2026-10-19
 
 - **Questie's icon size sliders now move the native quest map icons too.** With Questie's native quest map icons on, changing its icon size sliders left Tweaks' pins at their own size. They now follow the sliders, so the map reads as one set of icons. Thanks to Mouchoir for the fix.

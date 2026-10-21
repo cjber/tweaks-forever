@@ -192,7 +192,7 @@ L["Quests are accepted and turned in for you as you talk to an NPC. Hold Shift w
 L["Quests on minimap givers"] = "Misiones de asignadores en el minimapa"
 L["Quests to level: about %d"] = "Misiones para subir de nivel: unas %d"
 L["Quiet repeated combat errors"] = "Silenciar errores de combate repetidos"
-L["Questie's icon size sliders now move the native quest map icons too."] = "Questie's icon size sliders now move the native quest map icons too."
+L["Camp benefit names and effects are now in your language."] = "Camp benefit names and effects are now in your language."
 L["Rare alerts"] = "Avisos de raros"
 L["Reagent bag in combined bag"] = "Bolsa de componentes en la bolsa combinada"
 L["Red"] = "Rojo"

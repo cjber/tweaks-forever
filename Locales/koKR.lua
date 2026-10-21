@@ -192,7 +192,7 @@ L["Quests are accepted and turned in for you as you talk to an NPC. Hold Shift w
 L["Quests on minimap givers"] = "미니맵 퀘스트 NPC의 퀘스트"
 L["Quests to level: about %d"] = "레벨업까지 퀘스트 수: 약 %d"
 L["Quiet repeated combat errors"] = "반복되는 전투 오류 숨기기"
-L["Questie's icon size sliders now move the native quest map icons too."] = "Questie's icon size sliders now move the native quest map icons too."
+L["Camp benefit names and effects are now in your language."] = "Camp benefit names and effects are now in your language."
 L["Rare alerts"] = "희귀 몬스터 알림"
 L["Reagent bag in combined bag"] = "통합 가방에 재료 가방 포함"
 L["Red"] = "빨간색"
