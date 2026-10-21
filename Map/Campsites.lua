@@ -24,6 +24,7 @@ ns.Feature({
 
 local CAMP_BENEFITS, CAMPFIRE_NEARBY = 1229741, 1283391
 local TENT = 1229451
+local TENT_EXPLANATION = 1229487
 -- About the reach of Campfire Nearby: a campfire remembered farther off than this is not the one you are near.
 local NEARBY_YARDS = 120
 -- Closer than this, a direction means nothing.
@@ -68,9 +69,14 @@ local FEATURES = {
 }
 -- The placement spells of each campfire tier: the features that grant Camp Benefits.
 local CAMPFIRES = {}
+-- The first placement spell of each aura names the benefit, as the base feature before its upgrades.
+local PLACED = {}
 for _, feature in ipairs(FEATURES) do
 	if feature[3] == CAMP_BENEFITS then
 		CAMPFIRES[feature[1]] = true
+	end
+	if not PLACED[feature[3]] then
+		PLACED[feature[3]] = feature[1]
 	end
 end
 
@@ -125,6 +131,57 @@ local function Number(value)
 	return value % 1 == 0 and ("%d"):format(value) or ("%g"):format(value)
 end
 
+-- A client language other than English: English keeps the bundled wording byte for byte.
+---@return string?
+local function OtherLanguage()
+	local locale = type(GetLocale) == "function" and GetLocale() or nil
+	return locale and not locale:match("^en") and locale or nil
+end
+
+-- The benefit's name in the client's language, from the spell that places the feature. Falls back to the bundled
+-- English name when the spell is not cached, the spellbook is not loaded or the API is absent.
+---@param benefit TFCampBenefit
+---@return string
+local function Name(benefit)
+	local locale, spell = OtherLanguage(), PLACED[benefit[1]]
+	local getName = C_Spell and C_Spell.GetSpellName
+	if locale and spell and type(getName) == "function" then
+		local name = getName(spell)
+		if type(name) == "string" and name ~= "" then
+			return name
+		end
+	end
+	return benefit[2]
+end
+
+-- The effect in the client's language. The game exposes a spell's tooltip text but not the Camp Benefits summary
+-- that holds these effects, so an installed locale table covers what the client cannot return. English, and any
+-- value the client and the table both lack, stays the bundled English text.
+---@param benefit TFCampBenefit
+---@return string
+local function EffectText(benefit)
+	local locale = OtherLanguage()
+	if locale then
+		local getDescription = C_Spell and C_Spell.GetSpellDescription
+		local spell = benefit[1] == TENT and TENT_EXPLANATION or benefit[1]
+		if type(getDescription) == "function" then
+			local text = getDescription(spell)
+			if type(text) == "string" then
+				text = text:gsub("[\r\n]+", " "):gsub("^%s+", ""):gsub("%s+$", "")
+				if text ~= "" then
+					return text
+				end
+			end
+		end
+		local effects = ns.CampBenefitEffects and ns.CampBenefitEffects[locale]
+		local text = effects and effects[benefit[1]]
+		if text then
+			return text
+		end
+	end
+	return benefit[3]
+end
+
 -- The benefit's effect with the aura's own values in place of the spell's base ones. The server sets the values
 -- (a low level's First Aid Kit gives 8 Stamina, not the base 56) and no scaling in the game's data says how, so
 -- without all of the aura's values, `points` by effect, the effect names what it raises and no amount.
@@ -132,7 +189,7 @@ end
 ---@param points number[]?
 ---@return string
 local function Effect(benefit, points)
-	local effect, bases = benefit[3], benefit[5]
+	local effect, bases = EffectText(benefit), benefit[5]
 	if not bases then
 		return effect
 	end
@@ -173,10 +230,10 @@ end
 ---@return string
 local function Announcement(benefit, points)
 	local gives = benefit[1] == TENT and L["rested experience"] or Effect(benefit, points):gsub("^%u", string.lower)
-	return L["Camp benefit gained: %s (%s)"]:format(benefit[2], gives)
+	return L["Camp benefit gained: %s (%s)"]:format(Name(benefit), gives)
 end
 
-ns.Camp = { Listing = Listing, Toward = Toward, Effect = Effect, Announcement = Announcement }
+ns.Camp = { Listing = Listing, Toward = Toward, Name = Name, Effect = Effect, Announcement = Announcement }
 
 -- Aura data is secret in combat and wherever else the game restricts it: no reading, comparing or arithmetic then.
 local function AurasSecret()
@@ -206,7 +263,7 @@ end
 ---@param tooltip GameTooltip
 ---@param row TFCampRow
 local function AddRow(tooltip, row)
-	local aura, feature = row.benefit[1], row.benefit[2]
+	local aura, feature = row.benefit[1], Name(row.benefit)
 	local effect = Effect(row.benefit, row.points)
 	local text
 	if not row.left then

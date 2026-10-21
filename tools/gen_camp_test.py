@@ -2,7 +2,15 @@
 
 import unittest
 
-from tools.gen_camp import CAMP_BENEFITS, FEATURES, TENT, TENT_AURA, benefits
+from tools.gen_camp import (
+    CAMP_BENEFITS,
+    FEATURES,
+    TENT,
+    TENT_AURA,
+    benefits,
+    localised_effects,
+    summary_branches,
+)
 
 FIRST = 1230587
 
@@ -32,6 +40,21 @@ def features(count, first=FIRST):
     return [first + n for n in range(count)]
 
 
+class FakeLocale:
+    """The parts of gen_camp.LocaleSpells that localised_effects() reads."""
+
+    def __init__(self, summary, tent):
+        self.texts = {CAMP_BENEFITS: summary, TENT: tent}
+        self.strings = {
+            "INT_SPELL_DURATION_SEC": "%d сек.",
+            "INT_SPELL_DURATION_MIN": "%d мин.",
+            "INT_GENERAL_DURATION_HOURS": "%d |4час:часа;",
+        }
+
+    def description(self, spell):
+        return self.texts[spell]
+
+
 class CampTest(unittest.TestCase):
     def test_tent_first_from_its_own_spell(self):
         rows = benefits(FakeSpells(features(FEATURES)))
@@ -58,6 +81,28 @@ class CampTest(unittest.TestCase):
         spells.texts[TENT_AURA] = "Something else."
         with self.assertRaisesRegex(ValueError, "rest lockout"):
             benefits(spells)
+
+    def test_localised_effects_follow_the_translated_summary(self):
+        auras = features(FEATURES)
+        spells = FakeSpells(auras)
+        branches = "".join(f"$?a{aura}[Функция {aura}: Значение ${aura}w1.\r\n\r\n][]" for aura in auras)
+        texts = FakeLocale("Получены эффекты:\r\n\r\n" + branches, "Отдых после $d возле палатки.")
+        effects = localised_effects(spells, texts, benefits(spells))
+        self.assertEqual(effects[TENT_AURA], "Отдых после 30 сек. возле палатки")
+        self.assertEqual(effects[FIRST], "Значение 87")
+
+    def test_a_missing_branch_bracket_is_tolerated(self):
+        branches = summary_branches("$?a1230587][][Мана: $1230587w1][]")
+        self.assertEqual(branches, [(FIRST, "Мана: $1230587w1")])
+
+    def test_a_translated_number_in_another_order_fails(self):
+        auras = features(FEATURES)
+        spells = FakeSpells(auras)
+        first = f"$?a{FIRST}[Функция: ${FIRST}w2 ${FIRST}w1.\r\n\r\n][]"
+        rest = "".join(f"$?a{aura}[Функция: Значение ${aura}w1.\r\n\r\n][]" for aura in auras[1:])
+        texts = FakeLocale("Эффекты:\r\n\r\n" + first + rest, "Отдых после $d возле палатки.")
+        with self.assertRaisesRegex(ValueError, "another order"):
+            localised_effects(spells, texts, benefits(spells))
 
 
 if __name__ == "__main__":
