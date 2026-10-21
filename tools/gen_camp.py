@@ -13,8 +13,10 @@ from pathlib import Path
 
 try:
     from tools.forever_tools import wago
+    from tools.forever_tools.csvtable import parse_csv
 except ModuleNotFoundError:
     from forever_tools import wago
+    from forever_tools.csvtable import parse_csv
 
 BUILD = "1.60.1.70450"
 USER_AGENT = "TweaksForever/1.0"
@@ -24,6 +26,8 @@ OUTPUT = ROOT / "Data" / "CampBenefits.lua"
 CAMP_BENEFITS = 1229741  # its aura description lists every feature aura, one $?a branch each
 TENT_AURA, TENT = 1229451, 1229487  # the rest lockout the tent grants, and the tent's own explanation
 FEATURES = 9  # the summary's $?a branches: every camp feature but the tent
+# The languages the Forever client ships besides English, in Locales/. itIT is absent because the client has none.
+LOCALES = ("deDE", "esES", "esMX", "frFR", "koKR", "ptBR", "ruRU", "zhCN", "zhTW")
 # SpellEffect columns that make a value depend on level, stats or group size; all must be zero to ship a number.
 SCALING = (
     "Coefficient",
@@ -43,6 +47,13 @@ def db2(name, key, refresh=False, offline=False):
     ):
         rows.setdefault(row[key], []).append(row)
     return rows
+
+
+def locale_db2(name, key, locale, refresh=False, offline=False):
+    path = CACHE / f"{name}-{locale}-{BUILD}.csv"
+    url = f"{wago.DB2_URL.format(name=name, build=BUILD)}&locale={locale}"
+    data = wago.fetch(url, path, user_agent=USER_AGENT, refresh=refresh, offline=offline, timeout=600)
+    return parse_csv(data.decode("utf-8-sig"), name, ints=[key])
 
 
 class Spells:
@@ -78,6 +89,17 @@ def number(value):
     return str(int(value)) if value.is_integer() else f"{value:g}"
 
 
+class LocaleSpells:
+    def __init__(self, locale, refresh, offline):
+        self.spell = {row["ID"]: row for row in locale_db2("Spell", "ID", locale, refresh, offline)}
+        self.strings = {
+            row["BaseTag"]: row["TagText_lang"] for row in locale_db2("GlobalStrings", "ID", locale, refresh, offline)
+        }
+
+    def description(self, spell):
+        return self.spell[spell]["AuraDescription_lang"]
+
+
 def duration_text(seconds):
     # The client's own wording for $d in a description.
     if seconds < 60:
@@ -88,15 +110,32 @@ def duration_text(seconds):
     return f"{hours} hour" if hours == 1 else f"{hours} hours"
 
 
-def resolve(spells, text, own):
+def localised_duration_text(seconds, strings):
+    # The client language's own wording for $d, from its GlobalStrings at the same build.
+    if seconds < 60:
+        return strings["INT_SPELL_DURATION_SEC"] % seconds
+    if seconds < 3600:
+        return strings["INT_SPELL_DURATION_MIN"] % (seconds // 60)
+    hours = seconds // 3600
+    text = strings["INT_GENERAL_DURATION_HOURS"] % hours
+    return re.sub(r"\|4([^:;]+):([^;]+);", lambda match: match[1] if hours == 1 else match[2], text)
+
+
+def plural(text):
+    # $l singular:plural; picks one form; camp values are above one, so the plural is right for them.
+    return re.sub(r"\$l([^:;]+):([^;]+);", lambda match: match[2], text)
+
+
+def resolve(spells, text, own, duration=duration_text):
     """Substitute $[spell]w<n>, $[spell]t<n> and $[spell]d; anything else left is a failure. Also returns the
     base value put in for each $w<n>, in effect order: the aura's live values replace them in game."""
+    text = plural(text)
     bases = {}
 
     def value(match):
         spell, kind, index = int(match[1] or own), match[2], int(match[3] or 1) - 1
         if kind == "d":
-            return duration_text(spells.seconds(spell))
+            return duration(spells.seconds(spell))
         row = spells.effect_row(spell, index)
         if kind == "t":
             return number(int(row["EffectAuraPeriod"]) / 1000)
@@ -111,9 +150,30 @@ def resolve(spells, text, own):
     return resolved, [bases[i] for i in range(len(bases))]
 
 
+def summary_branches(text):
+    """The summary's $?a branches, tolerant of a missing opening bracket in one client language."""
+    branches = []
+    for match in re.finditer(r"\$\?a(\d+)", text):
+        aura, start = int(match[1]), match.end()
+        while start < len(text) and text[start] in "[]":
+            start += 1
+        end = text.find("][]", start)
+        if end < 0:
+            raise ValueError(f"spell {CAMP_BENEFITS}: branch {aura} has no end")
+        branches.append((aura, text[start:end]))
+    return branches
+
+
+def split_feature(body):
+    parts = re.split(r"[:：]", body.strip(), maxsplit=1)
+    if len(parts) != 2:
+        raise ValueError(f"spell {CAMP_BENEFITS}: no colon between a feature and its effect in {body!r}")
+    return parts[0].strip(), parts[1].strip()
+
+
 def benefits(spells):
     template = spells.description(CAMP_BENEFITS)
-    branches = re.findall(r"\$\?a(\d+)\[(.*?)\]\[\]", template, re.S)
+    branches = summary_branches(template)
     # Since 1.60.1.70425 the summary no longer has a Tent branch; the tent is still a camp feature, explained by
     # its own spell, and its rest lockout aura is unchanged. It comes first, where the summary used to list it.
     if any(int(aura) == TENT_AURA for aura, _ in branches):
@@ -124,10 +184,29 @@ def benefits(spells):
         raise ValueError(f"spell {TENT_AURA} is no longer the Camp Tent's rest lockout")
     out = [(TENT_AURA, "Tent", resolve(spells, spells.description(TENT), TENT)[0], None, [])]
     for aura, body in branches:
-        aura = int(aura)
-        feature, effect = body.strip().split(": ", 1)
+        feature, effect = split_feature(body)
         text, bases = resolve(spells, effect, aura)
         out.append((aura, feature, text.rstrip("."), spells.seconds(aura), bases))
+    return out
+
+
+def localised_effects(spells, texts, auras):
+    """Each feature's effect in one client language, from the same auras and numbers."""
+    duration = lambda seconds: localised_duration_text(seconds, texts.strings)  # noqa: E731
+    out = {TENT_AURA: one_line(resolve(spells, texts.description(TENT), TENT, duration)[0]).rstrip("。.")}
+    branches = summary_branches(texts.description(CAMP_BENEFITS))
+    if len(branches) != FEATURES:
+        raise ValueError(f"Camp Benefits lists {len(branches)} features, not {FEATURES}; the template changed")
+    for aura, body in branches:
+        _, effect = split_feature(body)
+        text, bases = resolve(spells, effect, aura, duration)
+        if bases != next(row[4] for row in auras if row[0] == aura):
+            raise ValueError(
+                f"spell {aura}: its translated numbers are in another order; live values would not line up"
+            )
+        out[aura] = one_line(text).rstrip("。.")
+    if set(out) != {row[0] for row in auras}:
+        raise ValueError("Camp Benefits: its translated branches do not cover every aura")
     return out
 
 
@@ -135,9 +214,14 @@ def lua_string(text):
     return '"' + text.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
-def wrap(text, indent):
+def one_line(text):
+    # A tooltip line never spans rows, and Lua short strings cannot hold a raw newline.
+    return re.sub(r"[ \t\r\n]+", " ", text).strip()
+
+
+def wrap(text, indent, prefix=0):
     """A Lua string expression that fits the 120-column limit, split at spaces with `..` as stylua lays it out."""
-    width = 120 - 4 * indent - 4  # tabs count 4; room for the quotes, a comma and a leading `.. `
+    width = 120 - 4 * indent - 4 - prefix  # tabs count 4; room for the quotes, a comma and a leading `.. `
     chunks, line = [], ""
     for word in re.findall(r"\S+\s*", text):
         if line and len(line) + len(word) > width:
@@ -155,11 +239,12 @@ def entry(fields):
     return "\t{\n" + "".join(f"\t\t{field},\n" for field in fields) + "\t},"
 
 
-def render(rows):
+def render(rows, localised):
     lines = [
-        "-- Generated by tools/gen_camp.py — do not edit.",
+        "-- Generated by tools/gen_camp.py; do not edit.",
         f"-- Source: https://wago.tools/db2/Spell/csv?build={BUILD} (the Camp Benefits and Camp Tent",
-        "-- auras' descriptions), with SpellEffect, SpellMisc and SpellDuration of the same build for the numbers.",
+        "-- auras' descriptions), with SpellEffect, SpellMisc and SpellDuration of the same build for the numbers,",
+        "-- and GlobalStrings of the same build and locale for a translated duration's wording.",
         "-- { aura, feature, effect, seconds it lasts (none for the tent's rest lockout), the effect's numbers in",
         "-- effect order }. The numbers are the spells' base values; the aura you get can carry others.",
         "local _, ns = ...",
@@ -172,7 +257,22 @@ def render(rows):
         if len(fields[2]) > 120 - 12:
             fields[2] = wrap(effect, 2)
         lines.append(entry(fields))
-    return "\n".join(lines + ["}", ""])
+    lines += [
+        "}",
+        "",
+        "-- Each feature's effect in the client languages, keyed by locale and then aura. A missing locale or",
+        "-- aura falls back to the English effect above.",
+        "ns.CampBenefitEffects = {",
+    ]
+    for locale in LOCALES:
+        lines.append(f"\t{locale} = {{")
+        for row in rows:
+            aura, effect = row[0], localised[locale][row[0]]
+            prefix = f"\t\t[{aura}] = "
+            lines.append(prefix + wrap(effect, 2, len(prefix.expandtabs(4))) + ",")
+        lines.append("\t},")
+    lines.append("}")
+    return "\n".join(lines + [""])
 
 
 def main():
@@ -181,7 +281,12 @@ def main():
     group.add_argument("--refresh", action="store_true", help="Download the pinned CSVs again")
     group.add_argument("--offline", action="store_true", help="Require cached CSVs")
     args = parser.parse_args()
-    OUTPUT.write_text(render(benefits(Spells(args.refresh, args.offline))), encoding="utf-8")
+    spells = Spells(args.refresh, args.offline)
+    rows = benefits(spells)
+    localised = {
+        locale: localised_effects(spells, LocaleSpells(locale, args.refresh, args.offline), rows) for locale in LOCALES
+    }
+    OUTPUT.write_text(render(rows, localised), encoding="utf-8")
     print(f"wrote {OUTPUT.relative_to(ROOT)}")
 
 

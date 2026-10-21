@@ -9,13 +9,24 @@ local ns = {
 	end,
 }
 local auras, messages, onAura, secret = {}, {}, nil, false
+local locale, names, descriptions = "enUS", {}, {}
 local env = setmetatable({
 	C_UnitAuras = {
 		GetPlayerAuraBySpellID = function(spell)
 			return auras[spell]
 		end,
 	},
-	C_Spell = { GetSpellName = function() end },
+	C_Spell = {
+		GetSpellName = function(spell)
+			return names[spell]
+		end,
+		GetSpellDescription = function(spell)
+			return descriptions[spell]
+		end,
+	},
+	GetLocale = function()
+		return locale
+	end,
 	C_Secrets = {
 		ShouldAurasBeSecret = function()
 			return false
@@ -138,4 +149,54 @@ onAura(nil, "UNIT_AURA", "player", {})
 auras[FISH_BOWL] = { points = { 8 } }
 onAura(nil, "UNIT_AURA", "player", {})
 assert(#messages == 3, "gained again after it ran out")
+-- Another client language: the name comes from the spell that places the feature, the effect from the client.
+locale = "deDE"
+names[1307259], descriptions[1230587] = "Manabrunnen", "Stellt alle 5 Sekunden 29 Mana wieder her"
+assert(Camp.Name(byAura[MANA_WELL]) == "Manabrunnen")
+assert(Camp.Effect(byAura[MANA_WELL], { 12 }) == "Stellt alle 5 Sekunden 12 Mana wieder her")
+assert(
+	Camp.Announcement(byAura[MANA_WELL], { 12 })
+		== "Camp benefit gained: Manabrunnen (stellt alle 5 Sekunden 12 Mana wieder her)"
+)
+names[1307230] = "Lagerzelt"
+assert(Camp.Name(byAura[TENT]) == "Lagerzelt", "the tent takes the placement spell's translated name")
+
+-- A CJK client substitutes the same numbers inside its own description.
+locale = "zhCN"
+names[1307259], descriptions[1230587] = "法力之井", "每5秒恢复29点法力值"
+assert(Camp.Name(byAura[MANA_WELL]) == "法力之井")
+assert(Camp.Effect(byAura[MANA_WELL], { 12 }) == "每5秒恢复12点法力值")
+assert(
+	Camp.Announcement(byAura[MANA_WELL], { 12 }) == "Camp benefit gained: 法力之井 (每5秒恢复12点法力值)"
+)
+
+-- When the client has no description, the bundled translated effect still takes the live values.
+descriptions[1230587] = nil
+assert(Camp.Effect(byAura[MANA_WELL], { 12 }) == "每5秒恢复12点法力值")
+assert(Camp.Effect(byAura[FIRST_AID], { 8 }) == "耐力提高8点")
+
+-- The API absent: names fall back to bundled English, and so do effects with no translated row.
+local savedEffects = ns.CampBenefitEffects.zhCN
+ns.CampBenefitEffects.zhCN = nil
+env.C_Spell = nil
+assert(Camp.Name(byAura[MANA_WELL]) == "Mana Well")
+assert(Camp.Effect(byAura[MANA_WELL], { 12 }) == "Restores 12 Mana every 5 seconds")
+assert(Camp.Name(byAura[TENT]) == "Tent")
+env.C_Spell = {
+	GetSpellName = function()
+		return nil
+	end,
+	GetSpellDescription = function()
+		return nil
+	end,
+}
+ns.CampBenefitEffects.zhCN = savedEffects
+assert(Camp.Name(byAura[MANA_WELL]) == "Mana Well", "a missing spell never formats a nil name")
+
+-- English is unchanged byte for byte, even with the placement spell cached.
+locale, names[1307230] = "enUS", "Camp Tent"
+assert(Camp.Name(byAura[TENT]) == "Tent")
+locale = "enGB"
+assert(Camp.Name(byAura[TENT]) == "Tent")
+assert(Camp.Effect(byAura[MANA_WELL], nil) == "Restores Mana every 5 seconds")
 print("campsites: ok")
