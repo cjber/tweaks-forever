@@ -52,7 +52,7 @@ def db2(name, key, refresh=False, offline=False):
 def locale_db2(name, key, locale, refresh=False, offline=False):
     path = CACHE / f"{name}-{locale}-{BUILD}.csv"
     url = f"{wago.DB2_URL.format(name=name, build=BUILD)}&locale={locale}"
-    data, _ = wago.read_source(url, path, user_agent=USER_AGENT, refresh=refresh, offline=offline, timeout=600)
+    data = wago.fetch(url, path, user_agent=USER_AGENT, refresh=refresh, offline=offline, timeout=600)
     return parse_csv(data.decode("utf-8-sig"), name, ints=[key])
 
 
