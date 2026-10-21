@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.15.1"
-ns.WHATS_NEW = L["Questie's icon size sliders now move the native quest map icons too."]
+ns.WHATS_NEW_VERSION = "0.15.2"
+ns.WHATS_NEW = L["Camp benefit names and effects are now in your language."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

@@ -192,7 +192,7 @@ L["Quests are accepted and turned in for you as you talk to an NPC. Hold Shift w
 L["Quests on minimap givers"] = "小地图任务NPC的任务"
 L["Quests to level: about %d"] = "升级所需任务：约%d"
 L["Quiet repeated combat errors"] = "屏蔽重复的战斗错误"
-L["Questie's icon size sliders now move the native quest map icons too."] = "Questie's icon size sliders now move the native quest map icons too."
+L["Camp benefit names and effects are now in your language."] = "Camp benefit names and effects are now in your language."
 L["Rare alerts"] = "稀有生物提醒"
 L["Reagent bag in combined bag"] = "组合背包中包含材料包"
 L["Red"] = "红色"
