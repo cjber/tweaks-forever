@@ -111,6 +111,10 @@ Each one works on its own, and they work together when you install more than one
 
 <!-- forever-family:end -->
 
+With Shortest Path Forever, clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses
+Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for
+Legacy Forever.
+
 ## Development
 
 ```sh
