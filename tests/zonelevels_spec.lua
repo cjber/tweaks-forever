@@ -22,6 +22,21 @@ setfenv(assert(loadfile("Map/ZoneLevels.lua")), env)("TweaksForever", ns)
 local Model = ns.ZoneLevels
 assert(features.zoneLevels.default == true)
 
+local function PolestarPath(feature)
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.polestar then
+			return conflict.polestar
+		end
+	end
+end
+assert(PolestarPath(features.zoneLevels) == "maps.zoneLevels")
+for _, conflict in ipairs(features.zoneLevels.conflicts) do
+	if conflict.openmap then
+		assert(conflict.openmap == "zoneLevels", "OpenMap's hover label adds the same ranges")
+	end
+end
+assert(#features.zoneLevels.conflicts == 3, "Leatrix Maps, Polestar and OpenMap")
+
 -- Leatrix Maps shows zone levels unless its option is explicitly off.
 local leatrix = features.zoneLevels.conflicts[1]
 assert(leatrix.addon == "Leatrix_Maps" and leatrix.when())

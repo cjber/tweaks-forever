@@ -7,6 +7,19 @@ LeaPlusDB = nil
 LeaMapsDB = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
+-- OpenMap's account settings, one table per module; only its world map options are read.
+---@type {worldmap: table<string, any>?}?
+OpenMapDB = nil
+-- OpenMap's namespace: only whether its world map module started is read.
+---@type {modules: table<string, {enabled: boolean?}>?}?
+OpenMap = nil
+-- Polestar's namespace: its settings by path, and its message bus (SETTING_CHANGED as a setting changes).
+---@class PolestarNamespace
+---@field Get fun(path: string): any
+---@field On? fun(message: string, fn: function)
+
+---@type PolestarNamespace?
+Polestar = nil
 ---@type {API: {RegisterOnReady: fun(callback: fun())?}?, usedIcons: table<integer, string>?, db: {profile: {autoaccept: boolean?, autocomplete: boolean?, trackerEnabled: boolean?, enableTooltips: boolean?, nameplateEnabled: boolean?}?}?}?
 Questie = nil
 
@@ -191,21 +204,6 @@ SETTINGS = ""
 ---@type string
 TRADE = ""
 
--- The auction house's category tree (Blizzard_AuctionData.lua). The pinned annotation marks the mixin but not
--- the fields this addon reads, nor the detail column it sets through the client's own method.
----@class AuctionCategoryMixin
----@field name string
----@field detailColumnString? string
----@field SetDetailColumnString fun(self: AuctionCategoryMixin, detailColumnString: string?)
-
--- Auction house strings the addon shows as they are, absent from Ketho's annotations.
----@type string
-ITEM_LEVEL_ABBR = ""
----@type string
-AUCTION_CATEGORY_WEAPONS = ""
----@type string
-AUCTION_CATEGORY_ARMOR = ""
-
 -- QuestMapFrame.xml places its quest text inside this scroll child.
 ---@class QuestMapDetailsScrollFrame
 ---@field Contents Frame
@@ -224,3 +222,16 @@ AUCTION_CATEGORY_ARMOR = ""
 
 ---@type {ImportModule: fun(self: table, name: string): TFQuestieMap}?
 QuestieLoader = nil
+
+-- InputInterfaceStyleDocumentation.lua: which interface the game shows, mouse and keyboard or the gamepad one.
+---@type {GetCurrentStyle: fun(): number}?
+C_InputInterfaceStyle = nil
+
+-- Blizzard_GamepadMapCursor: the gamepad's cursor on the world map, read for its place.
+---@type Frame
+SoftCursor = nil
+
+-- The Forever addons' world map markers, for each other (Map/MapCanvas.lua): each addon's function gives its shown
+-- markers on a map, as map fractions.
+---@type table<string, fun(map: WorldMapFrame): {x: number, y: number, kind: string}[]>
+ForeverMapMarkers = nil

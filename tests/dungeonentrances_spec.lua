@@ -31,6 +31,9 @@ local leatrix = features.dungeonEntrances.conflicts[1]
 assert(leatrix.addon == "Leatrix_Maps" and leatrix.when())
 env.LeaMapsDB = { ShowPointsOfInterest = "Off" }
 assert(not leatrix.when())
+-- OpenMap marks every entrance with its "Dungeons, travel and more" icons.
+local openmap = features.dungeonEntrances.conflicts[2]
+assert(openmap.openmap == "icons" and not openmap.when, "read by Core through ns.OpenMapOn")
 
 -- Every pin sits on its map, and every instance has a zone-map pin as well as a continent one.
 local shown = {}

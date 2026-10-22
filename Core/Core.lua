@@ -16,14 +16,17 @@ local conflicted = {}
 local missing = {}
 local pending, ready = {}, false
 
----@param fn fun()
-local function Start(fn)
-	xpcall(fn, geterrorhandler())
-end
-
 ---@param message string
 function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
+end
+
+-- Widens a button to its label, never below `width`: a translated label can run past the width chosen for the
+-- English, and UIPanelButtonTemplate neither shrinks nor wraps its text. Call it after each SetText.
+---@param button Button
+---@param width number
+function ns.FitButton(button, width)
+	button:SetWidth(math.max(width, math.ceil(button:GetTextWidth()) + 24))
 end
 
 -- The bag frames, read straight from the container. ContainerFrameUtil_EnumerateContainerFrames builds Blizzard's
@@ -81,33 +84,98 @@ end
 ---@param fn fun(tooltip: GameTooltip, getter: string, ...: any)
 function ns.OnTooltip(dataType, getters, fn)
 	TooltipDataProcessor.AddTooltipPostCall(dataType, function(tooltip)
-		if tooltip ~= GameTooltip then
+		if tooltip ~= GameTooltip or not ns.Usable(tooltip) then
 			return
 		end
 		local info = tooltip:GetProcessingTooltipInfo()
 		local args = info and info.getterArgs
 		if info and getters[info.getterName] then
-			fn(GameTooltip, info.getterName, unpack(args or {}, 1, args and args.n or 0))
+			ns.SafeCall(
+				"tooltip",
+				fn,
+				GameTooltip,
+				info.getterName,
+				unpack(args or {}, 1, args and args.n or 0) -- multi-value: the getter's arguments
+			)
 		end
 	end)
 end
 
 -- Declare a feature. A conflict is { addon = folder name, title = shown name, when = optional check of that
--- addon's own setting }; with no `when`, the addon being loaded is the conflict.
+-- addon's own setting }; with no `when`, the addon being loaded is the conflict. { polestar = setting path } is
+-- Polestar's own setting, on (ns.PolestarOn) while Polestar is loaded; `addon` can name another of its addons that
+-- must be loaded too. { openmap = option } is one of OpenMap's world map options, on (ns.OpenMapOn) while OpenMap
+-- is loaded.
 ---@param feature TFFeature
 function ns.Feature(feature)
 	assert(not byKey[feature.key], "duplicate feature " .. feature.key)
 	feature.conflicts = feature.conflicts or {}
+	for _, conflict in ipairs(feature.conflicts) do
+		if conflict.polestar then
+			conflict.addon, conflict.title = conflict.addon or "Polestar", "Polestar"
+		elseif conflict.openmap then
+			-- Its TOC title is colour-coded, so name it plainly.
+			conflict.addon, conflict.title = conflict.addon or "OpenMap", "OpenMap"
+		end
+	end
 	ns.features[#ns.features + 1] = feature
 	byKey[feature.key] = feature
+end
+
+-- Whether Polestar is loaded with one of its settings on, read through its own Polestar.Get. Its settings are
+-- true/false, or a choice where "off" is off. Anything unreadable counts as off.
+---@param path string
+---@return boolean
+function ns.PolestarOn(path)
+	if not (C_AddOns.IsAddOnLoaded("Polestar") and Polestar and Polestar.Get) then
+		return false
+	end
+	local ok, value = pcall(Polestar.Get, path)
+	return ok and value ~= nil and value ~= false and value ~= "off"
+end
+
+-- Whether OpenMap is loaded and its world map runs with one of its options on. It keeps them in
+-- OpenMapDB.worldmap, filled from its defaults as it loads: a missing table or option is its default, and every
+-- option it shares with a feature here starts on. Its options are true/false, or a choice where "hide" is off
+-- (unexplored areas hidden, as the game's own map does). Whether the world map runs is its module's own flag once
+-- it has started (false when it failed to start; switching it in OpenMap's options takes a reload there too), and
+-- its saved setting before then.
+---@param option string
+---@return boolean
+function ns.OpenMapOn(option)
+	if not C_AddOns.IsAddOnLoaded("OpenMap") then
+		return false
+	end
+	local db = type(OpenMapDB) == "table" and OpenMapDB.worldmap
+	db = type(db) == "table" and db or {}
+	local modules = type(OpenMap) == "table" and OpenMap.modules
+	local worldmap = type(modules) == "table" and modules.worldmap
+	local running = db.enabled ~= false
+	if type(worldmap) == "table" and type(worldmap.enabled) == "boolean" then
+		running = worldmap.enabled
+	end
+	local value = db[option]
+	return running == true and value ~= false and value ~= "hide"
+end
+
+---@param conflict TFConflict
+---@return boolean?
+local function Applies(conflict)
+	if conflict.polestar then
+		return ns.PolestarOn(conflict.polestar)
+	elseif conflict.openmap then
+		return ns.OpenMapOn(conflict.openmap)
+	end
+	return not conflict.when or conflict.when()
 end
 
 ---@param feature TFFeature
 ---@return string?
 local function FindConflict(feature)
 	for _, conflict in ipairs(feature.conflicts) do
-		if C_AddOns.IsAddOnLoaded(conflict.addon) and (not conflict.when or conflict.when()) then
-			return conflict.title or C_AddOns.GetAddOnMetadata(conflict.addon, "Title") or conflict.addon
+		local addon = conflict.addon --[[@as string]]
+		if C_AddOns.IsAddOnLoaded(addon) and Applies(conflict) then
+			return conflict.title or C_AddOns.GetAddOnMetadata(addon, "Title") or addon
 		end
 	end
 end
@@ -140,12 +208,13 @@ function ns.ConflictOf(key)
 end
 
 -- Switched on, not already handled by another addon and not missing one it needs. Checked when the feature acts,
--- so toggles apply at once.
+-- so toggles apply at once. Off until PLAYER_LOGIN has read the saved settings: some events (map markers,
+-- nameplates) reach a feature while the world loads, before then (#202).
 ---@param key string
 ---@return boolean
 function ns.Active(key)
 	assert(byKey[key], "unknown feature " .. key)
-	return not not ns.db[key] and not conflicted[key] and not missing[key]
+	return ns.db ~= nil and not not ns.db[key] and not conflicted[key] and not missing[key]
 end
 
 -- The Settings variable a feature's setting is registered under.
@@ -160,17 +229,18 @@ end
 ---@param key string
 ---@param fn function
 function ns.OnSettingChanged(key, fn)
-	Settings.SetOnValueChangedCallback(ns.SettingVariable(key), fn)
+	Settings.SetOnValueChangedCallback(ns.SettingVariable(key), function(...)
+		ns.SafeCall("setting " .. key, fn, ...)
+	end)
 end
 
 local handlers = {}
 local events = CreateFrame("Frame")
+-- Each handler runs through ns.SafeCall: one that fails is kept for /tweaks report, reaches the game's error
+-- handler, and doesn't stop the rest.
 events:SetScript("OnEvent", function(_, event, ...)
-	local args, count = { ... }, select("#", ...)
 	for _, fn in ipairs(handlers[event]) do
-		Start(function()
-			fn(unpack(args, 1, count))
-		end)
+		ns.SafeCall(event, fn, ...)
 	end
 end)
 
@@ -215,14 +285,14 @@ function ns.HookBagButtons(update, click)
 		hooked[button] = true
 		button:HookScript("OnClick", function(self, mouseButton)
 			if IsModifiedBagClick(self, mouseButton) then
-				click(self, mouseButton)
+				ns.SafeCall("bag click", click, self, mouseButton)
 			end
 		end)
 	end
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
 		for _, button in ns.BagItems(container) do
 			Hook(button)
-			update(button)
+			ns.SafeCall("bag update", update, button)
 		end
 	end)
 	for container in ns.ContainerFrames() do
@@ -246,7 +316,7 @@ end
 ---@param fn fun()
 function ns.Init(fn)
 	if ready then
-		Start(fn)
+		ns.SafeCall("startup", fn)
 	else
 		pending[#pending + 1] = fn
 	end
@@ -254,6 +324,12 @@ end
 
 local login = CreateFrame("Frame")
 login:RegisterEvent("PLAYER_LOGIN")
+-- A load-on-demand addon (Polestar's quest database) can become a conflict after login.
+ns.On("ADDON_LOADED", function()
+	if ready then
+		ns.RefreshConflicts()
+	end
+end)
 login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
@@ -265,9 +341,15 @@ login:SetScript("OnEvent", function()
 	TweaksForeverDB, ns.db = db, db
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	ns.RefreshConflicts()
+	-- Polestar applies its settings at once, so its matching features here follow them at once too.
+	if Polestar and type(Polestar.On) == "function" and C_AddOns.IsAddOnLoaded("Polestar") then
+		pcall(Polestar.On, "SETTING_CHANGED", function()
+			ns.RefreshConflicts()
+		end)
+	end
 	ready = true
 	for _, fn in ipairs(pending) do
-		Start(fn)
+		ns.SafeCall("startup", fn)
 	end
 	pending = nil
 end)

@@ -60,6 +60,10 @@ local function Client(slots, db)
 			return not not c.db[key]
 		end,
 		ConflictOf = function() end,
+		-- Core's check of a Polestar setting, which also covers Polestar being loaded.
+		PolestarOn = function(path)
+			return c.polestar == path
+		end,
 		Print = function(message)
 			c.printed[#c.printed + 1] = message
 		end,
@@ -84,7 +88,9 @@ local function Client(slots, db)
 		Enum = { TooltipDataType = { Item = 0 } },
 		hooksecurefunc = function() end,
 		IsControlKeyDown = No,
-		IsShiftKeyDown = No,
+		IsShiftKeyDown = function()
+			return c.shift
+		end,
 		IsAltKeyDown = function()
 			return c.alt
 		end,
@@ -578,6 +584,32 @@ do -- Leatrix owns greys only when its auto-sell is on.
 	c.leatrix, c.env.LeaPlusDB = "Off", { AutoSellJunk = "Off" }
 	c.visit()
 	same(c.nativeCalls, 1, "Leatrix with auto-sell off leaves native selling here")
+end
+
+do -- Shift held as the merchant opens skips automatic selling there; Sell All Junk still sells.
+	local c = Client({ grey(1), green(2) }, { markJunk = true, junk = { [2] = true } })
+	c.shift = true
+	c.visit()
+	same(c.nativeCalls, nil, "no native sale")
+	same(c.sold(), "", "no marked sale")
+	c.shift = false
+	c.clickSellAll()
+	c.confirm()
+	c.settle()
+	same(c.sold(), "2", "Sell All Junk still sells the marked stack")
+end
+
+do -- Polestar owns greys only while its own junk selling is on.
+	local c = Client({ grey(1), green(2) }, { markJunk = true, junk = { [2] = true } })
+	c.polestar = "qol.sellJunk"
+	c.visit()
+	same(c.nativeCalls, nil, "Polestar sells the greys")
+	same(c.sold(), "2", "marked non-grey items still sell")
+	assert(c.slots[1])
+
+	c = Client({ grey(1) })
+	c.visit()
+	same(c.nativeCalls, 1, "Polestar with junk selling off leaves native selling here")
 end
 
 do -- Sell All Junk, once confirmed, also sells the marked non-grey stacks; Blizzard sells the greys.

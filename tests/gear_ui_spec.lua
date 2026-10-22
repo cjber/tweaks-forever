@@ -41,6 +41,10 @@ local function frame(kind, name, _, template)
 	function f:SetPropagateKeyboardInput(value)
 		self.propagate = value
 	end
+	function f:GetPropagateKeyboardInput()
+		return self.propagate
+	end
+	f.HookScript = noop
 	f.SetFrameStrata, f.SetClampedToScreen, f.EnableKeyboard = noop, noop, noop
 	f.SetSize, f.SetHeight, f.SetWidth, f.SetPoint, f.ClearAllPoints = noop, noop, noop, noop, noop
 	f.CreateFontString = region
@@ -124,6 +128,7 @@ local env = setmetatable({
 	InCombatLockdown = function()
 		return false
 	end,
+	C_Timer = { After = noop },
 	IsControlKeyDown = function()
 		return true
 	end,
@@ -160,6 +165,7 @@ local ns = {
 	end,
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
+setfenv(assert(loadfile("UI/Keys.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Bags/Gear.lua")), env)("TweaksForever", ns)
 for _, fn in ipairs(initializers) do
 	fn()

@@ -7,9 +7,91 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 Added/Fixed lists.
 
 Each version's entry is also its release notes on GitHub, CurseForge and Wago. Older entries are kept
-verbatim rather than rewritten as the addon moves.
+verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
+optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+
+## [0.15.2] - 2026-10-21
+
+- **Camp benefit names and effects are now in your language.** On a translated client the camp tooltip and the "camp benefit gained" line used to read English, because they came only from a table with nothing but English in it. Names now come from the game's own spell names, and effects from the client's spell text where it has any; the bundled per-language table fills in the auras the client leaves empty, and English keeps the wording it had. Where the client is missing an API the lines fall back to the bundled text rather than going blank. ([#210](https://github.com/cjber/tweaks-forever/issues/210))
+
+## [0.15.1] - 2026-10-19
+
+- **Questie's icon size sliders now move the native quest map icons too.** With Questie's native quest map icons on, changing its icon size sliders left Tweaks' pins at their own size. They now follow the sliders, so the map reads as one set of icons. Thanks to Mouchoir for the fix.
+
+## [0.15.0] - 2026-10-18
+
+- **Gamepad interface: the maps are only read.** Instance entrances, the unexplored-area tint, the dungeon interior and the coordinates bar are now drawn on frames of Tweaks' own over the world map and the zone map, so the game's maps no longer hold any of the addon's pins or data. With the gamepad interface on, the map walks its own pins from secure code every frame, and an addon's pins in that walk are a likely cause of the crash some controller players reported. Entrances work as before: their tooltip, a mouse click to travel there, right-click to zoom out, and stepping aside for a flight master or another Forever addon's marker. Under the gamepad interface, an entrance under the map cursor shows its tooltip; travelling there still takes a mouse click. Thanks to the CurseForge player who reported it, and to Polestar for the idea.
+
+### For addon authors
+
+- **`ForeverMapMarkers`.** The entrance pins aren't the map's own any more, so `WorldMapFrame:EnumeratePinsByTemplate` no longer finds them. `ForeverMapMarkers.TweaksForever(WorldMapFrame)` returns the shown entrances as `{x, y, kind = "entrance"}` map fractions on the map being viewed, and Tweaks reads the other Forever addons' markers the same way.
+
+## [0.14.1] - 2026-10-17
+
+- **Data checked against Forever 1.60.1.70450.** Two more quests are known as added in Forever. Camp benefits, class trainer spells, dungeon entrances, map overlays and zone levels are unchanged.
+
+## [0.14.0] - 2026-10-16
+
+- **In your language.** Tweaks Forever is now in German, French, Spanish (Spain and Latin America), Korean, Brazilian Portuguese, Russian, and Simplified and Traditional Chinese, using the game's own words for settings such as Auto Loot, Combine Bags and Max Camera Distance. These are machine translated; corrections are welcome through the [translation issue form](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml). There's no Italian, because the WoW: Forever client has none.
+- **Buttons fit their labels.** Train all, the Abandon quests buttons and the dungeon map's Back to map and Dungeon map buttons widen when a translated label is longer than the English.
+- **Camp benefits are still in English.** Their names and effects come from a table that only has English so far, so on a translated client a camp line mixes the two ([#210](https://github.com/cjber/tweaks-forever/issues/210)).
+
+## [0.13.1] - 2026-10-16
+
+- **No more Lua error at login.** A map marker update can arrive before Tweaks has read your settings, and Rare alerts then failed with "attempt to index field 'db'", even with Rare alerts off. Every feature now stays off until the settings are read, and Rare alerts then looks once for a rare already nearby. Thanks to Mouchoir for the report and fix.
+
+## [0.13.0] - 2026-10-16
+
+- **Map extras step aside for OpenMap.** With [OpenMap](https://www.curseforge.com/wow/addons/openmap) loaded, its coordinates, zone level ranges, unexplored areas and dungeon icons take over from Tweaks' own, each only while its matching option is on there. Change one of those options in OpenMap and Tweaks follows the next time you open its settings, or after a /reload. With OpenMap's unexplored areas set to Hide, Tweaks' blue tint can still run.
+- **A Forever addons page in the settings.** Under Tweaks Forever, a new page lists my five Forever addons with what each does, whether you have it, and a Copy link button for its CurseForge page. *Suggest my other Forever addons* lives there now, replacing Suggest companion addons. If you had that off, it stays off.
+- **A plainer dungeon entrance hint.** Without Shortest Path Forever, an entrance's tooltip now ends "With Shortest Path Forever, click to plan the way there." while *Suggest my other Forever addons* is on.
+- **Credits.** The README now thanks the players who reported bugs, Forever Loot Sparkles, and Polestar, which inspired some features (no code was copied). THIRD_PARTY.md has the full list.
+
+## [0.12.1] - 2026-10-16
+
+- **The auction house item level column is gone.** It worked by writing into the game's own auction category list, which the auction house reads when it lays out search results. That can get buying blocked and blamed on Tweaks, so it isn't worth the risk. The game still shows each item's level after its name; you just can't sort by it.
+- **Tweaks keeps out of the gamepad UI's way.** Backing out of the AddOns settings with a gamepad has been reported to break the game's interact button. With the gamepad UI on, Move and scale windows now stands down (windows open where the game puts them and Edit Mode has no Windows tab), and opening the settings no longer re-checks your other addons, so a change to one of them shows in Tweaks' settings after a /reload. If it still happens with only Tweaks enabled, say so on [issue #168](https://github.com/cjber/tweaks-forever/issues/168).
+- **Data checked against Forever 1.60.1.70425.** Four more quests are known as added in Forever. Camp benefits, class trainer spells, dungeon entrances, map overlays and zone levels are unchanged.
+
+## [0.12.0] - 2026-10-15
+
+- **Coordinates on the world map.** Your position and the cursor's show along the bottom of the world map. Turn it off under Maps; it steps aside for Leatrix Maps, Mapster, Coordinates and Polestar when they show their own.
+- **XP per hour on the experience bar.** Pointing at the experience bar adds your XP per hour over the last 15 minutes, the time to your next level at that pace, and about how many kills or quests that is.
+- **The reward that sells for most is marked.** When a quest lets you choose a reward, a gold coin sits on the choice a merchant pays most for, stacks counted. Nothing is picked for you, and a tie marks none. Turn it off under Interface.
+- **Quest progress on item and object tooltips.** With QuestieDB, a quest item shows the quest it counts for and your progress on its tooltip, as creatures already did, and so do objects you use or loot for a quest. An item that starts a quest you haven't done says "Starts a quest:" and names it.
+- **Quest levels in quest dialogs.** With Show quest levels on, the quest greeting list and a quest's detail and reward titles show its level, such as [12], where the game knows it.
+- **Keys for the nearest quest item and quest target.** Under Key Bindings > AddOns > Tweaks Forever you can bind one key to use your nearest quest's item, and another to target a creature your nearest unfinished quest still needs, a different one each press (needs QuestieDB).
+- **Unexplored areas show on the zone map too.** With Reveal unexplored areas on, the small zone map (Shift+M) gets the same blue tint as the world map, and an area you discover loses its tint at once.
+- **Rare alerts.** A new option, off until you turn it on, puts a chat line up and plays a map marker chime from the game's own sounds when a rare creature's nameplate or map marker appears near you, once per rare for ten minutes and never in combat.
+- **Party invites by who sends them, and duels from friends.** New options, all off until you turn them on: accept party invites from your friends, Battle.net friends and guild (not while you are queued for a battleground), decline invites from anyone else, and let friends and guild still challenge you when duels are declined.
+- **`/tweaks report` gives you something to paste into a bug report.** It opens a small window with the text already selected: your addon and game versions, your character, the settings you changed, which features are standing down for another addon, your other addons, and any errors Tweaks caught this session. Press Ctrl+C and paste it.
+- **Hold Shift to skip repairs and junk selling at one merchant.** Holding Shift while a merchant opens skips Tweaks' repair (chat says what it would have cost) and its junk selling for that visit; the Sell All Junk button still works.
+- **Junk sales pay for the repair.** If you arrive at a merchant without enough money to repair, the repair happens as soon as what you sell there, such as your junk, brings in enough.
+- **Summons and resurrections are accepted more carefully.** A summon isn't accepted where the game won't let you teleport out, and one that arrives in a fight is accepted when it ends. A resurrection waits out the delay after dying again soon, and Shift leaves either one, or a battleground release, to you. Their popups now close only once the game has taken the answer, so one it refuses stays up.
+- **Quest automation leaves the costly ones to you.** A quest that would flag you for PvP is no longer accepted for you, and a hand-in that costs gold is no longer paid without asking. A quest the game has already accepted for you is acknowledged instead of accepted again.
+- **Polestar is respected like the other addons.** With Polestar loaded, auto repair, quest and gossip automation, summons, resurrections, battleground release, duel declines, faster auto loot, quiet errors, revealed maps, zone level ranges, and quest tooltips and nameplate icons (once its quest database has loaded) each stand down, named in the settings, while Polestar's own matching option is on, and follow that option as soon as you change it. While Polestar sells your greys, only your marked non-grey junk is sold here.
+- **Faster auto loot asks for each item once.** When the game repeats its loot-ready signal for the same window, only items it hadn't asked for yet are taken.
+- **Data checked against Forever 1.60.1.70374 and Classic Era 1.15.9.70003.** The bundled game data is unchanged.
+
+## [0.11.5] - 2026-10-15
+
+- **Data checked against Forever 1.60.1.70374.** The bundled game data is unchanged.
+
+## [0.11.4] - 2026-10-13
+
+- **Movement keys keep working in combat.** The Gear groups panel, the Spells to track list and the dungeon map's floor list pass every key except Escape to the game, in and out of combat, so leaving one open no longer stops you moving in a fight.
+
+- **Spell reach icons after a reload.** Enemy nameplates already on screen when you reload get their icons straight away, not only plates that appear afterwards.
+
+- **Instance entrances follow the setting at once.** Turning Instance entrances off or on updates an open world map straight away.
+
+- **Guild names in player tooltips.** A guild whose name holds a race, such as Night Elf Lovers, stays in brackets as the guild, and the class joins the real level line, which is now found by the player's level as well as their race.
+
+## [0.11.3] - 2026-10-13
+
+- **Data checked against Forever 1.60.1.70338.** The bundled game data is unchanged.
 
 ## [0.11.2] - 2026-10-09
 

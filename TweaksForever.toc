@@ -1,6 +1,6 @@
 ## Interface: 16001
 ## Title: Tweaks Forever
-## Notes: Small quality-of-life automations and fixes that extend the default UI, stepping aside where another addon already does the job.
+## Notes: Options to accept and turn in quests (standing down for Polestar), name rares near you, and repair and sell junk at merchants.
 ## Author: cjber
 ## Version: @project-version@
 ## Category: Quality of Life
@@ -15,17 +15,32 @@
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
 Locales\enUS.lua
+Locales\deDE.lua
+Locales\esES.lua
+Locales\esMX.lua
+Locales\frFR.lua
+Locales\koKR.lua
+Locales\ptBR.lua
+Locales\ruRU.lua
+Locales\zhCN.lua
+Locales\zhTW.lua
 Data\Overlays.lua
 Data\CampBenefits.lua
 Data\ZoneLevels.lua
 Data\DungeonEntrances.lua
 Data\ClassSpells.lua
 Data\ForeverQuests.lua
+Core\Secret.lua
+Core\SafeCall.lua
 Core\Core.lua
 UI\Art.lua
+UI\ForeverFamily.lua
+UI\Report.lua
+UI\Keys.lua
 Features\Automation.lua
 Features\WhisperInvite.lua
 Features\LootConfirm.lua
+Features\RareAlerts.lua
 Bags\Vendor.lua
 Core\Modes.lua
 Bags\Junk.lua
@@ -40,13 +55,17 @@ Quests\QuestiePins.lua
 Quests\QuestDistance.lua
 Quests\QuestGivers.lua
 Quests\QuestProgress.lua
+Quests\QuestButtons.lua
 Quests\QuestLog.lua
+Quests\BestReward.lua
 UI\Tooltips.lua
 UI\CursorTooltip.lua
 UI\Nameplates.lua
 UI\SpellReach.lua
+Map\MapCanvas.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua
+Map\Coordinates.lua
 Integrations\Navigate.lua
 Map\DungeonEntrances.lua
 Map\DungeonEntrances.xml
@@ -55,14 +74,15 @@ UI\Frames.lua
 UI\Errors.lua
 UI\CameraZoom.lua
 UI\ScreenGlow.lua
+UI\XPRate.lua
 UI\LootSparkles.lua
 UI\TrainAll.lua
 UI\MacroNames.lua
-UI\AuctionHouse.lua
 UI\Spellbook.lua
 Features\Fishing.lua
 UI\Reload.lua
 UI\WhatsNew.lua
 Integrations\Companions.lua
+Core\Report.lua
 UI\Settings.lua
 Core\API.lua

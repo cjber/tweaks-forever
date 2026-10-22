@@ -6,7 +6,8 @@ ns.Feature({
 	key = "repair",
 	category = "Vendors",
 	name = "Repair automatically",
-	tooltip = "At any merchant who repairs, with the cost shown in chat.",
+	tooltip = "At any merchant who repairs, with the cost shown in chat. If you are short, it repairs once what "
+		.. "you sell there covers the cost. Hold Shift while a merchant opens to skip it there.",
 	default = true,
 	conflicts = {
 		{
@@ -15,6 +16,7 @@ ns.Feature({
 				return LeaPlusDB and LeaPlusDB.AutoRepairGear == "On"
 			end,
 		},
+		{ polestar = "qol.autoRepair" },
 	},
 })
 
@@ -37,10 +39,16 @@ local function GuildCovers(cost)
 	return limit == -1 or limit >= cost
 end
 
-ns.On("MERCHANT_SHOW", function()
+-- Set while a merchant is open and the repair is still waiting for money: junk sold here can pay for it.
+local owed = false
+
+-- Repair everything if the guild or your money covers it. `quiet` leaves a shortfall unannounced, for retries.
+---@param quiet boolean?
+local function Repair(quiet)
 	if not (ns.Active("repair") and CanMerchantRepair()) then
 		return
 	end
+	owed = false
 	local cost, canRepair = GetRepairAllCost()
 	if not canRepair or cost == 0 then
 		return
@@ -52,6 +60,33 @@ ns.On("MERCHANT_SHOW", function()
 		RepairAllItems()
 		ns.Print(L["repaired for %s."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
 	else
-		ns.Print(L["not enough money to repair (%s)."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
+		owed = true
+		if not quiet then
+			ns.Print(L["not enough money to repair (%s)."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
+		end
 	end
+end
+
+-- Shift held as the merchant opens skips the repair for this visit, saying so when there was one to do.
+ns.On("MERCHANT_SHOW", function()
+	if not IsShiftKeyDown() then
+		Repair()
+		return
+	end
+	owed = false
+	local cost, canRepair = GetRepairAllCost()
+	if ns.Active("repair") and CanMerchantRepair() and canRepair and cost > 0 then
+		ns.Print(L["repair skipped (%s)."]:format(C_CurrencyInfo.GetCoinTextureString(cost)))
+	end
+end)
+
+-- Selling junk (ours, the game's or another addon's) starts after the repair, so try again as the money comes in.
+ns.On("PLAYER_MONEY", function()
+	if owed then
+		Repair(true)
+	end
+end)
+
+ns.On("MERCHANT_CLOSED", function()
+	owed = false
 end)

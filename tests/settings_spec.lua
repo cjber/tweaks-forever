@@ -6,6 +6,7 @@
 local registered = {}
 -- [key] = the addon a feature needs and can't find.
 local missing = {}
+local panelScripts, refreshes, gamepad = {}, 0, false
 
 local function Layout()
 	return {
@@ -36,8 +37,15 @@ local function Initializer(kind, setting)
 end
 
 local function Category(name)
-	return { name = name }, Layout()
+	return {
+		name = name,
+		GetID = function()
+			return name
+		end,
+	}, Layout()
 end
+local opened
+local canvas
 
 local env = setmetatable({
 	Settings = {
@@ -46,6 +54,11 @@ local env = setmetatable({
 			return Category(name)
 		end,
 		RegisterVerticalLayoutSubcategory = function(_, name)
+			return Category(name)
+		end,
+		-- The Forever addons page: the shared module's own frame, on a canvas subpage.
+		RegisterCanvasLayoutSubcategory = function(parent, frame, name)
+			canvas = { parent = parent, frame = frame, name = name }
 			return Category(name)
 		end,
 		RegisterAddOnSetting = function(category, variable, key, _, varType, name)
@@ -74,12 +87,24 @@ local env = setmetatable({
 			registered[#registered + 1] = { category = category, initializer = initializer }
 		end,
 		RegisterAddOnCategory = function() end,
+		OpenToCategory = function(id)
+			opened = id
+		end,
 	},
 	CreateSettingsButtonInitializer = function(name, _, _, _, addSearchTags)
 		assert(addSearchTags == false, "index buttons stay out of search")
 		return { kind = "button", name = name }
 	end,
-	SettingsPanel = { HookScript = function() end },
+	SettingsPanel = {
+		HookScript = function(_, script, fn)
+			panelScripts[script] = fn
+		end,
+	},
+	InputUtil = {
+		IsGamepadUIEnabled = function()
+			return gamepad
+		end,
+	},
 	MinimalSliderWithSteppersMixin = { Label = { Right = "Right" } },
 	RED_FONT_COLOR = {
 		WrapTextInColorCode = function(_, text)
@@ -87,6 +112,9 @@ local env = setmetatable({
 		end,
 	},
 	SlashCmdList = {},
+	strtrim = function(text)
+		return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+	end,
 }, { __index = _G })
 
 local ns
@@ -108,6 +136,9 @@ ns = {
 		fn()
 	end,
 	ConflictOf = function() end,
+	RefreshConflicts = function()
+		refreshes = refreshes + 1
+	end,
 	SettingVariable = function(key)
 		return "TweaksForever_" .. key
 	end,
@@ -116,6 +147,26 @@ ns = {
 	end,
 	Active = function(key)
 		return ns.db[key] ~= false
+	end,
+	SafeCall = function(_, fn, ...)
+		return pcall(fn, ...)
+	end,
+	ReportLines = function()
+		return { "own line" }
+	end,
+	Family = {
+		CreatePanel = function(parent, db, current, L)
+			return { kind = "family panel", parent = parent, db = db, current = current, L = L }
+		end,
+	},
+}
+local reported
+ns.Report = {
+	Text = function(lines)
+		return "report: " .. lines[1]
+	end,
+	Show = function(text)
+		reported = text
 	end,
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
@@ -131,10 +182,37 @@ end
 assert(
 	table.concat(kinds, " ")
 		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever "
-			.. "slider@Interface button@Tweaks Forever",
+			.. "slider@Interface button@Tweaks Forever button@Tweaks Forever",
 	table.concat(kinds, " ")
 )
 local repair, guildRepair = registered[1].initializer, registered[2].initializer
+-- The Forever addons page, last: the shared panel on our saved variables, with this addon's row named.
+assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Tweaks Forever")
+assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
+assert(canvas.frame.L == nil, "ns.Family is already bound to Tweaks' L (ForeverFamily.For)")
+assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
+
+-- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
+do
+	local before, family = #registered, ns.Family
+	local addOnCategories = 0
+	env.Settings.RegisterAddOnCategory = function()
+		addOnCategories = addOnCategories + 1
+	end
+	ns.Family = {
+		CreatePanel = function()
+			error("broken copy")
+		end,
+	}
+	env.SLASH_TWEAKSFOREVER1 = nil
+	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
+	assert(addOnCategories == 1, "the category still registers")
+	assert(env.SLASH_TWEAKSFOREVER1 == "/tweaks", "and /tweaks still works")
+	for index = before + 1, #registered do
+		assert(registered[index].initializer.name ~= "Forever addons", "no index button for a page that failed")
+	end
+	ns.Family = family
+end
 assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
 assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")
 local function Modifiable(initializer)
@@ -162,4 +240,27 @@ assert(
 	"a slider is a number setting"
 )
 assert(size.options.min == 50 and size.options.max == 200 and size.options.step == 5, "the slider takes its bounds")
+
+-- /tweaks opens the settings; /tweaks report shows the report instead.
+env.SlashCmdList.TWEAKSFOREVER("")
+assert(opened == "Tweaks Forever" and reported == nil, "/tweaks opens the settings")
+opened = nil
+env.SlashCmdList.TWEAKSFOREVER("  Report ")
+assert(reported == "report: own line" and opened == nil, "/tweaks report shows the report")
+env.SlashCmdList.TWEAKSFOREVER("anything")
+assert(opened == "Tweaks Forever", "anything else opens the settings")
+ns.ReportLines = function()
+	error("lines broke", 0)
+end
+env.SlashCmdList.TWEAKSFOREVER("report")
+assert(reported == "report: Report lines failed: lines broke", "failing lines still open the report, saying so")
+-- #168: opening the settings re-reads conflicts, except with the gamepad UI on.
+assert(panelScripts.OnShow, "the settings panel's OnShow is hooked")
+panelScripts.OnShow()
+assert(refreshes == 1, "opening the settings re-reads conflicts")
+gamepad = true
+panelScripts.OnShow()
+assert(refreshes == 1, "with the gamepad UI on, opening the settings skips the conflict check")
+gamepad = false
+
 print("settings: ok")

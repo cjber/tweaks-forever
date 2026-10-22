@@ -6,19 +6,22 @@ The README keeps one line per feature; this is the detail. Every feature can be 
 
 All off until you turn them on, except faster auto loot.
 
-- Accept and turn in quests. Hold Shift to talk normally. A quest with a choice of rewards is left to you.
+- Accept and turn in quests. Hold Shift to talk normally. A quest with a choice of rewards, one that flags you for PvP and a hand-in that costs gold are left to you.
 - Skip gossip when an NPC offers only one thing (vendor, trainer), and go straight to the flight map at a flight master, whatever else they offer, unless they have a quest for you. Hold Shift to see it.
-- Accept summons, but not in combat.
-- Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time.
-- Release your spirit in battlegrounds unless you can resurrect yourself.
-- Decline duels.
+- Accept summons, once out of combat and not where you can't teleport from. Hold Shift to answer yourself.
+- Accept resurrections from your group, but not from someone in combat, so a battle resurrection is still yours to time. It waits out the game's delay after dying again soon, and Shift leaves it to you.
+- Their popups close only once the game has taken your answer.
+- Release your spirit in battlegrounds unless you can resurrect yourself or hold Shift.
+- Decline duels, optionally except from friends, Battle.net friends and guild.
+- Accept party invites from friends, Battle.net friends and guild, not while queued for a battleground; decline invites from anyone else.
 - Invite from whispers (off by default). Someone who whispers you the keyword you pick, as their whole message, is invited to your group, as long as you can invite: you are ungrouped, the group leader or a raid assistant. The keyword is **inv**, **invite** or **group**. Nothing is sent until such a whisper arrives.
 - Skip loot confirmations (off by default). The game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on Pickup item, is confirmed for you. Only the warnings your own clicks raise; nothing rolls or loots by itself.
 - Faster auto loot: everything at once instead of waiting for the loot window.
 
 ## Vendors
 
-- Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat.
+- Hold Shift while a merchant opens to skip the automatic repair and junk selling for that visit. Chat says what the repair would have cost.
+- Repair automatically at any merchant who repairs, from guild funds when the guild allows it. The cost is shown in chat. If you are short, it repairs once what you sell to that merchant, such as your junk, covers the cost.
 - Sell grey junk automatically through the game when its bulk sale is available, plus up to 12 manually marked non-grey stacks per visit.
 - Grey items show the game's junk coin in your bags all the time, not only at a merchant.
 - Mark any bag item as junk with **Alt+Right-click** (off by default). Marked items get the game's junk coin and a tooltip line, and they are sold with your greys, by the merchant's Sell All Junk button too. Marks are account-wide.
@@ -33,28 +36,31 @@ All off until you turn them on, except faster auto loot.
 
 ## Maps
 
-- Reveal unexplored areas on zone maps, tinted blue so explored ground still stands out (off by default).
+- Reveal unexplored areas on zone maps, in the world map and the small zone map (Shift+M), tinted blue so explored ground still stands out (off by default).
 - Point at a zone on the world map to see its level range after the name, coloured like quest levels: grey and green below you, yellow at your level, orange and red above. Forever's map data has no ranges of its own, so the original zones show the original game's, and Zephras Isle and Riverglades show the span of their subzones' exploration levels. Cities, battlegrounds, and Forever zones whose subzones carry no level show none.
-- Mark every dungeon and raid entrance on zone and continent maps with retail's icons; point at one for its name, and left-click it to travel there: Shortest Path Forever plans the journey when it is installed, and otherwise the map's own waypoint marks the entrance. Without Shortest Path Forever, a grey line in the tooltip says where to get it (or to switch it on, when it is installed but off). Instances sharing a way in, such as Blackrock Mountain, share one pin that lists them. The map's own **Show instance entrances** filter turns them off, and an entrance steps aside where a flight master or Shortest Path Forever portal or dock already marks the spot; Legacy Forever draws the same portal with its shield on the corner where a Legacy step is left there. Forever's new instances (Dalaran, the Ruins of Lordaeron, the Hall of Thanes and the Wetlands excavation) have no entrance in the game's data yet, so they have no pin.
+- Your position and the cursor's, as map coordinates, along the bottom of the world map.
+- Mark every dungeon and raid entrance on zone and continent maps with retail's icons; point at one for its name, and left-click it to travel there: Shortest Path Forever plans the journey when it is installed, and otherwise the map's own waypoint marks the entrance. Without Shortest Path Forever installed, a grey line in the tooltip says "With Shortest Path Forever, click to plan the way there." (turned off with *Suggest my other Forever addons*); when it is installed but switched off, the line says to enable it, since the click then only sets a waypoint. Instances sharing a way in, such as Blackrock Mountain, share one pin that lists them. The map's own **Show instance entrances** filter turns them off, and an entrance steps aside where a flight master or Shortest Path Forever portal or dock already marks the spot; Legacy Forever draws the same portal with its shield on the corner where a Legacy step is left there. Forever's new instances (Dalaran, the Ruins of Lordaeron, the Hall of Thanes and the Wetlands excavation) have no entrance in the game's data yet, so they have no pin.
 
 - Inside a five-player dungeon, opening the world map on the zone you are in shows the dungeon's own floor map and its legend over the map, with a button that opens a list of the floors and wings and a **Back to map** button that steps aside to the stock map; a **Dungeon map** button on the map's corner brings it back. Your floor choice is kept for the session. It needs [Atlas](https://www.curseforge.com/wow/addons/atlas) and its Atlas [Classic WoW] maps, which Tweaks Forever reads from your install and never copies; without them the setting is greyed out and says what to install. It adds no pins to the outdoor map and is on by default.
 
 ## Interface
 
-- Move and scale Blizzard windows in **Edit Mode**. The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
+- Move and scale Blizzard windows in **Edit Mode** (not while the gamepad UI is on). The Edit Mode panel gets a **Windows** tab next to **HUD**. Tick a window there to preview it where the game opens it, then drag, snap and scale it like the rest of the UI. Covers the character sheet, spellbook, map, quest windows, merchant, bank, mailbox, trainer, auction house, professions and more. Each Edit Mode layout keeps its own arrangement, and Reset puts a window back where Blizzard had it.
 - Quiet the errors a spammed macro repeats: no red text or spoken "not ready yet", out of range, not enough mana, rage or energy, no target or wrong facing. Full bags and other errors still show.
+- Rare alerts (off by default). A chat line and a map marker chime from the game's own sounds when a rare creature's nameplate, or its marker on the map where the game shows one, appears near you. Never in combat, once per rare for ten minutes, and never for a creature whose name the game keeps hidden.
+- XP per hour on the experience bar's tooltip: your rate over the last 15 minutes (after the first five), the time to level at that pace, and about how many kills or quests that is, from the XP your recent kills and hand-ins gave.
+- Two keys to bind under Key Bindings > AddOns > Tweaks Forever: **Use the nearest quest item** uses the quest item of your nearest quest, and **Target a creature for the nearest quest** targets a creature it still needs (from QuestieDB), a different one each press. They are set just before each press; in combat they keep what they last had.
 - Maximum camera zoom (off by default). The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch it off.
 - Show quest item sparkles (off by default). Uses the same five graphics settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) for the game's own sparkles on lootable quest objects. Normal and raid outlines stay off while enabled, even after changing graphics presets. Your previous settings are saved across reloads and restored when switched off. Removing sparkles needs a full game restart, because the client retains the effect through `/reload`.
 - No screen glow (off by default). Turns off the full screen glow effect, putting your earlier value back when you switch it off.
 - Train all button (off by default). A Train all button sits beside the class trainer's Train button. One click buys every spell the trainer is offering that your gold covers; it is disabled, and its tooltip says why, when nothing is available or you cannot pay for it all. It buys nothing on its own, and profession trainers are left alone.
 - `/rl` reloads the interface.
 - What's new after an update. The first time you log in after Tweaks Forever updates, one line in chat says what changed. On by default.
-- Suggest companion addons. Where another Forever addon would help, such as Shortest Path Forever on a dungeon entrance, a grey line in the tooltip says so, and goes once it is loaded. On by default.
+- Forever addons. A page of its own under Tweaks Forever's settings lists my five Forever addons, each with its icon, one line on what it does, whether it is on, installed but turned off, or not installed, and a **Copy link** button for its CurseForge page. It carries *Suggest my other Forever addons* (on by default): where one you don't have would help, such as Shortest Path Forever on a dungeon entrance, a grey line in the tooltip says so. Nothing shows for an addon you have, even switched off.
 - Hide macro names (off by default). Macros on your action bars show just their icon, without the name across the bottom.
-- Sort gear by item level on the auction house's Browse tab. Weapons and armour get an iLvl column between Name and Available, sorted by clicking its header like the game's own columns, and the item level no longer repeats after the name. On by default.
 - With **Combine Bags** on, the reagent bag's slots sit at the bottom of the combined bag, tinted green under a thin rule, instead of in a small window beside it, and the backpack key opens and closes both. Clicking the reagent bag on the bag bar still opens it in its own window.
 - Quests on minimap givers. Needs [QuestieDB](https://github.com/Questie/QuestieDB): the QuestieDB addon on its own is enough, Questie itself isn't needed. Pointing at a quest giver on the minimap lists the quests they have for you, such as "[15] Dry Times", coloured by level, and the next few levels' in grey with the level they open at. A giver you owe a quest to lists it with a gold ? once it is ready to hand in.
-- Quest progress on tooltips. Needs [QuestieDB](https://github.com/Questie/QuestieDB), on its own or with Questie. Pointing at a creature you need for a quest in your log, to kill or for an item it drops, adds the quest's title and your progress under its tooltip, as the retail game does: " - Mangy Wolf slain: 3/10", in white until that objective is done and grey after. QuestieDB says which creatures count, by their IDs; your progress is the quest log's own. On by default, and greyed out without QuestieDB.
+- Quest progress on tooltips. Needs [QuestieDB](https://github.com/Questie/QuestieDB), on its own or with Questie. Pointing at a creature you need for a quest in your log, to kill or for an item it drops, adds the quest's title and your progress under its tooltip, as the retail game does: " - Mangy Wolf slain: 3/10", in white until that objective is done and grey after. A quest item you need, and an object you use or loot for one, shows its quest and progress the same way, and an item that starts a quest you haven't done says "Starts a quest:" and names it. QuestieDB says which creatures, items and objects count, by their IDs; your progress is the quest log's own. On by default, and greyed out without QuestieDB.
 - Quest icons on nameplates. A small gold quest icon sits to the right of the nameplate of each creature you still need, and goes once you have enough or the quest is complete. The same creatures count as for the tooltips, so it needs QuestieDB too. On by default, and greyed out without QuestieDB.
 - Nearest quests first. The quest tracker sorts itself by distance as you move and shows how far away each quest is; the one whose area you're standing in reads "here" with a soft gold highlight.
 - Explain campsite benefits. Hovering a camp feature (a Camp Tent, Mana Well, Anvil and the rest) shows what sitting nearby gives you, such as "Stamina increased for 1 Hr", and whether you have it now, with the time left. A benefit you have carries your buff's own numbers ("Stamina increased by 8"); the game sets them when you gain it, so one you don't have shows none. Hovering a campfire lists every benefit a camp can give: the ones you have in green with their time left, the rest in grey. Your Campfire Nearby buff adds the benefits you have and which way the campfire is, once you have lit it or sat by it; your Camp Benefits buff adds the ones you haven't gained yet.
@@ -82,9 +88,11 @@ All off until you turn them on, except faster auto loot.
 
 ## Quest log
 
-**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
+**Show quest levels** uses the game's own level display for map quest tooltips and the tracker. **In quest dialogs too** adds the level in front of each quest in the quest greeting list (an NPC or board offering only quests) and in front of the title on the quest's detail and reward pages, where the game knows it. The gossip window's quest list is left as it is. Giver tooltips use QuestieDB for quest levels and difficulty colours; future quests show their required level. Unknown quests never receive a guessed level.
 
 **Highlight new Forever quests** marks quests added since Classic Era with a soft gold background in the log and quest text.
+
+**Mark the best-selling quest reward** puts a gold coin on the reward choice that sells to a merchant for the most, counting stacks. A tie, or nothing worth selling, marks none, and it never picks for you.
 
 **Abandon multiple quests** adds an Abandon quests button to the quest log. Select individual quests or Select all, then click Abandon selected and Confirm abandon. Progress and associated quest items are lost. Hidden and non-abandonable quests are excluded; combat prevents abandoning.
 
@@ -92,15 +100,15 @@ All off until you turn them on, except faster auto loot.
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, Questie and Legacy Forever, it steps aside only while that addon's matching option is on.
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever and Polestar, it steps aside only while that addon's matching option is on.
 
 | Feature | Addons |
 |---|---|
-| Quests | Leatrix Plus, Questie, AutoTurnIn |
+| Quests | Leatrix Plus, Questie, AutoTurnIn, Polestar |
 | Nearest quests first | Questie, while its tracker is on |
-| Quest progress on tooltips | Questie, while its tooltips are on |
-| Quest icons on nameplates | Questie, while its nameplate icons are on |
-| Other automations, repairs, quiet errors | Leatrix Plus |
+| Quest progress on tooltips | Questie, while its tooltips are on; Polestar, once its quest database has loaded |
+| Quest icons on nameplates | Questie, while its nameplate icons are on; Polestar, once its quest database has loaded |
+| Other automations, repairs, quiet errors | Leatrix Plus, Polestar |
 | Invite from whispers | Leatrix Plus |
 | Skip loot confirmations | Leatrix Plus |
 | Maximum camera zoom | Leatrix Plus |
@@ -108,15 +116,19 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Quest item sparkles | Forever Loot Sparkles |
 | Train all button | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
-| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus |
+| Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus, Polestar |
 | Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
-| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster |
-| Zone level ranges | Leatrix Maps |
-| Dungeon entrances | Leatrix Maps, while its points of interest are on |
+| Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar; OpenMap unless its unexplored areas are hidden |
+| Zone level ranges | Leatrix Maps, Polestar, OpenMap |
+| Rare alerts | RareScanner, Nova Rares, Polestar while its rare alerts are on |
+| XP per hour | XToLevel, Polestar while its XP tracker is on |
+| Coordinates on the world map | Leatrix Maps, Mapster, Polestar and OpenMap while their coordinates are on; Coordinates |
+| Dungeon entrances | Leatrix Maps, while its points of interest are on; OpenMap, while its dungeon icons are on |
 | Move windows | BlizzMove, MoveAnything |
 | Hide macro names | Dominos, Bartender4, ElvUI |
 | Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
-| Item level in the auction house | TradeSkillMaster, Auctioneer |
+| Best-selling quest reward | Polestar, while its reward highlight is on |
+| Quest levels in quest dialogs | Polestar, while its quest levels are on |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |

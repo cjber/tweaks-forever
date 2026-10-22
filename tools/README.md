@@ -32,9 +32,10 @@ with no tiles are counted and skipped.
 game's own words and numbers. The Camp Benefits aura's description (`Spell`) is a
 template with one `$?a<aura>[Feature: effect][]` branch per feature aura; the
 script takes each branch and fills in `$w` (effect base points, `SpellEffect`), `$t`
-(effect period) and `$d` (`SpellMisc` duration index into `SpellDuration`). The tent's
-branch only says rest was received, so its entry uses the Camp Tent aura's own
-description instead. Each entry also lists the base points it put in for `$w`, in effect
+(effect period) and `$d` (`SpellMisc` duration index into `SpellDuration`). Since
+1.60.1.70425 the template has no tent branch, so the tent's entry comes first from the
+Camp Tent spell's own description, and the script requires exactly the nine other
+branches and that its rest lockout aura is still the Camp Tent's. Each entry also lists the base points it put in for `$w`, in effect
 order, so the addon can put in the values the aura you get actually carries. It refuses to write a number that depends on level, stats or
 content tuning, and fails on any token it can't resolve. Same cache and flags as
 `gen_overlays.py`.
@@ -141,7 +142,9 @@ assignment, operator or non-final argument already consumes one value.
 `python3 -m tools.lint_taint` checks the same files for code that taints Blizzard's UI on Forever:
 `hooksecurefunc` on an object rather than a function name or a table the file built itself, a field
 written or method defined on a global the addon does not own, and calls to Blizzard's bag, panel and
-nameplate layout, its lazy bag caches, `SetModuleContainer`, `SetParentInitializer` and `AddMaskableTexture`. AGENTS.md lists what to
+nameplate layout, its lazy bag caches, `SetModuleContainer`, `SetParentInitializer` and `AddMaskableTexture`. Tweaks adds its own rule on
+top: a `Set*` method called on an entry of one of Blizzard's data tables (`AuctionCategories`), reached through
+the global, a local bound from it or a loop over it, and `SetDetailColumnString` on any receiver (#169). AGENTS.md lists what to
 use instead. A deliberate exception takes a trailing `-- taint-ok: reason` on the flagged line.
 
 `python3 tools/lint_art.py` checks the same files and the shipped XML for art that could be stretched: a raw

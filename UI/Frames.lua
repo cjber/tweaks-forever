@@ -7,7 +7,8 @@ ns.Feature({
 	category = "Interface",
 	name = "Move and scale windows",
 	tooltip = "Use the Windows tab in Edit Mode to preview, move and scale game windows and Adventure Guide. "
-		.. "Changes save immediately for the current layout. Reset returns a window to its default placement.",
+		.. "Changes save immediately for the current layout. Reset returns a window to its default placement. "
+		.. "Off while the gamepad UI is on.",
 	default = true,
 	conflicts = { { addon = "BlizzMove" }, { addon = "MoveAnything" } },
 })
@@ -209,8 +210,12 @@ local queue = Model.NewQueue(function()
 	return InCombatLockdown()
 end)
 
+-- With the gamepad UI on, Blizzard's gamepad navigation tracks these windows as they open and close, pushing and
+-- popping its input bindings, so the feature stands down: no hook does anything, the Windows tab stays shut and a
+-- moved window goes back where the game puts it (#168: a blocked gamepad interact call reported after backing
+-- out of the settings).
 local function Active()
-	return ns.Active("moveWindows")
+	return ns.Active("moveWindows") and not InputUtil.IsGamepadUIEnabled()
 end
 
 ---@param record TFWindowRecord
@@ -854,6 +859,12 @@ ns.Init(function()
 	-- These are checks only until enabled and conflict-free; no Blizzard frames are hooked while off.
 	hooksecurefunc(ns, "RefreshConflicts", CheckState)
 	ns.OnSettingChanged("moveWindows", CheckState)
+	-- Turning the gamepad UI on or off.
+	ns.On("CVAR_UPDATE", function(cvar)
+		if type(cvar) == "string" and cvar:lower():find("gamepad", 1, true) then
+			CheckState()
+		end
+	end)
 	ns.On("ADDON_LOADED", function()
 		ns.RefreshConflicts()
 		if Active() then

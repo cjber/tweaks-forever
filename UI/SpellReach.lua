@@ -698,13 +698,7 @@ local function BuildPicker()
 	content:SetWidth(PICKER_WIDTH - 76)
 	scroll:SetScrollChild(content)
 	panel.Content, panel.Rows = content, {}
-	panel:SetScript("OnKeyDown", function(self, key)
-		self:SetPropagateKeyboardInput(key ~= "ESCAPE")
-		if key == "ESCAPE" then
-			self:Hide()
-		end
-	end)
-	panel:EnableKeyboard(true)
+	ns.EscapeCloses(panel)
 	picker = panel
 	return panel
 end
@@ -735,6 +729,13 @@ ns.Init(function()
 			LoadItem()
 		end
 		Sync()
+	end
+	-- Plates already up before login, as after a reload, raise no NAME_PLATE_UNIT_ADDED.
+	for _, plate in ipairs(C_NamePlate.GetNamePlates()) do
+		local unit = plate.UnitFrame and plate.UnitFrame.unit
+		if unit then
+			plates[unit] = plate
+		end
 	end
 	Rescan()
 	ns.OnSettingChanged(KEY, Rescan)

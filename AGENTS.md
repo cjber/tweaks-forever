@@ -6,6 +6,7 @@ options in the game's own settings. Players install the zip the BigWigs packager
 ## Commands
 
 ```sh
+python3 tools/doctor.py   # first on a new machine: every tool pin below, with a fix for each problem
 stylua --check .
 luacheck .
 tools/typecheck.sh
@@ -14,8 +15,14 @@ ruff check tools && ruff format --check tools
 uvx ty@0.0.83 check tools --extra-search-path . --extra-search-path tools
 python3 tools/check_generated.py --offline # omit --offline to fetch missing pinned inputs
 python3 tools/changelog.py --check
+python3 tools/check_screenshots.py   # an image older than its sources; --record after tools/screenshots.py
 python3 .sift/gate.py --base origin/main && python3 .sift/agents.py check
 ```
+
+CI's `package` job builds the zip with the release's packager without uploading (`-d -z`) and runs
+`python3 tools/check_package.py` on its output: every loaded file ships, no development folder does, a licence file and
+THIRD_PARTY.md ship with README's `## Credits` and THIRD_PARTY's `## Ideas and contributors` (WFA-10, WFA-31), and the
+specs pass on the packaged files.
 
 The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and history.
 Every version needs a `CHANGELOG.md` entry (prose, bold-lead bullets) before its `v*` tag: the release
@@ -54,15 +61,21 @@ publishes that entry as its notes.
 - Never touch Blizzard's Lua state. Forever runs its UI through secure delegates, so an addon hook, write or
   first call there makes Blizzard's own code fail or be blocked, blamed on this addon. React through
   `HookScript`, events, `EventRegistry` or an object's own `RegisterCallback`, `TooltipDataProcessor`
-  (`ns.OnTooltip`), a map data provider of our own, or `hooksecurefunc("GlobalFunction", …)`; draw on our own
-  textures and frames; lay Blizzard frames out with engine calls (points, sizes, alpha) after Blizzard has.
-  Never `hooksecurefunc(object, …)`, a replaced method, a field written on a Blizzard table, or a call into
-  Blizzard's layout or lazy caches. `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a
-  deliberate exception carries a trailing `-- taint-ok: reason`.
+  (`ns.OnTooltip`), or `hooksecurefunc("GlobalFunction", …)`; draw on our own textures and frames; lay Blizzard
+  frames out with engine calls (points, sizes, alpha) after Blizzard has. Never `hooksecurefunc(object, …)`, a
+  replaced method, a field written on a Blizzard table, or a call into Blizzard's layout or lazy caches.
+  `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a deliberate exception carries a trailing
+  `-- taint-ok: reason`.
+- On a map, draw only through `Map/MapCanvas.lua`: frames of our own on the canvas, made with no parent and then
+  set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`, `AddOverlayFrame` or a
+  `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure code (#168).
+  `tests/map_canvas_spec.lua` runs the files that draw on a map against maps that fail on any write.
 - Player-visible text goes through `L["whole sentence"]` (a whole format string, never joined fragments), or a
   Blizzard GlobalString that says exactly the same; `ns.Feature`/`ns.ClickMode` text stays plain English.
 - Commits are signed (`git commit -S`) with the personal email.
 - Release: load `.agents/skills/release/SKILL.md` when preparing or publishing a release.
+  A cloud session cannot push tags: once the version's PR is merged and `.github/workflows/ci.yml` passed on main, start the Release
+  workflow on main with `version` (and `commit` for an older main commit); it tags that commit and publishes.
 - Quality: load `.agents/skills/sift-project/SKILL.md` before cleanup, dead-code or refactoring
   work.
 - A feature another loaded addon already provides is greyed out with that addon named, never run
@@ -106,13 +119,13 @@ Owner-approved exceptions to `wow-forever-addon`:
 
 ## Standards
 
-- `wow-forever-addon` — https://github.com/cjber/skills/tree/19082fc10bf90cbb466b8129bddc4a7f32334756/wow-forever-addon (UI look,
+- `wow-forever-addon` — https://github.com/cjber/skills/tree/c5071b8fcbca48aaa220027e68ff1110d7f1ca2f/wow-forever-addon (UI look,
   icon, README and store page, CI and release requirements shared by every WoW: Forever addon)
 
 
 ## Secure UI regression checks
 
-`tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage and `tools/lint_taint.py`.
+`tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage, `tools/lint_taint.py`, `tools/lint_secret.py` (secret values through `ns.Readable`, tooltip hooks behind `ns.Usable`), `tools/check_editorconfig.py` and `tools/check_family.py` (the shared family block between the `forever-family` markers in README.md and docs/curseforge.md).
 `tools/forever_tools/` is the shared tooling (cjber/skills, `wow-forever-addon/tooling`), vendored byte for byte: never edit it here.
 `python3 tools/forever_tools/sync.py check` verifies it offline; `sync.py update --source <checkout>` is the only way to refresh it.
 Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame

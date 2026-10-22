@@ -14,6 +14,7 @@
 ---@class TFCamp
 ---@field Listing fun(remaining: fun(aura: integer): number?, number[]?): TFCampRow[]
 ---@field Toward fun(north: number, west: number, facing: number): string
+---@field Name fun(benefit: TFCampBenefit): string
 ---@field Effect fun(benefit: TFCampBenefit, points: number[]?): string
 ---@field Announcement fun(benefit: TFCampBenefit, points: number[]?): string
 
@@ -135,6 +136,8 @@
 ---@class TFQuestTarget
 ---@field kind string
 ---@field npcs table<integer, true>
+---@field items table<integer, true> quest items it asks you to collect
+---@field objects table<integer, true> objects it asks you to use
 
 -- Which objectives of one quest a creature counts for by QuestieDB's IDs: [position in the log] = the kind there.
 ---@alias TFQuestLink table<integer, string>
@@ -156,8 +159,10 @@
 ---@field NpcId fun(guid: any): integer?
 ---@field Targets fun(id: integer): TFQuestTarget[]
 ---@field Rebuild fun()
----@field Matches fun(npc: integer?): TFQuestMatch[]
----@field Lines fun(npc: integer?): [string, number, number, number][]
+---@field Matches fun(id: integer?, kind?: "npc"|"item"|"object"): TFQuestMatch[]
+---@field Lines fun(id: integer?, kind?: "npc"|"item"|"object"): [string, number, number, number][]
+---@field Starts fun(item: integer?): string?
+---@field ObjectId fun(guid: any): integer?
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
@@ -214,7 +219,8 @@
 ---@field Icons fun(ids: integer[], known: TFSpellKnown, reaches: TFSpellReaches): TFReachIcon[]
 ---@field Size fun(barHeight: number, percent: number?): integer
 
----@class TFDatabase
+---@class TFDatabase : ForeverFamilyDB
+---@field companionHints? boolean the old hint setting, read once to carry a player's "off" over to suggestFamily
 ---@field junk TFMarks
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
 ---@field savedSounds? table<string, string>
@@ -237,10 +243,14 @@ TweaksForeverDB = nil
 ---@type TFCharacterDatabase
 TweaksForeverCharDB = nil
 
+-- `addon` may be left out of a `polestar` conflict: ns.Feature fills in "Polestar". An `openmap` conflict is
+-- one of OpenMap's world map options; ns.Feature fills in its addon and title.
 ---@class TFConflict
----@field addon string
+---@field addon? string
 ---@field title? string
 ---@field when? fun(): boolean?
+---@field polestar? string
+---@field openmap? string
 
 ---@class TFFeature
 ---@field key string
@@ -279,13 +289,14 @@ TweaksForeverCharDB = nil
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
 ---@field SpellReach TFSpellReach
----@field AuctionHouse TFAuctionHouse
+---@field Tooltips TFTooltips
 ---@field WhisperInvite TFWhisperInvite
 ---@field Exploration TFExploration
 ---@field CombinedBag TFCombinedBag
 ---@field Sections TFSections
 ---@field Reagents TFReagents
 ---@field CampBenefits TFCampBenefit[]
+---@field CampBenefitEffects table<string, table<integer, string>>
 ---@field Camp TFCamp
 ---@field FutureSpells TFFutureSpells
 ---@field ClassSpells table<string, TFClassSpells> by class token
@@ -300,6 +311,7 @@ TweaksForeverCharDB = nil
 ---@field InstanceEntrances table<integer, TFDungeonEntrance> by instance Map.ID, before pin clustering
 ---@field RaidInstances table<integer, boolean>
 ---@field Entrances TFEntrances
+---@field MapCanvas TFMapCanvasModule the views of our own on the maps (Map/MapCanvas.lua)
 ---@field DungeonMaps TFDungeonMaps
 ---@field Art TFArt
 ---@field QuestGivers TFQuestGivers
@@ -307,14 +319,29 @@ TweaksForeverCharDB = nil
 ---@field QuestieDB fun(): TFQuestieDB?
 ---@field QuestieSource TFQuestieSource
 ---@field Print fun(message: string)
+---@field FitButton fun(button: Button, width: number)
+---@field EscapeCloses fun(frame: Frame)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(): string
----@field Suggestion fun(addon: string, install: string, enable: string): string?
+---@field EntranceHint fun(): string? the grey line about Shortest Path Forever on a dungeon entrance (Integrations/Companions.lua)
+---@field Family ForeverFamilyAPI the shared Forever addons module (UI/ForeverFamily.lua)
 ---@field WHATS_NEW string
 ---@field WHATS_NEW_VERSION string
 ---@field WhatsNew TFWhatsNew
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
+---@field XPRate TFXPRate
+---@field QuestButtons TFQuestButtons
+---@field Coordinates TFCoordinates
+---@field BestReward TFBestReward
+---@field SafeCall fun(label: string, fn: function, ...: any): boolean, ... run fn as pcall does, keeping a failure for the report and passing it to the error handler (Core/SafeCall.lua)
+---@field RecordError fun(label: string, message: any, stack?: string) keep an error caught some other way for the report
+---@field CaughtErrors fun(): TFCaughtError[] this session's caught errors, oldest first, as copies
+---@field CutText fun(text: string, limit: integer): string `text` cut to `limit` bytes on a character boundary, ending "..."
+---@field Report TFReportModule the report window (UI/Report.lua)
+---@field ReportLines fun(): string[] Tweaks Forever's own lines in the report (Core/Report.lua)
+---@field PolestarOn fun(path: string): boolean
+---@field OpenMapOn fun(option: string): boolean
 ---@field ConflictOf fun(key: string): string?
 ---@field MissingOf fun(key: string): string?
 ---@field Active fun(key: string): boolean
@@ -324,6 +351,8 @@ TweaksForeverCharDB = nil
 ---@field Init fun(fn: fun())
 ---@field BagSize fun(container: ContainerFrameTemplate|ContainerFrameCombinedBags): integer
 ---@field BagItems fun(container: ContainerFrameTemplate|ContainerFrameCombinedBags): (fun(): integer?, ContainerFrameItemButtonTemplate?)
+---@field Readable fun(value: any): any
+---@field Usable fun(frame?: Frame): boolean
 ---@field OnTooltip fun(dataType: Enum.TooltipDataType, getters: table<string, true>, fn: fun(tooltip: GameTooltip, getter: string, ...: any))
 ---@field ContainerFrames fun(): (fun(): ContainerFrameTemplate|ContainerFrameCombinedBags?)
 ---@field ForEachBagButton fun(fn: fun(button: ContainerFrameItemButtonTemplate))

@@ -37,6 +37,47 @@ local ATLASES = {
 	[17] = "questobjective",
 }
 
+-- The setting each kind of pin takes its size from in Questie's options (Questie.ICON_TYPE_*): objectives by what they
+-- ask, and quests to pick up or hand in by one. A kind not listed follows the map or minimap slider alone.
+local KIND_SCALES = {
+	[1] = "monsterScale",
+	[2] = "lootScale",
+	[3] = "eventScale",
+	[4] = "objectScale",
+	[6] = "availableScale",
+	[7] = "availableScale",
+	[8] = "availableScale",
+	[10] = "availableScale",
+	[11] = "availableScale",
+	[12] = "availableScale",
+	[13] = "availableScale",
+	[14] = "availableScale",
+	[15] = "availableScale",
+	[16] = "availableScale",
+}
+
+-- How far the player has moved Questie's own sliders from their defaults: Map Icons or Minimap Icons, and the one
+-- for the pin's kind. The symbols keep their readable size at Questie's defaults and follow the sliders from there;
+-- the map's zoom stays out, so zooming out never shrinks them. A setting it cannot read counts as unmoved.
+---@param frame TFQuestiePin
+---@return number
+local function QuestieSliders(frame)
+	local db = Questie and Questie.db
+	local profile = db and db.profile
+	---@diagnostic disable-next-line: undefined-field
+	local defaults = db and db.defaults and db.defaults.profile
+	if type(profile) ~= "table" or type(defaults) ~= "table" then
+		return 1
+	end
+	---@param key string?
+	local function Ratio(key)
+		local value, default = key and tonumber(profile[key]), key and tonumber(defaults[key])
+		return value and default and default > 0 and value / default or 1
+	end
+	local kind = frame.data and KIND_SCALES[frame.data.Icon]
+	return Ratio(frame.miniMapIcon and "globalMiniMapScale" or "globalScale") * Ratio(kind)
+end
+
 ns.Init(function()
 	if not QuestieLoader then
 		return
@@ -63,7 +104,7 @@ ns.Init(function()
 			end
 			return
 		end
-		local span = frame.miniMapIcon and 20 or 24
+		local span = (frame.miniMapIcon and 20 or 24) * QuestieSliders(frame)
 		local scale = span / math.max(info.width, info.height)
 		frame:SetSize(info.width * scale, info.height * scale)
 		frame.texture:SetAtlas(atlas) -- art-ok: the pin, which the texture fills, takes the atlas's aspect above

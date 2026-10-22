@@ -31,9 +31,11 @@ ns.Feature({
 		BATCH_SIZE
 	)
 		.. " "
-		.. L["With Leatrix Plus auto-selling, only marked non-grey items are sold here."],
+		.. L["With Leatrix Plus or Polestar selling junk, only marked non-grey items are sold here."]
+		.. " "
+		.. L["Hold Shift while a merchant opens to skip automatic selling there."],
 	default = true,
-	-- Leatrix owns only greys; disabling this feature entirely would strand our marks.
+	-- Leatrix and Polestar sell only greys; disabling this feature entirely would strand our marks.
 	conflicts = conflicts,
 })
 
@@ -96,8 +98,12 @@ local function Marks()
 	return ns.Active("markJunk") and ns.db.junk or emptyMarks
 end
 
-local function LeatrixSellsGreys()
-	return C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On"
+-- Another addon selling the greys at each merchant, so the game's Sell All Junk would race it.
+local function OtherSellsGreys()
+	if C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On" then
+		return true
+	end
+	return ns.PolestarOn("qol.sellJunk")
 end
 
 local icons = {}
@@ -335,7 +341,11 @@ Start = function(manual)
 	if manual and batch then
 		batch.manualPending = true
 	end
-	if not merchant or batch or (not manual and (merchant.remaining == 0 or not ns.Active("sellJunk"))) then
+	if
+		not merchant
+		or batch
+		or (not manual and (merchant.skipped or merchant.remaining == 0 or not ns.Active("sellJunk")))
+	then
 		return
 	end
 	local run = { merchant = merchant, manual = manual, index = 1, sold = 0, money = 0 }
@@ -346,7 +356,7 @@ Start = function(manual)
 	if
 		not manual
 		and not merchant.native
-		and not LeatrixSellsGreys()
+		and not OtherSellsGreys()
 		and C_MerchantFrame.IsSellAllJunkEnabled()
 		and count > 0
 	then
@@ -413,7 +423,8 @@ ns.Init(function()
 		index = index + 1
 	end
 	ns.On("MERCHANT_SHOW", function()
-		merchant = { remaining = BATCH_SIZE }
+		-- Shift held as the merchant opens skips automatic selling for this visit; Sell All Junk still works.
+		merchant = { remaining = BATCH_SIZE, skipped = IsShiftKeyDown() }
 		local visit = merchant
 		C_Timer.After(0.2, function()
 			if merchant == visit then

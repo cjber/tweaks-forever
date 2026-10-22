@@ -1,5 +1,5 @@
 ---@type string, TFNamespace
-local _, ns = ...
+local addonName, ns = ...
 local L = ns.L
 
 -- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
@@ -111,16 +111,52 @@ ns.Init(function()
 			end, nil, false)
 		)
 	end
+	-- The Forever addons page is shared by all five addons (UI/ForeverFamily.lua), with the hint setting on it. It
+	-- is our own canvas frame, so nothing of ours goes into the settings search. The copy in use may be another
+	-- addon's newer one, so a failure there is caught and leaves the rest of the settings and /tweaks working.
+	ns.SafeCall("Forever addons page", function()
+		local family = Settings.RegisterCanvasLayoutSubcategory(
+			category,
+			ns.Family.CreatePanel(nil, ns.db, addonName),
+			L["Forever addons"]
+		)
+		Settings.RegisterInitializer(
+			category,
+			CreateSettingsButtonInitializer(L["Forever addons"], L["Open"], function()
+				Settings.OpenToCategory(family:GetID())
+			end, nil, false)
+		)
+	end)
 	Settings.RegisterAddOnCategory(category)
-	-- Another addon's settings may have changed since login.
-	SettingsPanel:HookScript("OnShow", ns.RefreshConflicts)
+	-- Another addon's settings may have changed since login. Not with the gamepad UI on (#168): its navigation
+	-- pushes and pops input bindings as this panel and its rows show and hide, and a blocked
+	-- SetPreferredGamepadInteractTarget has been reported after backing out of the AddOns settings. Skipping the
+	-- conflict check, and everything hooked on it, keeps most of our code out of that path; conflicts are still read
+	-- at login and as addons load. The rows' own tooltips and predicates still run, as every addon's do.
+	SettingsPanel:HookScript("OnShow", function()
+		if not InputUtil.IsGamepadUIEnabled() then
+			ns.RefreshConflicts()
+		end
+	end)
 
 	local function Open()
 		Settings.OpenToCategory(category:GetID())
 	end
 	SLASH_TWEAKSFOREVER1 = "/tweaks"
 	SLASH_TWEAKSFOREVER2 = "/tweaksforever"
-	SlashCmdList.TWEAKSFOREVER = Open
+	-- `/tweaks report` shows the report to copy into a bug report; anything else opens the settings.
+	local function Slash(message)
+		if strtrim(message or ""):lower() == "report" then
+			-- Tweaks' lines can fail in the very state being reported: the header and caught errors still show.
+			local ok, lines = ns.SafeCall("report lines", ns.ReportLines)
+			ns.Report.Show(ns.Report.Text(ok and lines or { "Report lines failed: " .. tostring(lines) }))
+		else
+			Open()
+		end
+	end
+	SlashCmdList.TWEAKSFOREVER = function(message)
+		ns.SafeCall("slash command", Slash, message)
+	end
 	-- The minimap's addon compartment calls this by name (## AddonCompartmentFunc).
 	TweaksForever_OnAddonCompartmentClick = Open
 end)

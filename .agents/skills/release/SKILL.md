@@ -27,6 +27,13 @@ authorization. A preparation-only request ends before tags or uploads.
    into `## [X.Y.Z] - YYYY-MM-DD` using the UTC release date. Keep the TOC version
    as `@project-version@`. Run `python3 tools/changelog.py --check X.Y.Z` and
    `python3 tools/changelog.py --check`; inspect the extracted version notes.
+   Public API changes go under an optional `### For addon authors` subsection after the
+   player bullets; the release notes carry it as written.
+   Before the version entry, translate every phrase added or reworded since the last
+   tag into each shipped `Locales/<locale>.lua` (WFA-34), the `UI/WhatsNew.lua` headline
+   included: `python3 tools/check_locales.py` lists each locale's gaps, a machine line in a
+   file with human lines ends `-- mt`, a human line is never overwritten, and
+   `python3 tools/check_locales.py --release` passes before the PR.
 
 ## Refresh every presentation surface
 

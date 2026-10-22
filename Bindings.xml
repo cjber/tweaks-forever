@@ -1,0 +1,4 @@
+<Bindings>
+	<Binding name="CLICK TweaksForeverQuestItemButton:LeftButton" header="TWEAKSFOREVER" category="ADDONS"/>
+	<Binding name="CLICK TweaksForeverQuestTargetButton:LeftButton" category="ADDONS"/>
+</Bindings>

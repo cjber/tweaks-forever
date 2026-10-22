@@ -31,6 +31,10 @@ ns.Feature({
 				return fog and fog:IsEnabled()
 			end,
 		},
+		-- "off", "on" or "tint": either of the last two reveals the map.
+		{ polestar = "maps.reveal" },
+		-- "show" or "dim" reveals its map; "hide" leaves unexplored areas blank.
+		{ openmap = "unexplored" },
 	},
 })
 
@@ -136,54 +140,53 @@ function Model.Unexplored(areas, explored)
 	return result
 end
 
--- Keep only the viewed art decoded; the source strings stay compact at login.
-local cachedArt, cachedLayers
----@param art integer
----@param layer integer
----@return TFOverlay[]
-local function Areas(art, layer)
-	if cachedArt ~= art then
-		cachedArt = art
-		cachedLayers = ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
-	end
-	return cachedLayers[layer] or {}
-end
-
-ns.Init(function()
-	local map = WorldMapFrame
-	-- Drawn on Blizzard's exploration pin, below its explored textures, so overlapping edges retain Blizzard's
-	-- normal artwork. Everything else is ours: a data provider of our own redraws them, and the map's mask is
-	-- applied here. Hooking the pin's methods or listing textures in the map's tables made Blizzard's own map code
-	-- fail with "attempt to call a nil value".
-	local pool, poolPin
+-- Draw the tint on one map canvas: the world map, or the zone map (BattlefieldMapFrame). Returns its redraw.
+---@param map TFMapCanvas
+---@return fun()
+local function Attach(map)
+	-- Drawn on a frame of our own on the map's canvas (Map/MapCanvas.lua), at the frame level the map gives its
+	-- exploration pin, with the map's mask applied here. Never on Blizzard's pin, through a data provider or in the
+	-- map's tables: the gamepad interface's secure code walks those, and hooking the pin's methods once made
+	-- Blizzard's own map code fail with "attempt to call a nil value".
+	local view = ns.MapCanvas.Watch(map)
+	local tint = ns.MapCanvas.FrameUnder("Frame", view.host)
+	tint:SetAllPoints(view.host)
+	tint:EnableMouse(false)
+	local pool = CreateTexturePool(tint, "ARTWORK")
 	-- [texture] = whether it carries the map's mask.
 	local masked = {}
 
-	---@return Frame?
-	local function ExplorationPin()
-		for pin in map:EnumeratePinsByTemplate("MapExplorationPinTemplate") do -- luacheck: ignore 512 (first only)
-			return pin
+	-- Keep only this map's viewed art decoded; the source strings stay compact at login.
+	local cachedArt, cachedLayers
+	---@param art integer
+	---@param layer integer
+	---@return TFOverlay[]
+	local function Areas(art, layer)
+		if cachedArt ~= art then
+			cachedArt = art
+			cachedLayers = ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
 		end
+		return cachedLayers[layer] or {}
 	end
 
+	-- The art layer last drawn: the tint is in canvas units, so a zoom redraws only when it changes the layer.
+	local drawnLayer
 	local function Draw()
-		if pool then
-			pool:ReleaseAll()
-		end
+		pool:ReleaseAll()
+		drawnLayer = nil
 		if not ns.Active("exploration") then
 			return
 		end
-		local pin = ExplorationPin()
 		local mapID = map:GetMapID()
 		local info = mapID and C_Map.GetMapInfo(mapID)
-		if not pin or not info or info.mapType ~= Enum.UIMapType.Zone then
+		if not info or info.mapType ~= Enum.UIMapType.Zone then
 			return
 		end
-		if poolPin ~= pin then
-			pool, poolPin = CreateTexturePool(pin, "ARTWORK", -1), pin
-		end
+		-- Just under the map's exploration pin, so its explored textures keep their edges over the tint.
+		tint:SetFrameLevel(view:Level("PIN_FRAME_LEVEL_MAP_EXPLORATION") - 1)
 		local art = C_Map.GetMapArtID(mapID)
 		local index = map:GetCanvasContainer():GetCurrentLayerIndex()
+		drawnLayer = index
 		local layers = C_Map.GetMapArtLayers(mapID)
 		local layer = layers and layers[index]
 		if not art or not layer then
@@ -215,14 +218,51 @@ ns.Init(function()
 		end
 	end
 
-	-- The base provider redraws on every map change as well; a zoom can change the art layer.
-	local Provider = CreateFromMixins(MapCanvasDataProviderMixin)
-	function Provider.RemoveAllData()
-		if pool then
-			pool:ReleaseAll()
+	-- Every map opened, turned to or resized redraws, and a zoom that changes the art layer.
+	ns.MapCanvas.Watch(map, function(_, what)
+		if what == "scale" then
+			if drawnLayer and drawnLayer ~= map:GetCanvasContainer():GetCurrentLayerIndex() then
+				Draw()
+			end
+		elseif what ~= "hide" then
+			Draw()
+		end
+	end)
+	-- A hidden map redraws when it next opens.
+	return function()
+		if
+			(map --[[@as Frame]]):IsShown()
+		then
+			Draw()
 		end
 	end
-	Provider.RefreshAllData = Draw
-	Provider.OnCanvasScaleChanged = Draw
-	map:AddDataProvider(Provider)
+end
+
+ns.Init(function()
+	---@type fun()[]
+	local redraws = {
+		Attach(WorldMapFrame --[[@as TFMapCanvas]]),
+	}
+	local function RedrawAll()
+		for _, Redraw in ipairs(redraws) do
+			Redraw()
+		end
+	end
+	-- The zone map (Shift+M) loads on demand.
+	local function AttachZoneMap()
+		redraws[#redraws + 1] = Attach(BattlefieldMapFrame --[[@as TFMapCanvas]])
+	end
+	if C_AddOns.IsAddOnLoaded("Blizzard_BattlefieldMap") then
+		AttachZoneMap()
+	else
+		ns.On("ADDON_LOADED", function(addon)
+			if addon == "Blizzard_BattlefieldMap" then
+				AttachZoneMap()
+			end
+		end)
+	end
+	-- Discovering an area clears its tint at once, and the setting and conflicts apply at once.
+	ns.On("MAP_EXPLORATION_UPDATED", RedrawAll)
+	ns.OnSettingChanged("exploration", RedrawAll)
+	hooksecurefunc(ns, "RefreshConflicts", RedrawAll)
 end)

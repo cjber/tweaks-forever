@@ -6,6 +6,10 @@ local ns = {
 	Init = function(fn)
 		init[#init + 1] = fn
 	end,
+	-- Records the width each button asks for, as Core's FitButton widens it to a longer translated label.
+	FitButton = function(button, width)
+		button.fitted = width
+	end,
 	OnSettingChanged = function(key, fn)
 		settings[key] = fn
 	end,
@@ -73,6 +77,8 @@ local env = setmetatable({
 	},
 }, { __index = _G })
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
+env.hooksecurefunc = env.hooksecurefunc or function() end
+ns.On = ns.On or function() end
 setfenv(assert(loadfile("Quests/QuestLevels.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestLog.lua")), env)("TweaksForever", ns)
 assert(loadfile("Data/ForeverQuests.lua"))("TweaksForever", ns)
@@ -104,7 +110,6 @@ local frames = {}
 local methods = {}
 for _, name in ipairs({
 	"SetSize",
-	"SetPoint",
 	"SetFrameStrata",
 	"SetJustifyH",
 	"SetWidth",
@@ -114,6 +119,12 @@ for _, name in ipairs({
 	"SetChecked",
 }) do
 	methods[name] = function() end
+end
+function methods:SetPoint(...)
+	self.point = { ... }
+end
+function methods:ClearAllPoints()
+	self.point = nil
 end
 function methods:SetText(value)
 	self.text = value
@@ -211,6 +222,10 @@ local receiver = open.level > scroll.level and open or scroll
 assert(receiver.scripts.OnClick, "the native scroll area must not intercept Abandon quests")
 Click(receiver)
 local selectAll = Button("Select all")
+-- Each button widens to a longer translated label, and Clear selection stays beside Select all however wide it is.
+assert(open.fitted == 140 and selectAll.fitted == 110, "the buttons fit their labels")
+local clear = Button("Clear selection")
+assert(clear.fitted == 130 and clear.point[2] == selectAll and clear.point[3] == "RIGHT", "anchored to Select all")
 local panel = selectAll.parent
 assert(panel.shown, "click opens the checklist")
 Click(selectAll)
@@ -219,5 +234,8 @@ assert(Button("Confirm abandon (2)") and #abandoned == 2, "first click only requ
 Click(Button("Cancel"))
 assert(not panel.shown and #abandoned == 2, "cancel never abandons quests")
 Click(open)
-assert(Button("Abandon selected (0)").enabled == false, "reopening clears the selection and pending confirmation")
+assert(
+	Button("Abandon selected (0)").enabled == false and Button("Abandon selected (0)").fitted == 210,
+	"reopening clears the selection and pending confirmation"
+)
 print("questlog: native scroll overlap and selection/confirmation/cancel verified")

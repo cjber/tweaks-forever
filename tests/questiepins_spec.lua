@@ -116,4 +116,22 @@ assert(
 enabled = true
 refresh()
 assert(frames.a.texture.atlas == "questnormal" and frames.a.width == 24)
+
+-- Questie's own sliders, against their defaults: Minimap Icons at half halves the minimap symbol, a kind's slider
+-- scales that kind, and the map's zoom still cannot shrink it.
+local defaults = { globalScale = 0.6, globalMiniMapScale = 0.7, availableScale = 1.2 }
+env.Questie.db = {
+	profile = { globalScale = 0.6, globalMiniMapScale = 0.35, availableScale = 1.2 },
+	defaults = { profile = defaults },
+}
+frames.b:UpdateTexture("original-turnin")
+assert(frames.b.width == 10, "Minimap Icons at half halves the minimap symbol")
+env.Questie.db.profile.availableScale = 2.4
+frames.a:UpdateTexture("original-pickup")
+assert(frames.a.width == 48, "a kind's own slider scales that kind")
+map.utils.RescaleIcon("a", 0.1)
+assert(frames.a.width == 48, "and the map's zoom still cannot shrink it")
+env.Questie.db.profile.globalScale = nil
+frames.a:UpdateTexture("original-pickup")
+assert(frames.a.width == 48, "a setting Questie cannot read leaves the size as it was set")
 print("questiepins: native art, aspect, zoom, reuse and restoration verified")
