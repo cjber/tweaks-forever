@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.15.4] - 2026-10-23
+
+- **Report a bug or request a feature from the game.** `/tw issue` (also `/tw bug` and `/tw feature`) opens a composer: write what went wrong, pick Bug or Feature request, and the window hands you a ready-made GitHub issue link, selected so Ctrl+C and a paste opens the new issue with your words and the addon's system report already filled in. Copy report still puts the same text in your hands for Discord.
+
 ## [0.15.3] - 2026-10-23
 
 - **Data checked against Forever 1.60.1.70532.** The bundled map overlays, camp benefits, zone levels, dungeon entrances, class trainer spells and Forever quests are unchanged apart from their build pin.
