@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.15.3] - 2026-10-23
+
+- **Data checked against Forever 1.60.1.70532.** The bundled map overlays, camp benefits, zone levels, dungeon entrances, class trainer spells and Forever quests are unchanged apart from their build pin.
+
 ## [0.15.2] - 2026-10-21
 
 - **Camp benefit names and effects are now in your language.** On a translated client the camp tooltip and the "camp benefit gained" line used to read English, because they came only from a table with nothing but English in it. Names now come from the game's own spell names, and effects from the client's spell text where it has any; the bundled per-language table fills in the auras the client leaves empty, and English keeps the wording it had. Where the client is missing an API the lines fall back to the bundled text rather than going blank. ([#210](https://github.com/cjber/tweaks-forever/issues/210))
