@@ -74,6 +74,7 @@ local function Widget(kind, template, parent)
 end
 
 local errors, addons, globals = {}, {}, {}
+local website = "https://github.com/cjber/tweaks-forever/"
 local env = setmetatable({
 	UISpecialFrames = {},
 	CreateFrame = function(kind, name, parent, template)
@@ -130,6 +131,9 @@ local env = setmetatable({
 	},
 	C_AddOns = {
 		GetAddOnMetadata = function(addon, field)
+			if addon == "TweaksForever" and field == "X-Website" then
+				return website
+			end
 			assert(field == "Version")
 			return addon == "TweaksForever" and "1.2.3" or addons[addon]
 		end,
@@ -184,6 +188,39 @@ end
 for _, file in ipairs({ "Core/SafeCall.lua", "UI/Report.lua", "Core/Report.lua" }) do
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
 end
+
+equal(ns.Report.Encode("a b&#é~"), "a%20b%26%23%C3%A9~", "URL encoding")
+equal(ns.Report.Repo(), "cjber/tweaks-forever", "repo from X-Website")
+website = nil
+equal(ns.Report.Repo(), "", "missing X-Website")
+website = "https://github.com/cjber/tweaks-forever/"
+local issue = ns.Report.Issue("bug", "Bug: one & two", "details", { "system line" })
+has(issue, "template=report.md", "issue template")
+has(issue, "labels=bug", "bug label")
+has(issue, "title=Bug%3A%20one%20%26%20two", "encoded title")
+has(
+	ns.Report.Body("bug", "Bug: one", "details", { "system line" }),
+	"### System information",
+	"markdown system section"
+)
+equal(#ns.Report.Issue("bug", "Bug: long", ("x"):rep(4000), { "system line" }) < 7000, true, "long detail URL cap")
+local previousBugGrabber = _G.BugGrabber
+_G.BugGrabber = {
+	GetDB = function()
+		return {
+			{ message = "stale session error", stack = "Old.lua:4", session = 6, counter = 8 },
+			{ message = "direct Lua failure", stack = "Addon/Feature.lua:42", session = 7, counter = 2 },
+		}
+	end,
+	GetSessionId = function()
+		return 7
+	end,
+}
+local issueBody = ns.Report.Body("bug", "Bug: direct Lua failure", "it broke", {})
+has(issueBody, "direct Lua failure", "BugGrabber runtime error in issue body")
+has(issueBody, "Addon/Feature.lua:42", "BugGrabber trace in issue body")
+lacks(issueBody, "stale session error", "old BugGrabber errors are excluded")
+_G.BugGrabber = previousBugGrabber
 
 local function Report()
 	ns.Report.Show(ns.Report.Text(ns.ReportLines()))

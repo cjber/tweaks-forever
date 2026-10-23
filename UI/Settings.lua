@@ -146,10 +146,16 @@ ns.Init(function()
 	SLASH_TWEAKSFOREVER2 = "/tweaksforever"
 	-- `/tweaks report` shows the report to copy into a bug report; anything else opens the settings.
 	local function Slash(message)
-		if strtrim(message or ""):lower() == "report" then
+		local command = strtrim(message or ""):lower()
+		if command == "report" then
 			-- Tweaks' lines can fail in the very state being reported: the header and caught errors still show.
 			local ok, lines = ns.SafeCall("report lines", ns.ReportLines)
 			ns.Report.Show(ns.Report.Text(ok and lines or { "Report lines failed: " .. tostring(lines) }))
+		elseif command == "issue" or command == "bug" or command == "feature" then
+			ns.Report.Compose(command == "feature" and "feature" or "bug")
+		elseif command == "help" then
+			ns.Print(L["/tw report - show a report to copy into a bug report"])
+			ns.Print(L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"])
 		else
 			Open()
 		end
