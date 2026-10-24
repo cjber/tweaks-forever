@@ -126,7 +126,7 @@ Owner-approved exceptions to `wow-forever-addon`:
 ## Secure UI regression checks
 
 `tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage, `tools/lint_taint.py`, `tools/lint_secret.py` (secret values through `ns.Readable`, tooltip hooks behind `ns.Usable`), `tools/check_editorconfig.py` and `tools/check_family.py` (the shared family block between the `forever-family` markers in README.md and docs/curseforge.md).
-`tools/forever_tools/` is the shared tooling (cjber/forever-core, `.agents/skills/wow-forever-addon/tooling`), vendored byte for byte: never edit it here.
+`tools/forever_tools/` is the shared tooling, vendored byte for byte from cjber/forever-core's wow-forever-addon skill: never edit it here.
 `python3 tools/forever_tools/sync.py check` verifies it offline; `sync.py update --source <checkout>` is the only way to refresh it.
 Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame
 so Blizzard finishes its own initialization. This supersedes WFA-5's AddContainer hook guidance.
