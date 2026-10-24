@@ -278,6 +278,7 @@ TweaksForeverCharDB = nil
 ---@field Apply fun(owner: Button, bag: integer, slot: integer)
 
 ---@class TFNamespace
+---@field ReportTitle string the localized title shown by the shared report window
 ---@field ForeverQuests table<integer, true>
 ---@field QuestLog TFQuestLog
 ---@field QuestTitle fun(id: integer, title: string): string
@@ -338,7 +339,7 @@ TweaksForeverCharDB = nil
 ---@field RecordError fun(label: string, message: any, stack?: string) keep an error caught some other way for the report
 ---@field CaughtErrors fun(): TFCaughtError[] this session's caught errors, oldest first, as copies
 ---@field CutText fun(text: string, limit: integer): string `text` cut to `limit` bytes on a character boundary, ending "..."
----@field Report TFReportModule the report window (UI/Report.lua)
+---@field Report ForeverReportModule the report window (UI/Report.lua)
 ---@field ReportLines fun(): string[] Tweaks Forever's own lines in the report (Core/Report.lua)
 ---@field PolestarOn fun(path: string): boolean
 ---@field OpenMapOn fun(option: string): boolean
