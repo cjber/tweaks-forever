@@ -1,5 +1,8 @@
 ---@type string, TFNamespace
 local _, ns = ...
+if ns.L then
+	ns.ReportTitle = ns.L["Tweaks Forever report"]
+end
 
 -- Features, in declaration order, and by key. Each is { key, category, name, tooltip, default, conflicts }, plus
 -- `options` ({ { value, label } }) for a choice rather than an on/off switch, `parent` (a key) to indent it

@@ -168,6 +168,14 @@ ns.Report = {
 	Show = function(text)
 		reported = text
 	end,
+	Command = function(command)
+		if command == "report" then
+			local ok, lines = ns.SafeCall("report lines", ns.ReportLines)
+			ns.Report.Show(ns.Report.Text(ok and lines or { "Report lines failed: " .. tostring(lines) }))
+			return true
+		end
+		return false
+	end,
 }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 -- A packaged German client: features declare English, and the settings show the translation where there is one.

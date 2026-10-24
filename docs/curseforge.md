@@ -37,6 +37,8 @@ Nameplates in retail's own frame, with your target outlined.
 
 Everything is under Options → AddOns → Tweaks Forever, or type `/tweaks`.
 
+For a bug report, type `/tweaks report` and paste what it shows. Type `/tweaks issue` to show a filled-in GitHub issue link, selected for copying, for a bug or feature request.
+
 Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian and Chinese (machine translated; [corrections welcome](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml)).
 
 <!-- forever-family:start -->
