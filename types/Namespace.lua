@@ -337,7 +337,7 @@ TweaksForeverCharDB = nil
 ---@field BestReward TFBestReward
 ---@field SafeCall fun(label: string, fn: function, ...: any): boolean, ... run fn as pcall does, keeping a failure for the report and passing it to the error handler (Core/SafeCall.lua)
 ---@field RecordError fun(label: string, message: any, stack?: string) keep an error caught some other way for the report
----@field CaughtErrors fun(): TFCaughtError[] this session's caught errors, oldest first, as copies
+---@field CaughtErrors fun(): ForeverCaughtError[] this session's caught errors, oldest first, as copies
 ---@field CutText fun(text: string, limit: integer): string `text` cut to `limit` bytes on a character boundary, ending "..."
 ---@field Report ForeverReportModule the report window (UI/Report.lua)
 ---@field ReportLines fun(): string[] Tweaks Forever's own lines in the report (Core/Report.lua)
