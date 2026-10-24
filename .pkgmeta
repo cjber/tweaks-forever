@@ -21,3 +21,4 @@ ignore:
   - ruff.toml
   - Locales/phrases.txt
   - Locales/README.md
+  - .claude
