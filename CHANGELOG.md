@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.16.0] - 2026-10-26
+
 - **Dungeon maps use the client's own painted floors.** The world map now draws the native four-by-three tiles with built-in area and boss labels, with no Atlas dependency or separate legend.
 
 ## [0.15.8] - 2026-10-26
