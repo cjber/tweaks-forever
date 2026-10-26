@@ -88,15 +88,14 @@
 ---@field instances integer[]
 ---@field area? integer
 
--- One floor or wing of a dungeon, as Atlas draws it: its sheet and its legend as one block of text.
+-- One floor in the client's own dungeon map art.
 ---@class TFInteriorMap
----@field key string Atlas's record key
 ---@field title string
----@field texture string a 512 by 512 sheet
----@field legend string
+---@field pattern string texture path before tile number
+---@field separator string tile path separator
 
 ---@class TFDungeonMaps
----@field Floors fun(atlas: table?, instance: integer): TFInteriorMap[]
+---@field Floors fun(art: table?, instance: integer): TFInteriorMap[]
 ---@field Inside fun(instanceType: string, instance: integer?, playerMap: integer?, shownMap: integer?): integer?
 ---@field Floor fun(count: integer, chosen: integer?): integer
 
@@ -314,6 +313,7 @@ TweaksForeverCharDB = nil
 ---@field Entrances TFEntrances
 ---@field MapCanvas TFMapCanvasModule the views of our own on the maps (Map/MapCanvas.lua)
 ---@field DungeonMaps TFDungeonMaps
+---@field DungeonMapArt table<integer, TFInteriorMap[]>
 ---@field Art TFArt
 ---@field QuestGivers TFQuestGivers
 ---@field QuestProgress TFQuestProgress

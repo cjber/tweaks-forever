@@ -122,7 +122,6 @@ L["How grouped gear shows in your bags, in each group's colour. A strip along th
 L["Icon size"] = "Taille des icônes"
 L["Icons sit"] = "Position des icônes"
 L["In quest dialogs too"] = "Aussi dans les dialogues de quête"
-L["Inside a dungeon, the world map opens on the dungeon's own floor map and what is where, with a button for the floor and a Back to map button. Needs Atlas and its Classic WoW maps."] = "Dans un donjon, la carte du monde s'ouvre sur le plan de l'étage du donjon et ce qui s'y trouve, avec un bouton pour l'étage et un bouton Retour à la carte. Nécessite Atlas et ses cartes Classic WoW."
 L["Install Questie, or its QuestieDB addon on its own, to see where your class trainers are."] = "Installez Questie, ou son addon QuestieDB seul, pour voir où sont vos maîtres de classe."
 L["Installed, turned off"] = "Installé, désactivé"
 L["Instance entrances"] = "Entrées d'instances"

@@ -5,13 +5,41 @@
 local _, ns = ...
 ns.DungeonMapArt = {
 	[33] = { -- Shadowfang Keep
-		{ title = "Shadowfang Keep 1", pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep1", separator = "_" },
-		{ title = "Shadowfang Keep 2", pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep2", separator = "_" },
-		{ title = "Shadowfang Keep 3", pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep3", separator = "_" },
-		{ title = "Shadowfang Keep 4", pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep4", separator = "_" },
-		{ title = "Shadowfang Keep 5", pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep5", separator = "_" },
-		{ title = "Shadowfang Keep 6", pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep6", separator = "_" },
-		{ title = "Shadowfang Keep 7", pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep7", separator = "_" },
+		{
+			title = "Shadowfang Keep 1",
+			pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep1",
+			separator = "_",
+		},
+		{
+			title = "Shadowfang Keep 2",
+			pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep2",
+			separator = "_",
+		},
+		{
+			title = "Shadowfang Keep 3",
+			pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep3",
+			separator = "_",
+		},
+		{
+			title = "Shadowfang Keep 4",
+			pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep4",
+			separator = "_",
+		},
+		{
+			title = "Shadowfang Keep 5",
+			pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep5",
+			separator = "_",
+		},
+		{
+			title = "Shadowfang Keep 6",
+			pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep6",
+			separator = "_",
+		},
+		{
+			title = "Shadowfang Keep 7",
+			pattern = "Interface\\WorldMap\\ShadowfangKeep\\ShadowfangKeep7",
+			separator = "_",
+		},
 	},
 	[34] = { -- The Stockade
 		{ title = "The Stockade", pattern = "Interface\\WorldMap\\TheStockade\\TheStockade1", separator = "_" },
@@ -21,15 +49,31 @@ ns.DungeonMapArt = {
 		{ title = "The Deadmines 2", pattern = "Interface\\WorldMap\\TheDeadmines\\TheDeadmines2", separator = "_" },
 	},
 	[43] = { -- Wailing Caverns
-		{ title = "Wailing Caverns", pattern = "Interface\\WorldMap\\WailingCaverns\\WailingCaverns1", separator = "_" },
+		{
+			title = "Wailing Caverns",
+			pattern = "Interface\\WorldMap\\WailingCaverns\\WailingCaverns1",
+			separator = "_",
+		},
 	},
 	[47] = { -- Razorfen Kraul
 		{ title = "Razorfen Kraul", pattern = "Interface\\WorldMap\\RazorfenKraul\\RazorfenKraul1", separator = "_" },
 	},
 	[48] = { -- Blackfathom Deeps
-		{ title = "Blackfathom Deeps 1", pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps1", separator = "_" },
-		{ title = "Blackfathom Deeps 2", pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps2", separator = "_" },
-		{ title = "Blackfathom Deeps 3", pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps3", separator = "_" },
+		{
+			title = "Blackfathom Deeps 1",
+			pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps1",
+			separator = "_",
+		},
+		{
+			title = "Blackfathom Deeps 2",
+			pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps2",
+			separator = "_",
+		},
+		{
+			title = "Blackfathom Deeps 3",
+			pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps3",
+			separator = "_",
+		},
 	},
 	[70] = { -- Uldaman
 		{ title = "Uldaman 1", pattern = "Interface\\WorldMap\\Uldaman\\Uldaman1", separator = "_" },
@@ -43,32 +87,88 @@ ns.DungeonMapArt = {
 		{ title = "Gnomeregan 4", pattern = "Interface\\WorldMap\\Gnomeregan\\Gnomeregan4", separator = "_" },
 	},
 	[109] = { -- The Temple of Atal'Hakkar
-		{ title = "The Temple of Atal'Hakkar", pattern = "Interface\\WorldMap\\TheTempleOfAtalHakkar\\TheTempleOfAtalHakkar1", separator = "_" },
+		{
+			title = "The Temple of Atal'Hakkar",
+			pattern = "Interface\\WorldMap\\TheTempleOfAtalHakkar\\TheTempleOfAtalHakkar1",
+			separator = "_",
+		},
 	},
 	[129] = { -- Razorfen Downs
 		{ title = "Razorfen Downs", pattern = "Interface\\WorldMap\\RazorfenDowns\\RazorfenDowns1", separator = "_" },
 	},
 	[189] = { -- Scarlet Monastery
-		{ title = "Scarlet Monastery: Graveyard", pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery1", separator = "_" },
-		{ title = "Scarlet Monastery: Library", pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery2", separator = "_" },
-		{ title = "Scarlet Monastery: Armory", pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery3", separator = "_" },
-		{ title = "Scarlet Monastery: Cathedral", pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery4", separator = "_" },
+		{
+			title = "Scarlet Monastery: Graveyard",
+			pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery1",
+			separator = "_",
+		},
+		{
+			title = "Scarlet Monastery: Library",
+			pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery2",
+			separator = "_",
+		},
+		{
+			title = "Scarlet Monastery: Armory",
+			pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery3",
+			separator = "_",
+		},
+		{
+			title = "Scarlet Monastery: Cathedral",
+			pattern = "Interface\\WorldMap\\ScarletMonastery\\ScarletMonastery4",
+			separator = "_",
+		},
 	},
 	[209] = { -- Zul'Farrak
 		{ title = "Zul'Farrak", pattern = "Interface\\WorldMap\\ZulFarrak\\ZulFarrak", separator = "" },
 	},
 	[229] = { -- Blackrock Spire
-		{ title = "Blackrock Spire 1", pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire1", separator = "_" },
-		{ title = "Blackrock Spire 2", pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire2", separator = "_" },
-		{ title = "Blackrock Spire 3", pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire3", separator = "_" },
-		{ title = "Blackrock Spire 4", pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire4", separator = "_" },
-		{ title = "Blackrock Spire 5", pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire5", separator = "_" },
-		{ title = "Blackrock Spire 6", pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire6", separator = "_" },
-		{ title = "Blackrock Spire: Upper Blackrock Spire", pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire7", separator = "_" },
+		{
+			title = "Blackrock Spire 1",
+			pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire1",
+			separator = "_",
+		},
+		{
+			title = "Blackrock Spire 2",
+			pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire2",
+			separator = "_",
+		},
+		{
+			title = "Blackrock Spire 3",
+			pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire3",
+			separator = "_",
+		},
+		{
+			title = "Blackrock Spire 4",
+			pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire4",
+			separator = "_",
+		},
+		{
+			title = "Blackrock Spire 5",
+			pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire5",
+			separator = "_",
+		},
+		{
+			title = "Blackrock Spire 6",
+			pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire6",
+			separator = "_",
+		},
+		{
+			title = "Blackrock Spire: Upper Blackrock Spire",
+			pattern = "Interface\\WorldMap\\BlackrockSpire\\BlackrockSpire7",
+			separator = "_",
+		},
 	},
 	[230] = { -- Blackrock Depths
-		{ title = "Blackrock Depths 1", pattern = "Interface\\WorldMap\\BlackrockDepths\\BlackrockDepths1", separator = "_" },
-		{ title = "Blackrock Depths 2", pattern = "Interface\\WorldMap\\BlackrockDepths\\BlackrockDepths2", separator = "_" },
+		{
+			title = "Blackrock Depths 1",
+			pattern = "Interface\\WorldMap\\BlackrockDepths\\BlackrockDepths1",
+			separator = "_",
+		},
+		{
+			title = "Blackrock Depths 2",
+			pattern = "Interface\\WorldMap\\BlackrockDepths\\BlackrockDepths2",
+			separator = "_",
+		},
 	},
 	[289] = { -- Scholomance
 		{ title = "Scholomance 1", pattern = "Interface\\WorldMap\\Scholomance\\Scholomance1", separator = "_" },
@@ -92,8 +192,16 @@ ns.DungeonMapArt = {
 		{ title = "Dire Maul: Capital Gardens", pattern = "Interface\\WorldMap\\DireMaul\\DireMaul2", separator = "_" },
 		{ title = "Dire Maul: Capital Gardens", pattern = "Interface\\WorldMap\\DireMaul\\DireMaul3", separator = "_" },
 		{ title = "Dire Maul: Capital Gardens", pattern = "Interface\\WorldMap\\DireMaul\\DireMaul4", separator = "_" },
-		{ title = "Dire Maul: Warpwood Quarter", pattern = "Interface\\WorldMap\\DireMaul\\DireMaul5", separator = "_" },
-		{ title = "Dire Maul: Warpwood Quarter", pattern = "Interface\\WorldMap\\DireMaul\\DireMaul6", separator = "_" },
+		{
+			title = "Dire Maul: Warpwood Quarter",
+			pattern = "Interface\\WorldMap\\DireMaul\\DireMaul5",
+			separator = "_",
+		},
+		{
+			title = "Dire Maul: Warpwood Quarter",
+			pattern = "Interface\\WorldMap\\DireMaul\\DireMaul6",
+			separator = "_",
+		},
 	},
 	-- tiles = 12 per floor, drawn in four columns and three rows.
 }

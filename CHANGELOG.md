@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Dungeon maps use the client's own painted floors.** The world map now draws the native four-by-three tiles with built-in area and boss labels, with no Atlas dependency or separate legend.
+
 ## [0.15.8] - 2026-10-26
 
 - **The addon now ships the suite's shared settings-page code.** Forever Core's settings-page chrome (`UI/SettingsPage.lua`) and its spec are vendored byte for byte so the suite's shared-code drift gate covers this addon; Tweaks keeps drawing its own settings page, so nothing changes in game.

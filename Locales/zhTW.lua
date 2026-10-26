@@ -122,7 +122,6 @@ L["How grouped gear shows in your bags, in each group's colour. A strip along th
 L["Icon size"] = "圖示大小"
 L["Icons sit"] = "圖示位置"
 L["In quest dialogs too"] = "任務對話中也顯示"
-L["Inside a dungeon, the world map opens on the dungeon's own floor map and what is where, with a button for the floor and a Back to map button. Needs Atlas and its Classic WoW maps."] = "在地城內，世界地圖會開啟該地城自己的樓層地圖及各處內容，並提供樓層按鈕和「返回地圖」按鈕。需要Atlas及其Classic WoW地圖。"
 L["Install Questie, or its QuestieDB addon on its own, to see where your class trainers are."] = "安裝Questie，或單獨安裝其QuestieDB插件，即可檢視你的職業訓練師在哪裡。"
 L["Installed, turned off"] = "已安裝，已停用"
 L["Instance entrances"] = "副本入口"

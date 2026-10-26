@@ -1,112 +1,38 @@
 ---@type string, TFNamespace
 local _, ns = ...
-local L = ns.L
-
-local MODULE = "Atlas_ClassicWoW"
 
 ns.Feature({
 	key = "dungeonMaps",
 	category = "Maps",
 	name = "Dungeon interior maps",
-	tooltip = "Inside a dungeon, the world map opens on the dungeon's own floor map and what is where, with a button "
-		.. "for the floor and a Back to map button. Needs Atlas and its Classic WoW maps.",
+	tooltip = "Inside a dungeon, the world map opens on its floor map, with a floor picker and a Back to map button.",
 	default = true,
-	needs = {
-		title = "Atlas [Classic WoW]",
-		check = function()
-			return (C_AddOns.IsAddOnLoaded(MODULE))
-		end,
-	},
 })
 
--- The Atlas records of each five-player dungeon, by the instance ID GetInstanceInfo gives: every floor and wing
--- is a record whose key starts "CL_" and one of these. A key ending "Ent" is the outdoor sheet of the way in.
-local GROUPS = {
-	[33] = { "ShadowfangKeep" },
-	[34] = { "TheStockade" },
-	[36] = { "TheDeadmines" },
-	[43] = { "WailingCaverns" },
-	[47] = { "RazorfenKraul" },
-	[48] = { "BlackfathomDeeps" },
-	[70] = { "Uldaman" },
-	[90] = { "Gnomeregan" },
-	[109] = { "TheSunkenTemple" },
-	[129] = { "RazorfenDowns" },
-	[189] = { "ScarletMonastery", "SM" },
-	[209] = { "ZulFarrak" },
-	[229] = { "BlackrockSpire" },
-	[230] = { "BlackrockDepths" },
-	[289] = { "Scholomance" },
-	[329] = { "Stratholme" },
-	[349] = { "Maraudon" },
-	[389] = { "RagefireChasm" },
-	[429] = { "DireMaul" },
-}
-local PAD = 12
+local PAD, HEADER, COLUMNS, ROWS = 12, 46, 4, 3
 local PICKER_WIDTH = 200
--- Room above the map sheet for the heading, the floor menu and Back to map.
-local HEADER = 46
 
 ---@class TFDungeonMaps
 local Model = {}
 ns.DungeonMaps = Model
 
----@param key string
----@param prefixes string[]
----@return boolean
-local function IsFloorOf(key, prefixes)
-	if key:sub(-3) == "Ent" then
-		return false
-	end
-	for _, prefix in ipairs(prefixes) do
-		if key:sub(1, #prefix + 3) == "CL_" .. prefix then
-			return true
-		end
-	end
-	return false
-end
-
--- The floors Atlas draws for a dungeon, in key order, each with its title and legend lines. `atlas` is Atlas's
--- AtlasMaps table, absent until the addon has loaded and read here without trusting its shape.
----@param atlas table?
+---@param art table?
 ---@param instance integer
 ---@return TFInteriorMap[]
-function Model.Floors(atlas, instance)
-	local prefixes, floors = GROUPS[instance], {}
-	if not (prefixes and type(atlas) == "table") then
+function Model.Floors(art, instance)
+	local source = type(art) == "table" and art[instance]
+	local floors = {}
+	if type(source) ~= "table" then
 		return floors
 	end
-	for key, record in pairs(atlas) do
-		local names = type(record) == "table" and record.ZoneName
-		if
-			type(key) == "string"
-			and key:match("^CL_[%w_]+$")
-			and IsFloorOf(key, prefixes)
-			and record.Module == MODULE
-			and type(names) == "table"
-			and type(names[1]) == "string"
-		then
-			local legend = {}
-			for _, line in ipairs(record) do
-				if type(line) == "table" and type(line[1]) == "string" then
-					legend[#legend + 1] = line[1]
-				end
-			end
-			floors[#floors + 1] = {
-				key = key,
-				title = names[1],
-				texture = "Interface\\AddOns\\" .. MODULE .. "\\Images\\" .. key,
-				legend = table.concat(legend, "\n"),
-			}
+	for _, floor in ipairs(source) do
+		if type(floor) == "table" and type(floor.title) == "string" and type(floor.pattern) == "string" then
+			floors[#floors + 1] = { title = floor.title, pattern = floor.pattern, separator = floor.separator or "_" }
 		end
 	end
-	table.sort(floors, function(a, b)
-		return a.key < b.key
-	end)
 	return floors
 end
 
--- The dungeon the player stands in while the map shows the zone they are in, which is when its interior opens.
 ---@param instanceType string
 ---@param instance integer?
 ---@param playerMap integer?
@@ -118,7 +44,6 @@ function Model.Inside(instanceType, instance, playerMap, shownMap)
 	end
 end
 
--- The floor to show: the one chosen last time, kept for the session, else the first.
 ---@param count integer
 ---@param chosen integer?
 ---@return integer
@@ -128,10 +53,9 @@ end
 
 ns.Init(function()
 	local map = WorldMapFrame
-	local host, art, heading, legend, legendBody, scroll, picker, popup, back, reopen
-	local choices = {}
-	local floors, selected, shown = {}, 1, nil
-	-- The floor chosen for each dungeon this session.
+	local host, heading, picker, popup, back, reopen
+	local tiles = {}
+	local choices, floors, selected, shown = {}, {}, 1, nil
 	---@type table<integer, integer>
 	local chosen = {}
 	local pending = false
@@ -145,24 +69,25 @@ ns.Init(function()
 		shown = nil
 	end
 
-	-- The legend text wraps to the scroll frame and the scroll child grows to the text.
-	local function FitLegend()
-		local width = math.max(1, scroll:GetWidth())
-		legend:SetWidth(width)
-		legendBody:SetSize(width, math.max(scroll:GetHeight(), legend:GetStringHeight() + PAD))
-	end
-
 	local function Layout()
 		local width, height = host:GetWidth(), host:GetHeight()
-		-- The sheets are square: the largest square that leaves the legend a column beside it.
-		local side = math.max(1, math.min(width * 0.58, height - HEADER - PAD))
-		art:SetSize(side, side)
-		FitLegend()
+		local sheetWidth = math.max(1, math.min(width - PAD * 2, (height - HEADER - PAD) * COLUMNS / ROWS))
+		local sheetHeight = sheetWidth * ROWS / COLUMNS
+		for index, tile in ipairs(tiles) do
+			local column, row = (index - 1) % COLUMNS, math.floor((index - 1) / COLUMNS)
+			tile:SetSize(sheetWidth / COLUMNS, sheetHeight / ROWS)
+			tile:ClearAllPoints()
+			tile:SetPoint(
+				"TOPLEFT",
+				host,
+				"TOPLEFT",
+				PAD + column * sheetWidth / COLUMNS,
+				-HEADER - row * sheetHeight / ROWS
+			)
+		end
 	end
 
 	local Select
-
-	-- One choice per floor, the current one greyed; the popup is as tall as its choices.
 	local function Choices()
 		for index, floor in ipairs(floors) do
 			local choice = choices[index]
@@ -188,16 +113,13 @@ ns.Init(function()
 	local function Draw()
 		local floor = floors[selected]
 		heading:SetText(floor.title)
-		art:SetTexture(floor.texture) -- art-ok: Atlas's map sheet, a 512 by 512 square drawn in a square
-		art:SetTexCoord(0, 1, 0, 1)
-		legend:SetText(floor.legend)
-		-- One floor needs no menu.
+		for index, tile in ipairs(tiles) do
+			tile:SetTexture(floor.pattern .. floor.separator .. index) -- art-ok: native 256px square tile in a square cell
+		end
 		picker:SetShown(#floors > 1)
 		picker:SetText(floor.title)
 		popup:Hide()
 		Choices()
-		FitLegend()
-		scroll:SetVerticalScroll(0)
 	end
 
 	---@param index integer
@@ -210,7 +132,6 @@ ns.Init(function()
 		Draw()
 	end
 
-	-- Our own frames over the map's canvas, so the map's own frames and Lua state are left alone.
 	local function Build()
 		local canvas = map.ScrollContainer
 		host = ns.MapCanvas.FrameUnder("Frame", canvas)
@@ -220,35 +141,23 @@ ns.Init(function()
 		local background = host:CreateTexture(nil, "BACKGROUND")
 		background:SetAllPoints()
 		background:SetColorTexture(0, 0, 0, 1)
-
 		heading = host:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 		heading:SetPoint("TOPLEFT", PAD, -PAD)
 		heading:SetJustifyH("LEFT")
-		art = host:CreateTexture(nil, "ARTWORK")
-		art:SetPoint("TOPLEFT", PAD, -HEADER)
-
-		scroll = ns.MapCanvas.FrameUnder("ScrollFrame", host, "ScrollFrameTemplate") --[[@as ScrollFrame]]
-		scroll:SetPoint("TOPLEFT", art, "TOPRIGHT", PAD, 0)
-		scroll:SetPoint("BOTTOMRIGHT", -PAD * 2, PAD)
-		legendBody = ns.MapCanvas.FrameUnder("Frame", scroll)
-		scroll:SetScrollChild(legendBody)
-		legend = legendBody:CreateFontString(nil, "ARTWORK", "GameFontHighlight")
-		legend:SetPoint("TOPLEFT")
-		legend:SetJustifyH("LEFT")
-		legend:SetWordWrap(true)
-		scroll:SetScript("OnSizeChanged", FitLegend)
-
+		for index = 1, COLUMNS * ROWS do
+			tiles[index] = host:CreateTexture(nil, "ARTWORK")
+			tiles[index]:SetTexCoord(0, 1, 0, 1)
+		end
 		back = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate") --[[@as Button]]
 		back:SetSize(112, 22)
 		back:SetPoint("TOPRIGHT", -PAD, -PAD)
-		back:SetText(L["Back to map"])
+		back:SetText(ns.L["Back to map"])
 		ns.FitButton(back, 112)
-		-- The map's own frames are untouched: the interior steps aside and a button on the canvas brings it back.
 		reopen = ns.MapCanvas.FrameUnder("Button", canvas, "UIPanelButtonTemplate") --[[@as Button]]
 		reopen:SetSize(112, 22)
 		reopen:SetPoint("BOTTOMLEFT", PAD, PAD)
 		reopen:SetFrameLevel(host:GetFrameLevel() + 1)
-		reopen:SetText(L["Dungeon map"])
+		reopen:SetText(ns.L["Dungeon map"])
 		ns.FitButton(reopen, 112)
 		reopen:Hide()
 		back:SetScript("OnClick", function()
@@ -259,10 +168,7 @@ ns.Init(function()
 			reopen:Hide()
 			host:Show()
 		end)
-
-		-- The floor picker is a button over a popup of choices, all our own frames: the game's menu pool
-		-- (GenerateMenu) asserts in Forever build 70009 when it opens.
-		picker = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate")
+		picker = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate") --[[@as Button]]
 		picker:SetSize(PICKER_WIDTH, 24)
 		picker:SetPoint("TOPRIGHT", back, "TOPLEFT", -8, 0)
 		popup = ns.MapCanvas.FrameUnder("Frame", picker)
@@ -288,7 +194,6 @@ ns.Init(function()
 		picker:SetScript("OnClick", function()
 			popup:SetShown(not popup:IsShown())
 		end)
-		heading:SetPoint("RIGHT", picker, "LEFT", -8, 0)
 		host:SetScript("OnSizeChanged", Layout)
 	end
 
@@ -306,15 +211,13 @@ ns.Init(function()
 			pending = false
 			return
 		end
-		-- Building and retargeting wait for the end of combat; leaving the interior never does. What the host
-		-- still holds is another dungeon's, or one the map has since closed on, so it steps aside until then.
 		if InCombatLockdown() then
 			Hide()
 			pending = true
 			return
 		end
 		pending = false
-		local found = Model.Floors(AtlasMaps, inside)
+		local found = Model.Floors(ns.DungeonMapArt, inside)
 		if #found == 0 then
 			Hide()
 			return
@@ -330,8 +233,6 @@ ns.Init(function()
 		Draw()
 	end
 
-	-- The map turning to another map, seen from a frame of our own (Map/MapCanvas.lua): never a data provider, which
-	-- the gamepad interface's secure code walks.
 	ns.MapCanvas.Watch(map, function(_, what)
 		if what == "map" then
 			Refresh()
