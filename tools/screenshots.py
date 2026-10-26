@@ -364,13 +364,16 @@ def dungeon_layers(ui):
     return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
 
 
-# Atlas and Atlas [Classic WoW] as released on WoWInterface (files 3896 and 20513): each version keeps its own zip
-# URL, pinned here by its sha256. Only the dungeon map screenshot reads them, straight from the zips, which are cached
-# beside wowmock's art and never committed. To move to a newer Atlas, change ATLAS_VERSION and both hashes.
-ATLAS_VERSION = "v1.54.00"
+# Atlas and Atlas [Classic WoW] as released on WoWInterface (files 3896 and 20513). WoWInterface serves the
+# current build of each release under any version in the filename, so the filename is only the cache key: the
+# sha256 below is the real pin, and a download that does not match it stops the render rather than silently
+# changing the screenshot. Both are cached beside wowmock's art and never committed. Only the dungeon map
+# screenshot reads them. To move to a newer Atlas, download both zips, change ATLAS_VERSION to the version in
+# their .toc and update both hashes.
+ATLAS_VERSION = "v1.54.04"
 ATLAS_ZIPS = {
-    "Atlas": (3896, "9296376bc05aea7577a1046111cd1ef2e434b5ae582a1b558bbc9d19bfe63d1c"),
-    "Atlas_ClassicWoW": (20513, "20fe0a7835498aa121304f5096f08f34d13adabfb57cdd9599fb1cb9f5f6379f"),
+    "Atlas": (3896, "74025c3ecf08050760752203776ee3beff8bae0abc7b02f9cb21edbe87ccd084"),
+    "Atlas_ClassicWoW": (20513, "45009a14d24fe8dbe4ab5f7908ee7d64af1bbc24d99b743f6e7e0f37ad5f7e21"),
 }
 ATLAS_CACHE = Path.home() / ".cache" / "wowmock" / "atlas"
 
