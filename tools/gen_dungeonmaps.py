@@ -1,9 +1,7 @@
-#!/usr/bin/env -S uv run --script
-# /// script
-# requires-python = ">=3.11"
-# dependencies = []
-# ///
 """Generate the client's own dungeon map sheets for the pinned Forever build (stdlib only).
+
+Run it with `python3 tools/gen_dungeonmaps.py`; it needs no packages, so it takes no uv script
+header and carries no shebang, which keeps ruff's EXE001 quiet whatever the checkout's file mode.
 
 Forever's client ships the classic dungeon interiors as painted parchment sheets, twelve 256 by 256 tiles
 each in a four by three grid, under Interface\\WorldMap. They carry the dungeon's name, its area labels and a
