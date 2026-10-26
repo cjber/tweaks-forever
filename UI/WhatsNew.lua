@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.15.8"
-ns.WHATS_NEW = L["The addon now ships the suite's shared settings-page code."]
+ns.WHATS_NEW_VERSION = "0.16.0"
+ns.WHATS_NEW = L["Dungeon maps use the client's own painted floors."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
