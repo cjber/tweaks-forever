@@ -122,7 +122,6 @@ L["How grouped gear shows in your bags, in each group's colour. A strip along th
 L["Icon size"] = "Размер значков"
 L["Icons sit"] = "Положение значков"
 L["In quest dialogs too"] = "И в диалогах заданий"
-L["Inside a dungeon, the world map opens on the dungeon's own floor map and what is where, with a button for the floor and a Back to map button. Needs Atlas and its Classic WoW maps."] = "Внутри подземелья карта мира открывает план этажа подземелья с тем, что где находится, с кнопкой этажа и кнопкой «Назад к карте». Требуется Atlas и его карты Classic WoW."
 L["Install Questie, or its QuestieDB addon on its own, to see where your class trainers are."] = "Установите Questie или только его модификацию QuestieDB, чтобы видеть, где ваши учителя класса."
 L["Installed, turned off"] = "Установлено, отключено"
 L["Instance entrances"] = "Входы в подземелья"

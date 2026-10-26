@@ -122,7 +122,6 @@ L["How grouped gear shows in your bags, in each group's colour. A strip along th
 L["Icon size"] = "아이콘 크기"
 L["Icons sit"] = "아이콘 위치"
 L["In quest dialogs too"] = "퀘스트 대화창에도 표시"
-L["Inside a dungeon, the world map opens on the dungeon's own floor map and what is where, with a button for the floor and a Back to map button. Needs Atlas and its Classic WoW maps."] = "던전 안에서는 세계 지도가 해당 던전의 층별 지도와 위치 정보를 열고, 층 버튼과 지도로 돌아가기 버튼을 제공합니다. Atlas와 Atlas의 Classic WoW 지도가 필요합니다."
 L["Install Questie, or its QuestieDB addon on its own, to see where your class trainers are."] = "직업 상급자의 위치를 보려면 Questie 또는 QuestieDB 애드온만 설치하세요."
 L["Installed, turned off"] = "설치됨, 사용 안 함"
 L["Instance entrances"] = "인스턴스 입구"

@@ -5,7 +5,7 @@
 ## Version: @project-version@
 ## Category: Quality of Life
 ## IconTexture: Interface\AddOns\TweaksForever\media\Icon
-## OptionalDeps: ShortestPathForever, QuestieDB, Questie, Atlas, Atlas_ClassicWoW
+## OptionalDeps: ShortestPathForever, QuestieDB, Questie
 ## AddonCompartmentFunc: TweaksForever_OnAddonCompartmentClick
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
@@ -30,6 +30,7 @@ Data\ZoneLevels.lua
 Data\DungeonEntrances.lua
 Data\ClassSpells.lua
 Data\ForeverQuests.lua
+Data\DungeonMapArt.lua
 Core\Secret.lua
 Core\SafeCall.lua
 Core\Core.lua

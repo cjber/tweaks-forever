@@ -3,26 +3,18 @@
     python3 tools/screenshots.py
 
 Needs Pillow and the wowmock library (env WOWMOCK, default ~/.claude/skills/wow-mock-screenshots). Assets
-are fetched from wago.tools once and cached under ~/.cache/wowmock/<build>/. The dungeon map scene reads Atlas's
-pinned release from WoWInterface, fetched once into ~/.cache/wowmock/atlas/ and never committed.
+are fetched from wago.tools once and cached under ~/.cache/wowmock/<build>/.
 """
 
 import functools
-import hashlib
 import io
 import math
 import os
 import re
 import sys
-import zipfile
 from pathlib import Path
 
 from PIL import Image  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
-
-try:
-    from tools.forever_tools import wago
-except ModuleNotFoundError:
-    from forever_tools import wago
 
 WOWMOCK = Path(os.environ.get("WOWMOCK", Path.home() / ".claude" / "skills" / "wow-mock-screenshots"))
 if not (WOWMOCK / "wowmock.py").exists():
@@ -364,137 +356,29 @@ def dungeon_layers(ui):
     return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
 
 
-# Atlas and Atlas [Classic WoW] as released on WoWInterface (files 3896 and 20513). WoWInterface serves the
-# current build of each release under any version in the filename, so the filename is only the cache key: the
-# sha256 below is the real pin, and a download that does not match it stops the render rather than silently
-# changing the screenshot. Both are cached beside wowmock's art and never committed. Only the dungeon map
-# screenshot reads them. To move to a newer Atlas, download both zips, change ATLAS_VERSION to the version in
-# their .toc and update both hashes.
-ATLAS_VERSION = "v1.54.04"
-ATLAS_ZIPS = {
-    "Atlas": (3896, "74025c3ecf08050760752203776ee3beff8bae0abc7b02f9cb21edbe87ccd084"),
-    "Atlas_ClassicWoW": (20513, "45009a14d24fe8dbe4ab5f7908ee7d64af1bbc24d99b743f6e7e0f37ad5f7e21"),
-}
-ATLAS_CACHE = Path.home() / ".cache" / "wowmock" / "atlas"
-
-
-@functools.cache
-def atlas_zip(name):
-    """One pinned Atlas folder's zip, downloaded once and checked against its sha256."""
-    file_id, digest = ATLAS_ZIPS[name]
-    filename = f"{name}-{ATLAS_VERSION}.zip"
-
-    def pinned(data):
-        if hashlib.sha256(data).hexdigest() != digest:
-            raise SystemExit(f"{filename} does not match its pinned sha256 in tools/screenshots.py")
-
-    data = wago.fetch(
-        f"https://cdn.wowinterface.com/downloads/file{file_id}/{filename}",
-        ATLAS_CACHE / filename,
-        user_agent="TweaksForever/1.0",
-        timeout=120,
-        validate=pinned,
-    )
-    return zipfile.ZipFile(io.BytesIO(data))
-
-
-def atlas_file(path):
-    """The bytes of `path`, "<folder>/...", from that Atlas folder's pinned zip."""
-    try:
-        return atlas_zip(path.split("/", 1)[0]).read(path)
-    except KeyError:
-        sys.exit(f"Atlas {ATLAS_VERSION} has no {path}")
-
-
-def atlas_text(path):
-    """A text file from the Atlas zips, with the newlines Python's text mode would give (they ship CRLF)."""
-    return atlas_file(path).decode().replace("\r\n", "\n")
-
-
-# Map/DungeonMaps.lua over the map's canvas: PAD, HEADER, the picker and Back to map sizes, the sheet's 0.58 share.
-DUNGEON_PAD, DUNGEON_HEADER, DUNGEON_PICKER = 12, 46, 200
-DUNGEON_FLOOR = "CL_BlackfathomDeepsA"
-LEGEND_FONT = FONTS["GameFontHighlight"]
-
-
-def atlas_strings(path):
-    """The `L["key"] = "value"` lines of one of Atlas's enUS locale files."""
-    return dict(re.findall(r'L\["([^"]+)"\]\s*=\s*"([^"]*)"', atlas_text(path)))
-
-
-def atlas_floor(key):
-    """(title, legend lines) of one Atlas_ClassicWoW record from the Forever data file the client loads, its Lua
-    concatenations resolved as the addon's enUS locale files do: colour constants, local ALC[...] aliases, L[...],
-    ALC[...], BZ[...] and getBossName(...)."""
-    source = atlas_text("Atlas_ClassicWoW/Data/Data-ClassicForever.lua")
-    words = atlas_strings("Atlas/Locale/Atlas-enUS.lua")
-    own = atlas_strings("Atlas_ClassicWoW/Locale/Atlas_ClassicWoW-enUS.lua")
-    labels = re.search(r"\blabels = \{\n(.*?)\n\t\},", atlas_text("Atlas/Data/Constants.lua"), re.S)
-    if not labels:
-        sys.exit("Atlas has no label colours")
-    constants = dict(re.findall(r'^\s*(\w+) = "([^"]*)"', labels.group(1), re.M))
-    for name, alias in re.findall(r'^local (\w+) = ALC\["([^"]+)"\]', source, re.M):
-        if alias not in words:
-            sys.exit(f"Atlas {key}: no enUS text for ALC[{alias!r}]")
-        constants[name] = words[alias]
-    found = re.search(rf"^\t{key} = \{{\n(.*?)\n\t\}},", source, re.M | re.S)
-    if not found:
-        sys.exit(f"Atlas has no record {key}")
-    record = found.group(1)
-
-    def resolve(expression):
-        text = ""
-        for part in (p.strip() for p in expression.split("..")):
-            if part in constants:
-                text += constants[part]
-            elif m := re.fullmatch(r'"([^"]*)"', part):
-                text += m.group(1)
-            elif m := re.fullmatch(r'ALC\["([^"]+)"\]', part):
-                text += words[m.group(1)]
-            elif m := re.fullmatch(r'L\["([^"]+)"\]', part):
-                text += own.get(m.group(1), m.group(1))
-            elif m := re.fullmatch(r'(?:BZ\["([^"]+)"\]|getBossName\("([^"]+)"(?:, [^)]*)?\))', part):
-                name = m.group(1) or m.group(2)
-                text += own.get(name, name)
-            else:
-                sys.exit(f"Atlas {key}: cannot resolve {part!r}")
-        return text
-
-    names = re.search(r"ZoneName = \{ (.*?) \},\n", record)
-    if not names:
-        sys.exit(f"Atlas {key} has no ZoneName")
-    # Each legend row is { text, optional ID },; the ID and any trailing comment are not shown.
-    legend = re.findall(r"^\t\t\{ (.*?)(?:, \d+)? \},(?:\s*--.*)?$", record, re.M)
-    return resolve(names.group(1)), [resolve(line) for line in legend]
-
-
 def dungeon_map(ui):
-    """The world map opened inside Blackfathom Deeps: Map/DungeonMaps.lua's host over the map's canvas, laid out by
-    its Layout (the largest square at 58% of the width, the legend in a column beside it), the heading, the floor
-    picker (a UIPanelButtonTemplate showing the floor) and Back to map, with Atlas's own sheet and legend."""
-    title, legend = atlas_floor(DUNGEON_FLOOR)
-    sheet = Image.open(io.BytesIO(atlas_file(f"Atlas_ClassicWoW/Images/{DUNGEON_FLOOR}.blp"))).convert("RGBA")
+    """The world map opened inside Blackfathom Deeps with the client's native four by three tile sheet."""
+    title = "Blackfathom Deeps 1"
     nav = ("World", "Kalimdor", "Ashenvale")
     frame, rects = world_map_frame(ui, map_art(ui, ASHENVALE), nav, arrows=nav[1:])
     cx, cy, cw, ch = rects["container"]
     frame.fill(cx, cy, cw, ch, (0, 0, 0, 1))
-    pad = DUNGEON_PAD
-    side = min(cw * 0.58, ch - DUNGEON_HEADER - pad)
-    frame.draw(sheet, cx + pad, cy + DUNGEON_HEADER, side, side)
+    pad, header, columns, rows = 12, 46, 4, 3
+    side = min(cw - 2 * pad, (ch - header - pad) * columns / rows)
+    tile_w, tile_h = side / columns, side / rows
+    for index in range(1, columns * rows + 1):
+        tile = ui.texture(f"Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps1_{index}.blp")
+        frame.draw(
+            tile,
+            cx + pad + (index - 1) % columns * tile_w,
+            cy + header + (index - 1) // columns * tile_h,
+            tile_w,
+            tile_h,
+        )
     back_x = cx + cw - pad - 112
     ui_panel_button(frame, back_x, cy + pad, 112, 22, "Back to map")
-    picker_x = back_x - 8 - DUNGEON_PICKER
-    ui_panel_button(frame, picker_x, cy + pad, DUNGEON_PICKER, 24, title)
+    ui_panel_button(frame, back_x - 8 - 200, cy + pad, 200, 24, title)
     frame.text(cx + pad, cy + pad, title, FONTS["GameFontNormalLarge"])
-    # The legend wraps to the scroll frame (art's right + pad, to 2 pads from the host's right edge); each Atlas line
-    # opens with its own colour, which a wrapped line carries on.
-    left, y = cx + pad + side + pad, cy + DUNGEON_HEADER
-    width = cx + cw - 2 * pad - left
-    for line in legend:
-        colour = line[:10] if line.startswith("|c") else ""
-        for index, part in enumerate(wrap_text(frame, line, LEGEND_FONT, width)):
-            frame.text(left, y, (colour if index else "") + part, LEGEND_FONT)
-            y += LEGEND_FONT.height
     return frame
 
 

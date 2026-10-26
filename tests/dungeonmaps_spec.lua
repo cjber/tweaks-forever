@@ -145,31 +145,33 @@ end
 
 local combat, instanceType, instance, playerMap = false, "party", 36, 1000
 local nextFrame = {}
-local loaded = true
-local floors = {
-	CL_TheDeadmines = {
-		ZoneName = { "The Deadmines" },
-		Module = "Atlas_ClassicWoW",
-		{ "A) Entrance" },
-		{ "1) Rhahk'Zor" },
+local art = {
+	[36] = {
+		{ title = "The Deadmines 1", pattern = "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1", separator = "_" },
+		{ title = "The Deadmines 2", pattern = "Interface\\WorldMap\\TheDeadmines\\TheDeadmines2", separator = "_" },
 	},
-	CL_TheDeadminesEnt = { ZoneName = { "The Deadmines (Entrance)" }, Module = "Atlas_ClassicWoW", { "A) Door" } },
-	CL_BlackfathomDeepsA = { ZoneName = { "Blackfathom Deeps (A)" }, Module = "Atlas_ClassicWoW", { "1) Ghamoo-ra" } },
-	CL_BlackfathomDeepsB = {
-		ZoneName = { "Blackfathom Deeps (B)" },
-		Module = "Atlas_ClassicWoW",
-		{ "2) Lady Sarevess" },
+	[48] = {
+		{
+			title = "Blackfathom Deeps 1",
+			pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps1",
+			separator = "_",
+		},
+		{
+			title = "Blackfathom Deeps 2",
+			pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps2",
+			separator = "_",
+		},
+		{
+			title = "Blackfathom Deeps 3",
+			pattern = "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps3",
+			separator = "_",
+		},
 	},
-	CL_BlackfathomDeepsC = { ZoneName = { "Blackfathom Deeps (C)" }, Module = "Atlas_ClassicWoW", { "3) Aku'mai" } },
-	CL_BlackfathomDeepsEnt = { ZoneName = { "Blackfathom Deeps (Entrance)" }, Module = "Atlas_ClassicWoW" },
-	CL_Gnomeregan = { ZoneName = { "Gnomeregan" }, Module = "Atlas_ClassicWoW" },
-	TheDeadmines = { ZoneName = { "Wrong key" }, Module = "Atlas_ClassicWoW" },
-	CL_TheDeadminesOther = { ZoneName = { "Another module" }, Module = "Atlas_Other" },
-	CL_TheDeadminesBroken = { Module = "Atlas_ClassicWoW" },
+	[90] = { { title = "Gnomeregan", pattern = "Interface\\WorldMap\\Gnomeregan\\Gnomeregan1", separator = "_" } },
 }
 local env = setmetatable({
 	WorldMapFrame = map,
-	AtlasMaps = floors,
+	DungeonMapArt = art,
 	InCombatLockdown = function()
 		return combat
 	end,
@@ -179,11 +181,6 @@ local env = setmetatable({
 	C_Map = {
 		GetBestMapForUnit = function()
 			return playerMap
-		end,
-	},
-	C_AddOns = {
-		IsAddOnLoaded = function()
-			return loaded, true
 		end,
 	},
 	CreateFrame = function(kind)
@@ -202,31 +199,22 @@ local env = setmetatable({
 setfenv(assert(loadfile("UI/Keys.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/DungeonMaps.lua")), env)("TweaksForever", ns)
 local Model = ns.DungeonMaps
+ns.DungeonMapArt = art
 local feature = features.dungeonMaps
 
--- On by default, and held back by Atlas's Classic WoW module rather than by a conflict.
+-- On by default, with no optional addon dependency.
 assert(feature.default == true and feature.category == "Maps")
 assert(#(feature.conflicts or {}) == 0)
-assert(feature.needs.check() == true)
-loaded = false
-assert(feature.needs.check() == false)
-loaded = true
 
--- A dungeon's floors are Atlas's classic records for it, in key order, with the legend as one block. The outdoor
--- sheet of the way in ("Ent") is not a floor.
-local found = Model.Floors(floors, 36)
-assert(#found == 1, #found)
-assert(found[1].key == "CL_TheDeadmines" and found[1].title == "The Deadmines")
-assert(found[1].texture == "Interface\\AddOns\\Atlas_ClassicWoW\\Images\\CL_TheDeadmines")
-assert(found[1].legend == "A) Entrance\n1) Rhahk'Zor")
-found = Model.Floors(floors, 48)
-assert(#found == 3 and found[1].key == "CL_BlackfathomDeepsA" and found[3].key == "CL_BlackfathomDeepsC")
-for _, floor in ipairs(found) do
-	assert(not floor.key:find("Ent$"), "an entrance sheet was offered as a floor")
-end
-assert(#Model.Floors(floors, 90) == 1 and Model.Floors(floors, 90)[1].legend == "")
-assert(#Model.Floors(floors, 409) == 0, "a raid has no interior")
-assert(#Model.Floors(nil, 36) == 0 and #Model.Floors("Atlas", 36) == 0)
+-- Floors come from generated native client metadata, including the tile stem.
+local found = Model.Floors(art, 36)
+assert(#found == 2 and found[1].title == "The Deadmines 1")
+assert(found[1].pattern == "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1" and found[1].separator == "_")
+found = Model.Floors(art, 48)
+assert(#found == 3 and found[1].title == "Blackfathom Deeps 1" and found[3].title == "Blackfathom Deeps 3")
+assert(#Model.Floors(art, 90) == 1)
+assert(#Model.Floors(art, 409) == 0)
+assert(#Model.Floors(nil, 36) == 0 and #Model.Floors("bad", 36) == 0)
 
 -- Only a party dungeon, while the map shows the zone the player is in.
 assert(Model.Inside("party", 36, 1000, 1000) == 36)
@@ -282,15 +270,13 @@ Close()
 Open()
 assert(created == 0 and #frames == 0, "an outdoor map built frames")
 
--- A one-floor dungeon draws its floor and needs no picker.
+-- A dungeon draws a twelve-tile floor and offers its floors in the picker.
 instanceType, instance = "party", 36
 Close()
 Open()
-local host, scroll, back, reopen, picker, popup
+local host, back, reopen, picker, popup
 for _, frame in ipairs(frames) do
-	if frame.template == "ScrollFrameTemplate" then
-		scroll = frame
-	elseif frame.template == "UIPanelButtonTemplate" and frame.text == "Back to map" then
+	if frame.template == "UIPanelButtonTemplate" and frame.text == "Back to map" then
 		back = frame
 	elseif frame.template == "UIPanelButtonTemplate" and frame.text == "Dungeon map" then
 		reopen = frame
@@ -300,15 +286,15 @@ for _, frame in ipairs(frames) do
 		popup = frame
 	end
 end
-host = frames[1] -- the first frame built is the one over the map's canvas
-assert(host and host.shown and scroll and back and reopen and picker and popup)
+host = frames[1] -- the first frame built is the one over the map canvas
+assert(host and host.shown and back and reopen and picker and popup)
 assert(reopen.text == "Dungeon map" and not reopen.shown)
 assert(back.fitted == 112 and reopen.fitted == 112, "both buttons widen to a longer translated label")
-local heading, legendText = fontStrings[1], fontStrings[2]
-local art = textures[2]
-assert(heading.text == "The Deadmines" and legendText.text == "A) Entrance\n1) Rhahk'Zor")
-assert(art.texture == "Interface\\AddOns\\Atlas_ClassicWoW\\Images\\CL_TheDeadmines")
-assert(not picker.shown, "one floor needs no picker")
+local heading = fontStrings[1]
+assert(heading.text == "The Deadmines 1")
+assert(textures[2].texture == "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1_1")
+assert(textures[13].texture == "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1_12")
+assert(picker.shown, "multiple floors need a picker")
 assert(not popup.shown and not popup.registered.GLOBAL_MOUSE_DOWN)
 local built = #frames
 
@@ -322,9 +308,9 @@ for _, frame in ipairs(frames) do
 		choices[#choices + 1] = frame
 	end
 end
-assert(#choices == 3 and heading.text == "Blackfathom Deeps (A)" and picker.text == "Blackfathom Deeps (A)")
+assert(#choices == 3 and heading.text == "Blackfathom Deeps 1" and picker.text == "Blackfathom Deeps 1")
 assert(
-	choices[1].text == "Blackfathom Deeps (A)" and not choices[1].enabled and choices[2].enabled and choices[3].enabled
+	choices[1].text == "Blackfathom Deeps 1" and not choices[1].enabled and choices[2].enabled and choices[3].enabled
 )
 assert(choices[3].shown and popup.size[2] == 3 * 26 + 12)
 local rebuilt = #frames
@@ -361,18 +347,18 @@ assert(not popup.shown)
 picker.scripts.OnClick()
 choices[2].scripts.OnClick()
 assert(not popup.shown and not popup.registered.GLOBAL_MOUSE_DOWN)
-assert(heading.text == "Blackfathom Deeps (B)" and picker.text == "Blackfathom Deeps (B)")
-assert(legendText.text == "2) Lady Sarevess" and art.texture:find("CL_BlackfathomDeepsB$"))
+assert(heading.text == "Blackfathom Deeps 2" and picker.text == "Blackfathom Deeps 2")
+assert(textures[2].texture == "Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps2_1")
 assert(choices[1].enabled and not choices[2].enabled and choices[3].enabled)
 Close()
 Open()
-assert(heading.text == "Blackfathom Deeps (B)" and not choices[2].enabled, "the chosen floor was forgotten")
+assert(heading.text == "Blackfathom Deeps 2" and not choices[2].enabled, "the chosen floor was forgotten")
 instance = 36
 events.ZONE_CHANGED_NEW_AREA()
-assert(heading.text == "The Deadmines" and not picker.shown)
+assert(heading.text == "The Deadmines 1" and picker.shown)
 instance = 48
 events.ZONE_CHANGED_NEW_AREA()
-assert(heading.text == "Blackfathom Deeps (B)" and picker.shown, "the floor was not remembered for the dungeon")
+assert(heading.text == "Blackfathom Deeps 2" and picker.shown, "the floor was not remembered for the dungeon")
 assert(#frames == rebuilt, "reopening or retargeting rebuilt the frames")
 
 -- Back to map steps aside to the stock map, and the canvas button brings the interior back.
@@ -417,7 +403,7 @@ combat = true
 instance = 90
 events.ZONE_CHANGED_NEW_AREA()
 assert(not host.shown and #frames == built, "combat kept or retargeted the old dungeon")
-assert(heading.text == "Blackfathom Deeps (B)", "combat drew over the old dungeon")
+assert(heading.text == "Blackfathom Deeps 2", "combat drew over the old dungeon")
 instanceType = "none"
 events.ZONE_CHANGED_NEW_AREA()
 assert(not host.shown, "combat kept the interior over the map")
@@ -441,7 +427,7 @@ events.PLAYER_REGEN_ENABLED()
 assert(not host.shown, "the end of combat drew while the map was still pending in combat")
 combat = false
 events.PLAYER_REGEN_ENABLED()
-assert(host.shown and heading.text == "Blackfathom Deeps (B)", "the end of combat missed the pending dungeon")
+assert(host.shown and heading.text == "Blackfathom Deeps 2", "the end of combat missed the pending dungeon")
 
 -- The same dungeon reopened in combat waits as well, and one already drawn is left alone.
 Close()
@@ -450,18 +436,18 @@ Open()
 assert(not host.shown)
 combat = false
 events.PLAYER_REGEN_ENABLED()
-assert(host.shown and heading.text == "Blackfathom Deeps (B)")
+assert(host.shown and heading.text == "Blackfathom Deeps 2")
 combat = true
 events.ZONE_CHANGED_NEW_AREA()
 assert(host.shown, "combat hid an interior that was already right")
 combat = false
 
--- Without Atlas's maps there is nothing to draw and nothing raises.
-env.AtlasMaps = nil
+-- An unlisted instance has no interior and nothing raises.
+env.DungeonMapArt = {}
 instance = 33
 events.ZONE_CHANGED_NEW_AREA()
 assert(not host.shown)
-env.AtlasMaps = floors
+env.DungeonMapArt = art
 instance = 90
 events.ZONE_CHANGED_NEW_AREA()
 assert(host.shown and heading.text == "Gnomeregan")
