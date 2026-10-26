@@ -85,4 +85,5 @@ UI\WhatsNew.lua
 Integrations\Companions.lua
 Core\Report.lua
 UI\Settings.lua
+UI\SettingsPage.lua
 Core\API.lua
