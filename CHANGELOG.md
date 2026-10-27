@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Camp, class-spell, dungeon, overlay, zone-level and Forever-quest data regenerated for client build 1.60.1.70630.** The generators now read the newest Forever build from wago.tools' `wowf` product as well as `wow_classic_beta`. wago lists 1.60.1.70630 only under `wowf`, so the daily refresh had been reporting itself already current and never regenerated; the bundled data had been on the previous build since 2026-10-21.
+
 ## [0.16.0] - 2026-10-26
 
 - **Dungeon maps use the client's own painted floors.** The world map now draws the native four-by-three tiles with built-in area and boss labels, with no Atlas dependency or separate legend.
