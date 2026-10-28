@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [[tweaks-forever]] - 2026-10-28
+
+- **Game data re-pinned to client build 1.60.1.70685.** Camp, class-spell, dungeon, overlay, quest and zone-level tables are read against the newer Forever build; regenerating against it produces no player-visible change.
+
 ## [0.16.2] - 2026-10-28
 
 - **Camp, class-spell, dungeon, overlay, zone-level and Forever-quest data re-pinned to client build 1.60.1.70658.** The generators now read and record the newer Forever build from wago.tools. Regenerating against this build produces no change to the bundled rows, so nothing a player sees changes.
