@@ -12,7 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-## [[tweaks-forever]] - 2026-10-28
+## [0.16.3] - 2026-10-28
 
 - **Game data re-pinned to client build 1.60.1.70685.** Camp, class-spell, dungeon, overlay, quest and zone-level tables are read against the newer Forever build; regenerating against it produces no player-visible change.
 
