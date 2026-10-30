@@ -18,7 +18,7 @@ except ModuleNotFoundError:
     from forever_tools import wago
     from forever_tools.csvtable import parse_csv
 
-BUILD = "1.60.1.70685"
+BUILD = "1.60.1.70707"
 USER_AGENT = "TweaksForever/1.0"
 ROOT = Path(__file__).resolve().parent.parent
 CACHE = ROOT / "tools" / ".cache"
