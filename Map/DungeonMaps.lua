@@ -5,7 +5,8 @@ ns.Feature({
 	key = "dungeonMaps",
 	category = "Maps",
 	name = "Dungeon interior maps",
-	tooltip = "Inside a dungeon, the world map opens on its floor map, with a floor picker and a Back to map button.",
+	tooltip = "Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a "
+		.. "floor picker and a Back to map button.",
 	default = true,
 })
 
@@ -33,13 +34,27 @@ function Model.Floors(art, instance)
 	return floors
 end
 
+-- Every floor of the instances an entrance leads to, in the entrance's order.
+---@param art table?
+---@param instances integer[]
+---@return TFInteriorMap[]
+function Model.FloorsOf(art, instances)
+	local floors = {}
+	for _, instance in ipairs(instances) do
+		for _, floor in ipairs(Model.Floors(art, instance)) do
+			floors[#floors + 1] = floor
+		end
+	end
+	return floors
+end
+
 ---@param instanceType string
 ---@param instance integer?
 ---@param playerMap integer?
 ---@param shownMap integer?
 ---@return integer?
 function Model.Inside(instanceType, instance, playerMap, shownMap)
-	if instanceType == "party" and playerMap and playerMap == shownMap then
+	if (instanceType == "party" or instanceType == "raid") and playerMap and playerMap == shownMap then
 		return instance
 	end
 end
@@ -56,9 +71,12 @@ ns.Init(function()
 	local host, heading, picker, popup, back, reopen
 	local tiles = {}
 	local choices, floors, selected, shown = {}, {}, 1, nil
-	---@type table<integer, integer>
+	---@type table<integer|string, integer>
 	local chosen = {}
 	local pending = false
+	-- The map an entrance was clicked on, while its dungeon's sheet is up over it.
+	---@type integer?
+	local viewing
 
 	local function Hide()
 		if host then
@@ -161,6 +179,11 @@ ns.Init(function()
 		ns.FitButton(reopen, 112)
 		reopen:Hide()
 		back:SetScript("OnClick", function()
+			if viewing then
+				viewing = nil
+				Hide()
+				return
+			end
 			host:Hide()
 			reopen:Show()
 		end)
@@ -197,9 +220,44 @@ ns.Init(function()
 		host:SetScript("OnSizeChanged", Layout)
 	end
 
+	---@param key integer|string
+	---@param found TFInteriorMap[]
+	local function Present(key, found)
+		if not host then
+			Build()
+		end
+		floors, shown = found, key
+		selected = Model.Floor(#floors, chosen[key])
+		reopen:Hide()
+		host:Show()
+		Layout()
+		Draw()
+	end
+
+	-- An entrance's dungeon, over the map it was clicked on. False leaves the click to travel instead.
+	---@param uiMapID integer
+	---@param instances integer[]
+	---@return boolean
+	function Model.Open(uiMapID, instances)
+		local found = Model.FloorsOf(ns.DungeonMapArt, instances)
+		if #found == 0 or not ns.Active("dungeonMaps") or InCombatLockdown() then
+			return false
+		end
+		viewing = uiMapID
+		Present(table.concat(instances, ","), found)
+		return true
+	end
+
 	local function Refresh()
 		if not map:IsShown() then
 			return
+		end
+		if viewing then
+			if viewing == map:GetMapID() and ns.Active("dungeonMaps") then
+				return
+			end
+			viewing = nil
+			Hide()
 		end
 		local _, instanceType, _, _, _, _, _, instance = GetInstanceInfo()
 		local inside = Model.Inside(instanceType, instance, C_Map.GetBestMapForUnit("player"), map:GetMapID())
@@ -222,15 +280,7 @@ ns.Init(function()
 			Hide()
 			return
 		end
-		if not host then
-			Build()
-		end
-		floors, shown = found, inside
-		selected = Model.Floor(#floors, chosen[inside])
-		reopen:Hide()
-		host:Show()
-		Layout()
-		Draw()
+		Present(inside, found)
 	end
 
 	ns.MapCanvas.Watch(map, function(_, what)
@@ -243,7 +293,7 @@ ns.Init(function()
 		if host then
 			popup:Hide()
 		end
-		shown = nil
+		shown, viewing = nil, nil
 	end)
 	ns.On("PLAYER_ENTERING_WORLD", Refresh)
 	ns.On("ZONE_CHANGED_NEW_AREA", Refresh)

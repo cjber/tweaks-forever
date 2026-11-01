@@ -116,6 +116,18 @@ local ns = {
 	end,
 }
 assert(loadfile("Map/MapCanvas.lua"))("TweaksForever", ns)
+-- No painted sheet here, so a click travels: tests/dungeonmaps_spec.lua runs the sheets.
+ns.DungeonMaps = {
+	FloorsOf = function()
+		return {}
+	end,
+	Open = function()
+		return false
+	end,
+}
+rawset(_G, "IsShiftKeyDown", function()
+	return false
+end)
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
 assert(loadfile("Data/Overlays.lua"))("TweaksForever", ns)
 assert(loadfile("Map/Exploration.lua"))("TweaksForever", ns)

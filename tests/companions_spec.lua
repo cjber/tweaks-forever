@@ -26,7 +26,7 @@ setfenv(assert(loadfile("Integrations/Companions.lua")), env)("TweaksForever", n
 assert(env.ForeverFamily and ns.Family and ns.Family.Hint, "ns.Family is the shared module")
 assert(ns.Family ~= env.ForeverFamily, "a view bound to our L (ForeverFamily.For), not the shared table itself")
 
-local MISSING = "With Shortest Path Forever, click to plan the way there."
+local MISSING = "With Shortest Path Forever, Shift-click plans the way there."
 local ENABLE = "Enable Shortest Path Forever for walked routes and boat times."
 
 assert(ns.EntranceHint() == nil, "nothing before the saved variables load")

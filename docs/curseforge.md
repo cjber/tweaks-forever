@@ -8,7 +8,7 @@ The junk coin marks what sells with your greys at a merchant. Also dungeon entra
 
 ![The world map inside Blackfathom Deeps with its floor and legend](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png)
 
-Inside a dungeon the map opens on its own floor, with its legend.
+Inside a dungeon or raid the map opens on its painted parchment sheet. Click an entrance to see one from outside.
 
 ![The Eastern Kingdoms with a dungeon icon at every entrance](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png)
 
@@ -24,7 +24,7 @@ Nameplates in retail's own frame, with your target outlined.
 - **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk when turned on. Hold Shift as a merchant opens to skip both.
 - **Rares and levelling**: optional rare alerts in chat, and XP per hour and time to level on the experience bar.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a coloured group, then equip the group in one click.
-- **Maps**: every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Inside a dungeon, the map shows its floors and legend (needs Atlas [Classic WoW]).
+- **Maps**: every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside or click their entrance.
 - **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Optional spell reach icons show which attacks reach.
 - **Windows**: move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
 - **Quests and camps**: quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
@@ -57,7 +57,7 @@ Each one works on its own, and they work together when you install more than one
 
 <!-- forever-family:end -->
 
-With Shortest Path Forever, clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for Legacy Forever.
+With Shortest Path Forever, Shift-clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for Legacy Forever.
 
 For a bug report, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
 

@@ -12,6 +12,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Click a dungeon entrance to see its map.** A left click on a dungeon or raid entrance now opens the client's painted parchment map, with every floor behind that entrance, and Back to map returns to the zone. Shift-click travels there, as a plain click used to.
+- **Raids have painted maps too.** Molten Core, Onyxia's Lair, Blackwing Lair, Zul'Gurub and both Ahn'Qiraj raids now open on their parchment map when you are inside, the same as dungeons.
+
 ## [0.16.4] - 2026-10-30
 
 - **Game data re-pinned to client build 1.60.1.70707.** Camp, class-spell, dungeon, overlay, quest and zone-level tables are read against the newer Forever build; regenerating against it produces no player-visible change.

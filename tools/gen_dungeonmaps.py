@@ -8,8 +8,9 @@ each in a four by three grid, under Interface\\WorldMap. They carry the dungeon'
 skull on every boss room, so the addon draws them as they are: no third-party map pack, no legend to keep.
 
 INSTANCES maps GetInstanceInfo's instance ID to the sheet prefix the client uses. The client names the tile
-`<prefix>_<1..12>`; Zul'Farrak has no floor number, so its tiles are `<prefix><1..12>`. Only the sheets the
-client actually ships are written, so a dungeon whose art is missing is simply absent.
+`<prefix>_<1..12>`; the single sheets in UNNUMBERED have no floor number, so their tiles are
+`<prefix><1..12>`. Only the sheets the client actually ships are written, so a dungeon whose art is missing is
+simply absent.
 """
 
 import argparse
@@ -19,7 +20,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-BUILD = "1.60.1.70124"
+BUILD = "1.60.1.70707"
 FILES = "https://wago.tools/api/files?search=interface%2Fworldmap%2F"
 
 # instance ID: (sheet directory and prefix, floors the client ships, per-floor titles when they differ from the
@@ -46,7 +47,10 @@ INSTANCES = {
     289: ("Scholomance/Scholomance", (1, 2, 3, 4), {}),
     329: ("Stratholme/Stratholme", (1, 2), {}),
     349: ("Maraudon/Maraudon", (1, 2), {}),
+    249: ("OnyxiasLair/OnyxiasLair", (1,), {}),
+    309: ("ZulGurub/ZulGurub", (1,), {}),
     389: ("Ragefire/Ragefire", (1,), {}),
+    409: ("MoltenCore/MoltenCore", (1,), {}),
     429: (
         "DireMaul/DireMaul",
         (1, 2, 3, 4, 5, 6),
@@ -59,7 +63,11 @@ INSTANCES = {
             6: "Warpwood Quarter",
         },
     ),
+    469: ("BlackwingLair/BlackwingLair", (1, 2, 3, 4), {}),
+    509: ("RuinsofAhnQiraj/RuinsofAhnQiraj", (1,), {}),
+    531: ("AhnQiraj/AhnQiraj", (1, 2, 3), {}),
 }
+UNNUMBERED = {209, 309, 509}
 NAMES = {
     33: "Shadowfang Keep",
     34: "The Stockade",
@@ -78,8 +86,14 @@ NAMES = {
     289: "Scholomance",
     329: "Stratholme",
     349: "Maraudon",
+    249: "Onyxia's Lair",
+    309: "Zul'Gurub",
     389: "Ragefire Chasm",
+    409: "Molten Core",
     429: "Dire Maul",
+    469: "Blackwing Lair",
+    509: "Ruins of Ahn'Qiraj",
+    531: "Ahn'Qiraj Temple",
 }
 TILES = 12
 
@@ -114,7 +128,7 @@ def main() -> int:
         directory, prefix = where.split("/")
         rows = []
         for floor in floors:
-            numbered = instance != 209
+            numbered = instance not in UNNUMBERED
             stem = sheet(directory, prefix, floor, numbered)
             folder = f"interface/worldmap/{directory.lower()}/"
             tiles = [

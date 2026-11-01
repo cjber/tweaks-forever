@@ -21,7 +21,7 @@ function ns.EntranceHint()
 		return nil
 	end
 	if Family.Hint(db, ENTRANCE_KEY, SPF) then
-		return L["With Shortest Path Forever, click to plan the way there."]
+		return L["With Shortest Path Forever, Shift-click plans the way there."]
 	end
 	if Family.State(SPF) == "off" then
 		local ok, exists = pcall(C_AddOns.DoesAddOnExist, SPF)

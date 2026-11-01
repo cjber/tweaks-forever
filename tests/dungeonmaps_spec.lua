@@ -216,11 +216,11 @@ assert(#Model.Floors(art, 90) == 1)
 assert(#Model.Floors(art, 409) == 0)
 assert(#Model.Floors(nil, 36) == 0 and #Model.Floors("bad", 36) == 0)
 
--- Only a party dungeon, while the map shows the zone the player is in.
+-- Only a dungeon or raid, while the map shows the zone the player is in.
 assert(Model.Inside("party", 36, 1000, 1000) == 36)
 assert(Model.Inside("party", 36, 1000, 1001) == nil)
 assert(Model.Inside("party", 36, nil, nil) == nil)
-assert(Model.Inside("raid", 409, 1, 1) == nil and Model.Inside("none", 0, 1, 1) == nil)
+assert(Model.Inside("raid", 409, 1, 1) == 409 and Model.Inside("none", 0, 1, 1) == nil)
 assert(Model.Floor(3, nil) == 1 and Model.Floor(3, 2) == 2 and Model.Floor(3, 9) == 3 and Model.Floor(1, 0) == 1)
 
 -- The feature starts from ns.Init and reaches the map only through a view of our own (Map/MapCanvas.lua, stubbed
@@ -451,4 +451,41 @@ env.DungeonMapArt = art
 instance = 90
 events.ZONE_CHANGED_NEW_AREA()
 assert(host.shown and heading.text == "Gnomeregan")
+
+-- Clicking an entrance outdoors draws every floor behind it over the map it was clicked on.
+instanceType, instance = "none", 0
+events.ZONE_CHANGED_NEW_AREA()
+assert(not host.shown)
+assert(Model.Open(map:GetMapID(), { 36, 90, 409 }), "an entrance with art opens")
+assert(host.shown and not reopen.shown and heading.text == "The Deadmines 1")
+assert(#Model.FloorsOf(art, { 36, 90, 409 }) == 3 and #Model.FloorsOf(art, { 409 }) == 0)
+events.ZONE_CHANGED_NEW_AREA()
+assert(host.shown, "a zone event closed the map the player asked for")
+
+-- Back returns to the zone, with no Dungeon map button left behind.
+back.scripts.OnClick()
+assert(not host.shown and not reopen.shown)
+
+-- The map turning, or closing, drops the entrance's map.
+assert(Model.Open(map:GetMapID(), { 36 }))
+local turned = map.GetMapID
+map.GetMapID = function()
+	return -1
+end
+Turned()
+assert(not host.shown, "another map stayed under an entrance's sheet")
+map.GetMapID = turned
+assert(Model.Open(map:GetMapID(), { 36 }))
+Close()
+Open()
+assert(not host.shown, "an entrance's sheet came back with the map")
+
+-- No art, combat or the setting off leaves the click to travel.
+assert(not Model.Open(map:GetMapID(), { 409 }))
+combat = true
+assert(not Model.Open(map:GetMapID(), { 36 }))
+combat = false
+active = false
+assert(not Model.Open(map:GetMapID(), { 36 }))
+active = true
 print("dungeonmaps: ok")

@@ -6,7 +6,8 @@ ns.Feature({
 	category = "Maps",
 	name = "Instance entrances",
 	tooltip = "Mark every dungeon and raid entrance on zone and continent maps with the retail icons; point at "
-		.. "one for its name, and click it to travel there. Follows the map's own Show instance entrances filter.",
+		.. "one for its name, click it for its map, and Shift-click it to travel there. Follows the map's own Show "
+		.. "instance entrances filter.",
 	default = true,
 	conflicts = {
 		{
@@ -80,6 +81,23 @@ function Model.Travel(uiMapID, entry)
 	ns.Navigate(uiMapID, entry.x, entry.y, (Model.Describe(entry)))
 end
 
+-- Whether a click on the entrance can open a painted map.
+---@param entry TFEntrance
+---@return boolean
+function Model.HasMap(entry)
+	return ns.Active("dungeonMaps") and #ns.DungeonMaps.FloorsOf(ns.DungeonMapArt, entry.instances) > 0
+end
+
+-- A click opens the entrance's map; Shift, or an entrance with no map to open, travels there.
+---@param uiMapID integer
+---@param entry TFEntrance
+---@param travel boolean
+function Model.Click(uiMapID, entry, travel)
+	if travel or not ns.DungeonMaps.Open(uiMapID, entry.instances) then
+		Model.Travel(uiMapID, entry)
+	end
+end
+
 -- Whether a marker at (mx, my) sits on (x, y), both normalized, within the given half extents.
 ---@return boolean
 function Model.Covers(x, y, mx, my, halfX, halfY)
@@ -124,8 +142,8 @@ ns.Init(function()
 
 	-- Retail's pin, fed from Data/DungeonEntrances.lua: C_EncounterJournal has no entrances without the journal's
 	-- tables, which Forever's client lacks, so Blizzard's own provider draws nothing. Drawn on a frame of our own
-	-- (Map/MapCanvas.lua) with the retail icon and tooltip; a left click travels there in place of retail's journal,
-	-- and a right click goes through to the map to zoom out.
+	-- (Map/MapCanvas.lua) with the retail icon and tooltip; a left click opens its map or travels there in place of
+	-- retail's journal, and a right click goes through to the map to zoom out.
 	---@class TFEntrancePin : TFCanvasPin
 	---@field Texture Texture
 	---@field HighlightTexture Texture
@@ -160,7 +178,11 @@ ns.Init(function()
 		if self.lines then
 			GameTooltip_AddNormalLine(tooltip, self.lines)
 		end
-		GameTooltip_AddInstructionLine(tooltip, ns.NavigateHint(), false)
+		local hasMap = Model.HasMap(self.entry)
+		if hasMap then
+			GameTooltip_AddInstructionLine(tooltip, ns.L["Click to view its map"], false)
+		end
+		GameTooltip_AddInstructionLine(tooltip, ns.NavigateHint(hasMap), false)
 		local hint = ns.EntranceHint()
 		if hint then
 			GameTooltip_AddDisabledLine(tooltip, hint)
@@ -178,7 +200,7 @@ ns.Init(function()
 	---@param button string
 	function Pin:OnMouseClickAction(button)
 		if button == "LeftButton" then
-			Model.Travel(map:GetMapID(), self.entry)
+			Model.Click(map:GetMapID(), self.entry, IsShiftKeyDown())
 		end
 	end
 

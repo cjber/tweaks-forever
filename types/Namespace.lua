@@ -97,6 +97,8 @@
 ---@class TFDungeonMaps
 ---@field Floors fun(art: table?, instance: integer): TFInteriorMap[]
 ---@field Inside fun(instanceType: string, instance: integer?, playerMap: integer?, shownMap: integer?): integer?
+---@field FloorsOf fun(art: table?, instances: integer[]): TFInteriorMap[]
+---@field Open fun(uiMapID: integer, instances: integer[]): boolean
 ---@field Floor fun(count: integer, chosen: integer?): integer
 
 ---@class TFPosition

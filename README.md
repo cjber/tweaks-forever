@@ -23,7 +23,7 @@ When another addon already does one of these jobs, that feature is greyed out an
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png" width="768" alt="The world map inside Blackfathom Deeps, showing the client's painted dungeon floor">
 </p>
 
-<p align="center">Inside a dungeon the map opens on its own floor, with the legend beside it and a button for each floor.</p>
+<p align="center">Inside a dungeon or raid the map opens on its painted sheet, and a click on an entrance shows it from outside, with a button for each floor.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms with a dungeon icon at every entrance">
@@ -41,7 +41,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on. Hold Shift as a merchant opens to skip both for that visit.
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Items show a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
 - **Map extras.** Unexplored areas in a blue tint on the world and zone maps (off until you turn it on), each zone's level range coloured like quest levels, your and the cursor's coordinates, and every dungeon and raid entrance marked with retail's icons.
-- **Dungeon maps.** Inside a dungeon, the world map opens on the client's own painted map, with its area names and boss rooms, a button for the floor and a Back to map button. The maps come with WoW: Forever; no extra addon is needed.
+- **Dungeon maps.** Inside a dungeon or raid, or when you click its entrance, the world map shows the client's own painted map, with its area names and boss rooms, a button for the floor and a Back to map button. The maps come with WoW: Forever; no extra addon is needed.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout (not with the gamepad UI).
 - **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
 - **Spell reach.** A small icon for each attack you track on every enemy nameplate: full colour in reach, solid red out of it. Off until you turn it on.

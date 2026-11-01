@@ -77,4 +77,28 @@ Model.Travel(1415, { x = 0.47, y = 0.61, instances = { 229, 409 }, area = 25 })
 assert(travelled[1] == 1415 and travelled[2] == 0.47 and travelled[3] == 0.61 and travelled[4] == "area 25")
 Model.Travel(1427, { x = 0.35, y = 0.84, instances = { 36 } })
 assert(travelled[1] == 1427 and travelled[4] == "instance 36")
+
+-- A click opens the entrance's map; Shift, or an entrance with no map, travels instead.
+local opened
+ns.DungeonMaps = {
+	Open = function(uiMapID, instances)
+		opened = { uiMapID, instances }
+		return instances[1] ~= 999
+	end,
+	FloorsOf = function(_, instances)
+		return instances[1] == 999 and {} or { {} }
+	end,
+}
+ns.Active = function()
+	return true
+end
+travelled = nil
+Model.Click(1427, { x = 0.3, y = 0.8, instances = { 36 } }, false)
+assert(opened[1] == 1427 and opened[2][1] == 36 and not travelled, "a click opened the map and did not travel")
+Model.Click(1427, { x = 0.3, y = 0.8, instances = { 999 } }, false)
+assert(travelled and travelled[1] == 1427, "an entrance with no map still travels")
+opened, travelled = nil, nil
+Model.Click(1427, { x = 0.3, y = 0.8, instances = { 36 } }, true)
+assert(travelled and not opened, "Shift travels without opening the map")
+assert(Model.HasMap({ instances = { 36 } }) and not Model.HasMap({ instances = { 999 } }))
 print("dungeonentrances: ok")
