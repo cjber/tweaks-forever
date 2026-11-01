@@ -17,6 +17,7 @@ ns.Feature({
 			end,
 		},
 		{ polestar = "qol.autoRepair" },
+		{ naowh = "autoRepair" },
 	},
 })
 

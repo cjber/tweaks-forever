@@ -31,11 +31,11 @@ ns.Feature({
 		BATCH_SIZE
 	)
 		.. " "
-		.. L["With Leatrix Plus or Polestar selling junk, only marked non-grey items are sold here."]
+		.. L["With another addon selling junk, only marked non-grey items are sold here."]
 		.. " "
 		.. L["Hold Shift while a merchant opens to skip automatic selling there."],
 	default = true,
-	-- Leatrix and Polestar sell only greys; disabling this feature entirely would strand our marks.
+	-- Leatrix, Polestar and Naowh Forever sell only greys; disabling this feature entirely would strand our marks.
 	conflicts = conflicts,
 })
 
@@ -103,7 +103,7 @@ local function OtherSellsGreys()
 	if C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On" then
 		return true
 	end
-	return ns.PolestarOn("qol.sellJunk")
+	return ns.PolestarOn("qol.sellJunk") or ns.NaowhOn("sellJunk")
 end
 
 local icons = {}

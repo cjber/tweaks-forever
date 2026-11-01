@@ -94,7 +94,7 @@ Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian a
 
 ## Works alongside
 
-A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
 
 <!-- forever-family:start -->
 

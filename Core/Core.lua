@@ -108,7 +108,8 @@ end
 -- addon's own setting }; with no `when`, the addon being loaded is the conflict. { polestar = setting path } is
 -- Polestar's own setting, on (ns.PolestarOn) while Polestar is loaded; `addon` can name another of its addons that
 -- must be loaded too. { openmap = option } is one of OpenMap's world map options, on (ns.OpenMapOn) while OpenMap
--- is loaded.
+-- is loaded. { naowh = switch } is one of Naowh Forever's QoL switches, on (ns.NaowhOn) while its QoL module is
+-- loaded.
 ---@param feature TFFeature
 function ns.Feature(feature)
 	assert(not byKey[feature.key], "duplicate feature " .. feature.key)
@@ -119,6 +120,8 @@ function ns.Feature(feature)
 		elseif conflict.openmap then
 			-- Its TOC title is colour-coded, so name it plainly.
 			conflict.addon, conflict.title = conflict.addon or "OpenMap", "OpenMap"
+		elseif conflict.naowh then
+			conflict.addon, conflict.title = "NaowhForever_QoL", "Naowh Forever"
 		end
 	end
 	ns.features[#ns.features + 1] = feature
@@ -161,6 +164,24 @@ function ns.OpenMapOn(option)
 	return running == true and value ~= false and value ~= "hide"
 end
 
+-- Whether Naowh Forever's QoL module is loaded with one of its switches on, read through its own settings store,
+-- which follows the character's profile and fills in its defaults. Anything unreadable counts as off.
+---@param switch string
+---@return boolean
+function ns.NaowhOn(switch)
+	if not C_AddOns.IsAddOnLoaded("NaowhForever_QoL") then
+		return false
+	end
+	local settings = NaowhForever and NaowhForever.QoLSettings
+	if not (settings and settings.Get) then
+		return false
+	end
+	local ok, on = pcall(function()
+		return settings.Get("enabled") and settings.Get(switch)
+	end)
+	return ok and not not on
+end
+
 ---@param conflict TFConflict
 ---@return boolean?
 local function Applies(conflict)
@@ -168,6 +189,8 @@ local function Applies(conflict)
 		return ns.PolestarOn(conflict.polestar)
 	elseif conflict.openmap then
 		return ns.OpenMapOn(conflict.openmap)
+	elseif conflict.naowh then
+		return ns.NaowhOn(conflict.naowh)
 	end
 	return not conflict.when or conflict.when()
 end
@@ -347,6 +370,13 @@ login:SetScript("OnEvent", function()
 	-- Polestar applies its settings at once, so its matching features here follow them at once too.
 	if Polestar and type(Polestar.On) == "function" and C_AddOns.IsAddOnLoaded("Polestar") then
 		pcall(Polestar.On, "SETTING_CHANGED", function()
+			ns.RefreshConflicts()
+		end)
+	end
+	-- Naowh's switches apply at once as well.
+	local naowh = NaowhForever and NaowhForever.QoLSettings
+	if naowh and naowh.OnChange then
+		pcall(naowh.OnChange, function()
 			ns.RefreshConflicts()
 		end)
 	end

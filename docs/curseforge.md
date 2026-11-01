@@ -1,6 +1,6 @@
 Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
-If you already run Polestar, Leatrix Plus, OpenMap, Questie, BlizzMove, Peddler or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
+If you already run Polestar, Naowh Forever, Leatrix Plus, OpenMap, Questie, BlizzMove, Peddler or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
 
 ![Dungeon entrances, nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 

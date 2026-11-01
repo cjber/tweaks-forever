@@ -13,6 +13,9 @@ OpenMapDB = nil
 -- OpenMap's namespace: only whether its world map module started is read.
 ---@type {modules: table<string, {enabled: boolean?}>?}?
 OpenMap = nil
+-- Naowh Forever's namespace: only its QoL settings store is read.
+---@type { QoLSettings: { Get: fun(key: string): any, OnChange: fun(fn: function) }? }?
+NaowhForever = nil
 -- Polestar's namespace: its settings by path, and its message bus (SETTING_CHANGED as a setting changes).
 ---@class PolestarNamespace
 ---@field Get fun(path: string): any

@@ -35,7 +35,7 @@ for _, conflict in ipairs(features.zoneLevels.conflicts) do
 		assert(conflict.openmap == "zoneLevels", "OpenMap's hover label adds the same ranges")
 	end
 end
-assert(#features.zoneLevels.conflicts == 3, "Leatrix Maps, Polestar and OpenMap")
+assert(#features.zoneLevels.conflicts == 4, "Leatrix Maps, Polestar, OpenMap and Naowh Forever")
 
 -- Leatrix Maps shows zone levels unless its option is explicitly off.
 local leatrix = features.zoneLevels.conflicts[1]

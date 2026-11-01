@@ -60,6 +60,9 @@ local function Client(slots, db)
 			return not not c.db[key]
 		end,
 		ConflictOf = function() end,
+		NaowhOn = function()
+			return false
+		end,
 		-- Core's check of a Polestar setting, which also covers Polestar being loaded.
 		PolestarOn = function(path)
 			return c.polestar == path

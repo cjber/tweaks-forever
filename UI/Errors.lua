@@ -17,6 +17,7 @@ ns.Feature({
 			end,
 		},
 		{ polestar = "qol.hideErrors" },
+		{ naowh = "hideErrors" },
 	},
 })
 

@@ -78,9 +78,9 @@ local feature = features.xpRate
 assert(feature.default == true, "a tooltip line, not an automation")
 local named = {}
 for _, conflict in ipairs(feature.conflicts) do
-	named[conflict.addon or conflict.polestar] = true
+	named[conflict.addon or conflict.polestar or conflict.naowh] = true
 end
-assert(named.XToLevel and named["qol.xpTracker"])
+assert(named.XToLevel and named["qol.xpTracker"] and named.xpTicker)
 
 local Model = ns.XPRate
 Model.Start(now, 0, 10000)

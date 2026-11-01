@@ -19,6 +19,7 @@ ns.Feature({
 		},
 		{ polestar = "maps.zoneLevels" },
 		{ openmap = "zoneLevels" },
+		{ naowh = "zoneLevels" },
 	},
 })
 

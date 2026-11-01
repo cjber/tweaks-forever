@@ -11,7 +11,7 @@ ns.Feature({
 	tooltip = "Pointing at the experience bar adds your XP per hour over the last 15 minutes, the time to your next "
 		.. "level at that pace, and about how many kills or quests that is.",
 	default = true,
-	conflicts = { { addon = "XToLevel" }, { polestar = "qol.xpTracker" } },
+	conflicts = { { addon = "XToLevel" }, { polestar = "qol.xpTracker" }, { naowh = "xpTicker" } },
 })
 
 -- The window the rate is measured over, in seconds, and how many recent kills and quests the averages use.

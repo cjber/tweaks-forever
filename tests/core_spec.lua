@@ -243,6 +243,56 @@ do -- An `openmap` conflict reads OpenMap's world map option while OpenMap is lo
 	assert(not ns.OpenMapOn("coords"), "nothing is on while OpenMap is not loaded")
 end
 
+do -- A `naowh` conflict reads Naowh Forever's QoL switch while its QoL module is loaded and switched on.
+	local loaded, settings = { NaowhForever_QoL = true }, { enabled = true, fastLoot = true, sellJunk = false }
+	local env = setmetatable({
+		strtrim = function(text)
+			return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+		end,
+		GetTime = function()
+			return 0
+		end,
+		geterrorhandler = function()
+			return error
+		end,
+		C_AddOns = {
+			IsAddOnLoaded = function(addon)
+				return loaded[addon] == true
+			end,
+		},
+		CreateFrame = function()
+			return { RegisterEvent = function() end, SetScript = function() end }
+		end,
+		NaowhForever = {
+			QoLSettings = {
+				Get = function(key)
+					return settings[key]
+				end,
+			},
+		},
+	}, { __index = _G })
+	local ns = {}
+	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
+	ns.Feature({ key = "fastLoot", default = true, conflicts = { { naowh = "fastLoot" } } })
+	ns.Feature({ key = "sell", default = true, conflicts = { { naowh = "sellJunk" } } })
+	ns.RefreshConflicts()
+	assert(ns.ConflictOf("fastLoot") == "Naowh Forever", "its switch on is the conflict")
+	assert(not ns.ConflictOf("sell"), "its switch off leaves ours")
+	settings.enabled = false
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("fastLoot"), "its whole QoL store switched off runs none of it")
+	settings.enabled = true
+	loaded.NaowhForever_QoL = false
+	ns.RefreshConflicts()
+	assert(not ns.ConflictOf("fastLoot"), "the core alone runs no QoL feature")
+	loaded.NaowhForever_QoL = true
+	env.NaowhForever.QoLSettings.Get = function()
+		error("not ready")
+	end
+	assert(not ns.NaowhOn("fastLoot"), "an unreadable store counts as off")
+end
+
 do -- Loaded at login, Polestar's own setting changes refresh the conflicts at once.
 	local settings, frames, listeners = { ["qol.fastLoot"] = false }, {}, {}
 	local env = setmetatable({

@@ -33,6 +33,9 @@ ns.Feature({
 		{ addon = "AutoTurnIn" },
 		{ polestar = "behavior.autoAccept" },
 		{ polestar = "behavior.autoTurnin" },
+		{ naowh = "questAccept" },
+		{ naowh = "questTurnIn" },
+		{ naowh = "questGossip" },
 	},
 })
 
@@ -42,7 +45,7 @@ ns.Feature({
 	name = "Skip single-option gossip",
 	tooltip = "Goes straight to the only thing an NPC offers, or a flight master's flight map. Hold Shift to see it.",
 	default = false,
-	conflicts = { Leatrix("AutomateGossip"), { polestar = "qol.skipGossip" } },
+	conflicts = { Leatrix("AutomateGossip"), { polestar = "qol.skipGossip" }, { naowh = "gossipAuto" } },
 })
 
 ns.Feature({
@@ -123,6 +126,7 @@ ns.Feature({
 		{ addon = "SpeedyAutoLoot" },
 		{ addon = "AutoLootPlus" },
 		{ polestar = "qol.fastLoot" },
+		{ naowh = "fastLoot" },
 	},
 })
 

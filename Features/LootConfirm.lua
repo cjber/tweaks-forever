@@ -15,6 +15,7 @@ ns.Feature({
 				return LeaPlusDB and LeaPlusDB.NoConfirmLoot == "On"
 			end,
 		},
+		{ naowh = "lootConfirm" },
 	},
 })
 

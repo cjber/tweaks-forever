@@ -12,8 +12,11 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.17.0] - 2026-11-01
+
 - **Click a dungeon entrance to see its map.** A left click on a dungeon or raid entrance now opens the client's painted parchment map, with every floor behind that entrance, and Back to map returns to the zone. Shift-click travels there, as a plain click used to.
 - **Raids have painted maps too.** Molten Core, Onyxia's Lair, Blackwing Lair, Zul'Gurub and both Ahn'Qiraj raids now open on their parchment map when you are inside, the same as dungeons.
+- Features that Naowh Forever's QoL module also does step aside while its matching switch is on: quest and gossip automation, faster auto loot, loot confirmations, repairs, quiet errors, the XP rate, unexplored areas and zone levels. With its junk selling on, only your marked non-grey items are sold here.
 
 ## [0.16.4] - 2026-10-30
 

@@ -247,6 +247,7 @@ read_globals = {
 	"ObjectiveTrackerFrame",
 	"OpenMap",
 	"OpenMapDB",
+	"NaowhForever",
 	"PAGE_NUMBER_WITH_MAX",
 	"PagedContentFrameBaseMixin",
 	"PanelTemplates_SetNumTabs",
