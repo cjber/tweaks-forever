@@ -14,7 +14,11 @@ OpenMapDB = nil
 ---@type {modules: table<string, {enabled: boolean?}>?}?
 OpenMap = nil
 -- Naowh Forever's namespace: only its QoL settings store is read.
----@type { QoLSettings: { Get: fun(key: string): any, OnChange: fun(fn: function) }? }?
+---@class TFNaowhSettings
+---@field Get fun(key: string): any
+---@field OnChange fun(fn: function)
+
+---@type { QoLSettings: TFNaowhSettings? }?
 NaowhForever = nil
 -- Polestar's namespace: its settings by path, and its message bus (SETTING_CHANGED as a setting changes).
 ---@class PolestarNamespace

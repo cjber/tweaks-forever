@@ -374,8 +374,9 @@ login:SetScript("OnEvent", function()
 		end)
 	end
 	-- Naowh's switches apply at once as well.
+	---@type TFNaowhSettings?
 	local naowh = NaowhForever and NaowhForever.QoLSettings
-	if naowh and naowh.OnChange then
+	if naowh then
 		pcall(naowh.OnChange, function()
 			ns.RefreshConflicts()
 		end)
