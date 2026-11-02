@@ -10,7 +10,8 @@ checks:
   - { name: typecheck, run: "tools/typecheck.sh" }
   - { name: specs, run: "for s in tests/*_spec.lua; do luajit \"$s\" || exit 1; done", tests: true }
   - { name: tools, run: "ruff check tools && ruff format --check tools" }
-  - { name: generated, run: "python3 tools/check_generated.py --offline" }
+  # check_generated.py --offline is left out: it reads the gitignored tools/.cache, which a run checkout
+  # does not have.
 focus: [Core/**, UI/**, Map/**, Features/**, Integrations/**]
 ignore: [Data/**, Locales/**, Libs/**, types/**, tools/forever_tools/**]
 guards: { maxFiles: 8, maxLines: 400 }
