@@ -12,6 +12,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Translations for the newest lines.** The `/tw issue` bug report and feature request lines now read in all nine
+  languages instead of falling back to English.
+
 ## [0.17.1] - 2026-11-02
 
 - **Entrance tooltips say what a click will do.** In combat a dungeon entrance no longer promises its map, since the click
