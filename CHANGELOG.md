@@ -12,6 +12,11 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.17.2] - 2026-11-02
+
+- **Dire Maul's floors are named apart.** The floor picker, heading and map tooltip printed three identical
+  "Capital Gardens" buttons and two "Warpwood Quarter" ones; a repeated floor name is now numbered in floor
+  order, so the six buttons read distinctly.
 - **Translations for the newest lines.** The `/tw issue` bug report and feature request lines now read in all nine
   languages instead of falling back to English.
 
