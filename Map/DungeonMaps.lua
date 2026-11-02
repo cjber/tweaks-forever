@@ -31,6 +31,23 @@ function Model.Floors(art, instance)
 			floors[#floors + 1] = { title = floor.title, pattern = floor.pattern, separator = floor.separator or "_" }
 		end
 	end
+	-- A few instances name several floors the same way (Dire Maul's three Capital Gardens levels and its two
+	-- Warpwood Quarter ones), which leaves a picker of identical buttons. Number the repeats, in floor order, the
+	-- way the generator already numbers a nameless instance ("Shadowfang Keep 1", "Shadowfang Keep 2"): a bare
+	-- number is the same in every language, so nothing here needs a translation.
+	local seen = {}
+	for _, floor in ipairs(floors) do
+		seen[floor.title] = (seen[floor.title] or 0) + 1
+	end
+	local numbered = {}
+	for _, floor in ipairs(floors) do
+		if seen[floor.title] > 1 then
+			numbered[floor.title] = (numbered[floor.title] or 0) + 1
+			if numbered[floor.title] > 1 then
+				floor.title = floor.title .. " (" .. numbered[floor.title] .. ")"
+			end
+		end
+	end
 	return floors
 end
 

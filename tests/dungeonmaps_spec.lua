@@ -216,6 +216,34 @@ assert(#Model.Floors(art, 90) == 1)
 assert(#Model.Floors(art, 409) == 0)
 assert(#Model.Floors(nil, 36) == 0 and #Model.Floors("bad", 36) == 0)
 
+-- Instances that name several floors the same way are numbered in floor order, so every picker button reads
+-- distinctly (Dire Maul: three Capital Gardens levels, two Warpwood Quarter ones).
+local dire = { [429] = {} }
+local titles = {
+	"Gordok Commons",
+	"Capital Gardens",
+	"Capital Gardens",
+	"Capital Gardens",
+	"Warpwood Quarter",
+	"Warpwood Quarter",
+}
+for index, title in ipairs(titles) do
+	dire[429][index] = { title = "Dire Maul: " .. title, pattern = "Interface\\WorldMap\\DireMaul\\DireMaul" .. index }
+end
+local named = Model.Floors(dire, 429)
+assert(#named == 6)
+local seenTitles = {}
+for _, floor in ipairs(named) do
+	assert(seenTitles[floor.title] == nil, "a floor title repeats: " .. floor.title)
+	seenTitles[floor.title] = true
+end
+assert(named[1].title == "Dire Maul: Gordok Commons")
+assert(named[2].title == "Dire Maul: Capital Gardens")
+assert(named[3].title == "Dire Maul: Capital Gardens (2)")
+assert(named[4].title == "Dire Maul: Capital Gardens (3)")
+assert(named[5].title == "Dire Maul: Warpwood Quarter")
+assert(named[6].title == "Dire Maul: Warpwood Quarter (2)")
+
 -- Only a dungeon or raid, while the map shows the zone the player is in.
 assert(Model.Inside("party", 36, 1000, 1000) == 36)
 assert(Model.Inside("party", 36, 1000, 1001) == nil)
