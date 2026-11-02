@@ -1,4 +1,4 @@
--- Machine translated (2026-10-16); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
+-- Machine translated (2026-10-16, issue-report lines 2026-11-02); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
 ---@type string, TFNamespace
 local _, ns = ...
 if GetLocale() ~= "ptBR" then
@@ -293,3 +293,15 @@ L["Shift-click to travel here with Shortest Path Forever"] = "Shift-clique para 
 L["Shift-click to set a waypoint here"] = "Shift-clique para definir um ponto de rota aqui"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "Dentro de uma masmorra ou raide, ou após clicar na entrada, o mapa-múndi mostra o mapa pintado, com seletor de andar e um botão Voltar ao mapa."
 L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."] = "Um clique na entrada de uma masmorra ou raide abre o mapa pintado, e as raides também têm mapas pintados."
+L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - relata um erro ou pede um recurso com um link de issue do GitHub já pronto"
+L["/tw report - show a report to copy into a bug report"] = "/tw report - mostra um relatório para copiar para um relato de erro"
+L["Bug"] = "Erro"
+L["Bug: "] = "Erro: "
+L["Copy issue link"] = "Copiar link da issue"
+L["Copy report"] = "Copiar relatório"
+L["Feature request"] = "Pedido de recurso"
+L["Feature request: "] = "Pedido de recurso: "
+L["Report a bug or request a feature"] = "Relatar um erro ou pedir um recurso"
+L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "O link está selecionado. Pressione Ctrl+C (Cmd+C num Mac) e cole num navegador; o GitHub abre uma issue já preenchida."
+L["Title"] = "Título"
+L["What happened, or what you would like"] = "O que aconteceu ou o que você gostaria"

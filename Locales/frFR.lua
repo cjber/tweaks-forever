@@ -1,4 +1,4 @@
--- Machine translated (2026-10-16); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
+-- Machine translated (2026-10-16, issue-report lines 2026-11-02); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
 ---@type string, TFNamespace
 local _, ns = ...
 if GetLocale() ~= "frFR" then
@@ -293,3 +293,15 @@ L["Shift-click to travel here with Shortest Path Forever"] = "Maj-clic pour vous
 L["Shift-click to set a waypoint here"] = "Maj-clic pour placer un point de passage ici"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "Dans un donjon ou un raid, ou après un clic sur son entrée, la carte du monde affiche sa carte peinte, avec un choix d'étage et un bouton Retour à la carte."
 L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."] = "Un clic sur l'entrée d'un donjon ou d'un raid ouvre sa carte peinte, et les raids ont aussi des cartes peintes."
+L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - signale un bug ou demande une fonctionnalité avec un lien d'issue GitHub prêt à l'emploi"
+L["/tw report - show a report to copy into a bug report"] = "/tw report - affiche un rapport à copier dans un rapport de bug"
+L["Bug"] = "Bug"
+L["Bug: "] = "Bug : "
+L["Copy issue link"] = "Copier le lien de l'issue"
+L["Copy report"] = "Copier le rapport"
+L["Feature request"] = "Demande de fonctionnalité"
+L["Feature request: "] = "Demande de fonctionnalité : "
+L["Report a bug or request a feature"] = "Signaler un bug ou demander une fonctionnalité"
+L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "Le lien est sélectionné. Appuyez sur Ctrl+C (Cmd+C sur un Mac), puis collez-le dans un navigateur ; GitHub ouvre une issue préremplie."
+L["Title"] = "Titre"
+L["What happened, or what you would like"] = "Ce qui s'est passé, ou ce que vous aimeriez"

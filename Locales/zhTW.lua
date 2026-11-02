@@ -1,4 +1,4 @@
--- Machine translated (2026-10-16); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
+-- Machine translated (2026-10-16, issue-report lines 2026-11-02); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
 ---@type string, TFNamespace
 local _, ns = ...
 if GetLocale() ~= "zhTW" then
@@ -293,3 +293,15 @@ L["Shift-click to travel here with Shortest Path Forever"] = "Shift-點選使用
 L["Shift-click to set a waypoint here"] = "Shift-點選在此處設定路徑點"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "在地城或團隊副本內，或點選其入口後，世界地圖會顯示其手繪地圖，並附有樓層選擇器和返回地圖按鈕。"
 L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."] = "點選地城或團隊副本入口可開啟其手繪地圖，團隊副本現在也有手繪地圖了。"
+L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - 回報錯誤或要求功能，並附上已填好的 GitHub issue 連結"
+L["/tw report - show a report to copy into a bug report"] = "/tw report - 顯示可複製到錯誤報告中的回報"
+L["Bug"] = "錯誤"
+L["Bug: "] = "錯誤："
+L["Copy issue link"] = "複製 issue 連結"
+L["Copy report"] = "複製回報"
+L["Feature request"] = "功能要求"
+L["Feature request: "] = "功能要求："
+L["Report a bug or request a feature"] = "回報錯誤或要求功能"
+L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "連結已選取。按 Ctrl+C（Mac 上按 Cmd+C）複製，然後貼上到瀏覽器中；GitHub 會開啟已填好的 issue。"
+L["Title"] = "標題"
+L["What happened, or what you would like"] = "發生了什麼，或者你希望有什麼"

@@ -1,4 +1,4 @@
--- Machine translated (2026-10-16); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
+-- Machine translated (2026-10-16, issue-report lines 2026-11-02); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
 ---@type string, TFNamespace
 local _, ns = ...
 if GetLocale() ~= "esMX" then
@@ -293,3 +293,15 @@ L["Shift-click to travel here with Shortest Path Forever"] = "Mayús-clic para v
 L["Shift-click to set a waypoint here"] = "Mayús-clic para fijar un punto de ruta aquí"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "Dentro de un calabozo o banda, o tras hacer clic en su entrada, el mapa del mundo muestra su mapa pintado, con selector de piso y un botón Volver al mapa."
 L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."] = "Un clic en la entrada de un calabozo o banda abre su mapa pintado, y las bandas también tienen mapas pintados."
+L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - reporta un error o pide una función con un enlace de issue de GitHub ya preparado"
+L["/tw report - show a report to copy into a bug report"] = "/tw report - muestra un informe para copiar en un informe de error"
+L["Bug"] = "Error"
+L["Bug: "] = "Error: "
+L["Copy issue link"] = "Copiar enlace del issue"
+L["Copy report"] = "Copiar informe"
+L["Feature request"] = "Solicitud de función"
+L["Feature request: "] = "Solicitud de función: "
+L["Report a bug or request a feature"] = "Reportar un error o pedir una función"
+L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "El enlace está seleccionado. Presiona Ctrl+C (Cmd+C en Mac) y pégalo en un navegador; GitHub abre un issue ya rellenado."
+L["Title"] = "Título"
+L["What happened, or what you would like"] = "Qué pasó o qué te gustaría"
