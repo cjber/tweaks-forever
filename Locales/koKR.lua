@@ -1,4 +1,4 @@
--- Machine translated (2026-10-16); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
+-- Machine translated (2026-10-16, issue-report lines 2026-11-02); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
 ---@type string, TFNamespace
 local _, ns = ...
 if GetLocale() ~= "koKR" then
@@ -293,3 +293,15 @@ L["Shift-click to travel here with Shortest Path Forever"] = "Shift-클릭하여
 L["Shift-click to set a waypoint here"] = "Shift-클릭하여 여기에 경유지 설정"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "던전이나 공격대 안에서, 또는 입구를 클릭하면 세계 지도에 채색 지도가 층 선택기 및 지도로 돌아가기 버튼과 함께 표시됩니다."
 L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."] = "던전이나 공격대 입구를 클릭하면 채색 지도가 열리며, 이제 공격대에도 채색 지도가 있습니다."
+L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - 미리 채워진 GitHub 이슈 링크로 버그를 신고하거나 기능을 요청합니다"
+L["/tw report - show a report to copy into a bug report"] = "/tw report - 버그 신고에 붙여 넣을 보고서를 표시합니다"
+L["Bug"] = "버그"
+L["Bug: "] = "버그: "
+L["Copy issue link"] = "이슈 링크 복사"
+L["Copy report"] = "보고서 복사"
+L["Feature request"] = "기능 요청"
+L["Feature request: "] = "기능 요청: "
+L["Report a bug or request a feature"] = "버그 신고 또는 기능 요청"
+L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "링크가 선택되어 있습니다. Ctrl+C(Mac은 Cmd+C)를 눌러 복사한 뒤 브라우저에 붙여 넣으세요. GitHub에서 내용이 채워진 이슈가 열립니다."
+L["Title"] = "제목"
+L["What happened, or what you would like"] = "무슨 일이 있었는지 또는 원하는 기능"

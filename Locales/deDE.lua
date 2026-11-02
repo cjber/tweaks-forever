@@ -1,4 +1,4 @@
--- Machine translated (2026-10-16); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
+-- Machine translated (2026-10-16, issue-report lines 2026-11-02); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
 ---@type string, TFNamespace
 local _, ns = ...
 if GetLocale() ~= "deDE" then
@@ -293,3 +293,15 @@ L["Shift-click to travel here with Shortest Path Forever"] = "Umschalt-Klick, um
 L["Shift-click to set a waypoint here"] = "Umschalt-Klick, um hier einen Wegpunkt zu setzen"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "In einem Dungeon oder Schlachtzug oder nach einem Klick auf den Eingang zeigt die Weltkarte die gemalte Karte, mit Etagenauswahl und der Schaltfläche Zurück zur Karte."
 L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."] = "Ein Klick auf einen Dungeon- oder Schlachtzugseingang öffnet die gemalte Karte, und auch Schlachtzüge haben jetzt gemalte Karten."
+L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - meldet einen Fehler oder wünscht eine Funktion mit einem fertigen GitHub-Issue-Link"
+L["/tw report - show a report to copy into a bug report"] = "/tw report - zeigt einen Bericht zum Kopieren in einen Fehlerbericht"
+L["Bug"] = "Fehler"
+L["Bug: "] = "Fehler: "
+L["Copy issue link"] = "Issue-Link kopieren"
+L["Copy report"] = "Bericht kopieren"
+L["Feature request"] = "Funktionswunsch"
+L["Feature request: "] = "Funktionswunsch: "
+L["Report a bug or request a feature"] = "Einen Fehler melden oder eine Funktion wünschen"
+L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "Der Link ist markiert. Drückt Strg+C (Cmd+C auf einem Mac) und fügt ihn dann in einen Browser ein; GitHub öffnet ein ausgefülltes Issue."
+L["Title"] = "Titel"
+L["What happened, or what you would like"] = "Was passiert ist oder was Ihr Euch wünscht"

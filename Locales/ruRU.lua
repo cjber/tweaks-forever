@@ -1,4 +1,4 @@
--- Machine translated (2026-10-16); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
+-- Machine translated (2026-10-16, issue-report lines 2026-11-02); corrections welcome: https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml
 ---@type string, TFNamespace
 local _, ns = ...
 if GetLocale() ~= "ruRU" then
@@ -293,3 +293,15 @@ L["Shift-click to travel here with Shortest Path Forever"] = "Shift-щелчок
 L["Shift-click to set a waypoint here"] = "Shift-щелчок, чтобы поставить здесь точку маршрута"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "В подземелье или рейде, а также после щелчка по входу карта мира показывает его рисованную карту с выбором этажа и кнопкой «Назад к карте»."
 L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."] = "Щелчок по входу в подземелье или рейд открывает его рисованную карту, и у рейдов теперь тоже есть такие карты."
+L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - сообщает об ошибке или просит новую функцию с готовой ссылкой на issue в GitHub"
+L["/tw report - show a report to copy into a bug report"] = "/tw report - показывает отчет для вставки в сообщение об ошибке"
+L["Bug"] = "Ошибка"
+L["Bug: "] = "Ошибка: "
+L["Copy issue link"] = "Копировать ссылку на issue"
+L["Copy report"] = "Копировать отчет"
+L["Feature request"] = "Запрос функции"
+L["Feature request: "] = "Запрос функции: "
+L["Report a bug or request a feature"] = "Сообщить об ошибке или запросить функцию"
+L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "Ссылка выделена. Нажмите Ctrl+C (Cmd+C на Mac) и вставьте в браузер; GitHub откроет заполненный issue."
+L["Title"] = "Заголовок"
+L["What happened, or what you would like"] = "Что произошло или чего вы хотите"
