@@ -26,7 +26,8 @@ setfenv(assert(loadfile("Integrations/Companions.lua")), env)("TweaksForever", n
 assert(env.ForeverFamily and ns.Family and ns.Family.Hint, "ns.Family is the shared module")
 assert(ns.Family ~= env.ForeverFamily, "a view bound to our L (ForeverFamily.For), not the shared table itself")
 
-local MISSING = "With Shortest Path Forever, Shift-click plans the way there."
+local MISSING = "With Shortest Path Forever, click to plan the way there."
+local MISSING_SHIFT = "With Shortest Path Forever, Shift-click plans the way there."
 local ENABLE = "Enable Shortest Path Forever for walked routes and boat times."
 
 assert(ns.EntranceHint() == nil, "nothing before the saved variables load")
@@ -34,6 +35,7 @@ ns.db = {}
 initializers[1]()
 -- Not installed: what it would add, with the setting on by default.
 assert(ns.EntranceHint() == MISSING)
+assert(ns.EntranceHint(true) == MISSING_SHIFT, "a click that opens a map leaves planning to Shift")
 -- Installed but switched off: why the click only sets a waypoint.
 exists.ShortestPathForever = true
 assert(ns.EntranceHint() == ENABLE)

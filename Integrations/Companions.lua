@@ -14,14 +14,16 @@ local ENTRANCE_KEY = "TweaksForever.entrance"
 -- a waypoint. That explains a missing feature rather than suggesting an addon, so the setting ("only for addons
 -- you don't have") leaves it alone; it needs the client to say plainly that the addon exists, since the module
 -- reads an answer it can't get as "off".
+---@param shift boolean? whether a plain click opens a map, so planning takes Shift
 ---@return string?
-function ns.EntranceHint()
+function ns.EntranceHint(shift)
 	local Family, db = ns.Family, ns.db
 	if not (Family and db) then
 		return nil
 	end
 	if Family.Hint(db, ENTRANCE_KEY, SPF) then
-		return L["With Shortest Path Forever, Shift-click plans the way there."]
+		return shift and L["With Shortest Path Forever, Shift-click plans the way there."]
+			or L["With Shortest Path Forever, click to plan the way there."]
 	end
 	if Family.State(SPF) == "off" then
 		local ok, exists = pcall(C_AddOns.DoesAddOnExist, SPF)

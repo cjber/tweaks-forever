@@ -12,6 +12,13 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [0.17.1] - 2026-11-02
+
+- **Entrance tooltips say what a click will do.** In combat a dungeon entrance no longer promises its map, since the click
+  travels there instead, and on an entrance with no map the Shortest Path Forever tip says a plain click plans the way.
+- **Translation fixes.** The German, Spanish, French and Portuguese descriptions of the entrance setting read as one
+  sentence again.
+
 ## [0.17.0] - 2026-11-01
 
 - **Click a dungeon entrance to see its map.** A left click on a dungeon or raid entrance now opens the client's painted parchment map, with every floor behind that entrance, and Back to map returns to the zone. Shift-click travels there, as a plain click used to.
