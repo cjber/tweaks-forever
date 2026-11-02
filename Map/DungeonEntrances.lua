@@ -84,8 +84,11 @@ end
 -- Whether a click on the entrance can open a painted map.
 ---@param entry TFEntrance
 ---@return boolean
+-- Whether a plain click opens a map now: the map refuses to open in combat, so the click travels instead.
 function Model.HasMap(entry)
-	return ns.Active("dungeonMaps") and #ns.DungeonMaps.FloorsOf(ns.DungeonMapArt, entry.instances) > 0
+	return ns.Active("dungeonMaps")
+		and not InCombatLockdown()
+		and #ns.DungeonMaps.FloorsOf(ns.DungeonMapArt, entry.instances) > 0
 end
 
 -- A click opens the entrance's map; Shift, or an entrance with no map to open, travels there.
@@ -183,7 +186,7 @@ ns.Init(function()
 			GameTooltip_AddInstructionLine(tooltip, ns.L["Click to view its map"], false)
 		end
 		GameTooltip_AddInstructionLine(tooltip, ns.NavigateHint(hasMap), false)
-		local hint = ns.EntranceHint()
+		local hint = ns.EntranceHint(hasMap)
 		if hint then
 			GameTooltip_AddDisabledLine(tooltip, hint)
 		end

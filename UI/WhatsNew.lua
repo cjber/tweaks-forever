@@ -12,7 +12,7 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "0.17.0"
+ns.WHATS_NEW_VERSION = "0.17.1"
 ns.WHATS_NEW = L["A click on a dungeon or raid entrance opens its painted map, and raids have painted maps too."]
 
 -- The packager's placeholder, left as is in a dev checkout.

@@ -5,7 +5,11 @@ local ns = {
 	end,
 	Init = function() end,
 }
+local inCombat = false
 local env = setmetatable({
+	InCombatLockdown = function()
+		return inCombat
+	end,
 	GetRealZoneText = function(instance)
 		return "instance " .. instance
 	end,
@@ -101,4 +105,7 @@ opened, travelled = nil, nil
 Model.Click(1427, { x = 0.3, y = 0.8, instances = { 36 } }, true)
 assert(travelled and not opened, "Shift travels without opening the map")
 assert(Model.HasMap({ instances = { 36 } }) and not Model.HasMap({ instances = { 999 } }))
+inCombat = true
+assert(not Model.HasMap({ instances = { 36 } }), "in combat a click travels, so the tooltip must not promise the map")
+inCombat = false
 print("dungeonentrances: ok")
