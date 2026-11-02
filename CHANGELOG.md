@@ -12,6 +12,12 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-02
+
+- **The first stable release, ready for the WoW: Forever launch.** Tweaks Forever 1.0 works as 0.17.2 did: every
+  tweak and its default are unchanged. The version number now marks the addon as ready for everyday play, and the
+  chat line after the update says so in every shipped language.
+
 ## [0.17.2] - 2026-11-02
 
 - **Dire Maul's floors are named apart.** The floor picker, heading and map tooltip printed three identical
