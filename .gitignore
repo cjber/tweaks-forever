@@ -11,3 +11,6 @@ __pycache__/
 
 # Sloppatrol: local run data
 .sloppatrol/runs/
+
+# Speedpatrol: local run data
+.speedpatrol/runs/

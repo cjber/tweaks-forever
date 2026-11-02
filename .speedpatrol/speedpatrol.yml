@@ -1,0 +1,40 @@
+version: 1
+
+# Speedpatrol profile for Tweaks Forever, a WoW: Forever addon. The game client cannot run here, so
+# every benchmark is a command over the headless Lua harness the specs use. `speedpatrol init` reads
+# a repo without package.json as an HTTP API, so this file is written by hand. There is no bench
+# script to time here, so what is measured is the gate itself.
+project:
+  name: tweaks-forever
+  source: .
+app:
+  instructions: instructions.md
+  prepare: []
+  setup: []
+  teardown: []
+defaults:
+  iterations: 10
+  warmup: 1
+  timeoutMs: 180000
+  rounds: 2
+benchmarks:
+  - id: gate.specs
+    kind: command
+    critical: true
+    title: "The spec suite, as the gate runs it"
+    run: "for s in tests/*_spec.lua; do luajit \"$s\" >/dev/null || exit 1; done"
+    profile: { enabled: false }
+  - id: gate.typecheck
+    kind: command
+    critical: false
+    title: "The load graph and lint pass, including LuaLS"
+    run: "tools/typecheck.sh"
+    # About 22 s a run, so three samples rather than ten: the number is stable enough and the
+    # patrol should not spend four minutes per cycle re-running the linter.
+    iterations: 3
+    profile: { enabled: false }
+agents:
+  analyst: { use: claude, timeoutMinutes: 30 }
+  optimizer: { use: claude, enabled: true, maxPerCycle: 1, minImprovement: 0.05 }
+  github: { enabled: false }
+  patrol: { intervalMinutes: 30, pull: origin/main, cycles: 0 }
