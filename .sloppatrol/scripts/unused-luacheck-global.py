@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# sift-scope: all
-# sift-fix: delete the entry from .luacheckrc; luacheck never reports an allowed global that nothing reads
+# sloppatrol-scope: all
+# sloppatrol-fix: delete the entry from .luacheckrc; luacheck never reports an allowed global that nothing reads
 """Every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file.
 
 Locales/phrases.txt counts as Lua: translators copy it into Locales/<locale>.lua, so its `GetLocale()` line
@@ -11,7 +11,7 @@ import os
 import re
 import sys
 
-RULE = os.environ["SIFT_RULE"]
+RULE = os.environ["SLOPPATROL_RULE"]
 CONFIG = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
 TEMPLATES = {"Locales/phrases.txt"}
@@ -33,7 +33,7 @@ def entries(text):
 
 
 def main():
-    with open(os.environ["SIFT_FILES"], encoding="utf-8") as listing:
+    with open(os.environ["SLOPPATROL_FILES"], encoding="utf-8") as listing:
         paths = [p for p in listing.read().splitlines() if p]
     if CONFIG not in paths:
         return 0

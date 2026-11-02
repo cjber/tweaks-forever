@@ -3,7 +3,7 @@ __pycache__/
 *.zip
 .release/
 .release-notes.md
-.sift/runs/
+.sloppatrol/runs/
 .types/
 .claude/
 # Bugpatrol: local data and screenshots of the real app

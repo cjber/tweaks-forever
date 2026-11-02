@@ -10,7 +10,7 @@
     "tests",
     "tools",
     ".release",
-    ".sift",
+    ".sloppatrol",
     ".claude",
     ".bugpatrol",
     ".speedpatrol",

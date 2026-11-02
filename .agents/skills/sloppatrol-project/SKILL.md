@@ -1,9 +1,9 @@
 ---
-name: sift-project
-description: "Project profile for sift in Tweaks Forever: the exact quality-gate and evidence commands, live roots that must never be deleted as dead code, exclusions, conventions and risk order. Load before running sift or any code-quality, cleanup or dead-code work in this repository."
+name: sloppatrol-project
+description: "Project profile for Sloppatrol in Tweaks Forever: the exact quality-gate and evidence commands, live roots that must never be deleted as dead code, exclusions, conventions and risk order. Load before running Sloppatrol or any code-quality, cleanup or dead-code work in this repository."
 ---
 
-# sift project profile — Tweaks Forever
+# Sloppatrol project profile — Tweaks Forever
 
 A World of Warcraft addon for the WoW: Forever client (`## Interface: 16001`; the client's own UI code is
 called "Camelot" in comments). Lua 5.1 run by the game, loaded in `.toc` order, no `require`. Packaged by
@@ -25,7 +25,7 @@ Run in order from the repository root. All must pass before and after any audit 
 | Types (Python) | `uvx ty@0.0.83 check tools` | `All checks passed!` |
 | Workflows | `uvx --from actionlint-py==1.7.12.25 actionlint && uvx zizmor@1.30.1 --offline .github` | no output / `No findings` |
 | Secrets | `gitleaks git --redact --no-banner .` | `no leaks found` |
-| Project rules | `python3 .sift/gate.py --base origin/main && python3 .sift/agents.py check` | exit 0 |
+| Project rules | `python3 .sloppatrol/gate.py --base origin/main && python3 .sloppatrol/agents.py check` | exit 0 |
 
 ```sh
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
@@ -41,11 +41,11 @@ On-demand tools for audits. Output is candidates, never verdicts.
 |---|---|---|
 | Dead code (Lua) | `luacheck .` (unused locals/args are in the gate) plus the live-roots search below | Model functions used only by specs are live: specs are the reason they are exported. |
 | Dead code (Python) | `uvx vulture tools --min-confidence 60` | none seen |
-| Duplication | `npx --yes jscpd@4 --silent --reporters json --output .sift/runs/evidence/jscpd --ignore "**/.sift/**,**/Data/*.lua" .` | the spec files share a 10-line `ns` stub preamble on purpose (each spec is standalone) |
+| Duplication | `npx --yes jscpd@4 --silent --reporters json --output .sloppatrol/runs/evidence/jscpd --ignore "**/.sloppatrol/**,**/Data/*.lua" .` | the spec files share a 10-line `ns` stub preamble on purpose (each spec is standalone) |
 | Duplication, small | same command with `--min-lines 3 --min-tokens 30` and `**/tests/**` added to `--ignore` | the defaults missed the 6–11 line bag-hook clones between Bags/Junk.lua and Bags/Gear.lua; this run found them. Repeated checkout/setup-uv steps in ci.yml are expected. |
 | Writable globals never written | for each `globals` entry, `rg -n 'NAME\s*=' -g '*.lua' -g '!types/**' .` | luacheck accepts a writable global that is only read; move it to `read_globals` (the nameplate APIs sat there from #38 to this audit) |
 | Dead annotation fields | for each `---@field NAME` in `types/`, `rg -w NAME -g '*.lua' -g '!types/**' .` | fields of Blizzard objects the addon only reads through a hook still need one production reader |
-| Standards (`wow-forever-addon`) | `SIFT_STANDARDS_PATH=/home/cjber/skills python3 ~/.agents/skills/sift/scripts/agents.py standards` | without the variable the pack reports as not installed; findings use `rule_id` `standards` with `what` starting `WFA-n:` |
+| Standards (`wow-forever-addon`) | load the `wow-forever-addon` skill that AGENTS.md declares under `## Standards` | an audit reviews the addon against its WFA ids |
 | Unused allowed globals | for each name in `.luacheckrc`, `rg -wl NAME -g '*.lua' -g '*.xml' -g '!tests/**' -g '!types/**' -g '!Data/**' .` | luacheck never reports an unused `read_globals` entry, so these pile up when a feature drops an API; check open branches before removing one |
 
 String-named entrypoints (always pass a path: `rg` with no path reads stdin when it is not a terminal):
@@ -157,9 +157,9 @@ Unlisted paths are `production`.
 | `docs/features.md`, `Locales/README.md` | docs | |
 | `Locales/phrases.txt` | generated | written by `python3 -m tools.phrases --write`; never edit or review |
 | `LibAHTab/` | vendor | third-party library with its own TOC and licence; not reviewed |
-| `.sift/gate.py`, `.sift/agents.py`, `.sift/LICENSE` | vendor | copied byte for byte from sift; changed only by `sift update` |
+| `.sloppatrol/gate.py`, `.sloppatrol/agents.py`, `.sloppatrol/LICENSE` | vendor | copied byte for byte from Sloppatrol; changed only by `sloppatrol init --refresh` |
 | `media/`, `docs/screenshots/` | asset | not reviewed |
-| `.agents/`, `.sift/` | docs | this profile and audit reports |
+| `.agents/`, `.sloppatrol/` | docs | this profile and audit reports |
 
 ## Conventions
 
@@ -189,11 +189,11 @@ Audit slices from lowest to highest risk:
 
 ## Project rules and lenses
 
-- Rules: `unused-luacheck-global` (`.sift/scripts/unused-luacheck-global.py`): a `.luacheckrc` global that no
+- Rules: `unused-luacheck-global` (`.sloppatrol/scripts/unused-luacheck-global.py`): a `.luacheckrc` global that no
   tracked Lua, XML or `Locales/phrases.txt` names.
-- Rules: `setting-callback-outside-core` (`.sift/scripts/setting-callback-outside-core.py`): a
+- Rules: `setting-callback-outside-core` (`.sloppatrol/scripts/setting-callback-outside-core.py`): a
   `SetOnValueChangedCallback` call outside Core/Core.lua; use `ns.OnSettingChanged`.
-- Rules: `workflow-hashfiles-unmatched` (`.sift/scripts/workflow-hashfiles-unmatched.py`): a `hashFiles()`
+- Rules: `workflow-hashfiles-unmatched` (`.sloppatrol/scripts/workflow-hashfiles-unmatched.py`): a `hashFiles()`
   pattern in a workflow that matches no tracked file.
 - Lenses: none yet.
 

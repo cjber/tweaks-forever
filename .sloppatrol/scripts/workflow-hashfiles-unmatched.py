@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# sift-scope: all
-# sift-fix: delete the pattern from hashFiles(), or fix its path; a pattern that matches nothing adds nothing to the key
+# sloppatrol-scope: all
+# sloppatrol-fix: delete the pattern from hashFiles(), or fix its path; a pattern that matches nothing adds nothing to the key
 """Every pattern a workflow passes to hashFiles() matches at least one file in the repository.
 
 A cache key built from a pattern that matches nothing never changes when the file it was meant to track does.
@@ -11,7 +11,7 @@ import os
 import re
 import sys
 
-RULE = os.environ["SIFT_RULE"]
+RULE = os.environ["SLOPPATROL_RULE"]
 WORKFLOW = re.compile(r"^\.github/workflows/[^/]+\.ya?ml$")
 CALL = re.compile(r"hashFiles\(([^)]*)\)")
 PATTERN = re.compile(r"'([^']*)'")
@@ -24,7 +24,7 @@ def matcher(pattern):
 
 
 def main():
-    with open(os.environ["SIFT_FILES"], encoding="utf-8") as listing:
+    with open(os.environ["SLOPPATROL_FILES"], encoding="utf-8") as listing:
         paths = [p for p in listing.read().splitlines() if p]
     hits = []
     for path in paths:

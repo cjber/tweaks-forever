@@ -16,7 +16,7 @@ uvx ty@0.0.83 check tools --extra-search-path . --extra-search-path tools
 python3 tools/check_generated.py --offline # omit --offline to fetch missing pinned inputs
 python3 tools/changelog.py --check
 python3 tools/check_screenshots.py   # an image older than its sources; --record after tools/screenshots.py
-python3 .sift/gate.py --base origin/main && python3 .sift/agents.py check
+python3 .sloppatrol/gate.py --base origin/main && python3 .sloppatrol/agents.py check
 ```
 
 CI's `package` job builds the zip with the release's packager without uploading (`-d -z`) and runs
@@ -76,7 +76,7 @@ publishes that entry as its notes.
 - Release: load `.agents/skills/release/SKILL.md` when preparing or publishing a release.
   A cloud session cannot push tags: once the version's PR is merged and `.github/workflows/ci.yml` passed on main, start the Release
   workflow on main with `version` (and `commit` for an older main commit); it tags that commit and publishes.
-- Quality: load `.agents/skills/sift-project/SKILL.md` before cleanup, dead-code or refactoring
+- Quality: load `.agents/skills/sloppatrol-project/SKILL.md` before cleanup, dead-code or refactoring
   work.
 - A feature another loaded addon already provides is greyed out with that addon named, never run
   alongside it. Repairs, selling junk and faster auto loot start on;

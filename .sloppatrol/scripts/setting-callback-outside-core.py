@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-# sift-scope: all
-# sift-fix: call ns.OnSettingChanged(key, fn) instead; Core builds the TweaksForever_ variable and asserts the key
+# sloppatrol-scope: all
+# sloppatrol-fix: call ns.OnSettingChanged(key, fn) instead; Core builds the TweaksForever_ variable and asserts the key
 """Settings.SetOnValueChangedCallback is called only from Core/Core.lua's ns.OnSettingChanged.
 
 A feature file that restates the "TweaksForever_" .. key variable by hand registers a callback that never
@@ -11,14 +11,14 @@ import os
 import re
 import sys
 
-RULE = os.environ["SIFT_RULE"]
+RULE = os.environ["SLOPPATROL_RULE"]
 OWNER = "Core/Core.lua"
 CALL = re.compile(r"SetOnValueChangedCallback\s*\(")
-SKIP = ("tests/", "types/", ".sift/")
+SKIP = ("tests/", "types/", ".sloppatrol/")
 
 
 def main():
-    with open(os.environ["SIFT_FILES"], encoding="utf-8") as listing:
+    with open(os.environ["SLOPPATROL_FILES"], encoding="utf-8") as listing:
         paths = [p for p in listing.read().splitlines() if p]
     hits = []
     for path in paths:

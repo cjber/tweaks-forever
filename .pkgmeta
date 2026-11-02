@@ -9,7 +9,7 @@ manual-changelog:
 
 ignore:
   - .agents
-  - .sift
+  - .sloppatrol
   - AGENTS.md
   - tools
   - tests
