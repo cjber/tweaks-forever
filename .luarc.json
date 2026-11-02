@@ -11,7 +11,10 @@
     "tools",
     ".release",
     ".sift",
-    ".claude"
+    ".claude",
+    ".bugpatrol",
+    ".speedpatrol",
+    ".sloppatrol"
   ],
   "workspace.checkThirdParty": false,
   "diagnostics.libraryFiles": "Disable",

@@ -8,3 +8,6 @@ __pycache__/
 .claude/
 # Bugpatrol: local data and screenshots of the real app
 .bugpatrol/runs/
+
+# Sloppatrol: local run data
+.sloppatrol/runs/
