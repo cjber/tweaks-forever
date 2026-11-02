@@ -328,7 +328,7 @@ TweaksForeverCharDB = nil
 ---@field EscapeCloses fun(frame: Frame)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(shift: boolean?): string
----@field EntranceHint fun(): string? the grey line about Shortest Path Forever on a dungeon entrance (Integrations/Companions.lua)
+---@field EntranceHint fun(shift: boolean?): string? the grey line about Shortest Path Forever on a dungeon entrance (Integrations/Companions.lua)
 ---@field Family ForeverFamilyAPI the shared Forever addons module (UI/ForeverFamily.lua)
 ---@field WHATS_NEW string
 ---@field WHATS_NEW_VERSION string
