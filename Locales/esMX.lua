@@ -315,4 +315,3 @@ L["Gordok Commons"] = "Ágora de Gordok" -- mt
 L["Capital Gardens"] = "Jardines de la Capital" -- mt
 L["Warpwood Quarter"] = "Barrio Alabeo" -- mt
 
-L["Dungeon floor titles follow your client language."] = "Los nombres de los pisos de los calabozos se muestran en el idioma de tu cliente." -- mt

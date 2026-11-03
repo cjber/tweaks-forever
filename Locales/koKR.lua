@@ -315,4 +315,3 @@ L["Gordok Commons"] = "고르독 광장" -- mt
 L["Capital Gardens"] = "수도 정원" -- mt
 L["Warpwood Quarter"] = "굽이나무 지구" -- mt
 
-L["Dungeon floor titles follow your client language."] = "던전 층 이름이 클라이언트 언어로 표시됩니다." -- mt

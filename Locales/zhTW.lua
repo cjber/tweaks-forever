@@ -315,4 +315,3 @@ L["Gordok Commons"] = "戈多克議會" -- mt
 L["Capital Gardens"] = "中心花園" -- mt
 L["Warpwood Quarter"] = "扭木廣場" -- mt
 
-L["Dungeon floor titles follow your client language."] = "地城樓層名稱使用用戶端語言顯示。" -- mt
