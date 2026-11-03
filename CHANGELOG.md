@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-03
+
+- **Tweaks step aside for addons already doing the same job.** Repair, guild repair, grey selling, rare alerts, bag-button marks and tooltip restyling now switch themselves off when Scrap, Titan Panel, RareScanner, SilverDragon, Leatrix Plus, Dominos or a bag replacement is loaded with its own option on, so the same job never runs twice.
+
 ## [1.0.2] - 2026-11-03
 
 - **Distance labels use the units the game measures.** Quest and campfire distances no longer label yards as metres or kilometres in German, Spanish, French, Portuguese, Korean or Russian.
