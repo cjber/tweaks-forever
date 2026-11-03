@@ -590,7 +590,7 @@ local function GearRow(kind, index)
 		row:SetSize(24, 24)
 		row.Text:SetWidth(272)
 	else
-		row = CreateFrame("Button", nil, gearContent, "UIPanelButtonTemplate")
+		row = CreateFrame("Button", nil, gearContent, "SharedButtonSmallTemplate")
 		row:SetSize(300, 24)
 	end
 	gearRows[kind][index] = row

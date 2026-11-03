@@ -735,7 +735,7 @@ local function BuildEditor()
 			SavePreview(selected, value / 100)
 		end
 	end, dialog)
-	local reset = CreateFrame("Button", nil, dialog, "EditModeSystemSettingsDialogButtonTemplate")
+	local reset = CreateFrame("Button", nil, dialog, "SharedButtonSmallTemplate")
 	reset:SetSize(284, 24)
 	reset:SetPoint("TOPLEFT", 18, -94)
 	reset:SetText(HUD_EDIT_MODE_RESET_POSITION)

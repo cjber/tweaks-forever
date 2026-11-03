@@ -347,7 +347,7 @@ local function Run(installed, early, fromEditor)
 		if item.template == "MinimalSliderWithSteppersTemplate" then
 			slider = item
 		end
-		if item.template == "EditModeSystemSettingsDialogButtonTemplate" then
+		if item.template == "SharedButtonSmallTemplate" then
 			reset = item
 		end
 	end

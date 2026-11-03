@@ -130,7 +130,7 @@ local function Attach()
 		return
 	end
 	if not button then
-		button = CreateFrame("Button", nil, ClassTrainerFrame, "UIPanelButtonTemplate") --[[@as TFTrainAllButton]]
+		button = CreateFrame("Button", nil, ClassTrainerFrame, "SharedButtonSmallTemplate") --[[@as TFTrainAllButton]]
 		button:SetSize(80, ClassTrainerTrainButton:GetHeight())
 		button:SetPoint("RIGHT", ClassTrainerTrainButton, "LEFT", -4, 0)
 		button:SetText(L["Train all"])

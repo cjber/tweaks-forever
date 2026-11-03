@@ -304,11 +304,11 @@ Close()
 Open()
 local host, back, reopen, picker, popup
 for _, frame in ipairs(frames) do
-	if frame.template == "UIPanelButtonTemplate" and frame.text == "Back to map" then
+	if frame.template == "SharedButtonSmallTemplate" and frame.text == "Back to map" then
 		back = frame
-	elseif frame.template == "UIPanelButtonTemplate" and frame.text == "Dungeon map" then
+	elseif frame.template == "SharedButtonSmallTemplate" and frame.text == "Dungeon map" then
 		reopen = frame
-	elseif frame.template == "UIPanelButtonTemplate" and frame.parent == frames[1] then
+	elseif frame.template == "SharedButtonSmallTemplate" and frame.parent == frames[1] then
 		picker = frame
 	elseif frame.kind == "Frame" and frame.parent == picker then
 		popup = frame

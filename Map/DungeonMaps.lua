@@ -149,7 +149,7 @@ ns.Init(function()
 		for index, floor in ipairs(floors) do
 			local choice = choices[index]
 			if not choice then
-				choice = ns.MapCanvas.FrameUnder("Button", popup, "UIPanelButtonTemplate")
+				choice = ns.MapCanvas.FrameUnder("Button", popup, "SharedButtonSmallTemplate")
 				choice:SetSize(PICKER_WIDTH - 12, 24)
 				choice:SetPoint("TOPLEFT", 6, -6 - (index - 1) * 26)
 				choice:SetScript("OnClick", function()
@@ -205,12 +205,12 @@ ns.Init(function()
 			tiles[index] = host:CreateTexture(nil, "ARTWORK")
 			tiles[index]:SetTexCoord(0, 1, 0, 1)
 		end
-		back = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate") --[[@as Button]]
+		back = ns.MapCanvas.FrameUnder("Button", host, "SharedButtonSmallTemplate") --[[@as Button]]
 		back:SetSize(112, 22)
 		back:SetPoint("TOPRIGHT", -PAD, -PAD)
 		back:SetText(ns.L["Back to map"])
 		ns.FitButton(back, 112)
-		reopen = ns.MapCanvas.FrameUnder("Button", canvas, "UIPanelButtonTemplate") --[[@as Button]]
+		reopen = ns.MapCanvas.FrameUnder("Button", canvas, "SharedButtonSmallTemplate") --[[@as Button]]
 		reopen:SetSize(112, 22)
 		reopen:SetPoint("BOTTOMLEFT", PAD, PAD)
 		reopen:SetFrameLevel(host:GetFrameLevel() + 1)
@@ -230,7 +230,7 @@ ns.Init(function()
 			reopen:Hide()
 			host:Show()
 		end)
-		picker = ns.MapCanvas.FrameUnder("Button", host, "UIPanelButtonTemplate") --[[@as Button]]
+		picker = ns.MapCanvas.FrameUnder("Button", host, "SharedButtonSmallTemplate") --[[@as Button]]
 		picker:SetSize(PICKER_WIDTH, 24)
 		picker:SetPoint("TOPRIGHT", back, "TOPLEFT", -8, 0)
 		popup = ns.MapCanvas.FrameUnder("Frame", picker)

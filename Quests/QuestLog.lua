@@ -135,7 +135,7 @@ ns.Init(function()
 	---@param width number
 	---@param click function
 	local function Button(text, x, y, width, click)
-		local button = CreateFrame("Button", nil, panel, "UIPanelButtonTemplate")
+		local button = CreateFrame("Button", nil, panel, "SharedButtonSmallTemplate")
 		button:SetSize(width, 24)
 		button:SetPoint("TOPLEFT", x, y)
 		button:SetText(text)
@@ -235,7 +235,7 @@ ns.Init(function()
 	panel:SetScript("OnShow", Refresh)
 	-- Parented to the list itself, which the world map hides while a quest's details are shown: the button goes
 	-- with it, rather than sitting over the details page.
-	local open = CreateFrame("Button", nil, QuestScrollFrame, "UIPanelButtonTemplate")
+	local open = CreateFrame("Button", nil, QuestScrollFrame, "SharedButtonSmallTemplate")
 	open:SetFrameLevel(QuestScrollFrame:GetFrameLevel() + 1)
 	open:SetSize(140, 22)
 	open:SetPoint("BOTTOM", 0, 4)
