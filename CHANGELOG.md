@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-03
+
+- **The class trainer lists match the 1.60.1.70753 build.** Six spells this build no longer teaches are gone from the trainer lists, one trainer entry now names the spell it needs first, and the camp, dungeon, quest and zone-level data carry the new build's stamp. Nothing you already have changes.
+
 ## [1.0.0] - 2026-11-02
 
 - **The first stable release, ready for the WoW: Forever launch.** Tweaks Forever 1.0 works as 0.17.2 did: every
