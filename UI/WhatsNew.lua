@@ -12,7 +12,7 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "1.0.3"
+ns.WHATS_NEW_VERSION = "1.0.4"
 ns.WHATS_NEW = L["Tweaks step aside for addons already doing the same job."]
 
 -- The packager's placeholder, left as is in a dev checkout.
