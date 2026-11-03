@@ -50,6 +50,7 @@ L["Automation"] = "Automatisierung"
 L["Back to map"] = "Zurück zur Karte"
 L["Before fishing"] = "Vor dem Angeln"
 L["Below the health bar"] = "Unter der Gesundheitsleiste"
+L["Buttons and dialogs keep the Forever look."] = "Schaltflächen und Dialoge behalten das Forever-Aussehen." -- mt
 L["Camp benefit gained: %s (%s)"] = "Lagervorteil erhalten: %s (%s)"
 L["Campfire: about %d yd ahead"] = "Lagerfeuer: etwa %d yd voraus"
 L["Campfire: about %d yd ahead to your left"] = "Lagerfeuer: etwa %d yd voraus links"

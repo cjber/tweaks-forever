@@ -50,6 +50,7 @@ L["Automation"] = "자동화"
 L["Back to map"] = "지도로 돌아가기"
 L["Before fishing"] = "낚시 전"
 L["Below the health bar"] = "생명력 바 아래"
+L["Buttons and dialogs keep the Forever look."] = "버튼과 대화 상자는 Forever의 모습을 유지합니다." -- mt
 L["Camp benefit gained: %s (%s)"] = "캠핑 혜택 획득: %s (%s)"
 L["Campfire: about %d yd ahead"] = "모닥불: 앞쪽 약 %d야드"
 L["Campfire: about %d yd ahead to your left"] = "모닥불: 왼쪽 앞 약 %d야드"

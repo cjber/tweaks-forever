@@ -50,6 +50,7 @@ L["Automation"] = "自动化"
 L["Back to map"] = "返回地图"
 L["Before fishing"] = "钓鱼前"
 L["Below the health bar"] = "生命条下方"
+L["Buttons and dialogs keep the Forever look."] = "按钮与对话框保持 Forever 的外观。" -- mt
 L["Camp benefit gained: %s (%s)"] = "获得营地增益：%s（%s）"
 L["Campfire: about %d yd ahead"] = "营火：前方约%d码"
 L["Campfire: about %d yd ahead to your left"] = "营火：左前方约%d码"
