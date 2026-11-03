@@ -366,7 +366,7 @@ def dungeon_map(ui):
     frame.fill(cx, cy, cw, ch, (0, 0, 0, 1))
     pad, header, columns, rows = 12, 46, 4, 3
     side = min(cw - 2 * pad, (ch - header - pad) * columns / rows)
-    tile_w, tile_h = side / columns, side / rows
+    tile_w = tile_h = side / columns
     for index in range(1, columns * rows + 1):
         tile = ui.texture(f"Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps1_{index}.blp")
         frame.draw(

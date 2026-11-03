@@ -90,6 +90,8 @@
 
 -- One floor in the client's own dungeon map art.
 ---@class TFInteriorMap
+---@field wing? string localized through the floor picker
+---@field level? integer numbered floor when no wing is named
 ---@field title string
 ---@field pattern string texture path before tile number
 ---@field separator string tile path separator

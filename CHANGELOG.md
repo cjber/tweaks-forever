@@ -12,6 +12,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Distance labels use the units the game measures.** Quest and campfire distances no longer label yards as metres or kilometres in German, Spanish, French, Portuguese, Korean or Russian.
+- **Dungeon floor titles follow your client language.** The floor picker uses the client's dungeon names and translated wing labels, with the generated English titles as a fallback.
+
 ## [1.0.1] - 2026-11-03
 
 - **The class trainer lists match the 1.60.1.70753 build.** Six spells this build no longer teaches are gone from the trainer lists, one trainer entry now names the spell it needs first, and the camp, dungeon, quest and zone-level data carry the new build's stamp. Nothing you already have changes.

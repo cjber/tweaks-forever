@@ -13,6 +13,17 @@ ns.Feature({
 local PAD, HEADER, COLUMNS, ROWS = 12, 46, 4, 3
 local PICKER_WIDTH = 200
 
+local WINGS = {
+	["Graveyard"] = ns.L["Graveyard"],
+	["Library"] = ns.L["Library"],
+	["Armory"] = ns.L["Armory"],
+	["Cathedral"] = ns.L["Cathedral"],
+	["Upper Blackrock Spire"] = ns.L["Upper Blackrock Spire"],
+	["Gordok Commons"] = ns.L["Gordok Commons"],
+	["Capital Gardens"] = ns.L["Capital Gardens"],
+	["Warpwood Quarter"] = ns.L["Warpwood Quarter"],
+}
+
 ---@class TFDungeonMaps
 local Model = {}
 ns.DungeonMaps = Model
@@ -26,9 +37,20 @@ function Model.Floors(art, instance)
 	if type(source) ~= "table" then
 		return floors
 	end
+	local name = GetRealZoneText and GetRealZoneText(instance)
 	for _, floor in ipairs(source) do
 		if type(floor) == "table" and type(floor.title) == "string" and type(floor.pattern) == "string" then
-			floors[#floors + 1] = { title = floor.title, pattern = floor.pattern, separator = floor.separator or "_" }
+			local title = floor.title
+			if name and name ~= "" then
+				if floor.wing and WINGS[floor.wing] then
+					title = name .. ": " .. WINGS[floor.wing]
+				elseif floor.level then
+					title = name .. " " .. floor.level
+				elseif not floor.wing then
+					title = name
+				end
+			end
+			floors[#floors + 1] = { title = title, pattern = floor.pattern, separator = floor.separator or "_" }
 		end
 	end
 	-- A few instances name several floors the same way (Dire Maul's three Capital Gardens levels and its two

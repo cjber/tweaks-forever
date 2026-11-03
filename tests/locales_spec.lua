@@ -87,3 +87,20 @@ for _, code in ipairs(files) do
 	local other = Load(code, code == "deDE" and "frFR" or "deDE")
 	assert(next(rawget(other, "L")) == nil, code .. " wrote lines for another locale")
 end
+
+-- These values are formatted directly from the client's yard counts, without metric conversion.
+local yardWords =
+	{ deDE = "yd", esES = "yardas", esMX = "yardas", frFR = "yd", ptBR = "jardas", koKR = "야드", ruRU = "ярд." }
+for code, unit in pairs(yardWords) do
+	local translated = Load(code, code).L
+	assert(translated["%d yd"]:format(100):find(unit, 1, true), code .. ": 100 yards must retain its yard unit")
+	assert(
+		translated["%.1fk yd"]:format(1.5):find(unit, 1, true),
+		code .. ": 1500 yards must not be labelled kilometres"
+	)
+	for key, value in pairs(translated) do
+		if key:find("Campfire:", 1, true) and key:find("%d yd", 1, true) then
+			assert(value:format(100):find(unit, 1, true), code .. ": campfire yards must use the same unit")
+		end
+	end
+end

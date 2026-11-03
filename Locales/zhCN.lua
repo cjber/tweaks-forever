@@ -305,3 +305,12 @@ L["Report a bug or request a feature"] = "报告错误或请求功能"
 L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "链接已选中。按 Ctrl+C（Mac 上按 Cmd+C）复制，然后粘贴到浏览器中；GitHub 会打开已填好的 issue。"
 L["Title"] = "标题"
 L["What happened, or what you would like"] = "发生了什么，或者你希望有什么"
+
+L["Graveyard"] = "墓地" -- mt
+L["Library"] = "图书馆" -- mt
+L["Armory"] = "军械库" -- mt
+L["Cathedral"] = "大教堂" -- mt
+L["Upper Blackrock Spire"] = "黑石塔上层" -- mt
+L["Gordok Commons"] = "戈多克议会" -- mt
+L["Capital Gardens"] = "中心花园" -- mt
+L["Warpwood Quarter"] = "扭木广场" -- mt

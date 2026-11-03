@@ -517,3 +517,34 @@ active = false
 assert(not Model.Open(map:GetMapID(), { 36 }))
 active = true
 print("dungeonmaps: ok")
+
+-- Generated floor metadata builds localized names with the same texture paths and repeat numbering.
+local localized = {
+	L = setmetatable({ ["Capital Gardens"] = "Jardins de la capitale" }, {
+		__index = function(_, key)
+			return key
+		end,
+	}),
+	Feature = function() end,
+	Init = function() end,
+}
+local zoneNames = { [36] = "Les Mortemines", [429] = "Hache-tripes", [34] = "La Prison" }
+local environment = setmetatable({
+	GetRealZoneText = function(id)
+		return zoneNames[id] or ""
+	end,
+}, { __index = _G })
+setfenv(assert(loadfile("Data/DungeonMapArt.lua")), environment)("TweaksForever", localized)
+setfenv(assert(loadfile("Map/DungeonMaps.lua")), environment)("TweaksForever", localized)
+local localFloors = localized.DungeonMaps.Floors(localized.DungeonMapArt, 36)
+assert(localFloors[1].title == "Les Mortemines 1" and localFloors[2].title == "Les Mortemines 2")
+assert(localFloors[1].pattern == art[36][1].pattern, "localizing a title must not change the native tile path")
+local localDire = localized.DungeonMaps.Floors(localized.DungeonMapArt, 429)
+assert(localDire[2].title == "Hache-tripes: Jardins de la capitale")
+assert(localDire[3].title == "Hache-tripes: Jardins de la capitale (2)")
+assert(localized.DungeonMaps.Floors(localized.DungeonMapArt, 34)[1].title == "La Prison")
+zoneNames[36] = ""
+assert(
+	localized.DungeonMaps.Floors(localized.DungeonMapArt, 36)[1].title == "The Deadmines 1",
+	"missing client names retain the generated fallback"
+)
