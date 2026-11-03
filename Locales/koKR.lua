@@ -292,7 +292,6 @@ L["Click to view its map"] = "클릭하여 지도 보기"
 L["Shift-click to travel here with Shortest Path Forever"] = "Shift-클릭하여 Shortest Path Forever로 여기까지 이동"
 L["Shift-click to set a waypoint here"] = "Shift-클릭하여 여기에 경유지 설정"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "던전이나 공격대 안에서, 또는 입구를 클릭하면 세계 지도에 채색 지도가 층 선택기 및 지도로 돌아가기 버튼과 함께 표시됩니다."
-L["The class trainer lists match the 1.60.1.70753 build."] = "직업 훈련 목록이 1.60.1.70753 빌드와 일치합니다." -- mt
 L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - 미리 채워진 GitHub 이슈 링크로 버그를 신고하거나 기능을 요청합니다"
 L["/tw report - show a report to copy into a bug report"] = "/tw report - 버그 신고에 붙여 넣을 보고서를 표시합니다"
 L["Bug"] = "버그"
@@ -314,3 +313,5 @@ L["Upper Blackrock Spire"] = "검은바위 첨탑 상층" -- mt
 L["Gordok Commons"] = "고르독 광장" -- mt
 L["Capital Gardens"] = "수도 정원" -- mt
 L["Warpwood Quarter"] = "굽이나무 지구" -- mt
+
+L["Dungeon floor titles follow your client language."] = "던전 층 이름이 클라이언트 언어로 표시됩니다." -- mt

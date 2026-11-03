@@ -292,7 +292,6 @@ L["Click to view its map"] = "Klicken, um die Karte anzuzeigen"
 L["Shift-click to travel here with Shortest Path Forever"] = "Umschalt-Klick, um mit Shortest Path Forever hierher zu reisen"
 L["Shift-click to set a waypoint here"] = "Umschalt-Klick, um hier einen Wegpunkt zu setzen"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "In einem Dungeon oder Schlachtzug oder nach einem Klick auf den Eingang zeigt die Weltkarte die gemalte Karte, mit Etagenauswahl und der Schaltfläche Zurück zur Karte."
-L["The class trainer lists match the 1.60.1.70753 build."] = "Die Listen der Klassenlehrer entsprechen dem Build 1.60.1.70753." -- mt
 L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - meldet einen Fehler oder wünscht eine Funktion mit einem fertigen GitHub-Issue-Link"
 L["/tw report - show a report to copy into a bug report"] = "/tw report - zeigt einen Bericht zum Kopieren in einen Fehlerbericht"
 L["Bug"] = "Fehler"
@@ -314,3 +313,5 @@ L["Upper Blackrock Spire"] = "Obere Schwarzfelsspitze" -- mt
 L["Gordok Commons"] = "Gordokhallen" -- mt
 L["Capital Gardens"] = "Hauptstadtgärten" -- mt
 L["Warpwood Quarter"] = "Wucherborkenviertel" -- mt
+
+L["Dungeon floor titles follow your client language."] = "Die Namen der Ebenen von Dungeons entsprechen deiner Clientsprache." -- mt

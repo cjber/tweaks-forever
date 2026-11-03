@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-03
+
 - **Distance labels use the units the game measures.** Quest and campfire distances no longer label yards as metres or kilometres in German, Spanish, French, Portuguese, Korean or Russian.
 - **Dungeon floor titles follow your client language.** The floor picker uses the client's dungeon names and translated wing labels, with the generated English titles as a fallback.
 

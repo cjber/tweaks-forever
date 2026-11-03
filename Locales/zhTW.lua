@@ -292,7 +292,6 @@ L["Click to view its map"] = "點選檢視地圖"
 L["Shift-click to travel here with Shortest Path Forever"] = "Shift-點選使用Shortest Path Forever前往此處"
 L["Shift-click to set a waypoint here"] = "Shift-點選在此處設定路徑點"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "在地城或團隊副本內，或點選其入口後，世界地圖會顯示其手繪地圖，並附有樓層選擇器和返回地圖按鈕。"
-L["The class trainer lists match the 1.60.1.70753 build."] = "職業訓練師清單現已符合 1.60.1.70753 版本。" -- mt
 L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - 回報錯誤或要求功能，並附上已填好的 GitHub issue 連結"
 L["/tw report - show a report to copy into a bug report"] = "/tw report - 顯示可複製到錯誤報告中的回報"
 L["Bug"] = "錯誤"
@@ -314,3 +313,5 @@ L["Upper Blackrock Spire"] = "黑石塔上層" -- mt
 L["Gordok Commons"] = "戈多克議會" -- mt
 L["Capital Gardens"] = "中心花園" -- mt
 L["Warpwood Quarter"] = "扭木廣場" -- mt
+
+L["Dungeon floor titles follow your client language."] = "地城樓層名稱使用用戶端語言顯示。" -- mt

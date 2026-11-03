@@ -292,7 +292,6 @@ L["Click to view its map"] = "Haz clic para ver su mapa"
 L["Shift-click to travel here with Shortest Path Forever"] = "Mayús-clic para viajar aquí con Shortest Path Forever"
 L["Shift-click to set a waypoint here"] = "Mayús-clic para fijar un punto de ruta aquí"
 L["Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a floor picker and a Back to map button."] = "Dentro de un calabozo o banda, o tras hacer clic en su entrada, el mapa del mundo muestra su mapa pintado, con selector de piso y un botón Volver al mapa."
-L["The class trainer lists match the 1.60.1.70753 build."] = "Las listas de entrenadores de clase coinciden con la compilación 1.60.1.70753." -- mt
 L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - reporta un error o pide una función con un enlace de issue de GitHub ya preparado"
 L["/tw report - show a report to copy into a bug report"] = "/tw report - muestra un informe para copiar en un informe de error"
 L["Bug"] = "Error"
@@ -314,3 +313,5 @@ L["Upper Blackrock Spire"] = "Cumbre de Roca Negra Superior" -- mt
 L["Gordok Commons"] = "Ágora de Gordok" -- mt
 L["Capital Gardens"] = "Jardines de la Capital" -- mt
 L["Warpwood Quarter"] = "Barrio Alabeo" -- mt
+
+L["Dungeon floor titles follow your client language."] = "Los nombres de los pisos de los calabozos se muestran en el idioma de tu cliente." -- mt
