@@ -913,8 +913,11 @@ def quest_abandon(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).image.save(OUT / "quests.png")
 
 
+UI_ART_BUILD = "1.60.1.70124"
+
+
 def main():
-    ui = Ui(scale=2)
+    ui = Ui(build=UI_ART_BUILD, scale=2)
     quest_abandon(ui)
     gear(ui)
     menu(ui)
