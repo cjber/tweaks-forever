@@ -12,3 +12,9 @@ benchmarks run the headless harness the specs use, which stubs the client API an
   `tools/forever_tools/` are never edited by hand.
 - Commit only the files the change needs: no profiler output or scratch files.
 - Never launch the game, Battle.net, Lutris or Wine, and never use the network.
+
+## On pull requests
+
+`.github/workflows/speedpatrol.yml` runs `speedpatrol compare` on every pull request: three A/B rounds
+against the base branch, over `gate.specs` only, failing the job on a regression. Tweaks has no
+bench script; `gate.typecheck` is for the local patrol.

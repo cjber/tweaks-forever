@@ -12,6 +12,7 @@ checks:
   - { name: tools, run: "ruff check tools && ruff format --check tools" }
   # check_generated.py --offline is left out: it reads the gitignored tools/.cache, which a run checkout
   # does not have.
+  - { name: gate, run: "python3 .sloppatrol/gate.py --base origin/main && python3 .sloppatrol/agents.py check" }
 focus: [Core/**, UI/**, Map/**, Features/**, Integrations/**]
 ignore: [Data/**, Locales/**, Libs/**, types/**, tools/forever_tools/**]
 guards: { maxFiles: 8, maxLines: 400 }

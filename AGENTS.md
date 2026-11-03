@@ -25,6 +25,11 @@ THIRD_PARTY.md ship with README's `## Credits` and THIRD_PARTY's `## Ideas and c
 specs pass on the packaged files.
 
 The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and history.
+`.github/workflows/speedpatrol.yml` times the spec suite on every pull request against its base branch and fails on a
+regression (`.speedpatrol/instructions.md`).
+`.github/workflows/refresh-data.yml` runs daily: when wago.tools lists a newer Forever build it opens a
+`data/forever-<version>` PR and approves that PR's CI and Speedpatrol runs, which GitHub holds for a PR opened by
+`GITHUB_TOKEN`.
 Every version needs a `CHANGELOG.md` entry (prose, bold-lead bullets) before its `v*` tag: the release
 publishes that entry as its notes.
 
