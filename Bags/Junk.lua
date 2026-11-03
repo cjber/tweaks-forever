@@ -12,6 +12,16 @@ local conflicts = {
 	{ addon = "Vendor" },
 }
 
+-- Bag replacements hide Blizzard's bag frames, so the marks and coins drawn on those buttons never show. Selling
+-- at a merchant is unaffected, which is why this list is not the one above.
+local bagConflicts = {
+	{ addon = "AdiBags" },
+	{ addon = "ArkInventory" },
+	{ addon = "Baganator" },
+	{ addon = "Bagnon" },
+	{ addon = "BetterBags" },
+}
+
 ns.Feature({
 	key = "markJunk",
 	category = "Vendors",
@@ -20,7 +30,7 @@ ns.Feature({
 		.. " junk mark."
 		.. " The merchant's Sell All Junk also sells marked items.",
 	default = false,
-	conflicts = conflicts,
+	conflicts = bagConflicts,
 })
 
 ns.Feature({
@@ -45,7 +55,7 @@ ns.Feature({
 	name = "Junk coin on grey items",
 	tooltip = "Grey items show the game's gold junk coin in your bags all the time, not only while a merchant is open.",
 	default = true,
-	conflicts = conflicts,
+	conflicts = bagConflicts,
 })
 
 local POOR = 0
@@ -101,6 +111,9 @@ end
 -- Another addon selling the greys at each merchant, so the game's Sell All Junk would race it.
 local function OtherSellsGreys()
 	if C_AddOns.IsAddOnLoaded("Leatrix_Plus") and LeaPlusDB and LeaPlusDB.AutoSellJunk == "On" then
+		return true
+	end
+	if C_AddOns.IsAddOnLoaded("TitanRepair") and TitanGetVar and TitanGetVar("Repair", "SellAllGray") == 1 then
 		return true
 	end
 	return ns.PolestarOn("qol.sellJunk") or ns.NaowhOn("sellJunk")

@@ -11,6 +11,14 @@ ns.Feature({
 		.. "and picks each group's colour. Items in a group or an Equipment Manager set are marked in your bags "
 		.. "and named in their tooltip.",
 	default = true,
+	-- Bag replacements hide Blizzard's bag frames, so the group marks and the portrait menu have nowhere to show.
+	conflicts = {
+		{ addon = "AdiBags" },
+		{ addon = "ArkInventory" },
+		{ addon = "Baganator" },
+		{ addon = "Bagnon" },
+		{ addon = "BetterBags" },
+	},
 })
 
 ns.Feature({

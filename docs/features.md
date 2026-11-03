@@ -100,7 +100,7 @@ All off until you turn them on, except faster auto loot.
 
 ## Works alongside
 
-A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar and Naowh Forever, it steps aside only while that addon's matching option is on.
+A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, Scrap, Titan Panel, RareScanner and SilverDragon, it steps aside only while that addon's matching option is on.
 
 | Feature | Addons |
 |---|---|
@@ -108,7 +108,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Nearest quests first | Questie, while its tracker is on |
 | Quest progress on tooltips | Questie, while its tooltips are on; Polestar, once its quest database has loaded |
 | Quest icons on nameplates | Questie, while its nameplate icons are on; Polestar, once its quest database has loaded |
-| Other automations, repairs, quiet errors | Leatrix Plus, Polestar; Naowh Forever for gossip, repairs and quiet errors |
+| Other automations, repairs, quiet errors | Leatrix Plus, Polestar; Naowh Forever for gossip, repairs and quiet errors; Scrap for its repair and guild-funds repair; Titan Panel for its repair and guild-funds repair |
 | Invite from whispers | Leatrix Plus |
 | Skip loot confirmations | Leatrix Plus, Naowh Forever |
 | Maximum camera zoom | Leatrix Plus |
@@ -117,20 +117,23 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Train all button | Leatrix Plus |
 | `/rl` | Leatrix Plus, which always adds its own `/rl` |
 | Faster auto loot | Leatrix Plus, SpeedyAutoLoot, AutoLootPlus, Polestar, Naowh Forever |
-| Junk marks and selling | Peddler, Scrap, Dejunk, Vendor |
+| Junk marks and junk coin | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
+| Junk selling | Peddler, Scrap, Dejunk, Vendor; Titan Panel for its grey selling |
 | Unexplored areas | Legacy Forever, Leatrix Maps, Mapster, Polestar, Naowh Forever; OpenMap unless its unexplored areas are hidden |
 | Zone level ranges | Leatrix Maps, Polestar, OpenMap, Naowh Forever |
-| Rare alerts | RareScanner, Nova Rares, Polestar while its rare alerts are on |
-| XP per hour | XToLevel, Polestar while its XP tracker is on, Naowh Forever while its XP ticker is on |
+| Rare alerts | RareScanner, SilverDragon, Nova Rares, Polestar while its rare alerts are on |
+| XP per hour | XToLevel, Dominos for its XP bar, Titan Panel while its XP-per-hour plugin is on, Polestar while its XP tracker is on, Naowh Forever while its XP ticker is on |
 | Coordinates on the world map | Leatrix Maps, Mapster, Polestar and OpenMap while their coordinates are on; Coordinates |
 | Dungeon entrances | Leatrix Maps, while its points of interest are on; OpenMap, while its dungeon icons are on |
 | Move windows | BlizzMove, MoveAnything |
-| Hide macro names | Dominos, Bartender4, ElvUI |
+| Hide macro names | Dominos, Bartender4, ElvUI, Leatrix Plus |
 | Highlight new Forever quests | ForeverQuestTint, ForeverQuestTracker |
 | Best-selling quest reward | Polestar, while its reward highlight is on |
 | Quest levels in quest dialogs | Polestar, while its quest levels are on |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
-| Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac |
+| Sort gear into named groups | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
+| Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac, Leatrix Plus |
+| Tooltip at the cursor | Leatrix Plus |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Spell reach under nameplates | Range Lens, Plater, Kui Nameplates, NeatPlates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |

@@ -12,7 +12,20 @@ ns.Feature({
 		.. "Not in combat, and once per rare for ten minutes.",
 	default = false,
 	conflicts = {
-		{ addon = "RareScanner" },
+		{
+			addon = "RareScanner",
+			when = function()
+				local profile = RareScannerDB and RareScannerDB.profile
+				return profile and profile.general and profile.general.scanRares ~= false
+			end,
+		},
+		{
+			addon = "SilverDragon",
+			when = function()
+				local profile = SilverDragon3DB and SilverDragon3DB.profile
+				return profile and (profile.scan or 0) > 0
+			end,
+		},
 		{ addon = "NovaRares", title = "Nova Rares" },
 		{ polestar = "rares.alerts" },
 	},

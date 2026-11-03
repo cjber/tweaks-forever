@@ -10,6 +10,14 @@ ns.Feature({
 	tooltip = "The game's own tooltips follow the mouse cursor instead of the game's fixed corner. "
 		.. "Tooltips a window places itself, such as a bag item's, stay where it puts them.",
 	default = false,
+	conflicts = {
+		{
+			addon = "Leatrix_Plus",
+			when = function()
+				return LeaPlusDB and LeaPlusDB.TipModEnable == "On" and (LeaPlusDB.TooltipAnchorMenu or 1) ~= 1
+			end,
+		},
+	},
 })
 
 -- Blizzard places a tooltip it has no owner anchor for at a fixed corner through GameTooltip_SetDefaultAnchor.

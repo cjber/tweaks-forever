@@ -5,6 +5,18 @@
 LeaPlusDB = nil
 ---@type table<string, string>?
 LeaMapsDB = nil
+-- RareScanner's settings: only its switch for scanning rares is read.
+---@type {profile: {general: {scanRares: boolean?}?}?}?
+RareScannerDB = nil
+-- SilverDragon's settings: only its scan switch is read, where 0 is off.
+---@type {profile: {scan: integer?}?}?
+SilverDragon3DB = nil
+-- Scrap's merged settings, after its defaults table.
+---@type {sets: {repair: boolean?, guild: boolean?}?}?
+Scrap = nil
+-- Titan Panel's per-plugin setting getter.
+---@type fun(plugin: string, key: string): any
+TitanGetVar = nil
 ---@type {showAreas: boolean?}?
 LegacyForeverDB = nil
 -- OpenMap's account settings, one table per module; only its world map options are read.

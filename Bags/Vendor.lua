@@ -16,6 +16,19 @@ ns.Feature({
 				return LeaPlusDB and LeaPlusDB.AutoRepairGear == "On"
 			end,
 		},
+		{
+			addon = "Scrap",
+			when = function()
+				return type(Scrap) == "table" and Scrap.sets and Scrap.sets.repair == true
+			end,
+		},
+		{
+			addon = "TitanRepair",
+			title = "Titan Panel",
+			when = function()
+				return TitanGetVar and TitanGetVar("Repair", "AutoRepair") == true
+			end,
+		},
 		{ polestar = "qol.autoRepair" },
 		{ naowh = "autoRepair" },
 	},
@@ -29,6 +42,27 @@ ns.Feature({
 		.. "the repair comes out of your own money.",
 	default = true,
 	parent = "repair",
+	conflicts = {
+		{
+			addon = "Leatrix_Plus",
+			when = function()
+				return LeaPlusDB and LeaPlusDB.AutoRepairGear == "On" and LeaPlusDB.AutoRepairGuildFunds == "On"
+			end,
+		},
+		{
+			addon = "Scrap",
+			when = function()
+				return type(Scrap) == "table" and Scrap.sets and Scrap.sets.guild == true
+			end,
+		},
+		{
+			addon = "TitanRepair",
+			title = "Titan Panel",
+			when = function()
+				return TitanGetVar and TitanGetVar("Repair", "UseGuildBank") == true
+			end,
+		},
+	},
 })
 
 -- Whether the guild bank will cover `cost` (a withdraw limit of -1 is unlimited).

@@ -16,6 +16,12 @@ ns.Feature({
 		{ addon = "ElvUI" },
 		{ addon = "TinyTooltip" },
 		{ addon = "TipTac" },
+		{
+			addon = "Leatrix_Plus",
+			when = function()
+				return LeaPlusDB and LeaPlusDB.TipModEnable == "On"
+			end,
+		},
 	},
 })
 

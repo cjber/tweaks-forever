@@ -7,7 +7,17 @@ ns.Feature({
 	name = "Hide macro names",
 	tooltip = "Action buttons show a macro's icon without its name across the bottom.",
 	default = false,
-	conflicts = { { addon = "Dominos" }, { addon = "Bartender4" }, { addon = "ElvUI" } },
+	conflicts = {
+		{ addon = "Dominos" },
+		{ addon = "Bartender4" },
+		{ addon = "ElvUI" },
+		{
+			addon = "Leatrix_Plus",
+			when = function()
+				return LeaPlusDB and LeaPlusDB.HideMacroText == "On"
+			end,
+		},
+	},
 })
 
 -- Buttons whose name this has faded, so switching off touches only those.
