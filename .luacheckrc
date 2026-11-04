@@ -334,6 +334,7 @@ read_globals = {
 	"UnitPosition",
 	"UnitRace",
 	"UnitReaction",
+	"UnitThreatSituation",
 	"UnitXP",
 	"UnitXPMax",
 	"unpack",
