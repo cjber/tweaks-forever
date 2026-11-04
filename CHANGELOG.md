@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.7] - 2026-11-04
+
 - **Repeated errors stay distinct in reports.** Tweaks now keeps the full error text when grouping caught errors, so messages that only differ after the display limit are not merged, and BugGrabber entries already captured by Tweaks are omitted from the report.
 
 ## [1.0.6] - 2026-11-04
