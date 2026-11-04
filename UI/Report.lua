@@ -101,7 +101,6 @@ end
 ---@field message string
 ---@field count integer
 ---@field stack string?
----@field rawMessage string
 -- Its `GetDB` API is also what BugSack displays. The built-in ScriptErrors frame has no readable history API.
 ---@return ReportExternalError[]?
 local function BugGrabberErrors()
@@ -133,7 +132,6 @@ local function BugGrabberErrors()
 				end
 				result[#result + 1] = {
 					message = ns.CutText(entry.message, 140),
-					rawMessage = entry.message,
 					count = type(entry.counter) == "number" and entry.counter or 1,
 					stack = stack[1],
 				}
@@ -154,17 +152,13 @@ local function Errors()
 	local bugGrabber = BugGrabberErrors()
 	local lines = {}
 	if bugGrabber and bugGrabber[1] then
+		lines[#lines + 1] = "Recent Lua errors (BugGrabber):"
 		local caughtMessages = {}
 		for _, entry in ipairs(caught) do
-			caughtMessages[entry.rawMessage or entry.message] = true
+			caughtMessages[entry.message] = true
 		end
-		local added = false
 		for _, entry in ipairs(bugGrabber) do
-			if not caughtMessages[entry.rawMessage or entry.message] then
-				if not added then
-					lines[#lines + 1] = "Recent Lua errors (BugGrabber):"
-					added = true
-				end
+			if not caughtMessages[entry.message] then
 				lines[#lines + 1] = ("- x%d %s"):format(entry.count, entry.message)
 				if entry.stack then
 					lines[#lines + 1] = "    " .. entry.stack
