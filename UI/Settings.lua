@@ -12,19 +12,27 @@ local L = ns.L
 -- Feature files declare their category, name, tooltip and option labels in English; they are translated here, where
 -- they are shown (tools/phrases.py lists them for translators).
 
+-- A row that can never carry a note gets its text, not a function. Under the gamepad interface the cursor shows a
+-- row's tooltip and then, in the same call, a dropdown or slider row pushes its footer bindings, so a tooltip function
+-- of ours there taints the binding stack the gamepad action bar reads before a protected call (#168). Only a feature
+-- with a conflict or a needed addon keeps a function, read as it shows; tests/sim/gamepad_settings_scenario.lua.
 ---@param feature TFFeature
+---@return string|fun(): string?|nil
 local function Tooltip(feature)
+	local text = feature.tooltip and L[feature.tooltip]
+	if #(feature.conflicts or {}) == 0 and not feature.needs then
+		return text
+	end
 	return function()
 		local conflict, missing = ns.ConflictOf(feature.key), ns.MissingOf(feature.key)
-		local tooltip = feature.tooltip and L[feature.tooltip]
 		if not conflict and not missing then
-			return tooltip
+			return text
 		end
 		local note = RED_FONT_COLOR:WrapTextInColorCode(
 			conflict and L["%s already does this, so it is off here."]:format(conflict)
 				or L["Needs %s, which isn't loaded, so it is off here."]:format(missing)
 		)
-		return tooltip and tooltip .. "\n\n" .. note or note
+		return text and text .. "\n\n" .. note or note
 	end
 end
 

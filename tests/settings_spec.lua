@@ -70,9 +70,11 @@ local env = setmetatable({
 			initializer.tooltip = tooltip
 			return initializer
 		end,
-		CreateDropdownInitializer = function(setting, options)
+		CreateDropdownInitializer = function(setting, options, tooltip)
 			assert(setting.varType == "string" and options)
-			return Initializer("dropdown", setting)
+			local initializer = Initializer("dropdown", setting)
+			initializer.tooltip = tooltip
+			return initializer
 		end,
 		CreateSliderOptions = function(minValue, maxValue, step)
 			return { SetLabelFormatter = function() end, min = minValue, max = maxValue, step = step }
@@ -121,9 +123,16 @@ local ns
 ns = {
 	db = {},
 	features = {
-		{ key = "repair", category = "Merchants", name = "Repair", tooltip = "Repairs." },
+		-- `needs` an addon, so its tooltip can carry a note and is read as it shows.
+		{
+			key = "repair",
+			category = "Merchants",
+			name = "Repair",
+			tooltip = "Repairs.",
+			needs = { title = "QuestieDB", check = function() end },
+		},
 		{ key = "guildRepair", category = "Merchants", name = "Guild repair", parent = "repair" },
-		{ key = "gearMark", category = "Bags", name = "Mark", options = { { "strip", "Strip" } } },
+		{ key = "gearMark", category = "Bags", name = "Mark", tooltip = "Marks.", options = { { "strip", "Strip" } } },
 		{
 			key = "iconSize",
 			category = "Interface",
@@ -242,6 +251,9 @@ assert(not Modifiable(repair), "a row missing an addon it needs is greyed out")
 assert(repair.tooltip():find("Needs QuestieDB, which isn't loaded", 1, true), "and says so")
 missing.repair = nil
 assert(registered[4].initializer.setting.variable == "TweaksForever_gearMark")
+-- A row with no conflict and no needed addon carries its text, not a function of ours: under the gamepad interface a
+-- dropdown row's tooltip shows in the same call that pushes its footer bindings (#168).
+assert(registered[4].initializer.tooltip == "Marks.", "a row that can't carry a note gets its text")
 local size = registered[6].initializer
 assert(
 	size.setting.variable == "TweaksForever_iconSize" and size.setting.varType == "number",

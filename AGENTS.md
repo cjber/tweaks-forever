@@ -11,6 +11,7 @@ stylua --check .
 luacheck .
 tools/typecheck.sh
 for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
+python3 tools/forever_sim/fetch.py && luajit tools/forever_sim/run.lua   # tests/sim scenarios on the real Blizzard UI
 ruff check tools && ruff format --check tools
 uvx ty@0.0.83 check tools --extra-search-path . --extra-search-path tools
 python3 tools/check_generated.py --offline # omit --offline to fetch missing pinned inputs
