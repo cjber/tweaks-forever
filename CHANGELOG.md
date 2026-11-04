@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.8] - 2026-11-04
+
+- **The data now names the 1.60.1.70755 build.** Zone level ranges, camp benefits, dungeon and raid entrances, class trainer spells, world map overlays and Forever's added quests are regenerated from the new client build. The regenerated values match the previous build, so nothing a player sees moves and only the build stamp in each file changes.
+
 ## [1.0.7] - 2026-11-04
 
 - **Repeated errors stay distinct in reports.** Tweaks now keeps the full error text when grouping caught errors, so messages that only differ after the display limit are not merged, and BugGrabber entries already captured by Tweaks are omitted from the report.

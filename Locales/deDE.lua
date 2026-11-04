@@ -50,7 +50,6 @@ L["Automation"] = "Automatisierung"
 L["Back to map"] = "Zurück zur Karte"
 L["Before fishing"] = "Vor dem Angeln"
 L["Below the health bar"] = "Unter der Gesundheitsleiste"
-L["Buttons and dialogs keep the Forever look."] = "Schaltflächen und Dialoge behalten das Forever-Aussehen." -- mt
 L["Camp benefit gained: %s (%s)"] = "Lagervorteil erhalten: %s (%s)"
 L["Campfire: about %d yd ahead"] = "Lagerfeuer: etwa %d yd voraus"
 L["Campfire: about %d yd ahead to your left"] = "Lagerfeuer: etwa %d yd voraus links"
@@ -104,6 +103,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "Aus Eurer Gruppe und nicht von jemandem im Kampf, damit Ihr eine Kampfwiederbelebung weiterhin selbst timen könnt. Wartet die Verzögerung des Spiels ab, wenn Ihr bald erneut sterbt. Haltet Umschalt gedrückt, um selbst zu antworten."
 L["Future Spells"] = "Künftige Zauber"
 L["Future spells in spellbook"] = "Künftige Zauber im Zauberbuch"
+L["Game data now names the 1.60.1.70755 build."] = "Die Spieldaten nennen jetzt den Build 1.60.1.70755." -- mt
 L["Game menu"] = "Spielmenü"
 L["Gather grouped gear in bags"] = "Gruppierte Ausrüstung in Taschen sammeln"
 L["Gear"] = "Ausrüstung"
