@@ -103,7 +103,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "От вашей группы и не от того, кто в бою, чтобы момент боевого воскрешения выбирали вы. Выжидает задержку игры, если вы скоро снова погибнете. Удерживайте Shift, чтобы ответить самому."
 L["Future Spells"] = "Будущие заклинания"
 L["Future spells in spellbook"] = "Будущие заклинания в книге заклинаний"
-L["Bug reports keep distinct errors apart."] = "Отчёты об ошибках разделяют разные ошибки." -- mt
+L["A warning before you pull aggro."] = "Предупреждение перед набором угрозы." -- mt
 L["Game menu"] = "Главное меню"
 L["Gather grouped gear in bags"] = "Собирать сгруппированную экипировку в сумках"
 L["Gear"] = "Экипировка"
