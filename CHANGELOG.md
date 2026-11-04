@@ -12,6 +12,11 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.10] - 2026-11-04
+
+- **A chat warning before you pull a mob off the tank.** In a group, one line appears when your threat has passed the tank's but the mob has not turned on you yet. It stays quiet until you drop back below the tank, change target or leave combat, so a single pull is one line. It is on by default, acts for nobody else, and steps aside for Omen and ThreatClassic2. Nameplate threat colours are not duplicated: the game's own Settings > Nameplates already has that option, and the feature's tooltip says where to find it.
+
+
 - **A warning before you pull aggro.** In a group, a chat line tells you when your threat on your target has passed the tank's, so you can stop before the mob turns on you. It warns once, then again only after you drop back below the tank or change target. Turn it off under Interface in Tweaks' settings; nameplates coloured by threat are the game's own Nameplates option.
 
 ## [1.0.9] - 2026-11-04
