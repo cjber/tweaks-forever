@@ -103,7 +103,6 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "De votre groupe, et pas de quelqu'un en combat, pour que vous choisissiez toujours le moment d'une résurrection en combat. Attend le délai du jeu si vous mourez à nouveau peu après. Maintenez Maj pour répondre vous-même."
 L["Future Spells"] = "Sorts à venir"
 L["Future spells in spellbook"] = "Sorts à venir dans le grimoire"
-L["A waypoint to the rare in one click."] = "Un point de passage vers le rare en un clic." -- mt
 L["Game menu"] = "Menu de jeu"
 L["Gather grouped gear in bags"] = "Rassembler l'équipement groupé dans les sacs"
 L["Gear"] = "Équipement"
@@ -150,6 +149,7 @@ L["Modern"] = "Moderne"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "Moderne est un anthracite neutre qui garde le texte net sur n'importe quel décor. Retail est le bleu marine du jeu actuel, un peu transparent. Forever garde la bordure beige du jeu."
 L["Modern tooltips"] = "Infobulles modernes"
 L["Move and scale windows"] = "Déplacer et redimensionner les fenêtres"
+L["Moving through Tweaks Forever's settings with a gamepad no longer runs Tweaks code."] = "Parcourir les options de Tweaks Forever à la manette n'exécute plus de code de Tweaks." -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "Les barres d'info reçoivent une barre de vie plus haute dans le cadre de Retail, avec le nom complet centré au-dessus et le niveau, coloré selon la difficulté, après le nom. Votre cible est entourée et les autres s'estompent tant que vous en avez une. Les incantations s'affichent dans une barre plus fine avec l'icône et le nom du sort. Les chiffres de vie suivent les options Barres d'info du jeu. L'activer ou le désactiver prend effet après le prochain rechargement."
 L["Native quest map icons"] = "Icônes de quête du jeu sur la carte"
 L["Nearest quests first"] = "Quêtes les plus proches d'abord"

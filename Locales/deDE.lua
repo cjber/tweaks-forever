@@ -103,7 +103,6 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "Aus Eurer Gruppe und nicht von jemandem im Kampf, damit Ihr eine Kampfwiederbelebung weiterhin selbst timen könnt. Wartet die Verzögerung des Spiels ab, wenn Ihr bald erneut sterbt. Haltet Umschalt gedrückt, um selbst zu antworten."
 L["Future Spells"] = "Künftige Zauber"
 L["Future spells in spellbook"] = "Künftige Zauber im Zauberbuch"
-L["A waypoint to the rare in one click."] = "Ein Wegpunkt zum seltenen Gegner mit einem Klick." -- mt
 L["Game menu"] = "Spielmenü"
 L["Gather grouped gear in bags"] = "Gruppierte Ausrüstung in Taschen sammeln"
 L["Gear"] = "Ausrüstung"
@@ -150,6 +149,7 @@ L["Modern"] = "Modern"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "Modern ist ein neutrales Anthrazit, auf dem der Text vor jeder Kulisse scharf bleibt. Retail ist das Marineblau des aktuellen Spiels, leicht durchscheinend. Forever behält den beigen Rahmen des Spiels."
 L["Modern tooltips"] = "Moderne Tooltips"
 L["Move and scale windows"] = "Fenster verschieben und skalieren"
+L["Moving through Tweaks Forever's settings with a gamepad no longer runs Tweaks code."] = "Das Navigieren durch die Einstellungen von Tweaks Forever mit einem Gamepad führt keinen Tweaks-Code mehr aus." -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "Namensplaketten erhalten eine höhere Gesundheitsleiste im Retail-Rahmen, mit dem vollen Namen zentriert darüber und der Stufe, nach Schwierigkeit gefärbt, hinter dem Namen. Euer Ziel wird umrandet und die anderen treten zurück, solange Ihr eins habt. Zauber erscheinen in einer schmaleren Leiste mit Symbol und Namen des Zaubers. Gesundheitszahlen folgen den Optionen für Namensplaketten des Spiels. Das Ein- oder Ausschalten wirkt nach dem nächsten Neuladen."
 L["Native quest map icons"] = "Spieleigene Questsymbole auf der Karte"
 L["Nearest quests first"] = "Nächste Quests zuerst"

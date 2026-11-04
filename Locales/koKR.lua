@@ -103,7 +103,6 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "파티원의 부활만 수락하며, 전투 중인 사람의 부활은 수락하지 않아 전투 부활 시점은 직접 정할 수 있습니다. 곧 다시 죽으면 게임의 대기 시간을 기다립니다. 직접 응답하려면 Shift를 누르고 있으세요."
 L["Future Spells"] = "앞으로 배울 주문"
 L["Future spells in spellbook"] = "마법책에 앞으로 배울 주문 표시"
-L["A waypoint to the rare in one click."] = "한 번의 클릭으로 희귀 몬스터에게 경로 지점을 설정합니다." -- mt
 L["Game menu"] = "게임 메뉴"
 L["Gather grouped gear in bags"] = "묶은 장비를 가방에서 모아 두기"
 L["Gear"] = "장비"
@@ -150,6 +149,7 @@ L["Modern"] = "모던"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "모던은 어떤 배경에서도 글자가 선명한 중성적인 차콜색입니다. 정식 서버는 현재 게임의 남색으로 약간 투명합니다. Forever는 게임의 베이지색 테두리를 그대로 둡니다."
 L["Modern tooltips"] = "모던 툴팁"
 L["Move and scale windows"] = "창 이동 및 크기 조절"
+L["Moving through Tweaks Forever's settings with a gamepad no longer runs Tweaks code."] = "게임패드로 Tweaks Forever 설정을 탐색해도 더 이상 Tweaks 코드가 실행되지 않습니다." -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "이름표에 정식 서버 틀의 더 높은 생명력 바가 생기고, 전체 이름이 그 위 가운데에, 난이도 색의 레벨이 이름 뒤에 표시됩니다. 대상이 있으면 대상에 테두리가 생기고 나머지는 흐려집니다. 시전은 주문 아이콘과 이름이 들어간 더 얇은 바로 표시됩니다. 생명력 숫자는 게임의 이름표 설정을 따릅니다. 켜거나 끄면 다음 UI 재시작 후에 적용됩니다."
 L["Native quest map icons"] = "지도에 게임 퀘스트 아이콘 사용"
 L["Nearest quests first"] = "가까운 퀘스트 먼저"

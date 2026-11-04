@@ -103,7 +103,6 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "От вашей группы и не от того, кто в бою, чтобы момент боевого воскрешения выбирали вы. Выжидает задержку игры, если вы скоро снова погибнете. Удерживайте Shift, чтобы ответить самому."
 L["Future Spells"] = "Будущие заклинания"
 L["Future spells in spellbook"] = "Будущие заклинания в книге заклинаний"
-L["A waypoint to the rare in one click."] = "Точка маршрута к редкому противнику в один клик." -- mt
 L["Game menu"] = "Главное меню"
 L["Gather grouped gear in bags"] = "Собирать сгруппированную экипировку в сумках"
 L["Gear"] = "Экипировка"
@@ -150,6 +149,7 @@ L["Modern"] = "Современный"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "Современный — нейтральный графитовый, на котором текст четко виден на любом фоне. Retail — темно-синий из текущей версии игры, слегка прозрачный. Forever сохраняет бежевую рамку игры."
 L["Modern tooltips"] = "Современные подсказки"
 L["Move and scale windows"] = "Перемещение и масштаб окон"
+L["Moving through Tweaks Forever's settings with a gamepad no longer runs Tweaks code."] = "Перемещение по настройкам Tweaks Forever с геймпадом больше не запускает код Tweaks." -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "Индикаторы здоровья получают более высокую полосу здоровья в рамке Retail, с полным именем по центру над ней и уровнем, окрашенным по сложности, после имени. Ваша цель обведена, а остальные бледнеют, пока она у вас есть. Применение заклинаний показывается в более узкой полосе со значком и названием заклинания. Числа здоровья следуют настройкам индикаторов здоровья игры. Включение или выключение вступает в силу после следующей перезагрузки."
 L["Native quest map icons"] = "Значки заданий игры на карте"
 L["Nearest quests first"] = "Сначала ближайшие задания"

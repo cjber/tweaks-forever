@@ -103,7 +103,6 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "來自你的隊伍，且不來自戰鬥中的人，因此戰鬥復活的時機仍由你決定。如果你很快再次死亡，會等待遊戲的延遲。按住Shift可自己回應。"
 L["Future Spells"] = "未來法術"
 L["Future spells in spellbook"] = "法術書中的未來法術"
-L["A waypoint to the rare in one click."] = "一鍵為稀有怪設定路徑點。" -- mt
 L["Game menu"] = "遊戲選項"
 L["Gather grouped gear in bags"] = "在背包中集中已分組的裝備"
 L["Gear"] = "裝備"
@@ -150,6 +149,7 @@ L["Modern"] = "現代"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "現代是一種中性的炭灰色，在任何景色上都能讓文字保持清晰。正式服是當前遊戲的海軍藍，略微透明。Forever保留遊戲自己的米色邊框。"
 L["Modern tooltips"] = "現代風格滑鼠提示"
 L["Move and scale windows"] = "移動和縮放視窗"
+L["Moving through Tweaks Forever's settings with a gamepad no longer runs Tweaks code."] = "使用手把瀏覽 Tweaks Forever 的設定時不再執行 Tweaks 的程式碼。" -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "名條使用正式服框體中更高的生命條，完整名稱居中顯示在上方，按難度著色的等級顯示在名稱之後。你有目標時，目標會加上輪廓，其他名條變淡。施法顯示在更細的施法條中，內含法術圖示和名稱。生命值數字遵循遊戲的名條選項。開啟或關閉後，下次重新載入時生效。"
 L["Native quest map icons"] = "地圖使用遊戲原生任務圖示"
 L["Nearest quests first"] = "最近的任務優先"

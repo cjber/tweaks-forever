@@ -103,7 +103,6 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "Do seu grupo, e não de alguém em combate, para que o momento de uma ressurreição em combate continue sendo seu. Espera o atraso do jogo se você morrer de novo logo depois. Segure Shift para responder você mesmo."
 L["Future Spells"] = "Feitiços futuros"
 L["Future spells in spellbook"] = "Feitiços futuros no grimório"
-L["A waypoint to the rare in one click."] = "Um ponto de rota até o raro com um clique." -- mt
 L["Game menu"] = "Menu do Jogo"
 L["Gather grouped gear in bags"] = "Reunir equipamento agrupado nas bolsas"
 L["Gear"] = "Equipamento"
@@ -150,6 +149,7 @@ L["Modern"] = "Moderno"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "Moderno é um grafite neutro que mantém o texto nítido sobre qualquer cenário. Retail é o azul-marinho do jogo atual, um pouco translúcido. Forever mantém a borda bege do jogo."
 L["Modern tooltips"] = "Dicas modernas"
 L["Move and scale windows"] = "Mover e redimensionar janelas"
+L["Moving through Tweaks Forever's settings with a gamepad no longer runs Tweaks code."] = "Navegar pelas configurações do Tweaks Forever com um controle não executa mais código do Tweaks." -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "As placas de identificação ganham uma barra de vida mais alta na moldura do Retail, com o nome completo centralizado acima e o nível, colorido pela dificuldade, depois do nome. Seu alvo ganha contorno e os outros esmaecem enquanto você tiver um. Lançamentos aparecem numa barra mais fina com o ícone e o nome do feitiço. Os números de vida seguem as opções de Placas de identificação do jogo. Ligar ou desligar isto vale após o próximo recarregamento."
 L["Native quest map icons"] = "Ícones de missão do jogo no mapa"
 L["Nearest quests first"] = "Missões mais próximas primeiro"
