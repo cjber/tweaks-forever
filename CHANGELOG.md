@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.6] - 2026-11-04
+
 - **Screenshot art keeps its reviewed build.** The renderer records its UI-art pin independently of shared tooling updates, and changing it requires fresh screenshots.
 
 ## [1.0.5] - 2026-11-03
