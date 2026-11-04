@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.12] - 2026-11-04
+
 - **Moving through Tweaks Forever's settings with a gamepad no longer runs Tweaks code.** A row that can never show a "already does this" or "needs" note now carries its tooltip as plain text, so the controller's cursor landing on a dropdown or slider row no longer runs our code just before the game sets up that row's button prompts. That was one way for the game to block its target selection afterwards, which players reported as a crash after backing out of the settings with a gamepad. Mouse and keyboard tooltips read the same as before.
 
 ## [1.0.11] - 2026-11-04
