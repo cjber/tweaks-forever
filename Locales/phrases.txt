@@ -29,7 +29,7 @@ L["A shorter /reload. Switching this on or off takes effect after the next reloa
 L["A small quest icon sits beside the nameplate of each creature you still need for a quest in your log, to kill or for an item it drops, and goes once you have enough. Needs Questie, or its QuestieDB addon on its own."] = "A small quest icon sits beside the nameplate of each creature you still need for a quest in your log, to kill or for an item it drops, and goes once you have enough. Needs Questie, or its QuestieDB addon on its own."
 L["A soft gold background marks quests added in WoW: Forever in the quest log and quest text."] = "A soft gold background marks quests added in WoW: Forever in the quest log and quest text."
 L["A spell that cannot reach the enemy turns a solid red, fades out or hides, so what reaches is clear at a glance."] = "A spell that cannot reach the enemy turns a solid red, fades out or hides, so what reaches is clear at a glance."
-L["A warning before you pull aggro."] = "A warning before you pull aggro."
+L["A waypoint to the rare in one click."] = "A waypoint to the rare in one click."
 L["A whisper that is exactly the keyword you pick below invites its sender to your group. You must be ungrouped, the group leader or a raid assistant. Nothing is sent until such a whisper arrives."] = "A whisper that is exactly the keyword you pick below invites its sender to your group. You must be ungrouped, the group leader or a raid assistant. Nothing is sent until such a whisper arrives."
 L["Abandon multiple quests"] = "Abandon multiple quests"
 L["Abandon quests"] = "Abandon quests"
