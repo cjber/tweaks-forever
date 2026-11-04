@@ -20,7 +20,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-BUILD = "1.60.1.70707"
+BUILD = "1.60.1.70790"
 FILES = "https://wago.tools/api/files?search=interface%2Fworldmap%2F"
 
 # instance ID: (sheet directory and prefix, floors the client ships, per-floor titles when they differ from the
