@@ -9,7 +9,8 @@ ns.Feature({
 	category = "Interface",
 	name = "Rare alerts",
 	tooltip = "A chat line and a sound when a rare creature's nameplate or map marker appears near you. "
-		.. "Not in combat, and once per rare for ten minutes.",
+		.. "Not in combat, and once per rare for ten minutes. Click the rare's name in chat, or press the key "
+		.. "bound under Key Bindings > AddOns, to set a waypoint to it.",
 	default = false,
 	conflicts = {
 		{
@@ -46,6 +47,20 @@ local VIGNETTE_ATLAS = { VignetteKill = true, VignetteKillElite = true }
 local alerted = {}
 local count = 0
 
+---@class TFRarePlace
+---@field map integer
+---@field x number
+---@field y number
+---@field name string
+---@field vignette string? its map marker, read again on a click while the marker is still up
+
+-- [GUID] = where it was when it alerted, dropped with its `alerted` entry; `lastPlace` is the latest, for the
+-- key binding.
+---@type table<string, TFRarePlace>
+local places = {}
+---@type TFRarePlace?
+local lastPlace
+
 -- Whether `guid` should alert now, recording it when so. An unreadable GUID never alerts.
 ---@param guid any
 ---@param now number
@@ -63,7 +78,7 @@ local function Fresh(guid, now)
 		if count > 100 then
 			for other, at in pairs(alerted) do
 				if now - at >= QUIET then
-					alerted[other], count = nil, count - 1
+					alerted[other], places[other], count = nil, nil, count - 1
 				end
 			end
 		end
@@ -85,10 +100,67 @@ local CHIME_GAP = 2
 ---@type number?
 local chimed
 
+-- The marker the game shows for `guid`, if any: a rare seen by its nameplate may also have one.
+---@param guid string
+---@return string?
+local function MarkerOf(guid)
+	for _, id in ipairs(C_VignetteInfo and C_VignetteInfo.GetVignettes() or {}) do
+		local info = C_VignetteInfo.GetVignetteInfo(id)
+		if info and ns.Readable(info.objectGUID) == guid then
+			return ns.Readable(id)
+		end
+	end
+end
+
+-- Where the rare is on the player's map: its marker's position, else the player's own, since a rare with no marker
+-- was seen by its nameplate and so is close. Nil inside an instance, where neither is given.
+---@param vignette string?
+---@return integer? map
+---@return Vector2DMixin? position
+local function Position(vignette)
+	local map = C_Map.GetBestMapForUnit("player")
+	if not map then
+		return
+	end
+	local position = vignette and C_VignetteInfo.GetVignettePosition(vignette, map)
+	return map, position or C_Map.GetPlayerMapPosition(map, "player")
+end
+
+-- Sets a waypoint to `place` (Shortest Path Forever's journey when it takes it), at the marker's current position
+-- while it is still up.
+---@param place TFRarePlace?
+local function Waypoint(place)
+	if not place then
+		ns.Print(L["No rare has been found nearby yet."])
+		return
+	end
+	local info = place.vignette and C_VignetteInfo.GetVignetteInfo(place.vignette)
+	if info and not info.isDead then
+		local position = C_VignetteInfo.GetVignettePosition(place.vignette, place.map)
+		if position then
+			place.x, place.y = position.x, position.y
+		end
+	end
+	ns.Navigate(place.map, place.x, place.y, place.name)
+end
+
+local LINK = "addon:TweaksForever:rare:"
+
+---@param guid string
 ---@param name string
+---@param vignette string?
 ---@param now number
-local function Alert(name, now)
-	ns.Print(L["rare nearby: %s."]:format(name))
+local function Alert(guid, name, vignette, now)
+	vignette = vignette or MarkerOf(guid)
+	local map, position = Position(vignette)
+	local shown = name
+	if map and position then
+		lastPlace = { map = map, x = position.x, y = position.y, name = name, vignette = vignette }
+		places[guid] = lastPlace
+		-- A link the chat frame hands to the SetItemRef callback below when clicked.
+		shown = NORMAL_FONT_COLOR:WrapTextInColorCode(("|H%s%s|h[%s]|h"):format(LINK, guid, name))
+	end
+	ns.Print(L["rare nearby: %s."]:format(shown))
 	if not chimed or now - chimed >= CHIME_GAP then
 		-- A sound the client refuses to play leaves the next rare free to try.
 		if PlaySoundFile(SOUND, "Master") ~= false then
@@ -110,7 +182,7 @@ local function CheckUnit(unit)
 	local guid, name = ns.Readable(UnitGUID(unit)), ns.Readable(UnitName(unit)) -- multi-value: Readable keeps the name
 	local now = GetTime()
 	if Named(name) and Fresh(guid, now) then
-		Alert(name, now)
+		Alert(guid, name, nil, now)
 	end
 end
 
@@ -124,7 +196,7 @@ local function CheckVignette(id)
 	local guid, name = ns.Readable(info.objectGUID), ns.Readable(info.name)
 	local now = GetTime()
 	if Named(name) and Fresh(guid, now) then
-		Alert(name, now)
+		Alert(guid, name, ns.Readable(id), now)
 	end
 end
 
@@ -175,3 +247,21 @@ if C_VignetteInfo then
 		end)
 	end
 end
+
+-- A click on a rare's name in an alert line. The chat frame triggers this through EventRegistry, which runs each
+-- callback in its own secure call, and a waypoint is not a protected action.
+if EventRegistry then
+	EventRegistry:RegisterCallback("SetItemRef", function(_, link)
+		local guid = type(link) == "string" and link:sub(1, #LINK) == LINK and link:sub(#LINK + 1)
+		if guid then
+			ns.SafeCall("rare waypoint", Waypoint, places[guid])
+		end
+	end, places)
+end
+
+-- The key binding (Bindings.xml) clicks this button of our own, so a gamepad button can be bound to it too.
+local BUTTON = "TweaksForeverRareWaypointButton"
+_G["BINDING_NAME_CLICK " .. BUTTON .. ":LeftButton"] = L["Set a waypoint to the last rare found"]
+CreateFrame("Button", BUTTON):SetScript("OnClick", function()
+	ns.SafeCall("rare waypoint", Waypoint, lastPlace)
+end)

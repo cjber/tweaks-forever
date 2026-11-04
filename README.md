@@ -47,7 +47,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Spell reach.** A small icon for each attack you track on every enemy nameplate: full colour in reach, solid red out of it. Off until you turn it on.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
 - **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
-- **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Rare alerts (off by default) name nearby rares in chat. In a group, a pull warning says in chat when your threat passes the tank's.
+- **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Rare alerts (off by default) name nearby rares in chat; click the name, or press a bound key, to set a waypoint to it. In a group, a pull warning says in chat when your threat passes the tank's.
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet. With Combine Bags on, the reagent bag joins the combined bag.
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.
@@ -133,7 +133,7 @@ The addon is free and stays GPL-3.0. If it saves you time, you can [buy me a cof
 
 ## Credits
 
-LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab) (MIT). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts; no code was copied. Fitz is welcome to use our code. Thanks to Sojiro84, Mouchoir and everyone who reported a bug.
+LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab) (MIT). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts, and the rare waypoint by [RareScanner](https://www.curseforge.com/wow/addons/rarescanner); no code was copied. Fitz is welcome to use our code. Thanks to Sojiro84, Mouchoir and everyone who reported a bug.
 
 ## Licence
 

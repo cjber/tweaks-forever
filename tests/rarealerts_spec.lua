@@ -22,9 +22,19 @@ local ns = {
 	Print = function(message)
 		printed[#printed + 1] = message
 	end,
+	SafeCall = function(_, fn, ...)
+		return fn(...)
+	end,
 }
+local navigated = {}
+function ns.Navigate(map, x, y, title)
+	navigated[#navigated + 1] = { map = map, x = x, y = y, title = title }
+end
 
-local now, combat = 100, false
+-- No map until the waypoint section below: inside an instance an alert is a plain line.
+local now, combat, playerMap = 100, false, nil
+local markerAt = { v1 = { x = 0.4, y = 0.5 } }
+local callbacks, buttons = {}, {}
 local units = {
 	nameplate1 = { class = "rare", guid = "Creature-0-1-0-1-61-AAA", name = "Mother Fang" },
 	nameplate2 = { class = "normal", guid = "Creature-0-1-0-1-299-BBB", name = "Young Wolf" },
@@ -79,7 +89,42 @@ local env = setmetatable({
 		GetVignetteInfo = function(id)
 			return vignettes[id]
 		end,
+		GetVignettePosition = function(id, map)
+			assert(map == playerMap, "on the player's map")
+			return markerAt[id]
+		end,
 	},
+	C_Map = {
+		GetBestMapForUnit = function(unit)
+			assert(unit == "player")
+			return playerMap
+		end,
+		GetPlayerMapPosition = function(map, unit)
+			assert(map == playerMap and unit == "player")
+			return { x = 0.1, y = 0.2 }
+		end,
+	},
+	NORMAL_FONT_COLOR = {
+		WrapTextInColorCode = function(_, text)
+			return "|cffffd200" .. text .. "|r"
+		end,
+	},
+	EventRegistry = {
+		RegisterCallback = function(_, event, fn, owner)
+			callbacks[event] = function(...)
+				return fn(owner, ...)
+			end
+		end,
+	},
+	CreateFrame = function(kind, name)
+		assert(kind == "Button" and not name:find("Secure"), "a plain button of our own, never a secure template")
+		local button = {}
+		function button:SetScript(script, fn)
+			self[script] = fn
+		end
+		buttons[name] = button
+		return button
+	end,
 }, { __index = _G })
 setfenv(assert(loadfile("Core/Secret.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Features/RareAlerts.lua")), env)("TweaksForever", ns)
@@ -140,4 +185,45 @@ now = now + 601
 before = #printed
 initializers[1]()
 assert(#printed == before, "and nothing with Rare alerts off")
+
+-- Waypoints. The binding before any rare with a place says so, and sets nothing.
+assert(env["BINDING_NAME_CLICK TweaksForeverRareWaypointButton:LeftButton"] == "Set a waypoint to the last rare found")
+local button = buttons.TweaksForeverRareWaypointButton
+before = #printed
+button.OnClick(button)
+assert(printed[before + 1] == "No rare has been found nearby yet." and #navigated == 0, "nothing to point at yet")
+-- A rare with a map marker: its name is a link, and a click on it points at the marker.
+db.rareAlerts, playerMap = true, 1429
+now = now + 601
+handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
+local link = "addon:TweaksForever:rare:Creature-0-1-0-1-100-CCC"
+assert(printed[#printed] == "rare nearby: |cffffd200|H" .. link .. "|h[Gruff Swiftbite]|h|r.", printed[#printed])
+callbacks.SetItemRef(link, "[Gruff Swiftbite]", "LeftButton")
+local went = navigated[1]
+assert(went.map == 1429 and went.x == 0.4 and went.y == 0.5 and went.title == "Gruff Swiftbite", "at its marker")
+-- The marker moved: a later click follows it; once the marker is gone, the last place it was.
+markerAt.v1 = { x = 0.45, y = 0.55 }
+callbacks.SetItemRef(link)
+assert(navigated[2].x == 0.45 and navigated[2].y == 0.55, "the marker's current position")
+vignettes.v1.isDead = true
+callbacks.SetItemRef(link)
+assert(navigated[3].x == 0.45, "where it was last seen")
+vignettes.v1.isDead = nil
+-- Other addons' links and links to a rare we don't know are left alone.
+callbacks.SetItemRef("addon:OtherAddon:rare:x")
+callbacks.SetItemRef("item:6948")
+assert(#navigated == 3, "only our own links")
+-- A nameplate-only rare (no marker carries its GUID) is pinned where the player stood, close by plate range.
+now = now + 601
+handlers.NAME_PLATE_UNIT_ADDED("nameplate4")
+assert(printed[#printed]:find("|h%[Snort the Heckler%]|h"), "a nameplate rare's name is a link too")
+button.OnClick(button)
+went = navigated[4]
+assert(went.x == 0.1 and went.y == 0.2 and went.title == "Snort the Heckler", "the binding: the last rare, by you")
+-- A nameplate rare that also has a marker uses the marker.
+units.nameplate5 = { class = "rare", guid = "Creature-0-1-0-1-100-CCC", name = "Gruff Swiftbite" }
+now = now + 601
+handlers.NAME_PLATE_UNIT_ADDED("nameplate5")
+button.OnClick(button)
+assert(navigated[5].x == 0.45, "a nameplate rare with a marker: the marker")
 print("rarealerts: ok")
