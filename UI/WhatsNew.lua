@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "1.0.8"
-ns.WHATS_NEW = L["Game data now names the 1.60.1.70755 build."]
+ns.WHATS_NEW_VERSION = "1.0.9"
+ns.WHATS_NEW = L["Bug reports keep distinct errors apart."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

@@ -103,7 +103,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "来自你的队伍，且不来自战斗中的人，因此战斗复活的时机仍由你决定。如果你很快再次死亡，会等待游戏的延迟。按住Shift可自己回应。"
 L["Future Spells"] = "未来法术"
 L["Future spells in spellbook"] = "法术书中的未来法术"
-L["Game data now names the 1.60.1.70755 build."] = "游戏数据现在标注 1.60.1.70755 版本。" -- mt
+L["Bug reports keep distinct errors apart."] = "错误报告会区分不同的错误。" -- mt
 L["Game menu"] = "游戏菜单"
 L["Gather grouped gear in bags"] = "在背包中集中已分组的装备"
 L["Gear"] = "装备"

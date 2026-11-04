@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.9] - 2026-11-04
+
+- **Bug reports keep distinct errors apart.** The report groups caught errors on their full text rather than the shortened text it shows, so two errors that differ only past the display limit are listed separately. The BugGrabber section's heading now appears only when it has an error to add, so a report with nothing from BugGrabber no longer carries an empty heading.
+
 ## [1.0.8] - 2026-11-04
 
 - **The data now names the 1.60.1.70755 build.** Zone level ranges, camp benefits, dungeon and raid entrances, class trainer spells, world map overlays and Forever's added quests are regenerated from the new client build. The regenerated values match the previous build, so nothing a player sees moves and only the build stamp in each file changes.
