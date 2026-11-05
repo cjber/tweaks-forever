@@ -235,6 +235,7 @@ L["Starts a quest: %s"] = "Начинает задание: %s"
 L["Suggest my other Forever addons"] = "Предлагать другие мои модификации Forever"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Забирает все сразу, не дожидаясь окна добычи. Только когда действует автоматический сбор добычи."
 L["Target a creature for the nearest quest"] = "Выбрать существо для ближайшего задания"
+L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Аддоны Forever бесплатны, и ничего в них не закрыто за оплатой. Если они вам помогают, можете угостить меня кофе." -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "Камера отдаляется дальше, чем позволяет настройка игры «Максимальная дистанция камеры». Прежнее значение вернется, когда вы это выключите."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "При первом входе после обновления Tweaks Forever строка в чате сообщает, что изменилось."
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "Подсказки игры следуют за курсором мыши, а не стоят в фиксированном углу. Подсказки, которые окно размещает само, например у предмета в сумке, остаются там, где оно их ставит."

@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **The Forever addons settings page ends with a Ko-fi link.** If the addons help you, its Copy link button shows the address, ready to paste into your browser. Nothing is locked behind it, and it shows nowhere else.
+
 ## [1.0.18] - 2026-11-05
 
 - **The release packager moves to its newest action.** The workflow that packages each release uses the newest version of the packager action, so the zip that ships to CurseForge, Wago and GitHub is built by the current tool. Nothing a player sees changes.

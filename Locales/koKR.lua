@@ -235,6 +235,7 @@ L["Starts a quest: %s"] = "퀘스트 시작: %s"
 L["Suggest my other Forever addons"] = "제 다른 Forever 애드온 추천"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "전리품 창을 기다리지 않고 한 번에 모두 가져옵니다. 자동 전리품 획득이 적용될 때만 작동합니다."
 L["Target a creature for the nearest quest"] = "가장 가까운 퀘스트의 몬스터 대상 지정"
+L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Forever 애드온은 무료이며 잠긴 기능이 없습니다. 도움이 되셨다면 커피 한 잔 사 주세요." -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "게임의 최대 시야 거리 설정보다 시점이 더 멀리 물러납니다. 이 기능을 끄면 이전 값으로 돌아갑니다."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Tweaks Forever가 업데이트된 뒤 처음 접속하면 대화창에 무엇이 바뀌었는지 한 줄로 알려 줍니다."
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "게임의 툴팁이 고정된 구석 대신 마우스 커서를 따라다닙니다. 가방 아이템처럼 창이 직접 위치를 정하는 툴팁은 그 자리에 그대로 있습니다."

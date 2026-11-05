@@ -235,6 +235,7 @@ L["Starts a quest: %s"] = "Beginnt eine Quest: %s"
 L["Suggest my other Forever addons"] = "Meine anderen Forever-Addons vorschlagen"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Nimmt alles auf einmal, statt auf das Beutefenster zu warten. Nur wenn Schnell-Plündern greift."
 L["Target a creature for the nearest quest"] = "Kreatur für die nächste Quest anvisieren"
+L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Die Forever-Addons sind kostenlos, und nichts ist hinter einer Bezahlung versteckt. Wenn sie Euch helfen, könnt Ihr mir einen Kaffee spendieren." -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "Die Kamera zieht weiter zurück, als die Einstellung „Max. Kameraentfernung“ des Spiels erlaubt. Euer vorheriger Wert kehrt zurück, wenn Ihr dies ausschaltet."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Beim ersten Einloggen nach einem Update von Tweaks Forever sagt eine Chatzeile, was sich geändert hat."
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "Die Tooltips des Spiels folgen dem Mauszeiger statt der festen Ecke des Spiels. Tooltips, die ein Fenster selbst platziert, etwa der eines Taschengegenstands, bleiben, wo es sie hinsetzt."
