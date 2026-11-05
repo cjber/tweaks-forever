@@ -595,21 +595,6 @@ PLATES = [
 ]
 PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
 
-# UI/SpellReach.lua: bar-height icons with the Classic button's frame and room for its visible 2 px edge.
-# A shaman sees Earth Shock (0-20) and Lightning Bolt (0-30).
-REACH_GAP, REACH_FRAME_SCALE, REACH_EDGE = 2, 64 / 36, 2 / 36
-REACH = [
-    "interface/icons/spell_nature_earthshock.blp",
-    "interface/icons/spell_nature_lightning.blp",
-]
-
-
-def greyed(image):
-    """UI/SpellReach.lua's SetDesaturated: the icon's colours dropped, its alpha kept, for the vertex colour."""
-    red, green, blue, alpha = image.convert("RGBA").split()
-    luma = Image.merge("RGB", (red, green, blue)).convert("L")
-    return Image.merge("RGBA", (luma, luma, luma, alpha))
-
 
 def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
     image = ui.texture(fdid)
@@ -619,10 +604,8 @@ def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
     )
 
 
-def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest, reach=None):
-    """One nameplate as UI/Nameplates.lua lays out Blizzard's, with the Health Percent option on.
-
-    `reach` is UI/SpellReach.lua's row: one flag per REACH spell, true when the spell can reach the unit."""
+def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest):
+    """One nameplate as UI/Nameplates.lua lays out Blizzard's, with the Health Percent option on."""
 
     c = ui.canvas(240, 120)
     x, w = 37, PLATE_W
@@ -639,28 +622,6 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
         c.draw(
             ui.atlas("questobjective"), x + w + QUEST_GAP, y + (PLATE_HEALTH - QUEST_ICON) / 2, QUEST_ICON, QUEST_ICON
         )
-    if reach is not None:
-        # UI/SpellReach.lua's row, right of the bar where the level frame sits, centred on it. A spell in reach
-        # draws in full colour; one out of reach is desaturated and tinted solid red.
-        size = PLATE_HEALTH
-        pad = size * REACH_EDGE
-        for index, reaches in enumerate(reach):
-            ix = x + w + REACH_GAP + pad + index * (size + REACH_GAP + 2 * pad)
-            iy = y + (PLATE_HEALTH - size) // 2
-            art = ui.texture(REACH[index])
-            aw, ah = art.size
-            art = art.crop((round(aw * 0.08), round(ah * 0.08), round(aw * 0.92), round(ah * 0.92)))
-            colour = (1, 1, 1, 1) if reaches else (1, 0.08, 0.08, 1)
-            c.draw(art if reaches else greyed(art), ix, iy, size, size, color=colour)
-            frame_size = size * REACH_FRAME_SCALE
-            frame_offset = (frame_size - size) / 2
-            c.draw(
-                ui.texture("interface/buttons/ui-quickslot2.blp"),
-                ix - frame_offset,
-                iy - frame_offset,
-                frame_size,
-                frame_size,
-            )
     c.text(
         x,
         y,
@@ -718,20 +679,6 @@ def nameplates(ui):
 def nameplates_scene(ui):
     layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(PLATES, PLATE_POSITIONS, strict=True)]
     return scene(ui, layers, MARGIN)
-
-
-# A level 22 shaman targeting a Pillager: Earth Shock reaches it, Lightning Bolt does not. The second crawler is
-# inside both, the third Grimtusk outside both, so every state is shown once.
-REACH_PLATES = [
-    ("Defias Pillager", 15, FAIR, HOSTILE, 0.62, True, None, [], False, (True, False)),
-    ("Defias Tide Crawler", 12, EASY, HOSTILE, 1.0, False, None, [], False, (True, True)),
-    ("Grimtusk", 16, FAIR, ROGUE, 0.45, False, None, [], False, (False, False)),
-]
-
-
-def spellreach(ui):
-    layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(REACH_PLATES, PLATE_POSITIONS, strict=True)]
-    scene(ui, layers, MARGIN).save(OUT / "spellreach.png")
 
 
 # The demo: a short tour of dungeon pins, nameplates and junk coins, at 10 frames a second.
@@ -930,7 +877,6 @@ def main():
     campfire_buff(ui)
     editmode(ui)
     nameplates(ui)
-    spellreach(ui)
     tooltips(ui)
     frames, size = demo(ui)
     print(f"demo.gif: {frames} frames, {size} bytes")
