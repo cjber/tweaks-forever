@@ -319,4 +319,4 @@ L["Upper Blackrock Spire"] = "검은바위 첨탑 상층" -- mt
 L["Gordok Commons"] = "고르독 광장" -- mt
 L["Capital Gardens"] = "수도 정원" -- mt
 L["Warpwood Quarter"] = "굽이나무 지구" -- mt
-L["Suite tooling stays in step with Forever Core."] = "제품군 도구가 Forever Core와 보조를 맞춥니다." -- mt
+L["The release packager moves to its newest action."] = "릴리스 패키저가 최신 액션으로 이동합니다." -- mt

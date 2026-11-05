@@ -319,4 +319,4 @@ L["Upper Blackrock Spire"] = "Cumbre de Roca Negra Superior" -- mt
 L["Gordok Commons"] = "Ágora de Gordok" -- mt
 L["Capital Gardens"] = "Jardines de la Capital" -- mt
 L["Warpwood Quarter"] = "Barrio Alabeo" -- mt
-L["Suite tooling stays in step with Forever Core."] = "Las herramientas de la suite siguen el ritmo de Forever Core." -- mt
+L["The release packager moves to its newest action."] = "El empaquetador de versiones pasa a su acción más reciente." -- mt

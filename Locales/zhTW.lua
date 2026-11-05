@@ -319,4 +319,4 @@ L["Upper Blackrock Spire"] = "黑石塔上層" -- mt
 L["Gordok Commons"] = "戈多克議會" -- mt
 L["Capital Gardens"] = "中心花園" -- mt
 L["Warpwood Quarter"] = "扭木廣場" -- mt
-L["Suite tooling stays in step with Forever Core."] = "套件工具與 Forever Core 保持同步。" -- mt
+L["The release packager moves to its newest action."] = "發佈打包器改用其最新操作。" -- mt

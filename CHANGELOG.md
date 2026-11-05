@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.18] - 2026-11-05
+
+- **The release packager moves to its newest action.** The workflow that packages each release uses the newest version of the packager action, so the zip that ships to CurseForge, Wago and GitHub is built by the current tool. Nothing a player sees changes.
+
 ## [1.0.17] - 2026-11-05
 
 - **Suite tooling stays in step with Forever Core.** The vendored menu-scroll check and the workflow that runs it pick up Forever Core's newest rules, and the unused dropdown helper is gone from the shared settings page. Nothing a player sees changes.

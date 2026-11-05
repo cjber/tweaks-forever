@@ -319,4 +319,4 @@ L["Upper Blackrock Spire"] = "Верхняя часть пика Черной г
 L["Gordok Commons"] = "Палаты Гордока" -- mt
 L["Capital Gardens"] = "Центральные сады" -- mt
 L["Warpwood Quarter"] = "Квартал Криводревов" -- mt
-L["Suite tooling stays in step with Forever Core."] = "Инструменты набора идут в ногу с Forever Core." -- mt
+L["The release packager moves to its newest action."] = "Упаковщик релизов переходит на новейшее действие." -- mt
