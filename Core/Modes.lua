@@ -104,6 +104,7 @@ local function AddModes(owner, root)
 		return
 	end
 	local divided = false
+	-- menu-scroll-ok: modes holds the two click modes Bags/Gear.lua and Bags/Junk.lua declare
 	for _, mode in ipairs(modes) do
 		if ns.Active(mode.feature) then
 			if not divided then
