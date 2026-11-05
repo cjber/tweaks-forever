@@ -93,7 +93,12 @@ end
 ---@return Texture
 local function Background(button)
 	if not backgrounds[button] then
-		local texture = button:CreateTexture(nil, "BACKGROUND", "ItemSlotBackgroundCombinedBagsTemplate", -6)
+		-- The template that used to supply this art (ItemSlotBackgroundCombinedBagsTemplate) is Mainline only, so
+		-- the Forever client cannot inherit it: the slot background is drawn from the same file and crop.
+		local texture = button:CreateTexture(nil, "BACKGROUND", nil, -6)
+		-- art-ok: the slot background fill, stretched by the slot by design
+		texture:SetTexture("Interface\\ContainerFrame\\UI-Bag-Components")
+		texture:SetTexCoord(0.64453125, 0.7890625, 0.42578125, 0.498046875)
 		texture:SetAllPoints()
 		texture:SetVertexColor(0.6, 0.9, 0.6)
 		backgrounds[button] = texture

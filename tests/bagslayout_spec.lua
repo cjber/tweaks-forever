@@ -56,13 +56,23 @@ local function Region(props)
 		return 1
 	end
 	function r:SetColorTexture() end
+	function r:SetTexture(file)
+		self.file = file
+	end
+	function r:SetTexCoord(left, right, top, bottom)
+		self.texcoords = { left, right, top, bottom }
+	end
 	function r:SetVertexColor() end
 	function r:SetText(t)
 		self.text = t
 	end
 	function r:SetTextColor() end
-	function r:CreateTexture()
-		return Region()
+	function r:CreateTexture(name, layer, template, sublevel)
+		local texture = Region()
+		texture.name, texture.layer, texture.template, texture.sublevel = name, layer, template, sublevel
+		self.textures = self.textures or {}
+		self.textures[#self.textures + 1] = texture
+		return texture
 	end
 	function r:CreateFontString()
 		return Region()
@@ -240,6 +250,12 @@ assert(at(reagents.Items[1]) == "-378,46", at(reagents.Items[1]))
 assert(at(reagents.Items[10]) == "0,46", at(reagents.Items[10]))
 assert(at(reagents.Items[11]) == "-378,4", at(reagents.Items[11]))
 assert(at(reagents.Items[12]) == "-336,4", at(reagents.Items[12]))
+-- The green slot background draws the stock bag art itself: the template it used to inherit is Mainline only (#332).
+local background = reagents.Items[1].textures[1]
+assert(background.template == nil, "background texture inherits no template: " .. tostring(background.template))
+assert(background.file == "Interface\\ContainerFrame\\UI-Bag-Components", tostring(background.file))
+assert(background.texcoords[1] == 0.64453125 and background.texcoords[4] == 0.498046875, "the template's own crop")
+assert(background.shown, "background shown with its slot")
 -- The rest of the bag starts above the lift, under a rule in the gap: the last bag's last slot at the bottom right.
 assert(at(bag.Items[20]) == "0," .. 4 + lift, at(bag.Items[20]))
 assert(rule:IsShown() and select(5, rule:GetPoint()) == 4 + lift - 6, "rule between reagents and the rest")
