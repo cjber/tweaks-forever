@@ -149,7 +149,6 @@ L["Modern"] = "Moderno"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "Moderno é um grafite neutro que mantém o texto nítido sobre qualquer cenário. Retail é o azul-marinho do jogo atual, um pouco translúcido. Forever mantém a borda bege do jogo."
 L["Modern tooltips"] = "Dicas modernas"
 L["Move and scale windows"] = "Mover e redimensionar janelas"
-L["The settings page opens without an error."] = "A página de configurações abre sem erro." -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "As placas de identificação ganham uma barra de vida mais alta na moldura do Retail, com o nome completo centralizado acima e o nível, colorido pela dificuldade, depois do nome. Seu alvo ganha contorno e os outros esmaecem enquanto você tiver um. Lançamentos aparecem numa barra mais fina com o ícone e o nome do feitiço. Os números de vida seguem as opções de Placas de identificação do jogo. Ligar ou desligar isto vale após o próximo recarregamento."
 L["Native quest map icons"] = "Ícones de missão do jogo no mapa"
 L["Nearest quests first"] = "Missões mais próximas primeiro"
@@ -320,4 +319,4 @@ L["Upper Blackrock Spire"] = "Pico da Rocha Negra Superior" -- mt
 L["Gordok Commons"] = "Pátio Gordok" -- mt
 L["Capital Gardens"] = "Jardins Capitais" -- mt
 L["Warpwood Quarter"] = "Distrito Lenhâmbulante" -- mt
-
+L["Suite tooling stays in step with Forever Core."] = "As ferramentas da suíte acompanham o Forever Core." -- mt

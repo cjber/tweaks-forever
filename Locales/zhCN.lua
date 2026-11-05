@@ -149,7 +149,6 @@ L["Modern"] = "现代"
 L["Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail game's navy, a little see-through. Forever keeps the game's own beige border."] = "现代是一种中性的炭灰色，在任何景色上都能让文字保持清晰。正式服是当前游戏的海军蓝，略微透明。Forever保留游戏自己的米色边框。"
 L["Modern tooltips"] = "现代风格鼠标提示"
 L["Move and scale windows"] = "移动和缩放窗口"
-L["The settings page opens without an error."] = "设置页面打开时不再报错。" -- mt
 L["Nameplates get a taller health bar in the retail frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you have one. Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's Nameplates options. Switching this on or off takes effect after the next reload."] = "姓名板使用正式服框体中更高的生命条，完整名称居中显示在上方，按难度着色的等级显示在名称之后。你有目标时，目标会加上轮廓，其他姓名板变淡。施法显示在更细的施法条中，内含法术图标和名称。生命值数字遵循游戏的姓名板选项。开启或关闭后，下次重新加载时生效。"
 L["Native quest map icons"] = "地图使用游戏原生任务图标"
 L["Nearest quests first"] = "最近的任务优先"
@@ -320,4 +319,4 @@ L["Upper Blackrock Spire"] = "黑石塔上层" -- mt
 L["Gordok Commons"] = "戈多克议会" -- mt
 L["Capital Gardens"] = "中心花园" -- mt
 L["Warpwood Quarter"] = "扭木广场" -- mt
-
+L["Suite tooling stays in step with Forever Core."] = "套件工具与 Forever Core 保持同步。" -- mt

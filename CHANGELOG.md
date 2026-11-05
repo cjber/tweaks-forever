@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.17] - 2026-11-05
+
+- **Suite tooling stays in step with Forever Core.** The vendored menu-scroll check and the workflow that runs it pick up Forever Core's newest rules, and the unused dropdown helper is gone from the shared settings page. Nothing a player sees changes.
+
 ## [1.0.16] - 2026-11-05
 
 - **The settings page opens without an error.** Its title asked the game for a font Forever does not have, which logged a Lua error each time the page was built; it now uses the font the game's own settings pages title with.
