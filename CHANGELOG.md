@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.16] - 2026-11-05
+
+- **The retired merge bot's workflow is gone.** The MergeLoop workflow, its config and its agent skill were removed from the repo, so nothing here waits on a bot that no longer runs. Nothing a player sees changes.
+
 ## [1.0.15] - 2026-11-05
 
 - **The unit tooltip's health bar keeps its width.** A creature with a short name, such as a deer, no longer squeezes the tooltip down until the health bar and its percentage barely fit: the tooltip stays as wide as the game makes any tooltip with a bar.
