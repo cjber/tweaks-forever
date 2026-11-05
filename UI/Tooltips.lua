@@ -73,6 +73,9 @@ ns.Tooltips = Model
 local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 12, 10
 local PADDING = BOTTOM + HEIGHT + GAP - 10
 local TRACK = 0.3
+-- The width Blizzard gives a tooltip that carries a status bar (GameTooltip_ShowStatusBar), so a short name such
+-- as "Deer" still leaves the bar and its text room.
+local MIN_WIDTH = 140
 local OBJECT = { 0, 0.6, 0.1 }
 -- Room at the top of a comparison tooltip for its "Equipped" header.
 local HEADER = 16
@@ -231,12 +234,24 @@ local function HealthBar()
 		text:Show()
 	end
 
-	-- Room under the last line for the bar, made with the tooltip's padding, which GameTooltip clears as it shows.
+	-- Whether this file set the tooltip's minimum width, so it only ever clears its own.
+	local widened = false
+	local function Widen(wide)
+		if wide or widened then
+			tooltip:SetMinimumWidth(wide and MIN_WIDTH or 0)
+		end
+		widened = wide
+	end
+
+	-- Room under the last line for the bar, made with the tooltip's padding, which GameTooltip clears as it shows,
+	-- and a minimum width so the bar never shrinks to a short name.
 	local function Fit()
-		if ns.Active(KEY) and bar:IsShown() then
+		local wide = ns.Active(KEY) and bar:IsShown()
+		if wide then
 			local right, _, left, top = tooltip:GetPadding()
 			tooltip:SetPadding(right, PADDING, left, top)
 		end
+		Widen(wide)
 	end
 
 	local Style = HealthBarStyle(tooltip, bar, art, Update, Fit)
@@ -276,6 +291,7 @@ local function HealthBar()
 			local right, _, left, top = tooltip:GetPadding()
 			tooltip:SetPadding(right, 0, left, top)
 		end
+		Widen(false)
 	end)
 	tooltip:HookScript("OnShow", Fit)
 	return Style

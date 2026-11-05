@@ -55,6 +55,17 @@ local function Tooltip()
 end
 local GameTooltip = Tooltip()
 GameTooltip.StatusBar = Stub()
+-- The health bar's hooks and the tooltip's minimum width, to check the bar keeps its room.
+local barShown, barHooks, minWidth = true, {}, nil
+function GameTooltip.StatusBar.IsShown()
+	return barShown
+end
+function GameTooltip.StatusBar.HookScript(_, event, fn)
+	barHooks[event] = fn
+end
+function GameTooltip.SetMinimumWidth(_, width)
+	minWidth = width
+end
 GameTooltip.NineSlice = Stub()
 function GameTooltip.GetProcessingTooltipInfo()
 	return processing
@@ -187,3 +198,16 @@ built = Build("GetHyperlink", { "unit:Player-1", n = 1 }, {
 })
 assert(built[2].text == "Level 42 Night Elf Warrior (Player)", built[2].text)
 print("tooltips: the level line is found by race and level, never in a guild name: ok")
+
+-- A short name like "Deer" never squeezes the health bar: the tooltip keeps Blizzard's status bar width while the
+-- bar shows, and lets it go once the bar hides.
+barShown = true
+barHooks.OnShow()
+assert(minWidth == 140, "the bar widens the tooltip: " .. tostring(minWidth))
+barShown = false
+barHooks.OnHide()
+assert(minWidth == 0, "the width is released with the bar")
+minWidth = nil
+barHooks.OnHide()
+assert(minWidth == nil, "a width this file did not set is left alone")
+print("tooltips: the health bar keeps a minimum width: ok")

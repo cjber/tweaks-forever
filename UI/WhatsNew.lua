@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "1.0.14"
-ns.WHATS_NEW = L["Melee icons under nameplates turn red out of reach."]
+ns.WHATS_NEW_VERSION = "1.0.15"
+ns.WHATS_NEW = L["The unit tooltip's health bar keeps its width."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

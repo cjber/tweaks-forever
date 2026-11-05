@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.15] - 2026-11-05
+
+- **The unit tooltip's health bar keeps its width.** A creature with a short name, such as a deer, no longer squeezes the tooltip down until the health bar and its percentage barely fit: the tooltip stays as wide as the game makes any tooltip with a bar.
+
 ## [1.0.14] - 2026-11-05
 
 - **Melee icons under nameplates turn red out of reach.** Raptor Strike, Heroic Strike, Maul and the other melee attacks in Spell reach under nameplates now go red, faded or hidden when the enemy is beyond melee reach, in and out of combat. The game's own range check for these attacks never says they are out of reach, so a short distance check decides instead.
