@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-11-05
 - **Suite tooling stays in step with Forever Core.** The vendored shared-file check knows about the new tracker header menu spec. Nothing a player sees changes.
 - **The Abandon quests button has a place of its own.** The quest list now makes room for it below the last row, so it no longer covers the bottom quest's objective text and every quest in the log stays readable.
 
