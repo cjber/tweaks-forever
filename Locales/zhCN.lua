@@ -303,4 +303,4 @@ L["Upper Blackrock Spire"] = "黑石塔上层" -- mt
 L["Gordok Commons"] = "戈多克议会" -- mt
 L["Capital Gardens"] = "中心花园" -- mt
 L["Warpwood Quarter"] = "扭木广场" -- mt
-L["The release packager moves to its newest action."] = "发布打包器改用其最新操作。" -- mt
+L["Spell reach under nameplates is gone."] = "姓名板下的法术距离提示已移除。" -- mt

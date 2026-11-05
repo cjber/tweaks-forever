@@ -303,4 +303,4 @@ L["Upper Blackrock Spire"] = "검은바위 첨탑 상층" -- mt
 L["Gordok Commons"] = "고르독 광장" -- mt
 L["Capital Gardens"] = "수도 정원" -- mt
 L["Warpwood Quarter"] = "굽이나무 지구" -- mt
-L["The release packager moves to its newest action."] = "릴리스 패키저가 최신 액션으로 이동합니다." -- mt
+L["Spell reach under nameplates is gone."] = "이름표 아래의 주문 사거리 표시가 제거되었습니다." -- mt

@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-11-05
+
 - **The Forever addons settings page ends with a Ko-fi link.** If the addons help you, its Copy link button shows the address, ready to paste into your browser. Nothing is locked behind it, and it shows nowhere else.
 - **Spell reach under nameplates is gone.** The range icons on enemy nameplates, their spell picker and their settings are removed. A saved choice from an earlier version is simply ignored, and the other nameplate options are unchanged.
 

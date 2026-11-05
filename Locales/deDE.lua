@@ -303,4 +303,4 @@ L["Upper Blackrock Spire"] = "Obere Schwarzfelsspitze" -- mt
 L["Gordok Commons"] = "Gordokhallen" -- mt
 L["Capital Gardens"] = "Hauptstadtgärten" -- mt
 L["Warpwood Quarter"] = "Wucherborkenviertel" -- mt
-L["The release packager moves to its newest action."] = "Der Release-Packager wechselt auf seine neueste Aktion." -- mt
+L["Spell reach under nameplates is gone."] = "Die Zauberreichweite unter Namensplaketten ist entfernt." -- mt

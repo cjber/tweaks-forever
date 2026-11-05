@@ -303,4 +303,4 @@ L["Upper Blackrock Spire"] = "Верхняя часть пика Черной г
 L["Gordok Commons"] = "Палаты Гордока" -- mt
 L["Capital Gardens"] = "Центральные сады" -- mt
 L["Warpwood Quarter"] = "Квартал Криводревов" -- mt
-L["The release packager moves to its newest action."] = "Упаковщик релизов переходит на новейшее действие." -- mt
+L["Spell reach under nameplates is gone."] = "Дальность заклинаний под индикаторами имён убрана." -- mt

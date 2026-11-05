@@ -303,4 +303,4 @@ L["Upper Blackrock Spire"] = "Pic Rochenoire supérieur" -- mt
 L["Gordok Commons"] = "Communs gordok" -- mt
 L["Capital Gardens"] = "Jardins de la capitale" -- mt
 L["Warpwood Quarter"] = "Quartier de Crochebois" -- mt
-L["The release packager moves to its newest action."] = "L'empaqueteur de versions passe à sa dernière action." -- mt
+L["Spell reach under nameplates is gone."] = "La portée des sorts sous les plaques de nom a disparu." -- mt
