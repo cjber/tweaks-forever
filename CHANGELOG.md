@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+
+## [2.0.2] - 2026-11-05
 - **The reagent bag's slots keep their green background.** With Combine Bags on, opening all bags no longer logs a Lua error about a missing slot background template, and the reagent slots at the bottom of the combined bag keep the green tint that sets them apart.
 
 ## [2.0.1] - 2026-11-05

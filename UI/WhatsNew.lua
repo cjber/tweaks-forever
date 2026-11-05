@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "2.0.1"
-ns.WHATS_NEW = L["The Abandon quests button has a place of its own."]
+ns.WHATS_NEW_VERSION = "2.0.2"
+ns.WHATS_NEW = L["The reagent bag's slots keep their green background."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
