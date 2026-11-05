@@ -201,6 +201,8 @@ end
 env.UIParent = Frame()
 env.QuestMapFrame = { QuestsFrame = quests, DetailsFrame = { ScrollFrame = {} } }
 env.QuestScrollFrame = scroll
+scroll.BorderFrame = Frame(scroll)
+scroll.BorderFrame.Shadow = Frame(scroll.BorderFrame)
 env.QuestLogPopupDetailFrame = Frame()
 env.QuestFrameDetailPanel = Frame()
 env.QuestFrame = Frame()
@@ -214,13 +216,21 @@ local open = Button("Abandon quests")
 -- The world map hides the quest list and shows one quest's details in its place; the button belongs to the list
 -- and must go with it, rather than sitting over the details page.
 assert(open.parent == scroll, "the Abandon quests button must be parented to the quest list")
+-- The list stops 34 units above the panel's bottom, as the search box's header band does at the top, so the button
+-- sits below the last row instead of over its objectives. The button is 4 units above the panel's bottom, leaving
+-- 8 units between its top and the list.
+assert(scroll.point[1] == "BOTTOMRIGHT" and scroll.point[3] == 34, "the list reserves a footer for the button")
+assert(
+	open.point[1] == "BOTTOMLEFT" and open.point[2] == scroll and open.point[3] == "BOTTOMLEFT" and open.point[5] == -30,
+	"the button sits in the reserved footer"
+)
+assert(scroll.BorderFrame.point[5] == -40, "the quest log's frame art still reaches the panel's bottom")
+assert(scroll.BorderFrame.Shadow.point[5] == 38, "the bottom shadow stays on the list's edge, not the footer")
 scroll:SetShown(false)
 assert(not open:IsVisible(), "the button hides with the list while a quest's details show")
 scroll:SetShown(true)
--- The native scroll area's background receives clicks across the button's bounds.
-local receiver = open.level > scroll.level and open or scroll
-assert(receiver.scripts.OnClick, "the native scroll area must not intercept Abandon quests")
-Click(receiver)
+-- The button sits below the list, clear of the native scroll area, so its own click opens the checklist.
+Click(open)
 local selectAll = Button("Select all")
 -- Each button widens to a longer translated label, and Clear selection stays beside Select all however wide it is.
 assert(open.fitted == 140 and selectAll.fitted == 110, "the buttons fit their labels")
@@ -238,4 +248,10 @@ assert(
 	Button("Abandon selected (0)").enabled == false and Button("Abandon selected (0)").fitted == 210,
 	"reopening clears the selection and pending confirmation"
 )
-print("questlog: native scroll overlap and selection/confirmation/cancel verified")
+-- With the feature off, the list keeps the game's own size and the button leaves with the footer.
+features.bulkAbandon.default = false
+settings.bulkAbandon()
+assert(not open.shown, "the button hides with the feature")
+assert(scroll.point[3] == 0 and scroll.BorderFrame.point[5] == -6, "the list takes its native size back")
+assert(scroll.BorderFrame.Shadow.point[5] == 4, "the shadow returns to the game's list edge")
+print("questlog: footer placement and selection/confirmation/cancel verified")

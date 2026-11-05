@@ -233,20 +233,36 @@ ns.Init(function()
 		selected, pending, page = {}, nil, 1
 	end)
 	panel:SetScript("OnShow", Refresh)
-	-- Parented to the list itself, which the world map hides while a quest's details are shown: the button goes
-	-- with it, rather than sitting over the details page.
+	-- The quest log puts its search box above the list, in a header band it keeps clear. Reserve a matching footer
+	-- band below the list: the list stops short of the panel's bottom, its frame art reaches back over the band,
+	-- and the button sits in it, so it never covers a quest's objectives. Parented to the list itself, which the
+	-- world map hides while a quest's details are shown: the button goes with it, rather than sitting over the
+	-- details page.
+	local FOOTER = 34 -- the footer band: the button's 22 high plus 4 below it and 8 clear of the list
 	local open = CreateFrame("Button", nil, QuestScrollFrame, "SharedButtonSmallTemplate")
 	open:SetFrameLevel(QuestScrollFrame:GetFrameLevel() + 1)
 	open:SetSize(140, 22)
-	open:SetPoint("BOTTOM", 0, 4)
+	open:SetPoint("BOTTOMLEFT", QuestScrollFrame, "BOTTOMLEFT", 6, -(FOOTER - 4))
 	open:SetText(L["Abandon quests"])
 	ns.FitButton(open, 140)
 	open:SetScript("OnClick", function()
 		panel:SetShown(not panel:IsShown())
 	end)
 	local function Setting()
-		open:SetShown(ns.Active("bulkAbandon"))
-		if not ns.Active("bulkAbandon") then
+		local active = ns.Active("bulkAbandon")
+		QuestScrollFrame:SetPoint("BOTTOMRIGHT", 0, active and FOOTER or 0)
+		local border = QuestScrollFrame.BorderFrame
+		if border then
+			-- The border belongs to the list, so it would stop above the reserved band: put its bottom back at the
+			-- panel's edge, where the game draws it when the list fills the panel.
+			border:SetPoint("BOTTOMRIGHT", QuestScrollFrame, "BOTTOMRIGHT", 3, -6 - (active and FOOTER or 0))
+			-- Its bottom shadow fades the list's last row, not the footer: keep it at the list's edge.
+			if border.Shadow then
+				border.Shadow:SetPoint("BOTTOM", border, "BOTTOM", 0, 4 + (active and FOOTER or 0))
+			end
+		end
+		open:SetShown(active)
+		if not active then
 			panel:Hide()
 		end
 	end
