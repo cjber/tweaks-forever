@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **The settings page opens without an error.** Its title asked the game for a font Forever does not have, which logged a Lua error each time the page was built; it now uses the font the game's own settings pages title with.
+
 ## [1.0.15] - 2026-11-05
 
 - **The unit tooltip's health bar keeps its width.** A creature with a short name, such as a deer, no longer squeezes the tooltip down until the health bar and its percentage barely fit: the tooltip stays as wide as the game makes any tooltip with a bar.
