@@ -27,9 +27,11 @@ ns.L = setmetatable({}, {
 -- The client reads the module makes, stubbed: a hunter's book, what reaches each unit, the 5 yard melee item,
 -- and frames that record what is drawn on them.
 local book = { { actionID = 2973 }, { actionID = 75 }, { actionID = 116 }, { actionID = 78 }, { actionID = 403 } }
--- What the spell range check answers; a melee ability (2973) answers nil, which is the bug.
+-- What the spell range check answers. A melee ability (2973) answers nil, or, for one that waits for the next
+-- swing, true at any distance: neither is a distance.
 local range = { nameplate1 = { [75] = true, [116] = true }, nameplate2 = { [75] = true, [116] = true } }
 local MELEE_IDS = { [2973] = true, [78] = true }
+local meleeSpellAnswer = nil
 -- What the 5 yard item check answers. IsSpellInRange never can.
 local melee = { nameplate1 = false, nameplate2 = true }
 local RANGE = { [2973] = 5, [75] = 35, [116] = 30, [78] = 5, [403] = 30, [8042] = 20, [585] = 30 }
@@ -219,7 +221,7 @@ local env = setmetatable({
 	C_Spell = {
 		IsSpellInRange = function(id, unit)
 			if MELEE_IDS[id] then
-				return nil
+				return meleeSpellAnswer
 			end
 			return range[unit][id]
 		end,
@@ -269,6 +271,9 @@ local env = setmetatable({
 	},
 	InCombatLockdown = function()
 		return false
+	end,
+	GetTime = function()
+		return 0
 	end,
 	C_Timer = {
 		After = function() end,
@@ -413,6 +418,17 @@ assert(
 	"the melee ability lights up on the item check, not the nil spell range check"
 )
 melee.nameplate1 = false
+ticks[1]()
+
+-- A melee ability that waits for the next swing can be queued from any distance, so its own range check says yes
+-- out of reach. The item check still decides, so it turns red.
+meleeSpellAnswer = true
+ticks[1]()
+assert(
+	meleeIcon.desaturated and meleeIcon.color[2] == 0.08,
+	"a melee ability whose own check always says yes is red out of reach, answered by the item check"
+)
+meleeSpellAnswer = nil
 ticks[1]()
 
 -- The ranged spell's own range check still answers, so it reddens out of range on its own.

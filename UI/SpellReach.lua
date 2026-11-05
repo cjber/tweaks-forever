@@ -97,13 +97,16 @@ local DEFAULTS = {
 	DRUID = { 6807, 5176 }, -- Maul 0-5, Wrath 0-30
 }
 
--- Items used on an enemy whose own use range is 5 yards, the client's Combat Range (SpellRange 2), so a unit
--- inside one is in melee reach. The spell range check answers nil for a melee ability, so it cannot be asked.
--- IDs and the 5 yard band are LibRangeCheck-3.0's (MIT), the harm list Range Lens uses. Their item data must be
--- loaded before the check answers, so the first one the client holds is requested and remembered.
+-- Items used on an enemy whose own use range is 5 yards (SpellRange 12, Interact Range), so a unit inside one is
+-- in melee reach. A melee ability's own range check is no distance: it answers nil, or, for one that waits for the
+-- next swing (Raptor Strike, Heroic Strike, Maul) and can be queued from any distance, never false. IDs and the
+-- 5 yard band are LibRangeCheck-3.0's (MIT), the harm list Range Lens uses. Their item data must be loaded before
+-- the check answers, so the first one the client holds is requested and remembered.
 local MELEE_ITEMS =
 	{ 8149, 15826, 16308, 17117, 22259, 22432, 206466, 208760, 208855, 209027, 209057, 213036, 221199, 225943 }
 local MELEE_RANGE, MAX_TRACKED = 5, 4
+-- How long to wait before asking the client for the items' data again when none has arrived.
+local RETRY = 10
 
 local GAP = 2
 -- The Classic button frame has a 36 px opening in a 64 px file; its visible edge extends 2 px past the icon.
@@ -310,10 +313,11 @@ local function IsMelee(id)
 	return cached
 end
 
--- The 5 yard item the client holds, if any, and whether its data has been asked for.
+-- The 5 yard item the client holds, if any, and when its data was last asked for.
 ---@type integer?
 local meleeItem
-local requested = false
+---@type number?
+local requestedAt
 
 ---@param id integer
 ---@return boolean
@@ -321,8 +325,9 @@ local function ItemReady(id)
 	return C_Item.GetItemInfo(id) ~= nil
 end
 
--- Pick the first 5 yard item whose data is loaded. None loaded yet: ask the client for each once. The answer
--- arrives with GET_ITEM_INFO_RECEIVED, which redraws.
+-- Pick the first 5 yard item whose data is loaded. None loaded yet: ask the client for each, again every few
+-- seconds while none arrives, since a request made at login can go unanswered. The answer arrives with
+-- GET_ITEM_INFO_RECEIVED, which redraws.
 local function LoadItem()
 	if meleeItem and ItemReady(meleeItem) then
 		return
@@ -334,8 +339,9 @@ local function LoadItem()
 			return
 		end
 	end
-	if not requested then
-		requested = true
+	local now = GetTime()
+	if not requestedAt or now - requestedAt >= RETRY then
+		requestedAt = now
 		for _, id in ipairs(MELEE_ITEMS) do
 			if not ItemReady(id) then
 				C_Item.RequestLoadItemDataByID(id)
@@ -349,26 +355,27 @@ end
 ---@param unit string
 ---@return boolean?
 local function MeleeReaches(unit)
+	LoadItem()
 	if not meleeItem then
 		return nil
 	end
 	return C_Item.IsItemInRange(meleeItem, unit)
 end
 
--- Whether a spell reaches the unit: the client's own range check, and a melee ability, whose range check answers
--- nil, the 5 yard item check. A secret answer is handed straight back for the engine to draw.
+-- Whether a spell reaches the unit. A melee ability is answered by the 5 yard item check, since its own range
+-- check never says it is out of reach; its own check stands in only while the item's data is loading. Every
+-- other spell is the client's own range check. A secret answer is handed straight back for the engine to draw.
 ---@param id integer
 ---@param unit string
 ---@return boolean?
 local function Reaches(id, unit)
-	local answer = C_Spell.IsSpellInRange(id, unit)
-	if not canaccessvalue(answer) then
-		return answer
+	if IsMelee(id) then
+		local near = MeleeReaches(unit)
+		if not canaccessvalue(near) or near ~= nil then
+			return near
+		end
 	end
-	if answer == nil and IsMelee(id) then
-		return MeleeReaches(unit)
-	end
-	return answer
+	return C_Spell.IsSpellInRange(id, unit)
 end
 
 -- The character's picks, keyed by specialisation, stance or form.

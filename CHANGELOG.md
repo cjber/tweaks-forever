@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [1.0.14] - 2026-11-05
+
+- **Melee icons under nameplates turn red out of reach.** Raptor Strike, Heroic Strike, Maul and the other melee attacks in Spell reach under nameplates now go red, faded or hidden when the enemy is beyond melee reach, in and out of combat. The game's own range check for these attacks never says they are out of reach, so a short distance check decides instead.
+
 ## [1.0.13] - 2026-11-04
 
 - **Game data now names the 1.60.1.70790 build.** Camp benefits, class spells, dungeon entrances, Forever quests, map overlays and zone levels are regenerated from the new Forever client build. The regenerated values match the previous build, so nothing a player sees changes.
