@@ -12,8 +12,9 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "2.2.2"
-ns.WHATS_NEW = L["The tooltip health and power bars draw the game's cooldown bar at its own height."]
+ns.WHATS_NEW_VERSION = "2.3.0"
+ns.WHATS_NEW =
+	L["A pet trainer now names the abilities your current pet hasn't learned, with a button that opens Beast Training."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

@@ -311,7 +311,7 @@ L["Quest XP on the experience bar"] = "Опыт заданий на полосе
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Рисует опыт заданий из вашего журнала на полосе опыта: сначала задания, готовые к сдаче, начиная с текущего опыта, затем остаток журнала более бледно. При наведении на полосу подсказка добавляет обе суммы и уровень, которого они достигнут." -- mt
 L["Completed quests: %s XP"] = "Выполненные задания: %s опыта" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Все задания в журнале: %s опыта (достигает %d уровня, %d%%)" -- mt
-L["The tooltip health and power bars draw the game's cooldown bar at its own height."] = "Полосы здоровья и ресурса в подсказке используют полосу восстановления игры в её собственной высоте." -- mt
+L["A pet trainer now names the abilities your current pet hasn't learned, with a button that opens Beast Training."] = "Тренер питомцев теперь называет способности, которые ваш текущий питомец еще не выучил, с кнопкой, открывающей «Дрессировку»." -- mt
 
 L["%s hasn't learned %s."] = "%s еще не выучил %s." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "У тренера питомцев короткая заметка называет способности, которые вы знаете, а ваш питомец еще не выучил, и добавляет кнопку, открывающую «Дрессировку». В самой «Дрессировке» ничего не показывается, а кнопка ждет окончания боя." -- mt

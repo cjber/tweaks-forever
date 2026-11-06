@@ -311,7 +311,7 @@ L["Quest XP on the experience bar"] = "경험치 바의 퀘스트 XP" -- mt
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "경험치 바에 퀘스트 기록의 XP를 그립니다. 현재 XP부터 제출할 수 있는 퀘스트를, 그 뒤에 기록의 나머지를 더 흐리게 표시합니다. 바를 가리키면 두 합계와 도달하는 레벨이 툴팁에 추가됩니다." -- mt
 L["Completed quests: %s XP"] = "완료한 퀘스트: %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "기록의 모든 퀘스트: %s XP (레벨 %d, %d%% 도달)" -- mt
-L["The tooltip health and power bars draw the game's cooldown bar at its own height."] = "툴팁의 생명력 및 자원 바가 게임의 재사용 대기시간 바를 원래 높이로 표시합니다." -- mt
+L["A pet trainer now names the abilities your current pet hasn't learned, with a button that opens Beast Training."] = "이제 야수 조련사가 현재 소환수가 배우지 않은 능력을 알려 주며, 야수 훈련을 여는 버튼이 함께 표시됩니다." -- mt
 
 L["%s hasn't learned %s."] = "%s은(는) %s을(를) 아직 배우지 않았습니다." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "야수 조련사에게서 내가 알고 있는 능력 중 아직 소환수가 배우지 않은 능력을 짧은 안내로 보여 주고, 야수 훈련을 여는 버튼을 추가합니다. 야수 훈련 자체에서는 아무것도 표시되지 않으며, 버튼은 전투가 끝날 때까지 기다립니다." -- mt
