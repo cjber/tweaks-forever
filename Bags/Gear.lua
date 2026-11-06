@@ -52,8 +52,6 @@ local BEFORE_FISHING = L["Before fishing"]
 local WHITE = "Interface\\Buttons\\WHITE8X8"
 -- The quality border's own art, so a group border replaces it exactly.
 local ICON_FRAME = "Interface\\Common\\WhiteIconFrame"
--- The glow the bags give a new item, tinted and kept on.
-local GLOW = "bags-glow-white"
 local CIRCLE = "Interface\\CharacterFrame\\TempPortraitAlphaMask"
 -- Dots sit along the top of a slot; more than this would run off its left edge.
 local MAX_DOTS = 4
@@ -91,7 +89,7 @@ local RETIRED_PALETTES = {
 }
 -- The strip sits under the stack count; the border and dots sit over the quality border.
 ---@type table<string, DrawLayer>
-local LAYERS = { strip = "ARTWORK", border = "OVERLAY", glow = "OVERLAY", dots = "OVERLAY" }
+local LAYERS = { strip = "ARTWORK", border = "OVERLAY", dots = "OVERLAY" }
 -- Where a list comes from: a Tweaks group, an Equipment Manager set, or Before fishing.
 local KINDS = { "group", "set", "fishing" }
 
@@ -412,11 +410,7 @@ local function Texture(button, style, index)
 		pool[index] = button:CreateTexture(nil, LAYERS[style], nil, 2)
 		-- art-ok: the quality border's file, cut into slices by Border's coordinates, or a flat colour
 		pool[index]:SetTexture(style == "border" and ICON_FRAME or WHITE)
-		if style == "glow" then
-			-- art-ok: the atlas's sheet, which Border cuts and sizes from the atlas's own coordinates and size
-			pool[index]:SetTexture(C_Texture.GetAtlasInfo(GLOW).file)
-			pool[index]:SetBlendMode("ADD")
-		elseif style == "dots" then
+		if style == "dots" then
 			pool[index]:SetMask(CIRCLE)
 		end
 	end
@@ -443,14 +437,12 @@ local function Strip(button, found)
 	end
 end
 
--- One slice per group across the quality border's frame, with the new-item glow behind it split the same way.
+-- One slice per group across the quality border's frame.
 ---@param button ContainerFrameItemButtonTemplate
 ---@param found TFGearMark[]
 local function Border(button, found)
 	local frame, count = button.IconBorder, math.min(#found, MAX_BORDERS)
-	local glow = C_Texture.GetAtlasInfo(GLOW)
-	local width, glowWidth = frame:GetWidth() / count, glow.width / count
-	local glowSpan = glow.rightTexCoord - glow.leftTexCoord
+	local width = frame:GetWidth() / count
 	for index = 1, count do
 		local colour = Colour(found[index])
 		local slice = Texture(button, "border", index)
@@ -461,17 +453,6 @@ local function Border(button, found)
 		slice:SetWidth(width)
 		-- As in Strip: a 0 width would draw the slice at its native width.
 		slice:SetShown(width > 0)
-		local halo = Texture(button, "glow", index)
-		halo:SetVertexColor(unpack(colour))
-		halo:SetTexCoord(
-			glow.leftTexCoord + glowSpan * (index - 1) / count,
-			glow.leftTexCoord + glowSpan * index / count,
-			glow.topTexCoord,
-			glow.bottomTexCoord
-		)
-		halo:SetPoint("TOPLEFT", button, "CENTER", -glow.width / 2 + (index - 1) * glowWidth, glow.height / 2)
-		halo:SetSize(glowWidth, glow.height)
-		halo:Show()
 	end
 end
 
