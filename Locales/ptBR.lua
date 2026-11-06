@@ -306,4 +306,4 @@ L["Warpwood Quarter"] = "Distrito Lenhâmbulante" -- mt
 
 L["Unspent talent reminder"] = "Lembrete de pontos de talento não gastos" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Um brilho suave sobre o botão de talentos enquanto você tiver pontos de talento não gastos, ou seu mascote tiver pontos de treinamento não gastos, até serem gastos. Nada em combate." -- mt
-L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "As habilidades de ajudante que você ainda não aprendeu aparecem na aba Ajudante do grimório." -- mt
+L["The unspent talent reminder is a glow only."] = "O lembrete de pontos de talento não gastos agora é apenas um brilho." -- mt

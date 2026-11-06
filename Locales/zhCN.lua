@@ -306,4 +306,4 @@ L["Warpwood Quarter"] = "扭木广场" -- mt
 
 L["Unspent talent reminder"] = "未使用天赋点提醒" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "当你或你的宠物还有未使用的天赋点或训练点时，在天赋按钮上显示柔和的光晕，直到用完为止。战斗中不显示。" -- mt
-L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "尚未学会的宠物技能会显示在法术书的宠物页签中。" -- mt
+L["The unspent talent reminder is a glow only."] = "未使用天赋点的提醒现在只显示光晕。" -- mt

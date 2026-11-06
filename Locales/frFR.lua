@@ -306,4 +306,4 @@ L["Warpwood Quarter"] = "Quartier de Crochebois" -- mt
 
 L["Unspent talent reminder"] = "Rappel de points de talent non dépensés" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Une lueur douce sur le bouton des talents tant que vous avez des points de talent non dépensés, ou que votre familier a des points d'entraînement non dépensés, jusqu'à ce qu'ils soient dépensés. Rien en combat." -- mt
-L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Les techniques de familier que vous n'avez pas apprises s'affichent dans l'onglet Familier du grimoire." -- mt
+L["The unspent talent reminder is a glow only."] = "Le rappel des points de talent non dépensés n'est plus qu'une lueur." -- mt
