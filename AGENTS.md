@@ -111,6 +111,9 @@ Owner-approved exceptions to `wow-forever-addon`:
 - WFA-28: which NPCs train each class (`Data/ClassSpells.lua` `trainers`, NPC IDs only): CMaNGOS classic-db
   `creature_template.TrainerClass`. QuestieDB marks a trainer with a general flag and a translated subtitle, never
   its class, and AtlasLoot has no trainers. Their names and places are read from QuestieDB.
+- WFA-28: pet family abilities with their pet level and training points (`Data/ClassSpells.lua` `PetFamilies`):
+  the Forever client's `CreatureFamily`, `SkillLine`, `SkillLineAbility` and `SpellLevels` on wago.tools.
+  QuestieDB has no pet ability rows and AtlasLoot has none.
 - WFA-28: dungeon and raid entrances (`Data/DungeonEntrances.lua`): the Forever client's `Map` corpse points on
   wago.tools. QuestieDB keeps one zone point per dungeon, shared by every instance of a complex such as Blackrock
   Mountain, not each instance's own door, and AtlasLoot has no map points.

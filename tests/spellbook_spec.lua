@@ -131,6 +131,55 @@ for token, class in pairs(ns.ClassSpells) do
 	end
 end
 
+-- A hunter pet's baked family: its own and the generic pet abilities show before any trainer visit, by the family
+-- the client names in its own language, with a trainer visit's rows laid over them.
+local WOLF = ns.PetFamilies[1]
+assert(WOLF and #WOLF.spells > 0, "the Wolf family is baked")
+for familyID, family in pairs(ns.PetFamilies) do
+	assert(#family.lines > 0 and #family.spells > 0, "family " .. familyID .. " has lines and ranks")
+	for _, row in ipairs(family.spells) do
+		assert(row[1] > 0 and row[2] >= 1 and (row[3] == nil or row[3] >= 0), "family " .. familyID)
+	end
+end
+local PET_NAMES = { [17253] = "Bite", [17255] = "Bite", [17256] = "Bite", [2649] = "Growl" }
+local PET_RANKS = { [17253] = "Rank 1", [17255] = "Rank 2", [17256] = "Rank 3", [2649] = "Rank 1" }
+local function PetDescribe(id)
+	return { name = PET_NAMES[id] or ("spell " .. id), icon = id, rank = PET_RANKS[id] }
+end
+local wolf = Model.PetSpells(WOLF, nil, PetDescribe)
+assert(wolf[17253].lineID == Model.PET and wolf[17253].points, "a baked row belongs to the Pet tab")
+assert(wolf[17253].level == 1 and wolf[17253].cost == 1, "Bite rank 1's pet level and training points")
+assert(wolf[2649].name == "Growl" and wolf[2649].cost == 0, "the generic line's free Growl")
+local knownPet = { [17255] = true } -- the pet knows Bite rank 2
+local pickedPet = Model.Choose(wolf, Model.PET, 8, function(id)
+	return knownPet[id]
+end)
+local bite
+for _, entry in ipairs(pickedPet) do
+	if entry.spell.name == "Bite" then
+		bite = entry
+	end
+end
+assert(bite and bite.id == 17256 and not bite.ready, "the rank after the known one, never the lower rank again")
+local liveWolf = { [17253] = { name = "Bite", rank = "Rank 1", level = 8, cost = 99, icon = 1, lineID = Model.PET } }
+local mergedWolf = Model.PetSpells(WOLF, liveWolf, PetDescribe)
+assert(mergedWolf[17253].cost == 99 and mergedWolf[17253].level == 8, "a pet trainer visit's own rows win")
+local FAMILIES = { [1] = { name = "Wolf (client)" }, [2] = { name = "Cat (client)" } }
+local function FamilyInfo(id)
+	return FAMILIES[id]
+end
+assert(Model.PetFamilyID(ns.PetFamilies, "Cat (client)", FamilyInfo) == 2, "the family by the client's own name")
+assert(Model.PetFamilyID(ns.PetFamilies, "Wolf", FamilyInfo) == nil, "never a baked English name")
+env.UnitCreatureFamily = function()
+	return "Wolf (client)"
+end
+env.C_CreatureInfo = { GetCreatureFamilyInfo = FamilyInfo }
+assert(ns.PetFamily() == WOLF, "the current pet's family")
+env.UnitCreatureFamily = function()
+	return nil
+end
+assert(ns.PetFamily() == nil, "no pet, no family")
+
 -- A German client: the tabs and the trainer name every line in German, and the baked rows still find their tab.
 local TABS = { "Allgemein", "Elementarkampf", "Verstärkung" }
 local TAB_OF = { [375] = 2, [373] = 3 } -- no Restoration spell learned yet, so no tab for it

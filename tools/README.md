@@ -62,19 +62,27 @@ area. An instance with an entrance but no curated zone fails the run; instances
 with no entrance at all are listed. Same cache and flags as `gen_overlays.py`.
 
 `gen_classspells.py` writes `Data/ClassSpells.lua`: what each class trainer teaches,
-for *Future spells in spellbook* before you have visited one, and the NPC IDs of each
-class's trainers, for addons. Forever's client has no trainer lists, and neither QuestieDB
-nor AtlasLoot records what a class trainer teaches or which class it trains, so the rows
-come from the class trainers in CMaNGOS classic-db (pinned by commit), each teaching spell
-resolved to the spell you learn through the Classic Era client's `SpellEffect` (Forever's
-drops most teaching spells). A trainer's name and where it stands are not bundled:
+for *Future spells in spellbook* before you have visited one, the NPC IDs of each
+class's trainers for addons, and what each hunter pet family can learn for the Pet tab.
+Forever's client has no trainer lists, and neither QuestieDB nor AtlasLoot records what a
+class trainer teaches or which class it trains, so the rows come from the class trainers
+in CMaNGOS classic-db (pinned by commit), each teaching spell resolved to the spell you
+learn through the Classic Era client's `SpellEffect` (Forever's drops most teaching
+spells). A trainer's name and where it stands are not bundled:
 `Integrations/QuestieSource.lua` reads them from the installed QuestieDB in game.
 Forever's `SkillLineAbility` gives each spell's class
 skill line, kept by ID as a tab's name is in the client's language, and its races;
 `Spell`'s rank subtext names the rank before one no trainer teaches (a talent, quest or
 starting spell), which has to be known first. Spells the client lacks or on no class
-skill line are counted and left out. Same cache and flags as `gen_overlays.py`, plus
-`--check`, which fails when the file is out of date.
+skill line are counted and left out.
+
+The Pet tab's list needs no trainer: `CreatureFamily.PetFoodMask` marks the tameable
+families, whose `SkillLine_0` and `SkillLine_1` are the family line and the generic pet
+line, `SkillLineAbility` lists their ranks, `SpellLevels.SpellLevel` gives each rank's pet
+level and `SkillLineAbility`'s unnamed 5.5.4 field gives its training point cost. Rows
+with no rank or pet level (passives, talents and server-side speed spells) are counted
+and left out; a cost the client lacks stays nil and its tooltip omits it. Same cache and
+flags as `gen_overlays.py`, plus `--check`, which fails when the file is out of date.
 
 The *Refresh game data* workflow runs `latest_build.py` daily, and when a newer
 build is listed it bumps `BUILD` in every generator, regenerates, runs the checks and

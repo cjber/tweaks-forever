@@ -11,6 +11,7 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+- **Pet abilities you haven't learned show before a trainer visit.** The spellbook's Pet tab now lists the abilities your current pet's family can learn, greyed out after the ones it knows, with each rank's level and training point cost in its tooltip from your first login. Visiting a pet trainer still brings the server's own list and prices up to date.
 
 ## [2.1.0] - 2026-11-06
 - **Pet abilities you haven't learned show on the spellbook's Pet tab.** After a visit to a pet trainer, the abilities it can teach appear greyed out after the ones your pet knows, ready ones first, with each row's level and training point cost in its tooltip.

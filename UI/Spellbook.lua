@@ -23,8 +23,17 @@ local TRAINABLE_FX = 176
 -- The General tab has no skill line of its own: a spell on a line that isn't a class line (Dual Wield, Defense,
 -- armour, Lockpicking) is listed there. SkillLine IDs start at 1, so this stands for it among them.
 Model.GENERAL = 0
--- The Pet tab has no skill line either: a pet trainer row belongs to it, and its cost is training points.
+-- The Pet tab has no skill line either: a baked pet family row and a pet trainer row both belong to it, and their
+-- cost is training points.
 Model.PET = -1
+
+-- The rank number in a "Rank 3" subtext, in any client language's wording; nil for a spell with no rank.
+---@param subtext string?
+---@return integer?
+local function RankOf(subtext)
+	local rank = subtext and subtext:match("%d+")
+	return rank and tonumber(rank)
+end
 
 ---@param a TFFutureSpell
 ---@param b TFFutureSpell
@@ -39,21 +48,32 @@ local function InOrder(a, b)
 end
 
 -- A tab's unlearned spells, or every tab's with no line: the lowest unlearned rank of each, those your trainer
--- teaches now first, then by level. A row with no skill line ID (weapons, riding) is never listed.
+-- teaches now first, then by level. A rank below one you already know is not a future spell, even when the game no
+-- longer counts it as known because a higher rank replaced it. A row with no skill line ID (weapons, riding) is
+-- never listed.
 ---@param spells table<integer, TFTrainerSpell>
 ---@param lineID integer? the tab's SkillLine ID, or GENERAL
 ---@param level number
 ---@param Skip fun(id: integer): boolean? known, or hidden by the spellbook's filter
 ---@return TFFutureSpell[]
 function Model.Choose(spells, lineID, level, Skip)
+	local knownRank = {}
+	for id, spell in pairs(spells) do
+		local rank = Skip(id) and RankOf(spell.rank)
+		if rank and (not knownRank[spell.name] or rank > knownRank[spell.name]) then
+			knownRank[spell.name] = rank
+		end
+	end
 	---@type table<string, TFFutureSpell>
 	local byName = {}
 	for id, spell in pairs(spells) do
 		local held = byName[spell.name]
+		local rank = RankOf(spell.rank)
 		if
 			spell.lineID
 			and (not lineID or (spell.general and Model.GENERAL or spell.lineID) == lineID)
 			and not Skip(id)
+			and (not rank or not knownRank[spell.name] or rank > knownRank[spell.name])
 			and (not held or spell.level < held.spell.level)
 		then
 			byName[spell.name] = { id = id, spell = spell, ready = spell.level <= level }
@@ -144,6 +164,54 @@ function Model.PetTrainer(services)
 		end
 	end
 	return spells
+end
+
+-- What the current pet's family can learn: its baked ranks, all on the Pet tab, with the rows a pet trainer visit
+-- recorded laid over them, as the server has the last word on what it teaches and for how much. A baked rank the
+-- client can't describe is left out, never guessed at.
+---@param baked TFPetFamily?
+---@param live table<integer, TFTrainerSpell>?
+---@param Describe fun(id: integer): TFSpellFacts?
+---@return table<integer, TFTrainerSpell>
+function Model.PetSpells(baked, live, Describe)
+	---@type table<integer, TFTrainerSpell>
+	local spells = {}
+	for _, row in ipairs(baked and baked.spells or {}) do
+		local facts = Describe(row[1])
+		if facts then
+			spells[row[1]] = {
+				name = facts.name,
+				rank = facts.rank,
+				icon = facts.icon,
+				level = row[2],
+				cost = row[3],
+				lineID = Model.PET,
+				points = true,
+			}
+		end
+	end
+	for id, spell in pairs(live or {}) do
+		spells[id] = spell
+	end
+	return spells
+end
+
+-- The baked family whose client name is the pet's. The client names the family in the same language on both sides,
+-- so no baked English name is ever compared: only the IDs the client itself names.
+---@param families table<integer, TFPetFamily>?
+---@param name string?
+---@param Info fun(id: integer): CreatureFamilyInfo?
+---@return integer?
+function Model.PetFamilyID(families, name, Info)
+	if not name then
+		return nil
+	end
+	for id in pairs(families or {}) do
+		local info = Info(id)
+		if info and info.name == name then
+			return id
+		end
+	end
 end
 
 -- The class skill line on each spellbook tab, by tab index. A tab tells only its name, in the client's language,
@@ -290,6 +358,16 @@ function ns.TrainerSpells()
 	return Model.Spells(ClassData(), live, (select(3, UnitRace("player"))), Describe, ns.KnownSpell)
 end
 
+-- The current pet's baked family, found through the client's own family names so every locale works.
+---@return TFPetFamily?
+function ns.PetFamily()
+	if not C_CreatureInfo or not C_CreatureInfo.GetCreatureFamilyInfo then
+		return nil
+	end
+	local id = Model.PetFamilyID(ns.PetFamilies, UnitCreatureFamily("pet"), C_CreatureInfo.GetCreatureFamilyInfo)
+	return id and ns.PetFamilies[id]
+end
+
 ---@return table<integer, integer> tab index -> SkillLine ID
 local function Tabs()
 	local data = ClassData()
@@ -433,7 +511,9 @@ local function ShowTooltip(button)
 		GameTooltip_AddErrorLine(GameTooltip, SPELLBOOK_AVAILABLE_AT:format(entry.spell.level))
 	end
 	if entry.spell.points then
-		GameTooltip_AddNormalLine(GameTooltip, TRAINING_POINTS_ABBREV:format(entry.spell.cost or 0))
+		if entry.spell.cost then
+			GameTooltip_AddNormalLine(GameTooltip, TRAINING_POINTS_ABBREV:format(entry.spell.cost))
+		end
 	elseif entry.spell.cost and entry.spell.cost > 0 then
 		SetTooltipMoney(GameTooltip, entry.spell.cost, nil, COSTS_LABEL)
 	end
@@ -473,7 +553,8 @@ local function Render()
 	local pet = line == Model.PET
 	local spells = {}
 	if pet then
-		spells = (TweaksForeverCharDB and TweaksForeverCharDB.petTrainer) or {}
+		local live = TweaksForeverCharDB and TweaksForeverCharDB.petTrainer
+		spells = Model.PetSpells(ns.PetFamily(), live, Describe)
 	elseif line then
 		spells = ns.TrainerSpells()
 	end

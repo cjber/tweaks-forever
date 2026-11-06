@@ -65,6 +65,18 @@
 ---@field spells TFClassSpell[]
 ---@field trainers integer[] the NPC IDs of the class trainers to visit
 
+-- A spell a hunter pet family can learn: { spell, pet level, training points }. A nil cost is one the client does
+-- not carry, and its tooltip omits it.
+---@class TFPetFamilySpell
+---@field [1] integer
+---@field [2] integer
+---@field [3] integer?
+
+-- What a hunter pet family can learn, keyed by the client's CreatureFamily ID.
+---@class TFPetFamily
+---@field lines integer[] its pet SkillLine IDs: the family's own line and the generic pet line
+---@field spells TFPetFamilySpell[]
+
 -- What the client knows of a spell, for a trainer row it has never seen.
 ---@class TFSpellFacts
 ---@field name string
@@ -264,6 +276,8 @@ TweaksForeverCharDB = nil
 ---@field FutureSpells TFFutureSpells
 ---@field TalentReminder TFTalentReminder
 ---@field ClassSpells table<string, TFClassSpells> by class token
+---@field PetFamilies table<integer, TFPetFamily> by CreatureFamily ID
+---@field PetFamily fun(): TFPetFamily?
 ---@field TrainerSpells fun(): table<integer, TFTrainerSpell>
 ---@field LineName fun(lineID: integer, fallback: string?): string
 ---@field GeneralName fun(): string

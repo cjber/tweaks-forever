@@ -1,8 +1,17 @@
-"""The class trainer generator: dump parsing, teaching spells, ranks, races and what it leaves out."""
+"""The class trainer generator: dump parsing, teaching spells, ranks, races, pet families and what it leaves out."""
 
 import unittest
+from collections import Counter
 
-from tools.gen_classspells import CREATURE_COLUMNS, generate, race_ids, teachings, values
+from tools.gen_classspells import (
+    CREATURE_COLUMNS,
+    PET_TRAINING_COST,
+    generate,
+    generate_pets,
+    race_ids,
+    teachings,
+    values,
+)
 
 
 def creature(entry, trainer_class, template=0, trainer_type=0, name="Trainer"):
@@ -15,14 +24,35 @@ def offer(entry, spell, cost, level, skill=0):
     return [str(entry), str(spell), str(cost), str(skill), "0", str(level), "NULL", "NULL", "NULL", "0"]
 
 
-def ability(spell, line, class_mask=64, low=0, high=0):
-    return {
+def ability(spell, line, class_mask=64, low=0, high=0, cost=None):
+    row = {
         "Spell": str(spell),
         "SkillLine": str(line),
         "ClassMask": str(class_mask),
         "RaceMasks_0": str(low),
         "RaceMasks_1": str(high),
     }
+    if cost is not None:
+        row[PET_TRAINING_COST] = str(cost)
+    return row
+
+
+def family(family_id, food, line, generic=270, name="Wolf"):
+    return {
+        "ID": str(family_id),
+        "Name_lang": name,
+        "PetFoodMask": str(food),
+        "SkillLine_0": str(line),
+        "SkillLine_1": str(generic),
+    }
+
+
+def skill(line_id, category=7, name="Pet - Wolf"):
+    return {"ID": str(line_id), "DisplayName_lang": name, "CategoryID": str(category)}
+
+
+def spell_level(spell, level, base=0, difficulty=0):
+    return {"SpellID": str(spell), "DifficultyID": str(difficulty), "SpellLevel": str(level), "BaseLevel": str(base)}
 
 
 def learn(teacher, taught):
@@ -86,6 +116,69 @@ class GenerateTest(unittest.TestCase):
         )
         self.assertEqual((stats["SHAMAN"], stats["not_in_client"], stats["skill_gated"]), (2, 1, 1))
         self.assertEqual(stats["trainers"], 2)
+
+
+class PetFamiliesTest(unittest.TestCase):
+    def build(self, families, abilities, levels, spells=None):
+        """A Forever export with the pet tables, a family line (208), the generic line (270) and a non-pet line."""
+        ranks = {
+            100: "Rank 1",
+            101: "Rank 2",
+            200: "Rank 1",
+            201: "Rank 1",
+            300: "",
+            400: "Rank 1",
+            500: "Rank 1",
+        }
+        if spells is not None:
+            ranks = spells
+        return {
+            "Spell": [{"ID": str(spell), "NameSubtext_lang": rank} for spell, rank in ranks.items()],
+            "SpellName": [{"ID": str(spell), "Name_lang": f"Ability {spell}"} for spell in ranks if spell != 500],
+            "SkillLine": [skill(208), skill(270, name="Pet - Generic"), skill(300, category=0, name="Other")],
+            "SkillLineAbility": abilities,
+            "SpellLevels": levels,
+            "CreatureFamily": families,
+        }
+
+    def test_a_tameable_family_gets_its_own_and_generic_ranks(self):
+        families = [family(1, 1, 208), family(2, 0, 209), family(3, 1, 300, generic=0)]
+        abilities = [
+            ability(100, 208, cost=5),
+            ability(101, 208, cost=10),
+            ability(200, 270, cost=0),
+            ability(201, 270, cost=2),
+            ability(300, 270),  # no rank
+            ability(400, 208),  # no pet level
+            ability(500, 208),  # not in the client's SpellName
+        ]
+        levels = [
+            spell_level(100, 1),
+            spell_level(101, 8),
+            spell_level(200, 1),
+            spell_level(201, 20),
+            spell_level(300, 1),
+            spell_level(400, 0),
+            spell_level(500, 1),
+        ]
+        stats = Counter()
+        result = generate_pets(self.build(families, abilities, levels), stats)
+        self.assertEqual(
+            result,
+            {1: ([208, 270], [(100, 1, 5), (200, 1, 0), (101, 8, 10), (201, 20, 2)])},
+            "the family line then the generic line, by pet level",
+        )
+        self.assertNotIn(2, result, "a family that eats nothing is not a hunter pet")
+        self.assertNotIn(3, result, "a family line outside the pet category teaches nothing")
+        self.assertEqual((stats["pet_families"], stats["pet_abilities"]), (1, 4))
+        self.assertEqual((stats["pet_not_a_rank"], stats["pet_not_in_client"]), (2, 1))
+
+    def test_a_cost_the_client_lacks_stays_nil_and_base_level_fills_in(self):
+        abilities = [ability(100, 208)]
+        levels = [spell_level(100, 0, base=30)]
+        stats = Counter()
+        result = generate_pets(self.build([family(1, 1, 208)], abilities, levels), stats)
+        self.assertEqual(result[1][1], [(100, 30, None)], "no cost column, and SpellLevel 0 falls back to BaseLevel")
 
 
 class TrainersTest(unittest.TestCase):
