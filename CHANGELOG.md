@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+- **Daily and repeatable quest markers come from the game's map.** Questie's daily quests and repeatable hand-ins on the map and minimap now use the client's own recurring quest symbols, so they read like every other quest marker there.
+- **The grouped-gear border no longer glows.** A group border still splits the quality border into the group colours, without the bags' new-item glow behind it, so a grouped item no longer looks like one you just picked up.
 
 ## [2.2.2] - 2026-11-06
 - **The tooltip health and power bars draw the game's cooldown bar at its own height.** They no longer squash a taller progress bar into the tooltip, so the bar is the shape the game draws it at, only as wide as the tooltip makes it.

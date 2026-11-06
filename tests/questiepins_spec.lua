@@ -27,6 +27,9 @@ function map.utils.RescaleIcon(ref)
 	frame:SetSize(8, 8)
 end
 local hooks = 0
+local ATLAS_SIZE = {
+	SideInProgressquesticon = { 16, 18 },
+}
 local env = setmetatable({
 	_G = frames,
 	Questie = { usedIcons = { [6] = "original-pickup", [8] = "original-turnin" } },
@@ -37,10 +40,8 @@ local env = setmetatable({
 	},
 	C_Texture = {
 		GetAtlasInfo = function(atlas)
-			return {
-				width = atlas == "SideInProgressquesticon" and 16 or 32,
-				height = atlas == "SideInProgressquesticon" and 18 or 32,
-			}
+			local size = ATLAS_SIZE[atlas] or { 32, 32 }
+			return { width = size[1], height = size[2] }
 		end,
 	},
 	hooksecurefunc = function(object, key, fn)
@@ -97,6 +98,24 @@ assert(frames.a.width == 24, "zoom cannot shrink native marker to unreadable siz
 local new = Pin(2, false)
 map.utils.SetDrawOrder(new)
 assert(new.texture.atlas == "questobjective", "new objective pins retain their locations")
+
+-- Daily and repeatable quests take the game's own recurring quest symbols, the client's 32x32 map art.
+local daily, repeatable = Pin(10, false), Pin(11, true)
+map.utils.SetDrawOrder(daily)
+map.utils.SetDrawOrder(repeatable)
+assert(daily.texture.atlas == "UI-QuestPoiRecurring-QuestBang", "a daily quest takes the game's recurring symbol")
+assert(repeatable.texture.atlas == "UI-QuestPoiRecurring-QuestBangTurnIn", "a repeatable hand-in takes its turn-in")
+assert(daily.width == 24 and daily.height == 24, "the recurring symbol keeps its square shape on the map")
+assert(repeatable.width == 20 and repeatable.height == 20, "and on the minimap")
+for kind, atlas in pairs({
+	[13] = "UI-QuestPoiRecurring-QuestBang",
+	[14] = "UI-QuestPoiRecurring-QuestBangTurnIn",
+}) do
+	local pin = Pin(kind, false)
+	map.utils.SetDrawOrder(pin)
+	assert(pin.texture.atlas == atlas, "every recurring quest kind takes the game's symbol")
+end
+
 local manual = Pin(6, false)
 manual.isManualIcon = true
 manual.width = 8
