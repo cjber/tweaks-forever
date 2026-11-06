@@ -221,7 +221,6 @@ L["Starts a quest: %s"] = "퀘스트 시작: %s"
 L["Suggest my other Forever addons"] = "제 다른 Forever 애드온 추천"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "전리품 창을 기다리지 않고 한 번에 모두 가져옵니다. 자동 전리품 획득이 적용될 때만 작동합니다."
 L["Target a creature for the nearest quest"] = "가장 가까운 퀘스트의 몬스터 대상 지정"
-L["The reagent bag's slots keep their green background."] = "재료 가방 칸이 초록색 배경을 유지합니다." -- mt
 L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Forever 애드온은 무료이며 잠긴 기능이 없습니다. 도움이 되셨다면 커피 한 잔 사 주세요." -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "게임의 최대 시야 거리 설정보다 시점이 더 멀리 물러납니다. 이 기능을 끄면 이전 값으로 돌아갑니다."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Tweaks Forever가 업데이트된 뒤 처음 접속하면 대화창에 무엇이 바뀌었는지 한 줄로 알려 줍니다."
@@ -310,3 +309,4 @@ L["One line in chat at login and after each level-up while you have unspent tale
 L["you have unspent talent points, and your pet has unspent training points."] = "사용하지 않은 특성 점수와 소환수의 사용하지 않은 훈련 점수가 있습니다." -- mt
 L["you have unspent talent points."] = "사용하지 않은 특성 점수가 있습니다." -- mt
 L["your pet has unspent training points."] = "소환수에게 사용하지 않은 훈련 점수가 있습니다." -- mt
+L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "아직 배우지 않은 소환수 능력이 마법책의 소환수 탭에 표시됩니다." -- mt

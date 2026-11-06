@@ -221,7 +221,6 @@ L["Starts a quest: %s"] = "開始任務：%s"
 L["Suggest my other Forever addons"] = "推薦我的其他Forever插件"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "一次拿走所有物品，不等待拾取視窗。僅在自動拾取生效時。"
 L["Target a creature for the nearest quest"] = "選取最近任務所需的生物"
-L["The reagent bag's slots keep their green background."] = "材料包的格子保留綠色背景。" -- mt
 L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Forever 插件全部免費，沒有任何付費才能使用的內容。如果它們對你有幫助，可以請我喝杯咖啡。" -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "鏡頭可以拉得比遊戲的「鏡頭最遠距離」設定更遠。關閉此功能後會恢復你之前的值。"
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Tweaks Forever更新後首次登入時，聊天視窗中會有一行說明有哪些變化。"
@@ -310,3 +309,4 @@ L["One line in chat at login and after each level-up while you have unspent tale
 L["you have unspent talent points, and your pet has unspent training points."] = "你有未使用的天賦點，你的寵物也有未使用的訓練點。" -- mt
 L["you have unspent talent points."] = "你有未使用的天賦點。" -- mt
 L["your pet has unspent training points."] = "你的寵物有未使用的訓練點。" -- mt
+L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "尚未學會的寵物技能會顯示在法術書的寵物頁籤中。" -- mt

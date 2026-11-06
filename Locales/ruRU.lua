@@ -221,7 +221,6 @@ L["Starts a quest: %s"] = "Начинает задание: %s"
 L["Suggest my other Forever addons"] = "Предлагать другие мои модификации Forever"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Забирает все сразу, не дожидаясь окна добычи. Только когда действует автоматический сбор добычи."
 L["Target a creature for the nearest quest"] = "Выбрать существо для ближайшего задания"
-L["The reagent bag's slots keep their green background."] = "Ячейки сумки для реагентов сохраняют зелёный фон." -- mt
 L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Аддоны Forever бесплатны, и ничего в них не закрыто за оплатой. Если они вам помогают, можете угостить меня кофе." -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "Камера отдаляется дальше, чем позволяет настройка игры «Максимальная дистанция камеры». Прежнее значение вернется, когда вы это выключите."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "При первом входе после обновления Tweaks Forever строка в чате сообщает, что изменилось."
@@ -310,3 +309,4 @@ L["One line in chat at login and after each level-up while you have unspent tale
 L["you have unspent talent points, and your pet has unspent training points."] = "у вас есть нераспределённые очки талантов, и у вашего питомца есть нераспределённые очки обучения." -- mt
 L["you have unspent talent points."] = "у вас есть нераспределённые очки талантов." -- mt
 L["your pet has unspent training points."] = "у вашего питомца есть нераспределённые очки обучения." -- mt
+L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Способности питомца, которые вы ещё не изучили, показываются на вкладке «Питомец» в книге заклинаний." -- mt

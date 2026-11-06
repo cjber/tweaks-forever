@@ -221,7 +221,6 @@ L["Starts a quest: %s"] = "Commence une quête : %s"
 L["Suggest my other Forever addons"] = "Suggérer mes autres addons Forever"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Prend tout d'un coup au lieu d'attendre la fenêtre de butin. Seulement quand la fouille automatique s'applique."
 L["Target a creature for the nearest quest"] = "Cibler une créature pour la quête la plus proche"
-L["The reagent bag's slots keep their green background."] = "Les emplacements du sac de composants gardent leur fond vert." -- mt
 L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Les addons Forever sont gratuits et rien n'est réservé aux donateurs. S'ils vous aident, vous pouvez m'offrir un café." -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "La caméra recule plus loin que le réglage Distance de caméra maximale du jeu ne le permet. Votre valeur précédente est rétablie quand vous désactivez ceci."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "À la première connexion après une mise à jour de Tweaks Forever, une ligne dans la discussion indique ce qui a changé."
@@ -310,3 +309,4 @@ L["One line in chat at login and after each level-up while you have unspent tale
 L["you have unspent talent points, and your pet has unspent training points."] = "vous avez des points de talent non dépensés, et votre familier a des points d'entraînement non dépensés." -- mt
 L["you have unspent talent points."] = "vous avez des points de talent non dépensés." -- mt
 L["your pet has unspent training points."] = "votre familier a des points d'entraînement non dépensés." -- mt
+L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Les techniques de familier que vous n'avez pas apprises s'affichent dans l'onglet Familier du grimoire." -- mt

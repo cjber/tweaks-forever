@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+
+## [2.1.0] - 2026-11-06
 - **Pet abilities you haven't learned show on the spellbook's Pet tab.** After a visit to a pet trainer, the abilities it can teach appear greyed out after the ones your pet knows, ready ones first, with each row's level and training point cost in its tooltip.
 - **A reminder when talent or pet training points are unspent.** One chat line at login and after each level-up, and a soft glow over the talents button until they are spent. Nothing in combat. It is on by default under Interface.
 

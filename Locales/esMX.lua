@@ -221,7 +221,6 @@ L["Starts a quest: %s"] = "Inicia una misión: %s"
 L["Suggest my other Forever addons"] = "Sugerir mis otros addons Forever"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Lo toma todo de una vez en lugar de esperar a la ventana de botín. Solo cuando se aplica el despojo automático."
 L["Target a creature for the nearest quest"] = "Seleccionar una criatura para la misión más cercana"
-L["The reagent bag's slots keep their green background."] = "Las casillas de la bolsa de componentes conservan su fondo verde." -- mt
 L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Los addons Forever son gratuitos y no hay nada bloqueado tras un pago. Si te ayudan, puedes invitarme un café." -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "La cámara se aleja más de lo que permite el ajuste Distancia máxima de cámara del juego. Tu valor anterior vuelve al desactivar esto."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "La primera vez que te conectas tras una actualización de Tweaks Forever, una línea en el chat dice qué cambió."
@@ -310,3 +309,4 @@ L["One line in chat at login and after each level-up while you have unspent tale
 L["you have unspent talent points, and your pet has unspent training points."] = "tienes puntos de talento sin gastar, y tu mascota tiene puntos de entrenamiento sin gastar." -- mt
 L["you have unspent talent points."] = "tienes puntos de talento sin gastar." -- mt
 L["your pet has unspent training points."] = "tu mascota tiene puntos de entrenamiento sin gastar." -- mt
+L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Las habilidades de mascota que aún no aprendiste aparecen en la pestaña Mascota del libro de hechizos." -- mt
