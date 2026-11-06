@@ -50,6 +50,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet, and the Pet tab does the same for the abilities your pet's family can learn. With Combine Bags on, the reagent bag joins the combined bag.
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.
+- **Pet trainer hint.** At a pet trainer, names the abilities you know that your pet hasn't learned, with a button that opens Beast Training. It says when the trainer's filter hides the ranks you already know.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and a warning when you have none.
 - **Quest item sparkles.** The game's own sparkles on lootable quest objects, as in [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles). Off by default. Outlines are off while it's on and come back after; removing sparkles needs a game restart.
 - **Small things.** Quiet repeated macro errors, hints for my other Forever addons (with a Forever addons settings page) and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.

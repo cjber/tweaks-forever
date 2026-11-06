@@ -109,6 +109,10 @@ FACTION_HORDE = ""
 ---@class TFBagChild : Frame
 ---@field GetSlotAndBagID? fun(self: TFBagChild): integer, integer
 
+-- Forever's trainer frame, whose inset holds the skill list under its title.
+---@class ClassTrainerFrame
+---@field Inset Frame
+
 -- Forever's TrainerDocumentation/TrainerConstantsDocumentation; absent from the pinned Retail API.
 C_Trainer = {}
 ---@enum Enum.TrainerType

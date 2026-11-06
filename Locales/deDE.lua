@@ -312,3 +312,9 @@ L["Draws the XP of the quests in your log on the experience bar: the quests read
 L["Completed quests: %s XP"] = "Abgeschlossene Quests: %s EP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Alle Quests im Log: %s EP (erreicht Stufe %d, %d%%)" -- mt
 L["The tooltip health and power bars draw the game's cooldown bar at its own height."] = "Die Gesundheits- und Energieleisten im Tooltip zeigen die Abklingleiste des Spiels in ihrer eigenen Höhe." -- mt
+
+L["%s hasn't learned %s."] = "%s hat %s noch nicht gelernt." -- mt
+L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "Bei einem Tierausbilder nennt eine kurze Notiz die Fähigkeiten, die Ihr kennt und Euer Begleiter noch nicht gelernt hat, mit einer Schaltfläche, die Bestientraining öffnet. Im Bestientraining selbst erscheint nichts, und die Schaltfläche wartet, bis der Kampf endet." -- mt
+L["Pet trainer hint"] = "Hinweis beim Tierausbilder" -- mt
+L["Teach with Beast Training"] = "Mit Bestientraining lehren" -- mt
+L["The ranks you already know are hidden by the filter."] = "Die Ränge, die Ihr bereits kennt, sind durch den Filter ausgeblendet." -- mt

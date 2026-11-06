@@ -11,6 +11,7 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+- **A pet trainer says what your pet hasn't learned.** At a pet trainer, a short note names the abilities you know that your current pet lacks, with a **Teach with Beast Training** button that opens Beast Training. It also says when the trainer's filter hides the ranks you already know, which can leave the list looking empty. Nothing changes in Beast Training itself, and the button waits until combat ends.
 - **Daily and repeatable quest markers come from the game's map.** Questie's daily quests and repeatable hand-ins on the map and minimap now use the client's own recurring quest symbols, so they read like every other quest marker there.
 - **The grouped-gear border no longer glows.** A group border still splits the quality border into the group colours, without the bags' new-item glow behind it, so a grouped item no longer looks like one you just picked up.
 

@@ -312,3 +312,9 @@ L["Draws the XP of the quests in your log on the experience bar: the quests read
 L["Completed quests: %s XP"] = "已完成任务：%s 经验" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "日志中所有任务：%s 经验（达到 %d 级，%d%%）" -- mt
 L["The tooltip health and power bars draw the game's cooldown bar at its own height."] = "鼠标提示的生命条和能量条以原始高度绘制游戏的冷却条。" -- mt
+
+L["%s hasn't learned %s."] = "%s还没有学会%s。" -- mt
+L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "在宠物训练师处，一段简短的提示会列出你已学会、但当前宠物尚未学会的技能，并提供一个打开野兽训练的按钮。野兽训练窗口中不会显示任何内容，按钮会等到战斗结束后再出现。" -- mt
+L["Pet trainer hint"] = "宠物训练师提示" -- mt
+L["Teach with Beast Training"] = "用野兽训练教学" -- mt
+L["The ranks you already know are hidden by the filter."] = "你已学会的等级被过滤器隐藏了。" -- mt

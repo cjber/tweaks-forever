@@ -274,6 +274,7 @@ TweaksForeverCharDB = nil
 ---@field CampBenefitEffects table<string, table<integer, string>>
 ---@field Camp TFCamp
 ---@field FutureSpells TFFutureSpells
+---@field PetTrainerHint TFPetTrainerHint
 ---@field TalentReminder TFTalentReminder
 ---@field ClassSpells table<string, TFClassSpells> by class token
 ---@field PetFamilies table<integer, TFPetFamily> by CreatureFamily ID
