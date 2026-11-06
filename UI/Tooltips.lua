@@ -72,7 +72,7 @@ ns.Tooltips = Model
 -- last line. The tooltip's own margin under its lines is 10. The track under the fill is its colour at this shade.
 local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 12, 10
 local PADDING = BOTTOM + HEIGHT + GAP - 10
-local TRACK = 0.3
+local TRACK_SHADE = 0.3
 -- The width Blizzard gives a tooltip that carries a status bar (GameTooltip_ShowStatusBar), so a short name such
 -- as "Deer" still leaves the bar and its text room.
 local MIN_WIDTH = 140
@@ -132,40 +132,20 @@ local function Repaint(tooltips)
 	end
 end
 
--- The retail game's tooltip status bar: TargetingFrame's bar texture, on a track of the same texture in a darker
--- shade, framed by Blizzard's own tooltip bar border as TooltipStatusBarTemplate places it, 2 out on every side.
-local FILL = "Interface\\TargetingFrame\\UI-StatusBar"
-local FRAME = "Interface\\Tooltips\\UI-StatusBar-Border"
--- The border file is 128x16 and drawn 16 tall, so a texel is a unit. Its 8-texel ends stay at native size and
--- only the flat middle stretches along the bar.
-local FRAME_SIZE, FRAME_CAP, FRAME_OUT = 128, 8, 2
-
--- One piece of the border, cut from texel `from` to `to` of the file.
-local function FramePiece(bar, from, to)
-	local piece = bar:CreateTexture(nil, "OVERLAY", nil, -1)
-	piece:SetTexture(FRAME) -- art-ok: a bar border's piece: the ends at native size, the flat middle stretches
-	piece:SetTexCoord(from / FRAME_SIZE, to / FRAME_SIZE, 0, 1)
-	piece:SetHeight(HEIGHT + 2 * FRAME_OUT)
-	return piece
-end
+-- The client's own coloured progress bar (ColoredProgressBarTemplate in Blizzard_SharedXML): a white fill the
+-- bar tints, over the background art that carries the bar's border, so the whole bar is the game's current art.
+local FILL = "common-stat-bar-white"
+local TRACK = "common-stat-bar-BG"
 
 local function HealthBarArt(bar)
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
-	track:SetTexture(FILL) -- art-ok: a status bar's track, stretched by design
+	-- art-ok: a bar's background, stretched along the bar by design
+	track:SetAtlas(TRACK)
 	track:SetAllPoints()
-	local left = FramePiece(bar, 0, FRAME_CAP)
-	left:SetWidth(FRAME_CAP)
-	left:SetPoint("TOPLEFT", -FRAME_OUT, FRAME_OUT)
-	local right = FramePiece(bar, FRAME_SIZE - FRAME_CAP, FRAME_SIZE)
-	right:SetWidth(FRAME_CAP)
-	right:SetPoint("TOPRIGHT", FRAME_OUT, FRAME_OUT)
-	local middle = FramePiece(bar, FRAME_CAP, FRAME_SIZE - FRAME_CAP)
-	middle:SetPoint("TOPLEFT", left, "TOPRIGHT")
-	middle:SetPoint("TOPRIGHT", right, "TOPLEFT")
 	-- The Arial Narrow outline Blizzard puts on its own bars' numbers (the profession rank bar, retail's damage meter).
 	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
 	text:SetPoint("CENTER")
-	return { track, left, middle, right, text }, track, text
+	return { track, text }, track, text
 end
 
 local function HealthBarStyle(tooltip, bar, art, Update, Fit)
@@ -182,7 +162,7 @@ local function HealthBarStyle(tooltip, bar, art, Update, Fit)
 			bar:SetPoint("TOPLEFT", tooltip, "BOTTOMLEFT", 2, -1)
 			bar:SetPoint("TOPRIGHT", tooltip, "BOTTOMRIGHT", -2, -1)
 			bar:SetHeight(8)
-			bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-TargetingFrame-BarFill")
+			bar:SetStatusBarTexture(FILL)
 			bar:SetStatusBarColor(0, 1, 0)
 		end
 		for _, region in ipairs(art) do
@@ -197,7 +177,7 @@ end
 
 -- The unit health bar Blizzard hangs under GameTooltip, moved inside it. Blizzard still watches the unit and sets the
 -- bar's value, which can be secret; this file never reads it. It only anchors, sizes, textures and colours the bar
--- (engine calls) and adds a track, border and text of its own.
+-- (engine calls) and adds a track and text of its own.
 local function HealthBar()
 	local tooltip = GameTooltip
 	local bar = tooltip.StatusBar
@@ -211,7 +191,7 @@ local function HealthBar()
 			return
 		end
 		bar:SetStatusBarColor(r, g, b)
-		track:SetVertexColor(r * TRACK, g * TRACK, b * TRACK)
+		track:SetVertexColor(r * TRACK_SHADE, g * TRACK_SHADE, b * TRACK_SHADE)
 		-- UnitHealth may always return a secret, UnitHealthMax does for units that aren't player-controlled, and
 		-- UnitHealthPercent does whenever its inputs are. Each goes straight to an API documented to take secrets
 		-- (BreakUpLargeNumbers, SetFormattedText): no arithmetic or comparison on any of them. The percentage is

@@ -736,7 +736,7 @@ def demo(ui):
 
 # UI/Tooltips.lua under Modern tooltips: the nine pieces cut from media/TooltipBorderModern.tga (PIECES, in sixteenths),
 # with room under the last line for the health bar (EDGE, BOTTOM, HEIGHT, GAP, PADDING), whose track is its colour at
-# TRACK and whose border is Tooltips\UI-StatusBar-Border as three pieces, 8-texel ends at native size.
+# TRACK_SHADE over the client's own bar background, ColoredProgressBarTemplate's common-stat-bar-BG and white fill.
 TIP_PIECES = {
     "TopLeftCorner": (0, 7, 0, 7),
     "TopRightCorner": (9, 16, 0, 7),
@@ -751,10 +751,9 @@ TIP_PIECES = {
 TIP_CORNER = 7
 BAR_EDGE, BAR_BOTTOM, BAR_HEIGHT, BAR_GAP = 10, 11, 12, 10
 BAR_PADDING = BAR_BOTTOM + BAR_HEIGHT + BAR_GAP - 10
-BAR_TRACK = 0.3
-BAR_FILL = "interface/targetingframe/ui-statusbar.blp"
-BAR_FRAME = "interface/tooltips/ui-statusbar-border.blp"
-BAR_FRAME_CAP, BAR_FRAME_OUT = 8, 2
+BAR_TRACK_SHADE = 0.3
+BAR_FILL = "common-stat-bar-white"
+BAR_TRACK = "common-stat-bar-BG"
 BAR_TEXT = Font(ARIALN, 12, (1, 1, 1), None, outline=True)  # Number12FontOutline
 GUILD = (0.6, 0.6, 0.6)
 HORDE = (0.90, 0.05, 0.07)  # PLAYER_FACTION_COLORS[0]
@@ -792,17 +791,11 @@ def unit_tooltip(ui, lines, colour, health, text):
         c.text(TOOLTIP_PADDING, y, line.left, font, line.color)
         y += font.height + TOOLTIP_LINE_GAP
     x, w, y = BAR_EDGE, width - 2 * BAR_EDGE, height - BAR_BOTTOM - BAR_HEIGHT
-    fill = ui.texture(BAR_FILL)
-    c.draw(fill, x, y, w, BAR_HEIGHT, color=(*(v * BAR_TRACK for v in colour), 1))
+    fill = ui.atlas(BAR_FILL)
+    c.draw(ui.atlas(BAR_TRACK), x, y, w, BAR_HEIGHT, color=(*(v * BAR_TRACK_SHADE for v in colour), 1))
     # A StatusBar crops its texture to the value rather than squeezing it.
-    shown = fill.crop((0, 0, max(1, round(fill.width * health)), fill.height))
+    shown = fill.image.crop((0, 0, max(1, round(fill.image.width * health)), fill.image.height))
     c.draw(shown, x, y, w * health, BAR_HEIGHT, color=(*colour, 1))
-    frame = ui.texture(BAR_FRAME)
-    cap, fx, fy = BAR_FRAME_CAP, x - BAR_FRAME_OUT, y - BAR_FRAME_OUT
-    fw, fh = w + 2 * BAR_FRAME_OUT, BAR_HEIGHT + 2 * BAR_FRAME_OUT
-    c.draw(frame.crop((0, 0, cap, frame.height)), fx, fy, cap, fh)
-    c.draw(frame.crop((cap, 0, frame.width - cap, frame.height)), fx + cap, fy, fw - 2 * cap, fh)
-    c.draw(frame.crop((frame.width - cap, 0, frame.width, frame.height)), fx + fw - cap, fy, cap, fh)
     c.text(x, y, text, BAR_TEXT, justify="CENTER", width=w, box_height=BAR_HEIGHT)
     return c
 

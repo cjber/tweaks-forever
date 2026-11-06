@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **The tooltip health bar and the reagent slots use the game's current art.** The bar under a unit's tooltip now comes from the same atlas as the game's own progress bars, and the green reagent slots in the combined bag use the client's bag slot art, so neither draws the pre-Legion chrome the client still ships.
+
 ## [2.2.0] - 2026-11-06
 - **Quest XP shows on the experience bar.** Turn it on under Interface to see what your quest log is worth: quests ready to hand in from where your bar is now, and the rest of the log fainter after them. Point at the bar and its tooltip adds both totals and the level they would reach. Off by default.
 - **Pet abilities you haven't learned show before a trainer visit.** The spellbook's Pet tab now lists the abilities your current pet's family can learn, greyed out after the ones it knows, with each rank's level and training point cost in its tooltip from your first login. Visiting a pet trainer still brings the server's own list and prices up to date.

@@ -59,6 +59,9 @@ local function Region(props)
 	function r:SetTexture(file)
 		self.file = file
 	end
+	function r:SetAtlas(atlas)
+		self.atlas = atlas
+	end
 	function r:SetTexCoord(left, right, top, bottom)
 		self.texcoords = { left, right, top, bottom }
 	end
@@ -250,11 +253,13 @@ assert(at(reagents.Items[1]) == "-378,46", at(reagents.Items[1]))
 assert(at(reagents.Items[10]) == "0,46", at(reagents.Items[10]))
 assert(at(reagents.Items[11]) == "-378,4", at(reagents.Items[11]))
 assert(at(reagents.Items[12]) == "-336,4", at(reagents.Items[12]))
--- The green slot background draws the stock bag art itself: the template it used to inherit is Mainline only (#332).
+-- The green slot background draws the client's own empty slot atlas: the template it used to inherit is
+-- Mainline only (#332).
 local background = reagents.Items[1].textures[1]
 assert(background.template == nil, "background texture inherits no template: " .. tostring(background.template))
-assert(background.file == "Interface\\ContainerFrame\\UI-Bag-Components", tostring(background.file))
-assert(background.texcoords[1] == 0.64453125 and background.texcoords[4] == 0.498046875, "the template's own crop")
+assert(background.atlas == "bags-item-slot64", tostring(background.atlas))
+assert(background.file == nil, "the atlas carries its own art: " .. tostring(background.file))
+assert(background.texcoords == nil, "the atlas carries its own crop")
 assert(background.shown, "background shown with its slot")
 -- The rest of the bag starts above the lift, under a rule in the gap: the last bag's last slot at the bottom right.
 assert(at(bag.Items[20]) == "0," .. 4 + lift, at(bag.Items[20]))
