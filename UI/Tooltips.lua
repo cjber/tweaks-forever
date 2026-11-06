@@ -68,11 +68,12 @@ local GUILD = { 0.6, 0.6, 0.6 }
 local Model = {}
 ns.Tooltips = Model
 
--- The health bar's fill: this far in from the tooltip's sides and bottom, this tall, and this far below the
--- last line. The tooltip's own margin under its lines is 10. The track under the fill is its colour at this shade.
-local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 12, 10
+-- The health bar sits this far in from the tooltip's sides and bottom, is this tall, and sits this far below the
+-- last line. The tooltip's own margin under its lines is 10, so PADDING is the extra room the bar and its gap need.
+-- The track under the fill is the bar's colour at this shade.
+local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 10, 10
 local PADDING = BOTTOM + HEIGHT + GAP - 10
-local TRACK = 0.3
+local TRACK_SHADE = 0.3
 -- The width Blizzard gives a tooltip that carries a status bar (GameTooltip_ShowStatusBar), so a short name such
 -- as "Deer" still leaves the bar and its text room.
 local MIN_WIDTH = 140
@@ -132,40 +133,20 @@ local function Repaint(tooltips)
 	end
 end
 
--- The retail game's tooltip status bar: TargetingFrame's bar texture, on a track of the same texture in a darker
--- shade, framed by Blizzard's own tooltip bar border as TooltipStatusBarTemplate places it, 2 out on every side.
-local FILL = "Interface\\TargetingFrame\\UI-StatusBar"
-local FRAME = "Interface\\Tooltips\\UI-StatusBar-Border"
--- The border file is 128x16 and drawn 16 tall, so a texel is a unit. Its 8-texel ends stay at native size and
--- only the flat middle stretches along the bar.
-local FRAME_SIZE, FRAME_CAP, FRAME_OUT = 128, 8, 2
-
--- One piece of the border, cut from texel `from` to `to` of the file.
-local function FramePiece(bar, from, to)
-	local piece = bar:CreateTexture(nil, "OVERLAY", nil, -1)
-	piece:SetTexture(FRAME) -- art-ok: a bar border's piece: the ends at native size, the flat middle stretches
-	piece:SetTexCoord(from / FRAME_SIZE, to / FRAME_SIZE, 0, 1)
-	piece:SetHeight(HEIGHT + 2 * FRAME_OUT)
-	return piece
-end
+-- The game's cooldown bar, UI-HUD-CoolDownManager-Bar: 124 by 10 units native, and the cooldown manager keeps it
+-- 10 tall while varying only its width, so the art stretches along the bar alone. It fills the bar (StatusBar
+-- textures take an atlas name) and, at TRACK_SHADE, is the track under it.
+local BAR = "UI-HUD-CoolDownManager-Bar"
 
 local function HealthBarArt(bar)
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
-	track:SetTexture(FILL) -- art-ok: a status bar's track, stretched by design
+	-- art-ok: the cooldown bar's own 10 units tall, stretched along the bar alone by design
+	track:SetAtlas(BAR)
 	track:SetAllPoints()
-	local left = FramePiece(bar, 0, FRAME_CAP)
-	left:SetWidth(FRAME_CAP)
-	left:SetPoint("TOPLEFT", -FRAME_OUT, FRAME_OUT)
-	local right = FramePiece(bar, FRAME_SIZE - FRAME_CAP, FRAME_SIZE)
-	right:SetWidth(FRAME_CAP)
-	right:SetPoint("TOPRIGHT", FRAME_OUT, FRAME_OUT)
-	local middle = FramePiece(bar, FRAME_CAP, FRAME_SIZE - FRAME_CAP)
-	middle:SetPoint("TOPLEFT", left, "TOPRIGHT")
-	middle:SetPoint("TOPRIGHT", right, "TOPLEFT")
 	-- The Arial Narrow outline Blizzard puts on its own bars' numbers (the profession rank bar, retail's damage meter).
 	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
 	text:SetPoint("CENTER")
-	return { track, left, middle, right, text }, track, text
+	return { track, text }, track, text
 end
 
 local function HealthBarStyle(tooltip, bar, art, Update, Fit)
@@ -176,13 +157,13 @@ local function HealthBarStyle(tooltip, bar, art, Update, Fit)
 			bar:SetPoint("BOTTOMLEFT", EDGE, BOTTOM)
 			bar:SetPoint("BOTTOMRIGHT", -EDGE, BOTTOM)
 			bar:SetHeight(HEIGHT)
-			bar:SetStatusBarTexture(FILL)
+			bar:SetStatusBarTexture(BAR)
 		else
 			-- GameTooltip.xml's own placement and art.
 			bar:SetPoint("TOPLEFT", tooltip, "BOTTOMLEFT", 2, -1)
 			bar:SetPoint("TOPRIGHT", tooltip, "BOTTOMRIGHT", -2, -1)
-			bar:SetHeight(8)
-			bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-TargetingFrame-BarFill")
+			bar:SetHeight(HEIGHT)
+			bar:SetStatusBarTexture(BAR)
 			bar:SetStatusBarColor(0, 1, 0)
 		end
 		for _, region in ipairs(art) do
@@ -197,7 +178,7 @@ end
 
 -- The unit health bar Blizzard hangs under GameTooltip, moved inside it. Blizzard still watches the unit and sets the
 -- bar's value, which can be secret; this file never reads it. It only anchors, sizes, textures and colours the bar
--- (engine calls) and adds a track, border and text of its own.
+-- (engine calls) and adds a track and text of its own.
 local function HealthBar()
 	local tooltip = GameTooltip
 	local bar = tooltip.StatusBar
@@ -211,7 +192,7 @@ local function HealthBar()
 			return
 		end
 		bar:SetStatusBarColor(r, g, b)
-		track:SetVertexColor(r * TRACK, g * TRACK, b * TRACK)
+		track:SetVertexColor(r * TRACK_SHADE, g * TRACK_SHADE, b * TRACK_SHADE)
 		-- UnitHealth may always return a secret, UnitHealthMax does for units that aren't player-controlled, and
 		-- UnitHealthPercent does whenever its inputs are. Each goes straight to an API documented to take secrets
 		-- (BreakUpLargeNumbers, SetFormattedText): no arithmetic or comparison on any of them. The percentage is
