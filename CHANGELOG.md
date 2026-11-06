@@ -14,6 +14,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 - **Daily and repeatable quest markers come from the game's map.** Questie's daily quests and repeatable hand-ins on the map and minimap now use the client's own recurring quest symbols, so they read like every other quest marker there.
 - **The grouped-gear border no longer glows.** A group border still splits the quality border into the group colours, without the bags' new-item glow behind it, so a grouped item no longer looks like one you just picked up.
 
+## [2.2.2] - 2026-11-06
+- **The tooltip health and power bars draw the game's cooldown bar at its own height.** They no longer squash a taller progress bar into the tooltip, so the bar is the shape the game draws it at, only as wide as the tooltip makes it.
+
 ## [2.2.1] - 2026-11-06
 - **The tooltip health bar and the reagent slots use the game's current art.** The bar under a unit's tooltip now comes from the same atlas as the game's own progress bars, and the green reagent slots in the combined bag use the client's bag slot art, so neither draws the pre-Legion chrome the client still ships.
 

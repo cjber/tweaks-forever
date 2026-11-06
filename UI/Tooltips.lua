@@ -68,9 +68,10 @@ local GUILD = { 0.6, 0.6, 0.6 }
 local Model = {}
 ns.Tooltips = Model
 
--- The health bar's fill: this far in from the tooltip's sides and bottom, this tall, and this far below the
--- last line. The tooltip's own margin under its lines is 10. The track under the fill is its colour at this shade.
-local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 12, 10
+-- The health bar sits this far in from the tooltip's sides and bottom, is this tall, and sits this far below the
+-- last line. The tooltip's own margin under its lines is 10, so PADDING is the extra room the bar and its gap need.
+-- The track under the fill is the bar's colour at this shade.
+local EDGE, BOTTOM, HEIGHT, GAP = 10, 11, 10, 10
 local PADDING = BOTTOM + HEIGHT + GAP - 10
 local TRACK_SHADE = 0.3
 -- The width Blizzard gives a tooltip that carries a status bar (GameTooltip_ShowStatusBar), so a short name such
@@ -132,15 +133,15 @@ local function Repaint(tooltips)
 	end
 end
 
--- The client's own coloured progress bar (ColoredProgressBarTemplate in Blizzard_SharedXML): a white fill the
--- bar tints, over the background art that carries the bar's border, so the whole bar is the game's current art.
-local FILL = "common-stat-bar-white"
-local TRACK = "common-stat-bar-BG"
+-- The game's cooldown bar, UI-HUD-CoolDownManager-Bar: 124 by 10 units native, and the cooldown manager keeps it
+-- 10 tall while varying only its width, so the art stretches along the bar alone. It fills the bar (StatusBar
+-- textures take an atlas name) and, at TRACK_SHADE, is the track under it.
+local BAR = "UI-HUD-CoolDownManager-Bar"
 
 local function HealthBarArt(bar)
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
-	-- art-ok: a bar's background, stretched along the bar by design
-	track:SetAtlas(TRACK)
+	-- art-ok: the cooldown bar's own 10 units tall, stretched along the bar alone by design
+	track:SetAtlas(BAR)
 	track:SetAllPoints()
 	-- The Arial Narrow outline Blizzard puts on its own bars' numbers (the profession rank bar, retail's damage meter).
 	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
@@ -156,13 +157,13 @@ local function HealthBarStyle(tooltip, bar, art, Update, Fit)
 			bar:SetPoint("BOTTOMLEFT", EDGE, BOTTOM)
 			bar:SetPoint("BOTTOMRIGHT", -EDGE, BOTTOM)
 			bar:SetHeight(HEIGHT)
-			bar:SetStatusBarTexture(FILL)
+			bar:SetStatusBarTexture(BAR)
 		else
 			-- GameTooltip.xml's own placement and art.
 			bar:SetPoint("TOPLEFT", tooltip, "BOTTOMLEFT", 2, -1)
 			bar:SetPoint("TOPRIGHT", tooltip, "BOTTOMRIGHT", -2, -1)
-			bar:SetHeight(8)
-			bar:SetStatusBarTexture(FILL)
+			bar:SetHeight(HEIGHT)
+			bar:SetStatusBarTexture(BAR)
 			bar:SetStatusBarColor(0, 1, 0)
 		end
 		for _, region in ipairs(art) do

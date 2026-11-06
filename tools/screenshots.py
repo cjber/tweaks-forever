@@ -735,8 +735,8 @@ def demo(ui):
 
 
 # UI/Tooltips.lua under Modern tooltips: the nine pieces cut from media/TooltipBorderModern.tga (PIECES, in sixteenths),
-# with room under the last line for the health bar (EDGE, BOTTOM, HEIGHT, GAP, PADDING), whose track is its colour at
-# TRACK_SHADE over the client's own bar background, ColoredProgressBarTemplate's common-stat-bar-BG and white fill.
+# with room under the last line for the health bar (EDGE, BOTTOM, HEIGHT, GAP, PADDING). Its fill and track are the
+# game's cooldown bar, UI-HUD-CoolDownManager-Bar, 124x10 native and always 10 tall, the track at TRACK_SHADE.
 TIP_PIECES = {
     "TopLeftCorner": (0, 7, 0, 7),
     "TopRightCorner": (9, 16, 0, 7),
@@ -749,11 +749,10 @@ TIP_PIECES = {
     "Center": (7, 9, 7, 9),
 }
 TIP_CORNER = 7
-BAR_EDGE, BAR_BOTTOM, BAR_HEIGHT, BAR_GAP = 10, 11, 12, 10
+BAR_EDGE, BAR_BOTTOM, BAR_HEIGHT, BAR_GAP = 10, 11, 10, 10
 BAR_PADDING = BAR_BOTTOM + BAR_HEIGHT + BAR_GAP - 10
 BAR_TRACK_SHADE = 0.3
-BAR_FILL = "common-stat-bar-white"
-BAR_TRACK = "common-stat-bar-BG"
+BAR = "UI-HUD-CoolDownManager-Bar"
 BAR_TEXT = Font(ARIALN, 12, (1, 1, 1), None, outline=True)  # Number12FontOutline
 GUILD = (0.6, 0.6, 0.6)
 HORDE = (0.90, 0.05, 0.07)  # PLAYER_FACTION_COLORS[0]
@@ -791,11 +790,14 @@ def unit_tooltip(ui, lines, colour, health, text):
         c.text(TOOLTIP_PADDING, y, line.left, font, line.color)
         y += font.height + TOOLTIP_LINE_GAP
     x, w, y = BAR_EDGE, width - 2 * BAR_EDGE, height - BAR_BOTTOM - BAR_HEIGHT
-    fill = ui.atlas(BAR_FILL)
-    c.draw(ui.atlas(BAR_TRACK), x, y, w, BAR_HEIGHT, color=(*(v * BAR_TRACK_SHADE for v in colour), 1))
-    # A StatusBar crops its texture to the value rather than squeezing it.
-    shown = fill.image.crop((0, 0, max(1, round(fill.image.width * health)), fill.image.height))
-    c.draw(shown, x, y, w * health, BAR_HEIGHT, color=(*colour, 1))
+    bar = ui.atlas(BAR)
+    c.draw(bar, x, y, w, BAR_HEIGHT, color=(*(v * BAR_TRACK_SHADE for v in colour), 1))
+    # A StatusBar crops its texture to the value rather than squeezing it: draw the fill at the bar's own width, then
+    # keep the shown part.
+    full = ui.canvas(w, BAR_HEIGHT)
+    full.draw(bar, 0, 0, w, BAR_HEIGHT, color=(*colour, 1))
+    shown = full.image.crop((0, 0, max(1, round(full.image.width * health)), full.image.height))
+    c.draw(shown, x, y, w * health, BAR_HEIGHT)
     c.text(x, y, text, BAR_TEXT, justify="CENTER", width=w, box_height=BAR_HEIGHT)
     return c
 

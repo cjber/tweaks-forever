@@ -255,7 +255,7 @@ L["The game's own tooltips follow the mouse cursor instead of the game's fixed c
 L["The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."] = "The link is selected. Press Ctrl+C (Cmd+C on a Mac), then paste into a browser; GitHub opens a filled-in issue."
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."
 L["The text is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it, then paste it into your bug report."] = "The text is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it, then paste it into your bug report."
-L["The tooltip health bar and the reagent slots use the game's current art."] = "The tooltip health bar and the reagent slots use the game's current art."
+L["The tooltip health and power bars draw the game's cooldown bar at its own height."] = "The tooltip health and power bars draw the game's cooldown bar at its own height."
 L["The whole whisper that invites its sender: the message must be this word alone."] = "The whole whisper that invites its sender: the message must be this word alone."
 L["This addon"] = "This addon"
 L["Time to level: %s"] = "Time to level: %s"

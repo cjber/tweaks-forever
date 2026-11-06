@@ -14,7 +14,8 @@ local function Stub()
 	})
 end
 
-local features, initializers = {}, {}
+local features, initializers, handlers = {}, {}, {}
+local active = true
 local ns = {
 	db = { tooltipStyle = "modern" },
 	Feature = function(feature)
@@ -24,10 +25,12 @@ local ns = {
 		initializers[#initializers + 1] = fn
 	end,
 	Active = function()
-		return true
+		return active
 	end,
 	OnTooltip = function() end,
-	OnSettingChanged = function() end,
+	OnSettingChanged = function(key, fn)
+		handlers[key] = fn
+	end,
 }
 
 -- GameTooltip's left lines, as Blizzard wrote them.
@@ -55,16 +58,42 @@ local function Tooltip()
 end
 local GameTooltip = Tooltip()
 GameTooltip.StatusBar = Stub()
--- The health bar's hooks and the tooltip's minimum width, to check the bar keeps its room.
+-- The health bar's hooks, art and height, and the tooltip's minimum width and padding, to check the bar keeps its
+-- room and its art's own height.
 local barShown, barHooks, minWidth = true, {}, nil
-function GameTooltip.StatusBar.IsShown()
+local barHeight, fill, padding
+local track = {}
+local bar = GameTooltip.StatusBar
+function bar.IsShown()
 	return barShown
 end
-function GameTooltip.StatusBar.HookScript(_, event, fn)
+function bar.HookScript(_, event, fn)
 	barHooks[event] = fn
+end
+function bar.SetHeight(_, height)
+	barHeight = height
+end
+function bar.SetStatusBarTexture(_, texture)
+	fill = texture
+end
+function bar.CreateTexture()
+	return track
+end
+function track.SetAtlas(_, atlas)
+	track.atlas = atlas
+end
+function track.SetAllPoints() end
+function track.SetShown(_, shown)
+	track.shown = shown
+end
+function track.SetVertexColor(_, r, g, b)
+	track.color = { r, g, b }
 end
 function GameTooltip.SetMinimumWidth(_, width)
 	minWidth = width
+end
+function GameTooltip.SetPadding(_, right, bottom, left, top)
+	padding = { right, bottom, left, top }
 end
 GameTooltip.NineSlice = Stub()
 function GameTooltip.GetProcessingTooltipInfo()
@@ -143,6 +172,25 @@ for _, fn in ipairs(initializers) do
 	fn()
 end
 assert(#pre == 1 and #linePre == 1 and #post == 1, "the player lines hook the tooltip data processor")
+
+-- The health bar is the game's cooldown bar at its own 10 units tall: the fill in the bar's colour, the track the
+-- same art at TRACK_SHADE, and room under the tooltip's last line for both.
+assert(barHeight == 10, "the health bar is 10 tall: " .. tostring(barHeight))
+assert(fill == "UI-HUD-CoolDownManager-Bar", "the health bar is filled with the cooldown bar: " .. tostring(fill))
+assert(track.atlas == "UI-HUD-CoolDownManager-Bar", "the track is the cooldown bar: " .. tostring(track.atlas))
+assert(
+	track.color[1] == 0 and track.color[2] == 0.6 * 0.3 and track.color[3] == 0.1 * 0.3,
+	"the track is the bar's colour at TRACK_SHADE"
+)
+assert(padding and padding[2] == 21, "the tooltip makes room for the bar: " .. tostring(padding and padding[2]))
+print("tooltips: the health bar is the cooldown bar at its own height: ok")
+
+-- Forever's style keeps Blizzard's placement under the tooltip, the same art and the same 10 units tall.
+active = false
+handlers.retailTooltips()
+assert(barHeight == 10 and fill == "UI-HUD-CoolDownManager-Bar", "the game's own style keeps the height and art")
+active = true
+handlers.retailTooltips()
 
 -- Build one tooltip: the pre-call, then each line through the line pre-call (true drops it), then the post-call.
 local function Build(getter, args, texts)

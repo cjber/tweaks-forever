@@ -311,4 +311,4 @@ L["Quest XP on the experience bar"] = "Quest-EP auf der Erfahrungsleiste" -- mt
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Zeichnet die EP der Quests in Eurem Questlog auf der Erfahrungsleiste: zuerst die Quests, die ab der aktuellen EP bereit zur Abgabe sind, danach schwächer den Rest des Logs. Beim Zeigen auf die Leiste kommen beide Summen und die erreichte Stufe in den Tooltip." -- mt
 L["Completed quests: %s XP"] = "Abgeschlossene Quests: %s EP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Alle Quests im Log: %s EP (erreicht Stufe %d, %d%%)" -- mt
-L["The tooltip health bar and the reagent slots use the game's current art."] = "Die Gesundheitsleiste im Tooltip und die Reagenzienplätze nutzen die aktuelle Grafik des Spiels." -- mt
+L["The tooltip health and power bars draw the game's cooldown bar at its own height."] = "Die Gesundheits- und Energieleisten im Tooltip zeigen die Abklingleiste des Spiels in ihrer eigenen Höhe." -- mt
