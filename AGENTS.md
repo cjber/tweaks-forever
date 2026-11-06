@@ -18,7 +18,7 @@ python3 tools/check_generated.py --offline # omit --offline to fetch missing pin
 python3 tools/changelog.py --check
 python3 tools/check_screenshots.py   # an image older than its sources; --record after tools/screenshots.py
 python3 tools/check_menu_scroll.py # menus built from a list scroll (WFA-36); CI runs it in core-shared
-python3 .sloppatrol/gate.py --base origin/main && python3 .sloppatrol/agents.py check
+python3 tools/repo_rules.py   # rules no linter covers; CI runs it in project-rules
 ```
 
 CI's `package` job builds the zip with the release's packager without uploading (`-d -z`) and runs
@@ -83,8 +83,8 @@ publishes that entry as its notes.
 - Release: load `.agents/skills/release/SKILL.md` when preparing or publishing a release.
   A cloud session cannot push tags: once the version's PR is merged and `.github/workflows/ci.yml` passed on main, start the Release
   workflow on main with `version` (and `commit` for an older main commit); it tags that commit and publishes.
-- Quality: load `.agents/skills/sloppatrol-project/SKILL.md` before cleanup, dead-code or refactoring
-  work.
+- Quality: read the live roots, settled shapes and anti-patterns in `.sloppatrol/instructions.md` before cleanup,
+  dead-code or refactoring work.
 - A feature another loaded addon already provides is greyed out with that addon named, never run
   alongside it. Repairs, selling junk and faster auto loot start on;
   every other automation that acts for the player is off by default.

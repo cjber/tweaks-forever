@@ -1,6 +1,5 @@
 # Sloppatrol profile for Tweaks Forever, a WoW: Forever addon in Lua 5.1 with Python tooling.
-# `sloppatrol init` writes a failing placeholder for a repo without package.json, so the checks
-# are set by hand from the gate in AGENTS.md.
+# The checks are the fast ones from AGENTS.md, set by hand: the repo has no package.json to infer them from.
 agent: claude
 prepare: []
 cleanup: [stylua .]
@@ -12,10 +11,7 @@ checks:
   - { name: tools, run: "ruff check tools && ruff format --check tools" }
   # check_generated.py --offline is left out: it reads the gitignored tools/.cache, which a run checkout
   # does not have.
-  - { name: gate, run: "python3 .sloppatrol/gate.py --base origin/main && python3 .sloppatrol/agents.py check" }
+  - { name: rules, run: "python3 tools/repo_rules.py" }
 focus: [Core/**, UI/**, Map/**, Features/**, Integrations/**]
 ignore: [Data/**, Locales/**, Libs/**, types/**, tools/forever_tools/**]
 guards: { maxFiles: 8, maxLines: 400 }
-agents:
-  refactorer: { maxPerCycle: 1, maxAttempts: 2 }
-github: { enabled: false }
