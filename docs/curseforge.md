@@ -30,10 +30,10 @@ Nameplates in retail's own frame, with your target outlined.
 - **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside.
 - **Windows**: move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
 - **Quests and camps**: quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
-- **Spellbook, trainer and bags**: unlearned spells in the spellbook, Train all for what you can afford, and the reagent bag in the combined bag.
+- **Spellbook, trainer and bags**: unlearned spells in the spellbook, the Pet tab's future abilities after a pet trainer visit, Train all for what you can afford, and the reagent bag in the combined bag.
 - **Fishing**: double right-click to cast or apply a lure, with a warning when you have none.
 - **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default; turns outlines off, and removing sparkles needs a restart.
-- **Also**: a page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names and `/rl`.
+- **Also**: a page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names, an unspent talent and pet training point reminder, and `/rl`.
 
 ## Usage
 

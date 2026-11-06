@@ -47,6 +47,28 @@ chosen = Model.Choose(spells, Model.GENERAL, 18, function()
 end)
 assert(#chosen == 1 and chosen[1].id == 10 and not chosen[1].ready, "the General tab lists its own rows only")
 
+-- A pet trainer visit: every row belongs to the Pet tab, keeps its training point cost, ready ones first.
+local pet = Model.PetTrainer({
+	{ id = 21, name = "Bite", kind = "available", icon = 21, level = 10, rank = "Rank 2", cost = 5 },
+	{ id = 22, name = "Bite", kind = "unavailable", icon = 22, level = 20, rank = "Rank 3", cost = 8 },
+	{ id = 23, name = "Claw", kind = "used", icon = 23, level = 1, cost = 0 },
+	{ id = 24, name = "Growl", kind = "available", icon = 24, level = 1, cost = 0 },
+	{ id = 25, name = "Dash", kind = "unavailable", icon = 25, level = 20, cost = 8 },
+})
+assert(pet[21].lineID == Model.PET and pet[21].points and pet[21].cost == 5, "a pet row and its points")
+assert(not pet[23], "a learned row is not kept")
+local petChosen = Model.Choose(pet, Model.PET, 18, function(id)
+	return id == 24
+end)
+assert(#petChosen == 2 and petChosen[1].id == 21 and petChosen[1].ready, "ready rows first")
+assert(petChosen[2].id == 25 and not petChosen[2].ready and petChosen[2].spell.cost == 8, "then level-locked")
+assert(#Model.Choose(pet, 375, 18, function()
+	return false
+end) == 0, "a class tab lists no pet rows")
+assert(#Model.Choose(spells, Model.PET, 18, function()
+	return false
+end) == 0, "the Pet tab lists no class rows")
+
 -- The baked trainer list, for a level 18 Dwarf Shaman who has never visited a trainer.
 env.tContains = function(list, value)
 	for _, item in ipairs(list) do

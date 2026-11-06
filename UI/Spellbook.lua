@@ -23,6 +23,8 @@ local TRAINABLE_FX = 176
 -- The General tab has no skill line of its own: a spell on a line that isn't a class line (Dual Wield, Defense,
 -- armour, Lockpicking) is listed there. SkillLine IDs start at 1, so this stands for it among them.
 Model.GENERAL = 0
+-- The Pet tab has no skill line either: a pet trainer row belongs to it, and its cost is training points.
+Model.PET = -1
 
 ---@param a TFFutureSpell
 ---@param b TFFutureSpell
@@ -117,6 +119,29 @@ function Model.Spells(baked, live, race, Describe, Known)
 	end
 	for id, spell in pairs(live or {}) do
 		spells[id] = spell
+	end
+	return spells
+end
+
+-- What a pet trainer teaches, from the rows a visit recorded: name, rank, level and training point cost, all on the
+-- Pet tab, which has no skill line of its own. Only the kinds worth keeping are stored; already learned rows are not.
+---@param services TFPetTrainerService[]
+---@return table<integer, TFTrainerSpell>
+function Model.PetTrainer(services)
+	---@type table<integer, TFTrainerSpell>
+	local spells = {}
+	for _, service in ipairs(services) do
+		if service.id and KEEP[service.kind] then
+			spells[service.id] = {
+				name = service.name,
+				rank = service.rank,
+				level = service.level or 1,
+				icon = service.icon,
+				lineID = Model.PET,
+				cost = service.cost,
+				points = true,
+			}
+		end
 	end
 	return spells
 end
@@ -243,8 +268,12 @@ local function Describe(id)
 end
 
 ---@param id integer
+---@param pet boolean? read the Pet tab's bank instead of the player's
 ---@return boolean
-function ns.KnownSpell(id)
+function ns.KnownSpell(id, pet)
+	if pet then
+		return C_SpellBook.IsSpellKnown(id, Enum.SpellBookSpellBank.Pet)
+	end
 	return C_SpellBook.IsSpellKnown(id)
 end
 
@@ -309,8 +338,8 @@ local function Book()
 	return PlayerSpellsFrame.SpellBookFrame
 end
 
--- The class skill line ID on show, GENERAL on the General tab, or nil on the pet and outfit tabs and in search
--- results.
+-- The class skill line ID on show, GENERAL on the General tab, PET on the Pet tab, or nil on the outfit tab and in
+-- search results.
 ---@return integer?
 local function ActiveLine()
 	local book = Book()
@@ -318,6 +347,9 @@ local function ActiveLine()
 		return nil
 	end
 	local category = book:GetActiveCategoryMixin()
+	if category and category.spellBank == Enum.SpellBookSpellBank.Pet then
+		return Model.PET
+	end
 	local index = category and category.skillLineIndex
 	if index == Enum.SpellBookSkillLineIndex.General then
 		return Model.GENERAL
@@ -400,7 +432,9 @@ local function ShowTooltip(button)
 	else
 		GameTooltip_AddErrorLine(GameTooltip, SPELLBOOK_AVAILABLE_AT:format(entry.spell.level))
 	end
-	if entry.spell.cost and entry.spell.cost > 0 then
+	if entry.spell.points then
+		GameTooltip_AddNormalLine(GameTooltip, TRAINING_POINTS_ABBREV:format(entry.spell.cost or 0))
+	elseif entry.spell.cost and entry.spell.cost > 0 then
 		SetTooltipMoney(GameTooltip, entry.spell.cost, nil, COSTS_LABEL)
 	end
 	GameTooltip:Show()
@@ -436,9 +470,18 @@ local function Render()
 	end
 	header:Hide()
 	local line = ns.Active("trainableSpells") and ActiveLine()
+	local pet = line == Model.PET
+	local spells = {}
+	if pet then
+		spells = (TweaksForeverCharDB and TweaksForeverCharDB.petTrainer) or {}
+	elseif line then
+		spells = ns.TrainerSpells()
+	end
+	-- A pet trainer's level is the pet's, not the player's.
+	local level = pet and UnitLevel("pet") or UnitLevel("player")
 	local chosen = line
-			and Model.Choose(ns.TrainerSpells(), line, UnitLevel("player"), function(id)
-				return ns.KnownSpell(id) or (GetCVarBool("spellBookHidePassives") and C_Spell.IsSpellPassive(id))
+			and Model.Choose(spells, line, level, function(id)
+				return ns.KnownSpell(id, pet) or (GetCVarBool("spellBookHidePassives") and C_Spell.IsSpellPassive(id))
 			end)
 		or {}
 	if #chosen == 0 then
@@ -583,16 +626,9 @@ local function RenderIfShown()
 end
 
 -- The server, not the baked list, has the last word on what the class trainer teaches and for how much. The trainer
--- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was. Rows merge by
--- spell and keep only lines the spellbook shows (class tabs, and the General tab's baked rows), so another trainer
--- (weapons, riding) neither replaces nor adds to them.
-local function ScanTrainer()
-	if not ns.Active("trainableSpells") or IsTradeskillTrainer() then
-		return
-	end
-	if C_Trainer.GetTrainerType() ~= Enum.TrainerType.General then
-		return
-	end
+-- lists only the kinds its filter shows: show both for the scan, then put the filter back as it was.
+---@param Scan fun()
+local function WithAllKinds(Scan)
 	local shown = {}
 	for kind in pairs(KEEP) do
 		if not GetTrainerServiceTypeFilter(kind) then
@@ -600,33 +636,81 @@ local function ScanTrainer()
 			SetTrainerServiceTypeFilter(kind, true, false)
 		end
 	end
-	local spells = TweaksForeverCharDB.trainer or {}
-	local classData = ClassData()
-	local Resolve = ns.LineResolver()
-	for i = 1, GetNumTrainerServices() do
-		local name, kind, icon, level, rank = GetTrainerServiceInfo(i)
-		local data = KEEP[kind] and C_TooltipInfo.GetTrainerService(i)
-		local line = GetTrainerServiceSkillLine(i)
-		local lineID = data and data.id and Resolve(data.id, line)
-		if lineID then
-			spells[data.id] = {
-				name = name or C_Spell.GetSpellName(data.id),
-				rank = rank ~= "" and rank or nil,
-				level = level or 1,
-				icon = icon,
-				lineID = lineID,
-				general = Model.OnGeneral(classData and classData.lines or {}, lineID),
-				line = line,
-				cost = GetTrainerServiceCost(i),
-			}
-		end
-	end
+	Scan()
 	for _, kind in ipairs(shown) do
 		SetTrainerServiceTypeFilter(kind, false, false)
 	end
+end
+
+-- Rows merge by spell and keep only lines the spellbook shows (class tabs, and the General tab's baked rows), so
+-- another trainer (weapons, riding) neither replaces nor adds to them.
+local function ScanClassTrainer()
+	local spells = TweaksForeverCharDB.trainer or {}
+	local classData = ClassData()
+	local Resolve = ns.LineResolver()
+	WithAllKinds(function()
+		for i = 1, GetNumTrainerServices() do
+			local name, kind, icon, level, rank = GetTrainerServiceInfo(i)
+			local data = KEEP[kind] and C_TooltipInfo.GetTrainerService(i)
+			local line = GetTrainerServiceSkillLine(i)
+			local lineID = data and data.id and Resolve(data.id, line)
+			if lineID then
+				spells[data.id] = {
+					name = name or C_Spell.GetSpellName(data.id),
+					rank = rank ~= "" and rank or nil,
+					level = level or 1,
+					icon = icon,
+					lineID = lineID,
+					general = Model.OnGeneral(classData and classData.lines or {}, lineID),
+					line = line,
+					cost = GetTrainerServiceCost(i),
+				}
+			end
+		end
+	end)
 	if next(spells) then
 		TweaksForeverCharDB.trainer = spells
 		RenderIfShown()
+	end
+end
+
+-- A pet trainer teaches abilities rather than spells on a class line, for pet training points rather than money.
+-- Its rows all belong to the Pet tab, so they are kept apart from the class trainer's.
+local function ScanPetTrainer()
+	local services = {}
+	WithAllKinds(function()
+		for i = 1, GetNumTrainerServices() do
+			local name, kind, icon, level, rank = GetTrainerServiceInfo(i)
+			local data = KEEP[kind] and C_TooltipInfo.GetTrainerService(i)
+			if data and data.id then
+				services[#services + 1] = {
+					id = data.id,
+					name = name or C_Spell.GetSpellName(data.id),
+					kind = kind,
+					icon = icon,
+					level = level,
+					rank = rank ~= "" and rank or nil,
+					cost = GetTrainerServiceCost(i),
+				}
+			end
+		end
+	end)
+	local spells = Model.PetTrainer(services)
+	if next(spells) then
+		TweaksForeverCharDB.petTrainer = spells
+		RenderIfShown()
+	end
+end
+
+local function ScanTrainer()
+	if not ns.Active("trainableSpells") or IsTradeskillTrainer() then
+		return
+	end
+	local trainerType = C_Trainer.GetTrainerType()
+	if trainerType == Enum.TrainerType.Pet then
+		ScanPetTrainer()
+	elseif trainerType == Enum.TrainerType.General then
+		ScanClassTrainer()
 	end
 end
 

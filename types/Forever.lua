@@ -84,6 +84,8 @@ function GetUIPanelLayoutAttribute(attribute) end
 -- Localised client strings are not included in Ketho's API annotations.
 ---@type string
 ERR_NOT_IN_COMBAT = ""
+---@type string
+TRAINING_POINTS_ABBREV = ""
 
 -- UIErrorsFrame's hidden message types (Blizzard_UIErrorsFrame), written by its SetMessageTypeEnabled.
 ---@type table<integer, boolean>
@@ -113,6 +115,14 @@ C_Trainer = {}
 Enum.TrainerType = { General = 0, TalentsObsolete = 1, Tradeskills = 2, Pet = 3 }
 ---@return Enum.TrainerType
 function C_Trainer.GetTrainerType() end
+
+-- Forever keeps the original talent point count, absent from the pinned Retail API.
+---@return integer
+function GetNumUnspentTalents() end
+
+-- Camelot's separate talents micro button, anchored to by our own glow.
+---@type Button
+TalentMicroButton = nil
 
 -- Forever's trainer rows include texture, required level and subtext (rank), as its TrainerUI consumes them.
 ---@param index integer

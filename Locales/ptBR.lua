@@ -304,3 +304,9 @@ L["Upper Blackrock Spire"] = "Pico da Rocha Negra Superior" -- mt
 L["Gordok Commons"] = "Pátio Gordok" -- mt
 L["Capital Gardens"] = "Jardins Capitais" -- mt
 L["Warpwood Quarter"] = "Distrito Lenhâmbulante" -- mt
+
+L["Unspent talent reminder"] = "Lembrete de pontos de talento não gastos" -- mt
+L["One line in chat at login and after each level-up while you have unspent talent points, or your pet has unspent training points, and a soft glow over the talents button until they are spent. Nothing in combat."] = "Uma linha no chat ao entrar e a cada aumento de nível enquanto você tiver pontos de talento não gastos, ou seu mascote tiver pontos de treinamento não gastos, e um brilho suave sobre o botão de talentos até serem gastos. Nada em combate." -- mt
+L["you have unspent talent points, and your pet has unspent training points."] = "você tem pontos de talento não gastos, e seu mascote tem pontos de treinamento não gastos." -- mt
+L["you have unspent talent points."] = "você tem pontos de talento não gastos." -- mt
+L["your pet has unspent training points."] = "seu mascote tem pontos de treinamento não gastos." -- mt

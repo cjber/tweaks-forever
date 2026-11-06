@@ -44,6 +44,7 @@ Features\WhisperInvite.lua
 Features\LootConfirm.lua
 Features\RareAlerts.lua
 Features\PullWarning.lua
+Features\TalentReminder.lua
 Bags\Vendor.lua
 Core\Modes.lua
 Bags\Junk.lua

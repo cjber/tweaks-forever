@@ -304,3 +304,9 @@ L["Upper Blackrock Spire"] = "Pic Rochenoire supérieur" -- mt
 L["Gordok Commons"] = "Communs gordok" -- mt
 L["Capital Gardens"] = "Jardins de la capitale" -- mt
 L["Warpwood Quarter"] = "Quartier de Crochebois" -- mt
+
+L["Unspent talent reminder"] = "Rappel de points de talent non dépensés" -- mt
+L["One line in chat at login and after each level-up while you have unspent talent points, or your pet has unspent training points, and a soft glow over the talents button until they are spent. Nothing in combat."] = "Une ligne dans le chat à la connexion et après chaque passage de niveau tant que vous avez des points de talent non dépensés, ou que votre familier a des points d'entraînement non dépensés, et une lueur douce sur le bouton des talents jusqu'à ce qu'ils soient dépensés. Rien en combat." -- mt
+L["you have unspent talent points, and your pet has unspent training points."] = "vous avez des points de talent non dépensés, et votre familier a des points d'entraînement non dépensés." -- mt
+L["you have unspent talent points."] = "vous avez des points de talent non dépensés." -- mt
+L["your pet has unspent training points."] = "votre familier a des points d'entraînement non dépensés." -- mt

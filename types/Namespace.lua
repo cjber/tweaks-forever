@@ -26,7 +26,18 @@
 ---@field lineID? integer the skill line the spell belongs to, as a SkillLine ID: a class line is its spellbook tab
 ---@field general? true its line is not a class line, so it goes on the General tab (Dual Wield, Defense, armour)
 ---@field line? string a trainer visit's name for that line, in the client's language
----@field cost? number copper
+---@field cost? number copper, or pet training points with `points`
+---@field points? true its cost is pet training points, not copper
+
+-- A row a pet trainer offers, as a visit reads it, before it is stored on the Pet tab.
+---@class TFPetTrainerService
+---@field id integer the spell ID
+---@field name string
+---@field kind string available, unavailable or used
+---@field icon fileID
+---@field level? number
+---@field rank? string
+---@field cost? number training points
 
 -- A spell a class trainer teaches: { spell, level, fee in copper (nil when unknown), SkillLine ID }. A class line
 -- is its spellbook tab; any other puts it on the General tab.
@@ -186,6 +197,7 @@
 ---@field colours TFColours
 ---@field beforeFishing? table<integer, integer>
 ---@field trainer? table<integer, TFTrainerSpell>
+---@field petTrainer? table<integer, TFTrainerSpell>
 
 ---@type TFDatabase
 TweaksForeverDB = nil
@@ -250,12 +262,13 @@ TweaksForeverCharDB = nil
 ---@field CampBenefitEffects table<string, table<integer, string>>
 ---@field Camp TFCamp
 ---@field FutureSpells TFFutureSpells
+---@field TalentReminder TFTalentReminder
 ---@field ClassSpells table<string, TFClassSpells> by class token
 ---@field TrainerSpells fun(): table<integer, TFTrainerSpell>
 ---@field LineName fun(lineID: integer, fallback: string?): string
 ---@field GeneralName fun(): string
 ---@field LineResolver fun(): fun(id: integer, name: string?): integer?
----@field KnownSpell fun(id: integer): boolean
+---@field KnownSpell fun(id: integer, pet: boolean?): boolean
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels
 ---@field DungeonEntrances table<integer, TFEntrance[]>
