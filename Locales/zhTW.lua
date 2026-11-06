@@ -311,4 +311,4 @@ L["Quest XP on the experience bar"] = "經驗條上的任務經驗" -- mt
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "在經驗條上顯示任務日誌中的任務經驗：從目前經驗開始，先顯示可以交的任務，然後以更淡的顏色顯示日誌中其餘任務。指向經驗條時，提示中會加入這兩個總數以及它們能達到的等級。" -- mt
 L["Completed quests: %s XP"] = "已完成任務：%s 經驗" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "日誌中所有任務：%s 經驗（達到 %d 級，%d%%）" -- mt
-L["The tooltip health bar and the reagent slots use the game's current art."] = "滑鼠提示的生命條和材料欄位使用遊戲目前的美術資源。" -- mt
+L["The tooltip health and power bars draw the game's cooldown bar at its own height."] = "滑鼠提示的生命條和能量條以原始高度繪製遊戲的冷卻條。" -- mt
