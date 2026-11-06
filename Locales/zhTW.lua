@@ -305,8 +305,5 @@ L["Capital Gardens"] = "中心花園" -- mt
 L["Warpwood Quarter"] = "扭木廣場" -- mt
 
 L["Unspent talent reminder"] = "未使用天賦點提醒" -- mt
-L["One line in chat at login and after each level-up while you have unspent talent points, or your pet has unspent training points, and a soft glow over the talents button until they are spent. Nothing in combat."] = "登入時以及每次升級後，如果你有未使用的天賦點，或你的寵物有未使用的訓練點，聊天欄會顯示一行提示，天賦按鈕上會出現柔和的光暈，直到點數用完。戰鬥中不顯示。" -- mt
-L["you have unspent talent points, and your pet has unspent training points."] = "你有未使用的天賦點，你的寵物也有未使用的訓練點。" -- mt
-L["you have unspent talent points."] = "你有未使用的天賦點。" -- mt
-L["your pet has unspent training points."] = "你的寵物有未使用的訓練點。" -- mt
+L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "當你或你的寵物還有未使用的天賦點或訓練點時，在天賦按鈕上顯示柔和的光暈，直到用完為止。戰鬥中不顯示。" -- mt
 L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "尚未學會的寵物技能會顯示在法術書的寵物頁籤中。" -- mt

@@ -305,8 +305,5 @@ L["Capital Gardens"] = "Jardines de la Capital" -- mt
 L["Warpwood Quarter"] = "Barrio Alabeo" -- mt
 
 L["Unspent talent reminder"] = "Recordatorio de puntos de talento sin gastar" -- mt
-L["One line in chat at login and after each level-up while you have unspent talent points, or your pet has unspent training points, and a soft glow over the talents button until they are spent. Nothing in combat."] = "Una línea en el chat al iniciar sesión y tras cada subida de nivel mientras tengas puntos de talento sin gastar, o tu mascota tenga puntos de entrenamiento sin gastar, y un brillo suave sobre el botón de talentos hasta que se gasten. Nada en combate." -- mt
-L["you have unspent talent points, and your pet has unspent training points."] = "tienes puntos de talento sin gastar, y tu mascota tiene puntos de entrenamiento sin gastar." -- mt
-L["you have unspent talent points."] = "tienes puntos de talento sin gastar." -- mt
-L["your pet has unspent training points."] = "tu mascota tiene puntos de entrenamiento sin gastar." -- mt
+L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Un brillo suave sobre el botón de talentos mientras tengas puntos de talento sin gastar, o tu mascota tenga puntos de entrenamiento sin gastar, hasta que se gasten. Nada en combate." -- mt
 L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Las habilidades de mascota que aún no aprendiste aparecen en la pestaña Mascota del libro de hechizos." -- mt

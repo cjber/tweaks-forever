@@ -305,8 +305,5 @@ L["Capital Gardens"] = "Hauptstadtgärten" -- mt
 L["Warpwood Quarter"] = "Wucherborkenviertel" -- mt
 
 L["Unspent talent reminder"] = "Erinnerung an unverteilte Talentpunkte" -- mt
-L["One line in chat at login and after each level-up while you have unspent talent points, or your pet has unspent training points, and a soft glow over the talents button until they are spent. Nothing in combat."] = "Eine Zeile im Chat beim Anmelden und nach jedem Stufenaufstieg, solange Ihr unverteilte Talentpunkte habt oder Euer Begleiter unverteilte Trainingspunkte, und ein sanftes Leuchten über der Talentschaltfläche, bis sie ausgegeben sind. Im Kampf nichts." -- mt
-L["you have unspent talent points, and your pet has unspent training points."] = "Ihr habt unverteilte Talentpunkte und Euer Begleiter hat unverteilte Trainingspunkte." -- mt
-L["you have unspent talent points."] = "Ihr habt unverteilte Talentpunkte." -- mt
-L["your pet has unspent training points."] = "Euer Begleiter hat unverteilte Trainingspunkte." -- mt
+L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Ein sanftes Leuchten über der Talent-Schaltfläche, solange Ihr unverteilte Talentpunkte oder Euer Begleiter unverteilte Trainingspunkte habt, bis sie ausgegeben sind. Im Kampf nichts." -- mt
 L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Begleiterfähigkeiten, die Ihr noch nicht gelernt habt, erscheinen im Zauberbuch auf dem Reiter „Begleiter“." -- mt

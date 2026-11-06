@@ -305,8 +305,5 @@ L["Capital Gardens"] = "Центральные сады" -- mt
 L["Warpwood Quarter"] = "Квартал Криводревов" -- mt
 
 L["Unspent talent reminder"] = "Напоминание о нераспределённых очках талантов" -- mt
-L["One line in chat at login and after each level-up while you have unspent talent points, or your pet has unspent training points, and a soft glow over the talents button until they are spent. Nothing in combat."] = "Строка в чате при входе в игру и после каждого повышения уровня, пока у вас есть нераспределённые очки талантов или у вашего питомца есть нераспределённые очки обучения, и мягкое свечение над кнопкой талантов, пока они не будут потрачены. В бою ничего не показывается." -- mt
-L["you have unspent talent points, and your pet has unspent training points."] = "у вас есть нераспределённые очки талантов, и у вашего питомца есть нераспределённые очки обучения." -- mt
-L["you have unspent talent points."] = "у вас есть нераспределённые очки талантов." -- mt
-L["your pet has unspent training points."] = "у вашего питомца есть нераспределённые очки обучения." -- mt
+L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Мягкое свечение над кнопкой талантов, пока у вас есть нераспределённые очки талантов или у вашего питомца есть нераспределённые очки обучения, пока они не будут потрачены. В бою ничего не показывается." -- mt
 L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Способности питомца, которые вы ещё не изучили, показываются на вкладке «Питомец» в книге заклинаний." -- mt

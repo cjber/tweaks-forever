@@ -33,7 +33,7 @@ Nameplates in retail's own frame, with your target outlined.
 - **Spellbook, trainer and bags**: unlearned spells in the spellbook, the Pet tab's future abilities after a pet trainer visit, Train all for what you can afford, and the reagent bag in the combined bag.
 - **Fishing**: double right-click to cast or apply a lure, with a warning when you have none.
 - **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default; turns outlines off, and removing sparkles needs a restart.
-- **Also**: a page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names, an unspent talent and pet training point reminder, and `/rl`.
+- **Also**: a page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names, an unspent talent and pet training point glow, and `/rl`.
 
 ## Usage
 

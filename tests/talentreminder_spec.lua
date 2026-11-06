@@ -1,6 +1,5 @@
--- Unspent talent reminder (Features/TalentReminder.lua): one line at login and after each level-up while talent or
--- pet training points are unspent, a glow of our own over the talents button, cleared as they are spent and never
--- drawn or announced in combat.
+-- Unspent talent reminder (Features/TalentReminder.lua): a glow of our own over the talents button while talent or
+-- pet training points are unspent, cleared as they are spent and never drawn in combat.
 local features, handlers, db, printed, initializers, frames = {}, {}, {}, {}, {}, {}
 local ns = {
 	L = setmetatable({}, {
@@ -108,7 +107,7 @@ db.talentReminder = true
 hasTalent, classPoints, specPoints = true, 2, 0
 initializers[1]()
 local glow = frames[1]
-assert(#printed == 1 and printed[1] == "you have unspent talent points.", "a line at login")
+assert(#printed == 0, "no chat line at login")
 assert(glow and glow.shown and glow.level == 55, "our glow over the talents button")
 assert(glow.texture.atlas == "collections-newglow" and glow.texture.width == 46, "drawn whole through Art")
 
@@ -116,27 +115,22 @@ assert(glow.texture.atlas == "collections-newglow" and glow.texture.width == 46,
 hasTalent = false
 petTotal, petUsed = 3, 1
 Fire("PLAYER_LEVEL_UP")
-assert(#printed == 2 and printed[2] == "your pet has unspent training points.", "pet points at a level-up")
-assert(glow.shown)
+assert(glow.shown, "the glow follows pet points at a level-up")
+assert(#printed == 0, "no chat line at a level-up")
 
 -- Spending every pet point clears the glow at once, with no more chat.
 petUsed = 3
 Fire("UNIT_PET_TRAINING_POINTS")
 assert(not glow.shown, "the glow clears when the points are spent")
-assert(#printed == 2)
 
 -- Both kinds waiting, then combat: no line, no glow.
 hasTalent, classPoints = true, 1
 petTotal, petUsed = 2, 0
 Fire("TRAIT_NODE_CHANGED")
 assert(glow.shown)
-Fire("PLAYER_LEVEL_UP")
-assert(printed[3] == "you have unspent talent points, and your pet has unspent training points.")
 combat = true
 Fire("PLAYER_REGEN_DISABLED")
 assert(not glow.shown, "nothing drawn in combat")
-Fire("PLAYER_LEVEL_UP")
-assert(#printed == 3, "nothing said in combat")
 combat = false
 Fire("PLAYER_REGEN_ENABLED")
 assert(glow.shown, "the glow returns once the fight is over")
@@ -156,5 +150,5 @@ env.C_ClassTalents = {
 db.talentReminder = false
 Fire("setting")
 Fire("PLAYER_LEVEL_UP")
-assert(#printed == 3 and not glow.shown, "off means nothing")
+assert(not glow.shown, "off means no glow")
 print("talentreminder_spec: ok")

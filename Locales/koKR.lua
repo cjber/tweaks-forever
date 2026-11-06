@@ -305,8 +305,5 @@ L["Capital Gardens"] = "수도 정원" -- mt
 L["Warpwood Quarter"] = "굽이나무 지구" -- mt
 
 L["Unspent talent reminder"] = "사용하지 않은 특성 점수 알림" -- mt
-L["One line in chat at login and after each level-up while you have unspent talent points, or your pet has unspent training points, and a soft glow over the talents button until they are spent. Nothing in combat."] = "접속할 때와 레벨이 오를 때마다 사용하지 않은 특성 점수나 소환수의 사용하지 않은 훈련 점수가 있으면 채팅으로 한 줄 알려 주고, 다 쓸 때까지 특성 버튼 위에 부드러운 빛을 표시합니다. 전투 중에는 아무것도 표시하지 않습니다." -- mt
-L["you have unspent talent points, and your pet has unspent training points."] = "사용하지 않은 특성 점수와 소환수의 사용하지 않은 훈련 점수가 있습니다." -- mt
-L["you have unspent talent points."] = "사용하지 않은 특성 점수가 있습니다." -- mt
-L["your pet has unspent training points."] = "소환수에게 사용하지 않은 훈련 점수가 있습니다." -- mt
+L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "사용하지 않은 특성 점수나 소환수의 사용하지 않은 훈련 점수가 있는 동안, 다 쓸 때까지 특성 버튼 위에 부드러운 빛을 표시합니다. 전투 중에는 아무것도 표시하지 않습니다." -- mt
 L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "아직 배우지 않은 소환수 능력이 마법책의 소환수 탭에 표시됩니다." -- mt

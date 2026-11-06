@@ -10,9 +10,8 @@ ns.Feature({
 	key = KEY,
 	category = "Interface",
 	name = "Unspent talent reminder",
-	tooltip = "One line in chat at login and after each level-up while you have unspent talent points, or your pet "
-		.. "has unspent training points, and a soft glow over the talents button until they are spent. Nothing in "
-		.. "combat.",
+	tooltip = "A soft glow over the talents button while you have unspent talent points, or your pet has unspent "
+		.. "training points, until they are spent. Nothing in combat.",
 	default = true,
 })
 
@@ -90,28 +89,9 @@ local function Refresh()
 	frame:SetShown(talent > 0 or pet > 0)
 end
 
--- One chat line, at login and after each level-up, only while something is waiting.
-local function Announce()
-	if not ns.Active(KEY) or InCombatLockdown() then
-		return
-	end
-	local talent, pet = Model.Unspent()
-	if talent > 0 and pet > 0 then
-		ns.Print(L["you have unspent talent points, and your pet has unspent training points."])
-	elseif talent > 0 then
-		ns.Print(L["you have unspent talent points."])
-	elseif pet > 0 then
-		ns.Print(L["your pet has unspent training points."])
-	end
-end
-
 ns.Init(function()
 	Refresh()
-	Announce()
-	ns.On("PLAYER_LEVEL_UP", function()
-		Announce()
-		Refresh()
-	end)
+	ns.On("PLAYER_LEVEL_UP", Refresh)
 	-- Spending a point clears the glow at once, whichever window is open.
 	for _, event in ipairs({
 		"CHARACTER_POINTS_CHANGED",
