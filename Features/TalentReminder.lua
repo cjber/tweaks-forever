@@ -1,6 +1,5 @@
 ---@type string, TFNamespace
 local _, ns = ...
-local L = ns.L
 
 local KEY = "talentReminder"
 -- A soft gold glow around the talents micro button while points wait to be spent.
