@@ -311,4 +311,4 @@ L["Quest XP on the experience bar"] = "XP de misiones en la barra de experiencia
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Dibuja el XP de las misiones de tu registro en la barra de experiencia: primero las misiones listas para entregar desde tu XP actual y después, más tenue, el resto del registro. Al señalar la barra, la información añade ambos totales y el nivel que alcanzan." -- mt
 L["Completed quests: %s XP"] = "Misiones completadas: %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Todas las misiones del registro: %s XP (alcanza el nivel %d, %d%%)" -- mt
-L["Quest XP shows on the experience bar."] = "La experiencia de misiones se muestra en la barra de experiencia." -- mt
+L["The tooltip health bar and the reagent slots use the game's current art."] = "La barra de salud del tooltip y las casillas de componentes usan el arte actual del juego." -- mt

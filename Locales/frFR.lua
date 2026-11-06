@@ -311,4 +311,4 @@ L["Quest XP on the experience bar"] = "XP de quête sur la barre d'expérience" 
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Dessine l'XP des quêtes de votre journal sur la barre d'expérience : d'abord les quêtes prêtes à rendre à partir de votre XP actuel, puis le reste du journal, plus pâle, après elles. En pointant la barre, son infobulle ajoute les deux totaux et le niveau qu'ils atteignent." -- mt
 L["Completed quests: %s XP"] = "Quêtes terminées : %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Toutes les quêtes du journal : %s XP (atteint le niveau %d, %d%%)" -- mt
-L["Quest XP shows on the experience bar."] = "L'XP de quête s'affiche sur la barre d'expérience." -- mt
+L["The tooltip health bar and the reagent slots use the game's current art."] = "La barre de vie de l'infobulle et les emplacements de composants utilisent l'art actuel du jeu." -- mt

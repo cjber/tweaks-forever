@@ -311,4 +311,4 @@ L["Quest XP on the experience bar"] = "Опыт заданий на полосе
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Рисует опыт заданий из вашего журнала на полосе опыта: сначала задания, готовые к сдаче, начиная с текущего опыта, затем остаток журнала более бледно. При наведении на полосу подсказка добавляет обе суммы и уровень, которого они достигнут." -- mt
 L["Completed quests: %s XP"] = "Выполненные задания: %s опыта" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Все задания в журнале: %s опыта (достигает %d уровня, %d%%)" -- mt
-L["Quest XP shows on the experience bar."] = "Опыт за задания отображается на полосе опыта." -- mt
+L["The tooltip health bar and the reagent slots use the game's current art."] = "Полоса здоровья в подсказке и ячейки реагентов используют текущее оформление игры." -- mt

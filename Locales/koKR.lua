@@ -311,4 +311,4 @@ L["Quest XP on the experience bar"] = "경험치 바의 퀘스트 XP" -- mt
 L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "경험치 바에 퀘스트 기록의 XP를 그립니다. 현재 XP부터 제출할 수 있는 퀘스트를, 그 뒤에 기록의 나머지를 더 흐리게 표시합니다. 바를 가리키면 두 합계와 도달하는 레벨이 툴팁에 추가됩니다." -- mt
 L["Completed quests: %s XP"] = "완료한 퀘스트: %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "기록의 모든 퀘스트: %s XP (레벨 %d, %d%% 도달)" -- mt
-L["Quest XP shows on the experience bar."] = "퀘스트 경험치가 경험치 바에 표시됩니다." -- mt
+L["The tooltip health bar and the reagent slots use the game's current art."] = "툴팁 생명력 바와 재료 칸이 게임의 현재 그래픽을 사용합니다." -- mt

@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.2.1] - 2026-11-06
 - **The tooltip health bar and the reagent slots use the game's current art.** The bar under a unit's tooltip now comes from the same atlas as the game's own progress bars, and the green reagent slots in the combined bag use the client's bag slot art, so neither draws the pre-Legion chrome the client still ships.
 
 ## [2.2.0] - 2026-11-06
