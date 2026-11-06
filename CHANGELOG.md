@@ -13,6 +13,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 - **Quest XP shows on the experience bar.** Turn it on under Interface to see what your quest log is worth: quests ready to hand in from where your bar is now, and the rest of the log fainter after them. Point at the bar and its tooltip adds both totals and the level they would reach. Off by default.
 - **Pet abilities you haven't learned show before a trainer visit.** The spellbook's Pet tab now lists the abilities your current pet's family can learn, greyed out after the ones it knows, with each rank's level and training point cost in its tooltip from your first login. Visiting a pet trainer still brings the server's own list and prices up to date.
+- **The unspent talent glow shows your points again.** The reminder reads them the way the game's own talent window does, so the talents button glows as soon as a point waits to be spent instead of staying dark.
 
 ## [2.1.1] - 2026-11-06
 - **The unspent talent reminder is a glow only.** The reminder no longer writes a line in chat at login and after each level-up, where it was lost among login spam. The soft glow over the talents button still shows while talent or pet training points wait to be spent, and clears as they are spent. Nothing in combat.
