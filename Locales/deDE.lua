@@ -306,4 +306,4 @@ L["Warpwood Quarter"] = "Wucherborkenviertel" -- mt
 
 L["Unspent talent reminder"] = "Erinnerung an unverteilte Talentpunkte" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Ein sanftes Leuchten über der Talent-Schaltfläche, solange Ihr unverteilte Talentpunkte oder Euer Begleiter unverteilte Trainingspunkte habt, bis sie ausgegeben sind. Im Kampf nichts." -- mt
-L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Begleiterfähigkeiten, die Ihr noch nicht gelernt habt, erscheinen im Zauberbuch auf dem Reiter „Begleiter“." -- mt
+L["The unspent talent reminder is a glow only."] = "Die Erinnerung an unverteilte Talentpunkte ist nur ein Leuchten." -- mt

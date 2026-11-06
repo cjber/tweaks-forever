@@ -13,6 +13,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 - **Pet abilities you haven't learned show before a trainer visit.** The spellbook's Pet tab now lists the abilities your current pet's family can learn, greyed out after the ones it knows, with each rank's level and training point cost in its tooltip from your first login. Visiting a pet trainer still brings the server's own list and prices up to date.
 
+## [2.1.1] - 2026-11-06
+- **The unspent talent reminder is a glow only.** The reminder no longer writes a line in chat at login and after each level-up, where it was lost among login spam. The soft glow over the talents button still shows while talent or pet training points wait to be spent, and clears as they are spent. Nothing in combat.
+
 ## [2.1.0] - 2026-11-06
 - **Pet abilities you haven't learned show on the spellbook's Pet tab.** After a visit to a pet trainer, the abilities it can teach appear greyed out after the ones your pet knows, ready ones first, with each row's level and training point cost in its tooltip.
 - **A reminder when talent or pet training points are unspent.** One chat line at login and after each level-up, and a soft glow over the talents button until they are spent. Nothing in combat. It is on by default under Interface.

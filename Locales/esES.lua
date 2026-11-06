@@ -306,4 +306,4 @@ L["Warpwood Quarter"] = "Barrio Alabeo" -- mt
 
 L["Unspent talent reminder"] = "Recordatorio de puntos de talento sin gastar" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Un brillo suave sobre el botón de talentos mientras tengas puntos de talento sin gastar, o tu mascota tenga puntos de entrenamiento sin gastar, hasta que se gasten. Nada en combate." -- mt
-L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Las habilidades de mascota que aún no has aprendido aparecen en la pestaña Mascota del libro de hechizos." -- mt
+L["The unspent talent reminder is a glow only."] = "El recordatorio de puntos de talento sin gastar es solo un brillo." -- mt

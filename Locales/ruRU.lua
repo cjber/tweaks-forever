@@ -306,4 +306,4 @@ L["Warpwood Quarter"] = "Квартал Криводревов" -- mt
 
 L["Unspent talent reminder"] = "Напоминание о нераспределённых очках талантов" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Мягкое свечение над кнопкой талантов, пока у вас есть нераспределённые очки талантов или у вашего питомца есть нераспределённые очки обучения, пока они не будут потрачены. В бою ничего не показывается." -- mt
-L["Pet abilities you haven't learned show on the spellbook's Pet tab."] = "Способности питомца, которые вы ещё не изучили, показываются на вкладке «Питомец» в книге заклинаний." -- mt
+L["The unspent talent reminder is a glow only."] = "Напоминание о нераспределённых очках талантов теперь только свечение." -- mt
