@@ -18,21 +18,26 @@ ns.Feature({
 local Model = {}
 ns.TalentReminder = Model
 
--- The client's own count of unspent class and spec talent points, with the classic count as a fallback for a tree
--- the newer API does not report (Forever has one talent currency).
+-- The player's unspent talent points, read the way Forever's own talent frame reads them: a class talent tree is a
+-- trait tree, and the quantity left of its first tree currency is what the frame's UNSPENT_POINTS display shows
+-- (Blizzard_PlayerSpells/Camelot/ClassTalents/Blizzard_ClassTalentsFrame.lua, RefreshClassCurrencyDisplay). The
+-- class and spec counts (C_ClassTalents.HasUnspentTalentPoints) cover mainline's separate class and spec trees, and
+-- the classic count (GetNumUnspentTalents) the talent system Forever replaced; neither is what this frame reads.
 ---@return integer
 local function TalentPoints()
-	local points = 0
-	if C_ClassTalents and C_ClassTalents.HasUnspentTalentPoints then
-		local has, classPoints, specPoints = C_ClassTalents.HasUnspentTalentPoints()
-		if has then
-			points = (classPoints or 0) + (specPoints or 0)
-		end
+	local configID = C_ClassTalents.GetActiveConfigID()
+	if not configID then
+		return 0
 	end
-	if points == 0 and GetNumUnspentTalents then
-		points = GetNumUnspentTalents() or 0
+	local config = C_Traits.GetConfigInfo(configID)
+	local treeID = config and config.treeIDs[1]
+	if not treeID then
+		return 0
 	end
-	return points
+	-- Staged spends count as spent, as they do in the frame: its `excludeStagedChangesForCurrencies` is false.
+	local currencies = C_Traits.GetTreeCurrencyInfo(configID, treeID, false)
+	local currency = currencies and currencies[1]
+	return currency and currency.quantity or 0
 end
 
 -- A pet's training points: the total it has earned less the ones already spent.
@@ -62,8 +67,14 @@ local function Glow()
 		return nil
 	end
 	glow = CreateFrame("Frame", nil, UIParent)
-	glow:SetFrameStrata("MEDIUM")
-	glow:SetFrameLevel(TalentMicroButton:GetFrameLevel() + 5)
+	-- The micro menu's own strata, and a level above the menu itself (frameLevel 51 in Camelot's
+	-- Blizzard_MicroMenu/Camelot/MainMenuBarMicroMenu.xml): our frame is no child of it, so nothing else lifts it.
+	glow:SetFrameStrata(TalentMicroButton:GetFrameStrata())
+	local level = TalentMicroButton:GetFrameLevel()
+	if MicroMenu then
+		level = math.max(level, MicroMenu:GetFrameLevel())
+	end
+	glow:SetFrameLevel(level + 5)
 	glow:SetPoint("CENTER", TalentMicroButton, "CENTER")
 	local texture = glow:CreateTexture(nil, "OVERLAY")
 	ns.Art.Fit(texture, GLOW_ATLAS, 46, 46)
@@ -90,13 +101,14 @@ end
 
 ns.Init(function()
 	Refresh()
+	-- A point earned or spent arrives as a tree currency update; the level-up is the earliest hint of one.
+	ns.On("TRAIT_TREE_CURRENCY_INFO_UPDATED", Refresh)
 	ns.On("PLAYER_LEVEL_UP", Refresh)
 	-- Spending a point clears the glow at once, whichever window is open.
 	for _, event in ipairs({
 		"CHARACTER_POINTS_CHANGED",
 		"TRAIT_CONFIG_UPDATED",
 		"TRAIT_NODE_CHANGED",
-		"TRAIT_TREE_CURRENCY_INFO_UPDATED",
 		"PLAYER_TALENT_UPDATE",
 		"UNIT_PET",
 		"UNIT_PET_TRAINING_POINTS",
