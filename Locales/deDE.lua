@@ -307,3 +307,8 @@ L["Warpwood Quarter"] = "Wucherborkenviertel" -- mt
 L["Unspent talent reminder"] = "Erinnerung an unverteilte Talentpunkte" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Ein sanftes Leuchten über der Talent-Schaltfläche, solange Ihr unverteilte Talentpunkte oder Euer Begleiter unverteilte Trainingspunkte habt, bis sie ausgegeben sind. Im Kampf nichts." -- mt
 L["The unspent talent reminder is a glow only."] = "Die Erinnerung an unverteilte Talentpunkte ist nur ein Leuchten." -- mt
+
+L["Quest XP on the experience bar"] = "Quest-EP auf der Erfahrungsleiste" -- mt
+L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Zeichnet die EP der Quests in Eurem Questlog auf der Erfahrungsleiste: zuerst die Quests, die ab der aktuellen EP bereit zur Abgabe sind, danach schwächer den Rest des Logs. Beim Zeigen auf die Leiste kommen beide Summen und die erreichte Stufe in den Tooltip." -- mt
+L["Completed quests: %s XP"] = "Abgeschlossene Quests: %s EP" -- mt
+L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Alle Quests im Log: %s EP (erreicht Stufe %d, %d%%)" -- mt

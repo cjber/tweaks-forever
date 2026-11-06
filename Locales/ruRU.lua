@@ -307,3 +307,8 @@ L["Warpwood Quarter"] = "Квартал Криводревов" -- mt
 L["Unspent talent reminder"] = "Напоминание о нераспределённых очках талантов" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Мягкое свечение над кнопкой талантов, пока у вас есть нераспределённые очки талантов или у вашего питомца есть нераспределённые очки обучения, пока они не будут потрачены. В бою ничего не показывается." -- mt
 L["The unspent talent reminder is a glow only."] = "Напоминание о нераспределённых очках талантов теперь только свечение." -- mt
+
+L["Quest XP on the experience bar"] = "Опыт заданий на полосе опыта" -- mt
+L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Рисует опыт заданий из вашего журнала на полосе опыта: сначала задания, готовые к сдаче, начиная с текущего опыта, затем остаток журнала более бледно. При наведении на полосу подсказка добавляет обе суммы и уровень, которого они достигнут." -- mt
+L["Completed quests: %s XP"] = "Выполненные задания: %s опыта" -- mt
+L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Все задания в журнале: %s опыта (достигает %d уровня, %d%%)" -- mt

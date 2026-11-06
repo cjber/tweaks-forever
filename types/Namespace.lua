@@ -310,6 +310,7 @@ TweaksForeverCharDB = nil
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
 ---@field XPRate TFXPRate
+---@field QuestXPBar TFQuestXPBar
 ---@field QuestButtons TFQuestButtons
 ---@field Coordinates TFCoordinates
 ---@field BestReward TFBestReward

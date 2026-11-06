@@ -307,3 +307,8 @@ L["Warpwood Quarter"] = "굽이나무 지구" -- mt
 L["Unspent talent reminder"] = "사용하지 않은 특성 점수 알림" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "사용하지 않은 특성 점수나 소환수의 사용하지 않은 훈련 점수가 있는 동안, 다 쓸 때까지 특성 버튼 위에 부드러운 빛을 표시합니다. 전투 중에는 아무것도 표시하지 않습니다." -- mt
 L["The unspent talent reminder is a glow only."] = "사용하지 않은 특성 점수 알림은 이제 빛만 표시합니다." -- mt
+
+L["Quest XP on the experience bar"] = "경험치 바의 퀘스트 XP" -- mt
+L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "경험치 바에 퀘스트 기록의 XP를 그립니다. 현재 XP부터 제출할 수 있는 퀘스트를, 그 뒤에 기록의 나머지를 더 흐리게 표시합니다. 바를 가리키면 두 합계와 도달하는 레벨이 툴팁에 추가됩니다." -- mt
+L["Completed quests: %s XP"] = "완료한 퀘스트: %s XP" -- mt
+L["All quests in log: %s XP (reaches level %d, %d%%)"] = "기록의 모든 퀘스트: %s XP (레벨 %d, %d%% 도달)" -- mt

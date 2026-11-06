@@ -24,7 +24,7 @@ Nameplates in retail's own frame, with your target outlined.
 
 - **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, open the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), accept party invites from friends or decline strangers'. All off by default.
 - **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk when turned on. Hold Shift as a merchant opens to skip both.
-- **Rares and levelling**: optional rare alerts in chat, and XP per hour and time to level on the experience bar.
+- **Rares and levelling**: optional rare alerts in chat, XP per hour and time to level on the experience bar, and the XP your quest log is worth shaded onto the bar.
 - **Gear groups**: Ctrl+Right-click a bag item to put it in a coloured group, then equip the group in one click.
 - **Maps**: every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside or click their entrance.
 - **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside.

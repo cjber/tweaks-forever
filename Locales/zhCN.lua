@@ -307,3 +307,8 @@ L["Warpwood Quarter"] = "扭木广场" -- mt
 L["Unspent talent reminder"] = "未使用天赋点提醒" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "当你或你的宠物还有未使用的天赋点或训练点时，在天赋按钮上显示柔和的光晕，直到用完为止。战斗中不显示。" -- mt
 L["The unspent talent reminder is a glow only."] = "未使用天赋点的提醒现在只显示光晕。" -- mt
+
+L["Quest XP on the experience bar"] = "经验条上的任务经验" -- mt
+L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "在经验条上显示任务日志中的任务经验：从当前经验开始，先显示可以交的任务，然后以更淡的颜色显示日志中其余任务。指向经验条时，提示中会添加这两个总数以及它们能到达的等级。" -- mt
+L["Completed quests: %s XP"] = "已完成任务：%s 经验" -- mt
+L["All quests in log: %s XP (reaches level %d, %d%%)"] = "日志中所有任务：%s 经验（达到 %d 级，%d%%）" -- mt

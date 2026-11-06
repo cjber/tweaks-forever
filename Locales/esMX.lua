@@ -307,3 +307,8 @@ L["Warpwood Quarter"] = "Barrio Alabeo" -- mt
 L["Unspent talent reminder"] = "Recordatorio de puntos de talento sin gastar" -- mt
 L["A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat."] = "Un brillo suave sobre el botón de talentos mientras tengas puntos de talento sin gastar, o tu mascota tenga puntos de entrenamiento sin gastar, hasta que se gasten. Nada en combate." -- mt
 L["The unspent talent reminder is a glow only."] = "El recordatorio de puntos de talento sin gastar es solo un brillo." -- mt
+
+L["Quest XP on the experience bar"] = "XP de misiones en la barra de experiencia" -- mt
+L["Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both totals and the level they reach."] = "Dibuja el XP de las misiones de tu registro en la barra de experiencia: primero las misiones listas para entregar desde tu XP actual y después, más tenue, el resto del registro. Al señalar la barra, la información añade ambos totales y el nivel que alcanzan." -- mt
+L["Completed quests: %s XP"] = "Misiones completadas: %s XP" -- mt
+L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Todas las misiones del registro: %s XP (alcanza el nivel %d, %d%%)" -- mt
