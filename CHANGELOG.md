@@ -12,6 +12,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.3.1] - 2026-11-07
+- **Game data now matches Forever build 1.60.1.70862.** The map overlays, zone level ranges, dungeon and raid entrances, class trainer spells, camp benefit texts and the quests Forever added are regenerated from the new client build, so the levels, the entrances and the spells the windows show are the ones this build has.
+
 ## [2.3.0] - 2026-11-06
 - **A pet trainer says what your pet hasn't learned.** At a pet trainer, a short note names the abilities you know that your current pet lacks, with a **Teach with Beast Training** button that opens Beast Training. It also says when the trainer's filter hides the ranks you already know, which can leave the list looking empty. Nothing changes in Beast Training itself, and the button waits until combat ends.
 - **Daily and repeatable quest markers come from the game's map.** Questie's daily quests and repeatable hand-ins on the map and minimap now use the client's own recurring quest symbols, so they read like every other quest marker there.
