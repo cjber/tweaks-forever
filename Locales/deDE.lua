@@ -313,10 +313,10 @@ L["Completed quests: %s XP"] = "Abgeschlossene Quests: %s EP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Alle Quests im Log: %s EP (erreicht Stufe %d, %d%%)" -- mt
 
 L["%s hasn't learned %s."] = "%s hat %s noch nicht gelernt." -- mt
-L["Game data now matches Forever build 1.60.1.70862."] = "Die Spieldaten entsprechen jetzt dem Forever-Build 1.60.1.70862." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "Bei einem Tierausbilder nennt eine kurze Notiz die Fähigkeiten, die Ihr kennt und Euer Begleiter noch nicht gelernt hat, mit einer Schaltfläche, die Bestientraining öffnet. Im Bestientraining selbst erscheint nichts, und die Schaltfläche wartet, bis der Kampf endet." -- mt
 L["Pet trainer hint"] = "Hinweis beim Tierausbilder" -- mt
 L["Teach with Beast Training"] = "Mit Bestientraining lehren" -- mt
 L["The ranks you already know are hidden by the filter."] = "Die Ränge, die Ihr bereits kennt, sind durch den Filter ausgeblendet." -- mt
 L["Known ranks in Beast Training"] = "Bekannte Ränge im Bestientraining" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "Markiert im Bestientraining die Ränge, die Euer Begleiter bereits kennt oder durch einen höheren Rang ersetzt hat, als bekannt, damit sie nicht mehr wie noch zu lernende Ränge aussehen." -- mt
+L["Beast Training marks the ranks your pet already knows."] = "Das Bestientraining markiert die Ränge, die Euer Begleiter bereits kennt." -- mt

@@ -313,10 +313,10 @@ L["Completed quests: %s XP"] = "완료한 퀘스트: %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "기록의 모든 퀘스트: %s XP (레벨 %d, %d%% 도달)" -- mt
 
 L["%s hasn't learned %s."] = "%s은(는) %s을(를) 아직 배우지 않았습니다." -- mt
-L["Game data now matches Forever build 1.60.1.70862."] = "게임 데이터가 이제 Forever 빌드 1.60.1.70862와 일치합니다." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "야수 조련사에게서 내가 알고 있는 능력 중 아직 소환수가 배우지 않은 능력을 짧은 안내로 보여 주고, 야수 훈련을 여는 버튼을 추가합니다. 야수 훈련 자체에서는 아무것도 표시되지 않으며, 버튼은 전투가 끝날 때까지 기다립니다." -- mt
 L["Pet trainer hint"] = "야수 조련사 안내" -- mt
 L["Teach with Beast Training"] = "야수 훈련으로 가르치기" -- mt
 L["The ranks you already know are hidden by the filter."] = "이미 알고 있는 등급은 필터에 가려져 있습니다." -- mt
 L["Known ranks in Beast Training"] = "야수 훈련의 알려진 등급" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "야수 훈련에서 펫이 이미 배운 등급이나 더 높은 등급으로 대체한 등급을 알려진 것으로 표시하여, 아직 배워야 할 등급처럼 보이지 않게 합니다." -- mt
+L["Beast Training marks the ranks your pet already knows."] = "야수 조련에서 소환수가 이미 아는 등급을 표시합니다." -- mt

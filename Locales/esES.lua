@@ -313,10 +313,10 @@ L["Completed quests: %s XP"] = "Misiones completadas: %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Todas las misiones del registro: %s XP (alcanza el nivel %d, %d%%)" -- mt
 
 L["%s hasn't learned %s."] = "%s no ha aprendido %s." -- mt
-L["Game data now matches Forever build 1.60.1.70862."] = "Los datos del juego ahora coinciden con la compilación 1.60.1.70862 de Forever." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "En un entrenador de mascotas, una nota breve nombra las habilidades que conoces y que tu mascota aún no ha aprendido, con un botón que abre Entrenamiento de bestias. No aparece nada en Entrenamiento de bestias, y el botón espera a que termine el combate." -- mt
 L["Pet trainer hint"] = "Sugerencia del entrenador de mascotas" -- mt
 L["Teach with Beast Training"] = "Enseñar con Entrenamiento de bestias" -- mt
 L["The ranks you already know are hidden by the filter."] = "Los rangos que ya conoces están ocultos por el filtro." -- mt
 L["Known ranks in Beast Training"] = "Rangos conocidos en Entrenamiento de bestias" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "En Entrenamiento de bestias, marca como conocidos los rangos que tu mascota ya sabe o que ha sustituido por un rango superior, para que dejen de parecer rangos que aún debe aprender." -- mt
+L["Beast Training marks the ranks your pet already knows."] = "El adiestramiento de bestias marca los rangos que tu mascota ya conoce." -- mt

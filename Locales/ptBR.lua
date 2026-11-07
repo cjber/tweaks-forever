@@ -313,10 +313,10 @@ L["Completed quests: %s XP"] = "Missões concluídas: %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Todas as missões do registro: %s XP (alcança o nível %d, %d%%)" -- mt
 
 L["%s hasn't learned %s."] = "%s ainda não aprendeu %s." -- mt
-L["Game data now matches Forever build 1.60.1.70862."] = "Os dados do jogo agora correspondem à compilação 1.60.1.70862 do Forever." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "Em um treinador de mascotes, uma nota curta nomeia as habilidades que você conhece e que sua mascote ainda não aprendeu, com um botão que abre Treinamento de Feras. Nada aparece no Treinamento de Feras, e o botão espera o combate terminar." -- mt
 L["Pet trainer hint"] = "Dica do treinador de mascotes" -- mt
 L["Teach with Beast Training"] = "Ensinar com Treinamento de Feras" -- mt
 L["The ranks you already know are hidden by the filter."] = "As patentes que você já conhece estão ocultas pelo filtro." -- mt
 L["Known ranks in Beast Training"] = "Graus conhecidos em Treinamento de Feras" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "No Treinamento de Feras, marca como conhecidos os graus que sua mascote já aprendeu ou que foram substituídos por um grau superior, para que não pareçam mais graus a aprender." -- mt
+L["Beast Training marks the ranks your pet already knows."] = "O Treinamento de Feras marca as patentes que seu ajudante já conhece." -- mt
