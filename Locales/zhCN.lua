@@ -318,3 +318,5 @@ L["At a pet trainer, names the abilities you know that your pet has not learned,
 L["Pet trainer hint"] = "宠物训练师提示" -- mt
 L["Teach with Beast Training"] = "用野兽训练教学" -- mt
 L["The ranks you already know are hidden by the filter."] = "你已学会的等级被过滤器隐藏了。" -- mt
+L["Known ranks in Beast Training"] = "野兽训练中的已知等级" -- mt
+L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "在野兽训练中，将你的宠物已经学会或已被更高等级替换的等级标记为已知，使它们不再看起来像尚未学习的等级。" -- mt

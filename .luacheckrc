@@ -230,6 +230,7 @@ read_globals = {
 	"ItemRefShoppingTooltip1",
 	"ItemRefShoppingTooltip2",
 	"ItemRefTooltip",
+	"ITEM_SPELL_KNOWN",
 	"LeaMapsDB",
 	"LeaPlusDB",
 	"LegacyForeverDB",

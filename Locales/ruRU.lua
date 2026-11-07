@@ -318,3 +318,5 @@ L["At a pet trainer, names the abilities you know that your pet has not learned,
 L["Pet trainer hint"] = "Подсказка у тренера питомцев" -- mt
 L["Teach with Beast Training"] = "Обучить с помощью «Дрессировки»" -- mt
 L["The ranks you already know are hidden by the filter."] = "Ранги, которые вы уже знаете, скрыты фильтром." -- mt
+L["Known ranks in Beast Training"] = "Известные ранги в дрессировке" -- mt
+L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "В дрессировке отмечает известными ранги, которые ваш питомец уже знает или заменил более высоким рангом, чтобы они больше не выглядели как ранги, которые ещё нужно изучить." -- mt

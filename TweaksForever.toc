@@ -84,6 +84,7 @@ UI\TrainAll.lua
 UI\MacroNames.lua
 UI\Spellbook.lua
 UI\PetTrainer.lua
+UI\BeastTraining.lua
 Features\Fishing.lua
 UI\Reload.lua
 UI\WhatsNew.lua

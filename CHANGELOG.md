@@ -11,6 +11,7 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+- **Beast Training marks the ranks your pet already knows.** A rank your pet knows, or one it has replaced with a higher rank, is dimmed and says it is already known instead of showing a training point cost, so Growl Rank 1 no longer looks learnable above the rank your pet has. It is on by default under Interface, and the other trainers are untouched.
 
 ## [2.3.1] - 2026-11-07
 - **Game data now matches Forever build 1.60.1.70862.** The map overlays, zone level ranges, dungeon and raid entrances, class trainer spells, camp benefit texts and the quests Forever added are regenerated from the new client build, so the levels, the entrances and the spells the windows show are the ones this build has.

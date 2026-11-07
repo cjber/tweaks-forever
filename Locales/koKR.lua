@@ -318,3 +318,5 @@ L["At a pet trainer, names the abilities you know that your pet has not learned,
 L["Pet trainer hint"] = "야수 조련사 안내" -- mt
 L["Teach with Beast Training"] = "야수 훈련으로 가르치기" -- mt
 L["The ranks you already know are hidden by the filter."] = "이미 알고 있는 등급은 필터에 가려져 있습니다." -- mt
+L["Known ranks in Beast Training"] = "야수 훈련의 알려진 등급" -- mt
+L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "야수 훈련에서 펫이 이미 배운 등급이나 더 높은 등급으로 대체한 등급을 알려진 것으로 표시하여, 아직 배워야 할 등급처럼 보이지 않게 합니다." -- mt

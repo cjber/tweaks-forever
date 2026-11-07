@@ -318,3 +318,5 @@ L["At a pet trainer, names the abilities you know that your pet has not learned,
 L["Pet trainer hint"] = "Hinweis beim Tierausbilder" -- mt
 L["Teach with Beast Training"] = "Mit Bestientraining lehren" -- mt
 L["The ranks you already know are hidden by the filter."] = "Die Ränge, die Ihr bereits kennt, sind durch den Filter ausgeblendet." -- mt
+L["Known ranks in Beast Training"] = "Bekannte Ränge im Bestientraining" -- mt
+L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "Markiert im Bestientraining die Ränge, die Euer Begleiter bereits kennt oder durch einen höheren Rang ersetzt hat, als bekannt, damit sie nicht mehr wie noch zu lernende Ränge aussehen." -- mt

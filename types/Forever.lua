@@ -86,6 +86,8 @@ function GetUIPanelLayoutAttribute(attribute) end
 ERR_NOT_IN_COMBAT = ""
 ---@type string
 TRAINING_POINTS_ABBREV = ""
+---@type string
+ITEM_SPELL_KNOWN = ""
 
 -- UIErrorsFrame's hidden message types (Blizzard_UIErrorsFrame), written by its SetMessageTypeEnabled.
 ---@type table<integer, boolean>
@@ -112,6 +114,10 @@ FACTION_HORDE = ""
 -- Forever's trainer frame, whose inset holds the skill list under its title.
 ---@class ClassTrainerFrame
 ---@field Inset Frame
+
+-- Forever's pet trainer rows add an alternate cost line beside the rank text, absent from pinned Retail FrameXML.
+---@class ClassTrainerSkillButtonTemplate
+---@field alternateCost FontString
 
 -- Forever's TrainerDocumentation/TrainerConstantsDocumentation; absent from the pinned Retail API.
 C_Trainer = {}

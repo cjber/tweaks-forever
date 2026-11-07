@@ -39,6 +39,23 @@
 ---@field rank? string
 ---@field cost? number training points
 
+-- A Beast Training row as the known-rank check reads it: its position in the trainer's list, its spell ID, its
+-- name and the number in its rank subtext.
+---@class TFBeastTrainingService
+---@field index integer
+---@field id integer
+---@field name? string
+---@field rank? integer
+
+---@class TFBeastTraining
+---@field KnownIndices fun(services: TFBeastTrainingService[], Known: fun(id: integer): boolean): table<integer, true>
+
+-- The element data Blizzard's trainer list passes to each row's initializer.
+---@class TFClassTrainerElement
+---@field skillIndex? integer
+---@field trainerType? Enum.TrainerType
+---@field data? TFClassTrainerElement
+
 -- A spell a class trainer teaches: { spell, level, fee in copper (nil when unknown), SkillLine ID }. A class line
 -- is its spellbook tab; any other puts it on the General tab.
 ---@class TFClassSpell
@@ -275,6 +292,7 @@ TweaksForeverCharDB = nil
 ---@field Camp TFCamp
 ---@field FutureSpells TFFutureSpells
 ---@field PetTrainerHint TFPetTrainerHint
+---@field BeastTraining TFBeastTraining
 ---@field TalentReminder TFTalentReminder
 ---@field ClassSpells table<string, TFClassSpells> by class token
 ---@field PetFamilies table<integer, TFPetFamily> by CreatureFamily ID
