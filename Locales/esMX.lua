@@ -313,6 +313,7 @@ L["Completed quests: %s XP"] = "Misiones completadas: %s XP" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Todas las misiones del registro: %s XP (alcanza el nivel %d, %d%%)" -- mt
 
 L["%s hasn't learned %s."] = "%s no ha aprendido %s." -- mt
+L["Game data now matches Forever build 1.60.1.70862."] = "Los datos del juego ahora coinciden con la compilación 1.60.1.70862 de Forever." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "En un entrenador de mascotas, una nota breve nombra las habilidades que conoces y que tu mascota aún no ha aprendido, con un botón que abre Entrenamiento de bestias. No aparece nada en Entrenamiento de bestias, y el botón espera a que termine el combate." -- mt
 L["Pet trainer hint"] = "Sugerencia del entrenador de mascotas" -- mt
 L["Teach with Beast Training"] = "Enseñar con Entrenamiento de bestias" -- mt

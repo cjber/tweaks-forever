@@ -313,6 +313,7 @@ L["Completed quests: %s XP"] = "已完成任务：%s 经验" -- mt
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "日志中所有任务：%s 经验（达到 %d 级，%d%%）" -- mt
 
 L["%s hasn't learned %s."] = "%s还没有学会%s。" -- mt
+L["Game data now matches Forever build 1.60.1.70862."] = "游戏数据现已与 Forever 版本 1.60.1.70862 匹配。" -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "在宠物训练师处，一段简短的提示会列出你已学会、但当前宠物尚未学会的技能，并提供一个打开野兽训练的按钮。野兽训练窗口中不会显示任何内容，按钮会等到战斗结束后再出现。" -- mt
 L["Pet trainer hint"] = "宠物训练师提示" -- mt
 L["Teach with Beast Training"] = "用野兽训练教学" -- mt

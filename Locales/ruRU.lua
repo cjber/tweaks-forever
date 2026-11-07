@@ -313,6 +313,7 @@ L["Completed quests: %s XP"] = "Выполненные задания: %s опы
 L["All quests in log: %s XP (reaches level %d, %d%%)"] = "Все задания в журнале: %s опыта (достигает %d уровня, %d%%)" -- mt
 
 L["%s hasn't learned %s."] = "%s еще не выучил %s." -- mt
+L["Game data now matches Forever build 1.60.1.70862."] = "Игровые данные теперь соответствуют сборке Forever 1.60.1.70862." -- mt
 L["At a pet trainer, names the abilities you know that your pet has not learned, and adds a button that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat ends."] = "У тренера питомцев короткая заметка называет способности, которые вы знаете, а ваш питомец еще не выучил, и добавляет кнопку, открывающую «Дрессировку». В самой «Дрессировке» ничего не показывается, а кнопка ждет окончания боя." -- mt
 L["Pet trainer hint"] = "Подсказка у тренера питомцев" -- mt
 L["Teach with Beast Training"] = "Обучить с помощью «Дрессировки»" -- mt
