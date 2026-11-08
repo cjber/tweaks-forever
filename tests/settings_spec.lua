@@ -64,6 +64,18 @@ local env = setmetatable({
 		RegisterAddOnSetting = function(category, variable, key, _, varType, name)
 			return { category = category, variable = variable, key = key, varType = varType, name = name }
 		end,
+		RegisterProxySetting = function(category, variable, varType, name, defaultValue, getValue, setValue)
+			return {
+				category = category,
+				variable = variable,
+				varType = varType,
+				name = name,
+				defaultValue = defaultValue,
+				getValue = getValue,
+				setValue = setValue,
+				proxy = true,
+			}
+		end,
 		CreateCheckboxInitializer = function(setting, _, tooltip)
 			assert(setting.varType == "boolean")
 			local initializer = Initializer("checkbox", setting)
@@ -77,12 +89,17 @@ local env = setmetatable({
 			return initializer
 		end,
 		CreateSliderOptions = function(minValue, maxValue, step)
-			return { SetLabelFormatter = function() end, min = minValue, max = maxValue, step = step }
+			local options = { min = minValue, max = maxValue, step = step }
+			function options:SetLabelFormatter(_, formatter)
+				self.formatter = formatter
+			end
+			return options
 		end,
-		CreateSliderInitializer = function(setting, options)
+		CreateSliderInitializer = function(setting, options, tooltip)
 			assert(setting.varType == "number" and options)
 			local initializer = Initializer("slider", setting)
 			initializer.options = options
+			initializer.tooltip = tooltip
 			return initializer
 		end,
 		RegisterInitializer = function(category, initializer)
@@ -132,7 +149,14 @@ ns = {
 			needs = { title = "QuestieDB", check = function() end },
 		},
 		{ key = "guildRepair", category = "Merchants", name = "Guild repair", parent = "repair" },
-		{ key = "gearMark", category = "Bags", name = "Mark", tooltip = "Marks.", options = { { "strip", "Strip" } } },
+		{
+			key = "gearMark",
+			category = "Bags",
+			name = "Mark",
+			tooltip = "Marks.",
+			default = "border",
+			options = { { "strip", "Strip" }, { "border", "Border" }, { "dots", "Dots" } },
+		},
 		{
 			key = "iconSize",
 			category = "Interface",
@@ -282,5 +306,52 @@ gamepad = true
 panelScripts.OnShow()
 assert(refreshes == 1, "with the gamepad UI on, opening the settings skips the conflict check")
 gamepad = false
+
+-- With the gamepad interface on, a choice is a number proxy setting on a slider: opening a dropdown would run our
+-- options and value code before the menu takes focus, and the binding set it removes in that same tainted call
+-- blocks the action bar's protected one (#168). Without it, the choice stays the dropdown it was.
+do
+	local function Choice(entries)
+		for _, entry in ipairs(entries) do
+			local setting = entry.initializer.setting
+			if setting and setting.variable == "TweaksForever_gearMark" then
+				return entry.initializer
+			end
+		end
+	end
+	local desktop = Choice(registered)
+	assert(desktop and desktop.kind == "dropdown", "without the gamepad UI a choice stays a dropdown")
+	local before = registered
+	registered = {}
+	gamepad = true
+	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
+	gamepad = false
+	local choice = Choice(registered)
+	assert(choice and choice.kind == "slider", "with the gamepad UI on a choice is a slider")
+	local setting = choice.setting
+	assert(setting.proxy and setting.varType == "number", "the choice is a number proxy setting")
+	assert(setting.variable == "TweaksForever_gearMark" and setting.name == "Mark", "it keeps its variable and name")
+	assert(setting.defaultValue == 2, "the default's index, not the string")
+	assert(
+		choice.options.min == 1 and choice.options.max == 3 and choice.options.step == 1,
+		"one step per option, from 1 to the last"
+	)
+	assert(
+		choice.options.formatter(1) == "Strip" and choice.options.formatter(2) == "Border",
+		"the labels are the options"
+	)
+	assert(
+		choice.options.formatter(2.4) == "Border" and choice.options.formatter(3) == "Dots",
+		"the value rounds to an index"
+	)
+	ns.db.gearMark = "dots"
+	assert(setting.getValue() == 3, "the saved string maps to its index")
+	ns.db.gearMark = "not an option"
+	assert(setting.getValue() == 2, "an unknown saved value maps to the default's index")
+	setting.setValue(2.4)
+	assert(ns.db.gearMark == "border", "the setter writes the option's string")
+	ns.db.gearMark = nil
+	registered = before
+end
 
 print("settings: ok")

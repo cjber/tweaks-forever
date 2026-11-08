@@ -16,6 +16,12 @@ local L = ns.L
 -- row's tooltip and then, in the same call, a dropdown or slider row pushes its footer bindings, so a tooltip function
 -- of ours there taints the binding stack the gamepad action bar reads before a protected call (#168). Only a feature
 -- with a conflict or a needed addon keeps a function, read as it shows; tests/sim/gamepad_settings_scenario.lua.
+--
+-- A on a dropdown row runs the menu generator, and so our options function and the setting's value, before the menu
+-- opens; the menu then takes the gamepad focus and SmartNavigation's binding set comes off the input stack in that
+-- same tainted call, so the action bar's next protected call is blocked and blamed on us (#168). With the gamepad
+-- interface on, a feature with options is a slider instead, which never opens a menu; the mouse and keyboard keep the
+-- dropdown.
 ---@param feature TFFeature
 ---@return string|fun(): string?|nil
 local function Tooltip(feature)
@@ -52,17 +58,57 @@ end
 ---@param feature TFFeature
 local function AddSetting(category, feature)
 	local options, slider = feature.options, feature.slider
-	local setting = Settings.RegisterAddOnSetting(
-		category,
-		ns.SettingVariable(feature.key),
-		feature.key,
-		ns.db,
-		options and Settings.VarType.String or slider and Settings.VarType.Number or Settings.VarType.Boolean,
-		L[feature.name],
-		feature.default
-	)
+	local gamepadOptions = options and InputUtil.IsGamepadUIEnabled()
+	-- ns.db keeps the option's string; only the row and its setting speak in indexes, so every reader and
+	-- OnSettingChanged callback sees what it did before.
+	local function IndexOf(value)
+		for index, option in ipairs(options or {}) do
+			if option[1] == value then
+				return index
+			end
+		end
+	end
+	local function Option(value)
+		assert(options, "a choice feature needs options")
+		local index = math.max(1, math.min(#options, math.floor((value or 1) + 0.5)))
+		return options[index]
+	end
+	local defaultIndex = IndexOf(feature.default) or 1
+	local setting
+	if gamepadOptions then
+		setting = Settings.RegisterProxySetting(
+			category,
+			ns.SettingVariable(feature.key),
+			Settings.VarType.Number,
+			L[feature.name],
+			defaultIndex,
+			function()
+				return IndexOf(ns.db[feature.key]) or defaultIndex
+			end,
+			function(value)
+				ns.db[feature.key] = Option(value)[1]
+			end
+		)
+	else
+		setting = Settings.RegisterAddOnSetting(
+			category,
+			ns.SettingVariable(feature.key),
+			feature.key,
+			ns.db,
+			options and Settings.VarType.String or slider and Settings.VarType.Number or Settings.VarType.Boolean,
+			L[feature.name],
+			feature.default
+		)
+	end
 	local initializer
-	if options then
+	if gamepadOptions then
+		-- The D-pad steps the same list the dropdown's arrows did, with the option's label on the right.
+		local sliderOptions = Settings.CreateSliderOptions(1, #options, 1)
+		sliderOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
+			return L[Option(value)[2]]
+		end)
+		initializer = Settings.CreateSliderInitializer(setting, sliderOptions, Tooltip(feature))
+	elseif options then
 		initializer = Settings.CreateDropdownInitializer(setting, function()
 			local container = Settings.CreateControlTextContainer()
 			for _, option in ipairs(options) do

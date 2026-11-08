@@ -7,9 +7,20 @@
 --
 -- A cursor move is one call: SmartNavigation:Navigate scrolls the list (HandleScroll), which builds the rows that
 -- scroll into view, then selects the next row, running its enter script (FocusEnter, the row's tooltip) and then its
--- OnSmartNavSelect. This walks every Tweaks page that way, opens and closes the Tooltip style and gear mark dropdowns,
--- backs out with B and changes target, failing on any binding-stack write made under our taint.
-local DROPDOWNS = { ["Tooltip style"] = true, ["Mark grouped gear with"] = true }
+-- OnSmartNavSelect. This walks every Tweaks page that way, steps each choice row with its slider footer's D-pad
+-- bindings, backs out with B and changes target, failing on any binding-stack write made under our taint.
+--
+-- A on a dropdown row opens a menu, which the client does by running the footer binding's MouseDown/MouseUp; that
+-- runs our settings code and then takes the gamepad focus in one call. The sim's generated MouseDown is a stub that
+-- does not run the client's C intrinsic, and its Blizzard source opens a menu without hiding SmartNavigation (the
+-- client's C click does), so the menu path cannot reproduce the binding-stack write here. A dropdown row is therefore
+-- a failure of this scenario on its own: under the gamepad interface every choice row must be a slider, not a
+-- dropdown.
+local CHOICES = {
+	["Tooltip style"] = { key = "tooltipStyle", values = { "modern", "retail", "forever" } },
+	["Mark grouped gear with"] = { key = "gearMark", values = { "strip", "border", "dots", "none" } },
+	["Invite keyword"] = { key = "whisperInviteKeyword", values = { "inv", "invite", "group" } },
+}
 
 scenario("gamepad through the Tweaks settings leaves the binding stack to the game", function(sim)
 	local G = sim.G
@@ -46,8 +57,10 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 		return false
 	end
 	G.SpellStopTargeting = G.SpellStopTargeting or function() end
-	sim:login()
+	-- The gamepad interface is on before the addon loads, as after a reload with it enabled: the settings register
+	-- each choice as a slider instead of a dropdown. Invite from whispers starts on so its keyword row is live.
 	sim:setGamepad(true)
+	sim:login({ savedVariables = { TweaksForeverDB = { whisperInvite = true } } })
 	assert(G.InputUtil.IsGamepadUIEnabled(), "the gamepad interface is on")
 
 	-- Every write to the binding stack, and the taint it ran under.
@@ -85,7 +98,29 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 		return row.Tooltip and row.Tooltip.smartNavigationProxyTarget or row
 	end
 
-	local opened = {}
+	-- The function a gamepad footer binds to key, as AddFunctionBinding stores it.
+	local function FooterBinding(footer, key)
+		for _, binding in pairs(footer.bindings.functions) do
+			if binding.keys[1] == key then
+				return binding
+			end
+		end
+	end
+
+	-- One D-pad press on a slider row: the footer's function binding steps the slider, as the client does.
+	local function StepRight()
+		local button = FooterBinding(G.SettingsSliderControlMixin.bindingGroup, G.GAMEPAD_DPAD_RIGHT)
+		assert(button, "the slider footer binds D-pad right")
+		sim:input(function()
+			button.func(true)
+		end)
+		sim:input(function()
+			button.func(false)
+		end)
+		sim:advance(0.05)
+	end
+
+	local stepped = {}
 	for _, sub in ipairs(category:GetSubcategories()) do
 		local page = sub:GetName()
 		-- Every settings page; Forever addons is a canvas of our own frame, not a list of rows.
@@ -108,23 +143,26 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 				sim:advance(0.05)
 				assert(row, page .. ": row " .. index .. " has a frame")
 				local label = row.Text and row.Text:GetText()
-				if DROPDOWNS[label] then
-					-- A on the row opens its menu (the footer's binding); B closes it.
-					sim:input(function()
-						row.Control.Dropdown:OpenMenu()
-					end)
-					sim:advance(0.05)
-					assert(row.Control.Dropdown:IsMenuOpen(), label .. " opens")
-					opened[#opened + 1] = label
-					sim:input(function()
-						row.Control.Dropdown:CloseMenu()
-					end)
-					sim:advance(0.05)
+				local choice = CHOICES[label]
+				assert(
+					not (row.Control and row.Control.Dropdown),
+					page .. ": " .. tostring(label) .. " is still a dropdown under the gamepad UI"
+				)
+				if choice then
+					local before = G.TweaksForeverDB[choice.key]
+					StepRight()
+					local after = G.TweaksForeverDB[choice.key]
+					local nextValue = choice.values[2]
+					assert(
+						after == nextValue,
+						label .. ": D-pad right moved " .. tostring(before) .. " to " .. tostring(after)
+					)
+					stepped[#stepped + 1] = label
 				end
 			end
 		end
 	end
-	assert(#opened == 2, "both dropdowns opened: " .. table.concat(opened, ", "))
+	assert(#stepped == 3, "all three choices stepped: " .. table.concat(stepped, ", "))
 
 	-- B out of the rows, then out of the panel.
 	sim:input(function()
