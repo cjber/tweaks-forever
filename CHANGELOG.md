@@ -11,7 +11,10 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
-- **The Forever addons settings page no longer writes the client's bare `Text` name.** Its check box came from a Blizzard template under an unnamed page, so the label landed on a global another addon or the game could read as its own. The page is named now (cjber/forever-core#208).
+
+## [2.3.3] - 2026-11-08
+
+- **The Forever addons settings page no longer leaves a stray name behind for other addons to trip over.** Its check box came from a Blizzard template under an unnamed page, so the label landed on a global another addon or the game could read as its own. The page is named now (cjber/forever-core#208).
 - **The coordinates bar steps aside for the game's own world map coordinates.** With either Player or Cursor coordinates on in the game's own settings, the bar hides so the map shows one set, and it returns when both are off. (cjber/tweaks-forever#371)
 
 ## [2.3.2] - 2026-11-07

@@ -320,4 +320,4 @@ L["Teach with Beast Training"] = "用野兽训练教学" -- mt
 L["The ranks you already know are hidden by the filter."] = "你已学会的等级被过滤器隐藏了。" -- mt
 L["Known ranks in Beast Training"] = "野兽训练中的已知等级" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "在野兽训练中，将你的宠物已经学会或已被更高等级替换的等级标记为已知，使它们不再看起来像尚未学习的等级。" -- mt
-L["Beast Training marks the ranks your pet already knows."] = "训练野兽会标出你的宠物已经学会的等级。" -- mt
+L["The coordinates bar steps aside for the game's own world map coordinates."] = "坐标栏会让位给游戏自带的世界地图坐标。" -- mt
