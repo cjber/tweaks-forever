@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.4.1] - 2026-11-08
+
 - **Choice settings become sliders with the gamepad interface on.** Tooltip style, Mark grouped gear with and Invite keyword are stepped with the D-pad instead of opening a menu, so opening one no longer blocks targeting with "Interface action failed because of an AddOn" (cjber/tweaks-forever#168).
 
 ## [2.4.0] - 2026-11-08
