@@ -31,6 +31,11 @@ ns.Feature({
 		{ addon = "Coordinates" },
 		{ polestar = "maps.coords" },
 		{ openmap = "coords" },
+		-- The game's own Map coordinates setting draws the same two lines (#371).
+		{
+			cvar = { "worldMapShowPlayerCoords", "worldMapShowCursorCoords" },
+			title = L["The game itself"],
+		},
 	},
 })
 

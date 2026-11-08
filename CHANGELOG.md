@@ -11,6 +11,8 @@ verbatim rather than rewritten as the addon moves. API changes other addons' aut
 optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
+- **The Forever addons settings page no longer writes the client's bare `Text` name.** Its check box came from a Blizzard template under an unnamed page, so the label landed on a global another addon or the game could read as its own. The page is named now (cjber/forever-core#208).
+- **The coordinates bar steps aside for the game's own world map coordinates.** With either Player or Cursor coordinates on in the game's own settings, the bar hides so the map shows one set, and it returns when both are off. (cjber/tweaks-forever#371)
 
 ## [2.3.2] - 2026-11-07
 - **Beast Training marks the ranks your pet already knows.** A rank your pet knows, or one it has replaced with a higher rank, is dimmed and says it is already known instead of showing a training point cost, so Growl Rank 1 no longer looks learnable above the rank your pet has. It is on by default under Interface, and the other trainers are untouched.

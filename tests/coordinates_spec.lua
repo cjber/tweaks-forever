@@ -1,29 +1,18 @@
 -- World map coordinates (Map/Coordinates.lua): the player's and the cursor's map position along the bottom of the
--- world map, from engine reads only, on our own frame.
-local features, db, initializers, settingCallbacks, hooks = {}, {}, {}, {}, {}
+-- world map, from engine reads only, on our own frame, and the bar stepping aside for the game's own coordinates
+-- (#371). Core's own conflict mechanism and event frame are loaded so the CVars reach the bar as they change.
+local frames, callbacks, errors, cvars = {}, {}, {}, {}
 local ns = {
 	L = setmetatable({}, {
 		__index = function(_, key)
 			return key
 		end,
 	}),
-	Feature = function(feature)
-		features[feature.key] = feature
-	end,
-	Init = function(fn)
-		initializers[#initializers + 1] = fn
-	end,
-	Active = function(key)
-		return db[key]
-	end,
-	OnSettingChanged = function(key, fn)
-		settingCallbacks[key] = fn
-	end,
 }
 
 local function Region()
 	local region = { shown = true }
-	for _, method in ipairs({ "SetPoint", "SetSize", "SetFrameLevel", "SetParent" }) do
+	for _, method in ipairs({ "SetPoint", "SetSize", "SetFrameLevel", "SetParent", "RegisterEvent", "UnregisterEvent" }) do
 		region[method] = function() end
 	end
 	function region:SetText(text)
@@ -63,8 +52,22 @@ local canvas = {
 		return 1
 	end,
 }
-local bar
 local env = setmetatable({
+	C_AddOns = {
+		IsAddOnLoaded = function()
+			return false
+		end,
+	},
+	C_CVar = {
+		GetCVarBool = function(name)
+			return cvars[name] == true
+		end,
+	},
+	Settings = {
+		SetOnValueChangedCallback = function(variable, fn)
+			callbacks[variable] = fn
+		end,
+	},
 	WorldMapFrame = {
 		ScrollContainer = {
 			Child = canvas,
@@ -80,9 +83,10 @@ local env = setmetatable({
 		end,
 	},
 	CreateFrame = function(_, _, parent)
-		assert(parent == nil, "the bar is made with no parent, then set on the map (Map/MapCanvas.lua)")
-		bar = Region()
-		return bar
+		assert(parent == nil, "frames are made with no parent, then set on the map (Map/MapCanvas.lua)")
+		local frame = Region()
+		frames[#frames + 1] = frame
+		return frame
 	end,
 	GetCursorPosition = function()
 		return cursorX, cursorY
@@ -96,17 +100,41 @@ local env = setmetatable({
 			}
 		end,
 	},
-	hooksecurefunc = function(_, name, fn)
-		hooks[name] = fn
+	hooksecurefunc = function(target, name, fn)
+		local original = target[name]
+		target[name] = function(...)
+			local results = { original(...) }
+			fn(...)
+			return unpack(results)
+		end
+	end,
+	strtrim = function(text)
+		return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+	end,
+	GetTime = function()
+		return 0
+	end,
+	geterrorhandler = function()
+		return function(message)
+			errors[#errors + 1] = message
+		end
 	end,
 }, { __index = _G })
+setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/MapCanvas.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/Coordinates.lua")), env)("TweaksForever", ns)
-local feature = features.mapCoords
-assert(feature.default == true, "a display, not an automation")
+
+local feature
+for _, declared in ipairs(ns.features) do
+	if declared.key == "mapCoords" then
+		feature = declared
+	end
+end
+assert(feature and feature.default == true, "a display, not an automation")
 local named = {}
 for _, conflict in ipairs(feature.conflicts) do
-	named[conflict.addon or conflict.polestar or conflict.openmap] = conflict
+	named[conflict.polestar or conflict.openmap or conflict.addon or conflict.title] = conflict
 end
 assert(named.Leatrix_Maps and named.Mapster and named.Coordinates and named["maps.coords"], "the coordinate addons")
 assert(named.coords and named.coords.openmap == "coords", "OpenMap's own coordinates bar")
@@ -115,6 +143,9 @@ env.LeaMapsDB = { ShowCoords = "Off" }
 assert(not named.Leatrix_Maps.when(), "Leatrix Maps with its coordinates off")
 env.LeaMapsDB.ShowCoords = "On"
 assert(named.Leatrix_Maps.when())
+local game = named["The game itself"]
+assert(game and game.cvar[1] == "worldMapShowPlayerCoords", "the game's own player coordinates")
+assert(game.cvar[2] == "worldMapShowCursorCoords", "and cursor coordinates")
 
 local Model = ns.Coordinates
 assert(Model.Format(0.452, 0.601) == "45.2, 60.1")
@@ -123,9 +154,12 @@ assert(Model.Format(1.2, 0.5) == nil and Model.Format(nil, nil) == nil, "off the
 local x, y = Model.Cursor(canvas)
 assert(x == 0.5 and y == 0.5, "the cursor's place on the canvas")
 
-db.mapCoords = true
-initializers[1]()
+-- Core's login frame is the second one it makes; the first carries its events.
+frames[2].scripts.OnEvent(frames[2])
+local bar = frames[#frames]
+assert(#errors == 0, "login starts the bar: " .. tostring(errors[1]))
 local text = bar.texts[1]
+assert(bar.shown, "both of the game's coordinate settings off leaves the bar alone")
 bar.scripts.OnShow()
 assert(text.text == "Player: 45.2, 60.1    Cursor: 50.0, 50.0", "filled in as the map opens")
 over = false
@@ -142,10 +176,29 @@ assert(text.text == "Cursor: 50.0, 50.0", "no player position where the map has 
 over = false
 bar.scripts.OnUpdate(bar, 0.2)
 assert(text.text == "", "neither")
-db.mapCoords = false
-settingCallbacks.mapCoords()
+
+cvars.worldMapShowPlayerCoords = true
+frames[1].scripts.OnEvent(frames[1], "CVAR_UPDATE", "worldMapShowPlayerCoords")
+assert(not bar.shown and ns.ConflictOf("mapCoords") == "The game itself", "the game's player coordinates hide the bar")
+cvars.worldMapShowPlayerCoords, cvars.worldMapShowCursorCoords = false, true
+frames[1].scripts.OnEvent(frames[1], "CVAR_UPDATE", "worldMapShowCursorCoords")
+assert(not bar.shown and ns.ConflictOf("mapCoords") == "The game itself", "its cursor coordinates hide the bar too")
+cvars.worldMapShowCursorCoords = false
+frames[1].scripts.OnEvent(frames[1], "CVAR_UPDATE", "worldMapShowCursorCoords")
+assert(bar.shown and not ns.ConflictOf("mapCoords"), "both off, the bar returns")
+cvars.worldMapShowCursorCoords = true
+frames[1].scripts.OnEvent(frames[1], "CVAR_UPDATE", "somethingElse")
+assert(bar.shown, "another CVar leaves the bar as it was")
+frames[1].scripts.OnEvent(frames[1], "CVAR_UPDATE", "worldMapShowCursorCoords")
+assert(not bar.shown, "and the game's cursor setting hides it when it turns on")
+
+ns.db.mapCoords = false
+callbacks.TweaksForever_mapCoords(nil, nil, false)
 assert(not bar.shown, "turned off, the bar hides at once")
-db.mapCoords = true
-hooks.RefreshConflicts()
-assert(bar.shown, "and follows conflicts")
+cvars.worldMapShowCursorCoords = false
+ns.RefreshConflicts()
+assert(not bar.shown, "and stays hidden while its setting is off")
+ns.db.mapCoords = true
+callbacks.TweaksForever_mapCoords(nil, nil, true)
+assert(bar.shown, "turned back on, it shows when no conflict is left")
 print("coordinates: ok")

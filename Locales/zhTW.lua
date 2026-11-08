@@ -224,6 +224,7 @@ L["Target a creature for the nearest quest"] = "選取最近任務所需的生�
 L["The Forever addons are free, with nothing locked behind them. If they help, you can buy me a coffee."] = "Forever 插件全部免費，沒有任何付費才能使用的內容。如果它們對你有幫助，可以請我喝杯咖啡。" -- mt
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "鏡頭可以拉得比遊戲的「鏡頭最遠距離」設定更遠。關閉此功能後會恢復你之前的值。"
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Tweaks Forever更新後首次登入時，聊天視窗中會有一行說明有哪些變化。"
+L["The game itself"] = "遊戲本身" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "遊戲的滑鼠提示跟隨滑鼠游標，而不是固定在遊戲的角落。視窗自行放置的提示（如背包物品的提示）保持在原處。"
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "任務問候列表（只有任務的NPC或公告板）以及任務詳情和獎勵頁面上的任務標題會顯示等級，如[12]。"
 L["The text is selected. Press Ctrl+C (Cmd+C on a Mac) to copy it, then paste it into your bug report."] = "文字已選取。按Ctrl+C（Mac上按Cmd+C）複製，然後貼上到你的錯誤報告中。"

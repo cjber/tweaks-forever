@@ -16,6 +16,7 @@ globals = {
 	"TweaksForeverDB",
 }
 read_globals = {
+	"C_CVar",
 	"C_InputInterfaceStyle",
 	"GameTooltip_AddInstructionLine",
 	"Lerp",

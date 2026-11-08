@@ -17,6 +17,9 @@ local conflicted = {}
 -- [key] = title of the addon a feature needs and can't find, once addons have loaded.
 ---@type table<string, string>
 local missing = {}
+-- [CVar name] = true for each of the game's own settings a feature's conflict watches.
+---@type table<string, boolean>
+local watchedCVars = {}
 local pending, ready = {}, false
 
 ---@param message string
@@ -109,13 +112,19 @@ end
 -- Polestar's own setting, on (ns.PolestarOn) while Polestar is loaded; `addon` can name another of its addons that
 -- must be loaded too. { openmap = option } is one of OpenMap's world map options, on (ns.OpenMapOn) while OpenMap
 -- is loaded. { naowh = switch } is one of Naowh Forever's QoL switches, on (ns.NaowhOn) while its QoL module is
--- loaded.
+-- loaded. { cvar = { names } } is one of the game's own settings, a conflict while any of its CVars is on; `title`
+-- names it (an L[...] phrase, as it is shown to the player).
 ---@param feature TFFeature
 function ns.Feature(feature)
 	assert(not byKey[feature.key], "duplicate feature " .. feature.key)
 	feature.conflicts = feature.conflicts or {}
 	for _, conflict in ipairs(feature.conflicts) do
-		if conflict.polestar then
+		if conflict.cvar then
+			assert(conflict.title, "a cvar conflict needs a title")
+			for _, name in ipairs(conflict.cvar) do
+				watchedCVars[name] = true
+			end
+		elseif conflict.polestar then
 			conflict.addon, conflict.title = conflict.addon or "Polestar", "Polestar"
 		elseif conflict.openmap then
 			-- Its TOC title is colour-coded, so name it plainly.
@@ -191,6 +200,13 @@ local function Applies(conflict)
 		return ns.OpenMapOn(conflict.openmap)
 	elseif conflict.naowh then
 		return ns.NaowhOn(conflict.naowh)
+	elseif conflict.cvar then
+		for _, name in ipairs(conflict.cvar) do
+			if C_CVar.GetCVarBool(name) then
+				return true
+			end
+		end
+		return false
 	end
 	return not conflict.when or conflict.when()
 end
@@ -199,9 +215,9 @@ end
 ---@return string?
 local function FindConflict(feature)
 	for _, conflict in ipairs(feature.conflicts) do
-		local addon = conflict.addon --[[@as string]]
-		if C_AddOns.IsAddOnLoaded(addon) and Applies(conflict) then
-			return conflict.title or C_AddOns.GetAddOnMetadata(addon, "Title") or addon
+		local addon = conflict.addon
+		if (not addon or C_AddOns.IsAddOnLoaded(addon)) and Applies(conflict) then
+			return conflict.title or (addon and C_AddOns.GetAddOnMetadata(addon, "Title")) or addon
 		end
 	end
 end
@@ -279,6 +295,13 @@ function ns.On(event, fn)
 	end
 	table.insert(handlers[event], fn)
 end
+
+-- A feature that yields to one of the game's own settings follows that setting as the player changes it.
+ns.On("CVAR_UPDATE", function(name)
+	if ready and watchedCVars[name] then
+		ns.RefreshConflicts()
+	end
+end)
 
 -- Blizzard's rule for a modified click (ContainerFrameItemButtonMixin:OnClick): with the auto-loot toggle held, a
 -- button other than the left one on a lootable item is an ordinary click.

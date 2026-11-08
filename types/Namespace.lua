@@ -235,7 +235,8 @@ TweaksForeverCharDB = nil
 
 -- `addon` may be left out of a `polestar` conflict: ns.Feature fills in "Polestar". An `openmap` conflict is
 -- one of OpenMap's world map options and a `naowh` conflict one of Naowh Forever's QoL switches; ns.Feature fills
--- in their addon and title.
+-- in their addon and title. A `cvar` conflict is one of the game's own settings, a conflict while any CVar in its
+-- list is on; its `title` names it to the player and is an L[...] phrase.
 ---@class TFConflict
 ---@field addon? string
 ---@field title? string
@@ -243,6 +244,7 @@ TweaksForeverCharDB = nil
 ---@field polestar? string
 ---@field openmap? string
 ---@field naowh? string
+---@field cvar? string[]
 
 ---@class TFFeature
 ---@field key string
