@@ -320,7 +320,7 @@ L["Teach with Beast Training"] = "用野獸訓練教導" -- mt
 L["The ranks you already know are hidden by the filter."] = "你已學會的等級被篩選器隱藏了。" -- mt
 L["Known ranks in Beast Training"] = "野獸訓練中的已知等級" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "在野獸訓練中，將你的寵物已經學會或已被更高等級取代的等級標記為已知，讓它們不再看起來像尚未學習的等級。" -- mt
-L["The coordinates bar steps aside for the game's own world map coordinates."] = "座標列會讓位給遊戲自帶的世界地圖座標。" -- mt
+L["The error report keeps errors from earlier sessions."] = "錯誤報告會保留先前工作階段的錯誤。" -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "偵錯記錄已關閉。"

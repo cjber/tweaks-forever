@@ -320,7 +320,7 @@ L["Teach with Beast Training"] = "Mit Bestientraining lehren" -- mt
 L["The ranks you already know are hidden by the filter."] = "Die Ränge, die Ihr bereits kennt, sind durch den Filter ausgeblendet." -- mt
 L["Known ranks in Beast Training"] = "Bekannte Ränge im Bestientraining" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "Markiert im Bestientraining die Ränge, die Euer Begleiter bereits kennt oder durch einen höheren Rang ersetzt hat, als bekannt, damit sie nicht mehr wie noch zu lernende Ränge aussehen." -- mt
-L["The coordinates bar steps aside for the game's own world map coordinates."] = "Die Koordinatenleiste weicht den eigenen Weltkartenkoordinaten des Spiels." -- mt
+L["The error report keeps errors from earlier sessions."] = "Der Fehlerbericht behält Fehler aus früheren Sitzungen." -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "Das Debug-Protokoll ist aus."
