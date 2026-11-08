@@ -65,14 +65,15 @@ publishes that entry as its notes.
 - A final `select(...)` or multi-return call (`GetDrawLayer`, `GetPoint`, `GetRGB`, … in
   `tools/lint_multivalue.py`) as an argument, table element or return must be parenthesised, or carry a
   trailing `-- multi-value: reason` when expansion is intentional.
-- Never touch Blizzard's Lua state. Forever runs its UI through secure delegates, so an addon hook, write or
+- Never touch Blizzard's Lua state (WFA-38). Forever runs its UI through secure delegates, so an addon hook, write or
   first call there makes Blizzard's own code fail or be blocked, blamed on this addon. React through
   `HookScript`, events, `EventRegistry` or an object's own `RegisterCallback`, `TooltipDataProcessor`
   (`ns.OnTooltip`), or `hooksecurefunc("GlobalFunction", …)`; draw on our own textures and frames; lay Blizzard
   frames out with engine calls (points, sizes, alpha) after Blizzard has. Never `hooksecurefunc(object, …)`, a
   replaced method, a field written on a Blizzard table, or a call into Blizzard's layout or lazy caches.
-  `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a deliberate exception carries a trailing
-  `-- taint-ok: reason`.
+  To restyle a Blizzard element, draw our own frame or texture on top and set theirs to alpha 0.
+  `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a `-- taint-ok: reason` exception
+  holds only as WFA-38 allows.
 - On a map, draw only through `Map/MapCanvas.lua`: frames of our own on the canvas, made with no parent and then
   set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`, `AddOverlayFrame` or a
   `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure code (#168).
@@ -129,9 +130,9 @@ Owner-approved exceptions to `wow-forever-addon`:
 
 ## Standards
 
-- `wow-forever-addon`: https://github.com/cjber/forever-core/tree/af94fd89610c9128bc11ec07354bd9dabafb5dd0/.agents/skills/wow-forever-addon (UI look,
+- `wow-forever-addon`: https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-forever-addon (UI look,
   icon, README and store page, CI and release requirements shared by every WoW: Forever addon)
-- `wow-retail-ui-style`: https://github.com/cjber/forever-core/tree/af94fd89610c9128bc11ec07354bd9dabafb5dd0/.agents/skills/wow-retail-ui-style (native host integration, compact layout rhythm, and asset blacklist)
+- `wow-retail-ui-style`: https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-retail-ui-style (native host integration, compact layout rhythm, and asset blacklist)
 
 
 ## Secure UI regression checks
@@ -141,5 +142,4 @@ Owner-approved exceptions to `wow-forever-addon`:
 `python3 tools/forever_tools/sync.py check` verifies it offline; `sync.py update --source <checkout>` is the only way to refresh it.
 Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame
 so Blizzard finishes its own initialization. This supersedes WFA-5's AddContainer hook guidance.
-A `taint-ok` exception must identify an addon-owned object or a verified safe contract; it cannot
-excuse hooking a native frame. Test event ordering and reuse, not just method existence.
+Test event ordering and reuse, not just method existence.
