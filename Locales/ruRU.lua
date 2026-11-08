@@ -320,7 +320,7 @@ L["Teach with Beast Training"] = "Обучить с помощью «Дресс�
 L["The ranks you already know are hidden by the filter."] = "Ранги, которые вы уже знаете, скрыты фильтром." -- mt
 L["Known ranks in Beast Training"] = "Известные ранги в дрессировке" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "В дрессировке отмечает известными ранги, которые ваш питомец уже знает или заменил более высоким рангом, чтобы они больше не выглядели как ранги, которые ещё нужно изучить." -- mt
-L["The error report keeps errors from earlier sessions."] = "Отчёт об ошибках хранит ошибки из прошлых сессий." -- mt
+L["Choice settings become sliders with the gamepad interface on."] = "С включённым интерфейсом геймпада настройки выбора становятся ползунками." -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "Журнал отладки выключен."
