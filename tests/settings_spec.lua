@@ -46,6 +46,7 @@ local function Category(name)
 end
 local opened
 local canvas
+local vertical
 
 local env = setmetatable({
 	Settings = {
@@ -56,7 +57,7 @@ local env = setmetatable({
 		RegisterVerticalLayoutSubcategory = function(_, name)
 			return Category(name)
 		end,
-		-- The Forever addons page: the shared module's own frame, on a canvas subpage.
+		-- The Forever addons page: the shared module's own frame on a canvas, or its rows under the gamepad UI.
 		RegisterCanvasLayoutSubcategory = function(parent, frame, name)
 			canvas = { parent = parent, frame = frame, name = name }
 			return Category(name)
@@ -191,6 +192,19 @@ ns = {
 		CreatePanel = function(parent, db, current, L)
 			return { kind = "family panel", parent = parent, db = db, current = current, L = L }
 		end,
+		-- The shared page: a canvas with the mouse, the client's own rows under the gamepad UI (#382).
+		Register = function(category, db, current, L)
+			if env.InputUtil.IsGamepadUIEnabled() then
+				vertical = env.Settings.RegisterVerticalLayoutSubcategory(category, "Forever addons")
+				vertical.kind = "vertical"
+				return vertical
+			end
+			return env.Settings.RegisterCanvasLayoutSubcategory(
+				category,
+				ns.Family.CreatePanel(nil, db, current, L),
+				"Forever addons"
+			)
+		end,
 	},
 }
 local reported
@@ -241,7 +255,7 @@ do
 		addOnCategories = addOnCategories + 1
 	end
 	ns.Family = {
-		CreatePanel = function()
+		Register = function()
 			error("broken copy")
 		end,
 	}
@@ -326,6 +340,10 @@ do
 	gamepad = true
 	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 	gamepad = false
+	assert(
+		vertical and vertical.kind == "vertical" and vertical.name == "Forever addons",
+		"with the gamepad UI on the Forever addons page is the client's rows (#382)"
+	)
 	local choice = Choice(registered)
 	assert(choice and choice.kind == "slider", "with the gamepad UI on a choice is a slider")
 	local setting = choice.setting

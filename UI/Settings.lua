@@ -165,15 +165,12 @@ ns.Init(function()
 			end, nil, false)
 		)
 	end
-	-- The Forever addons page is shared by all five addons (UI/ForeverFamily.lua), with the hint setting on it. It
-	-- is our own canvas frame, so nothing of ours goes into the settings search. The copy in use may be another
-	-- addon's newer one, so a failure there is caught and leaves the rest of the settings and /tweaks working.
+	-- The Forever addons page is shared by all five addons (UI/ForeverFamily.lua), with the hint setting on it. With
+	-- the gamepad interface on it is the client's own rows so the Options navigation can enter it (#382); otherwise
+	-- our canvas frame, and nothing of ours goes into the settings search. The copy in use may be another addon's
+	-- newer one, so a failure there is caught and leaves the rest of the settings and /tweaks working.
 	ns.SafeCall("Forever addons page", function()
-		local family = Settings.RegisterCanvasLayoutSubcategory(
-			category,
-			ns.Family.CreatePanel(nil, ns.db, addonName),
-			L["Forever addons"]
-		)
+		local family = ns.Family.Register(category, ns.db, addonName)
 		Settings.RegisterInitializer(
 			category,
 			CreateSettingsButtonInitializer(L["Forever addons"], L["Open"], function()

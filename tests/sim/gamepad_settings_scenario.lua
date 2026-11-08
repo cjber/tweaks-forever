@@ -16,6 +16,9 @@
 -- client's C click does), so the menu path cannot reproduce the binding-stack write here. A dropdown row is therefore
 -- a failure of this scenario on its own: under the gamepad interface every choice row must be a slider, not a
 -- dropdown.
+--
+-- #382: the Options navigation enters only the client's vertical pages, so the Forever addons page is registered as
+-- the client's own rows with the gamepad interface on, and every page the cursor lands on must show its first target.
 local CHOICES = {
 	["Tooltip style"] = { key = "tooltipStyle", values = { "modern", "retail", "forever" } },
 	["Mark grouped gear with"] = { key = "gearMark", values = { "strip", "border", "dots", "none" } },
@@ -123,42 +126,47 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 	local stepped = {}
 	for _, sub in ipairs(category:GetSubcategories()) do
 		local page = sub:GetName()
-		-- Every settings page; Forever addons is a canvas of our own frame, not a list of rows.
-		if G.SettingsPanel:GetLayout(sub):IsVerticalLayout() then
+		-- Every Tweaks page, the shared Forever addons one included, is the client's own rows with the gamepad UI on:
+		-- the cursor cannot enter a canvas page (#382).
+		assert(
+			G.SettingsPanel:GetLayout(sub):IsVerticalLayout(),
+			page .. " is a canvas page, which the gamepad cursor cannot enter (#382)"
+		)
+		sim:input(function()
+			G.SettingsPanel:SelectCategory(sub)
+		end)
+		sim:advance(0.1)
+		local first = G.SettingsPanel:GetFirstSmartNavFocusableSettingFrame()
+		assert(first and first:IsVisible(), page .. ": the cursor's first target is hidden (#382)")
+		local box = G.SettingsPanel:GetSettingsList().ScrollBox
+		local count = box:GetDataProvider():GetSize()
+		assert(count > 0, page .. " has rows")
+		for index = 1, count do
+			local row
+			-- One D-pad press: scroll the next row into view, then select it.
 			sim:input(function()
-				G.SettingsPanel:SelectCategory(sub)
+				box:ScrollToElementDataIndex(index, nil, nil, true)
+				row = box:FindFrame(box:GetDataProvider():Find(index))
+				G.SmartNavigation:SelectButton(target(row))
 			end)
-			sim:advance(0.1)
-			local box = G.SettingsPanel:GetSettingsList().ScrollBox
-			local count = box:GetDataProvider():GetSize()
-			assert(count > 0, page .. " has rows")
-			for index = 1, count do
-				local row
-				-- One D-pad press: scroll the next row into view, then select it.
-				sim:input(function()
-					box:ScrollToElementDataIndex(index, nil, nil, true)
-					row = box:FindFrame(box:GetDataProvider():Find(index))
-					G.SmartNavigation:SelectButton(target(row))
-				end)
-				sim:advance(0.05)
-				assert(row, page .. ": row " .. index .. " has a frame")
-				local label = row.Text and row.Text:GetText()
-				local choice = CHOICES[label]
+			sim:advance(0.05)
+			assert(row, page .. ": row " .. index .. " has a frame")
+			local label = row.Text and row.Text:GetText()
+			local choice = CHOICES[label]
+			assert(
+				not (row.Control and row.Control.Dropdown),
+				page .. ": " .. tostring(label) .. " is still a dropdown under the gamepad UI"
+			)
+			if choice then
+				local before = G.TweaksForeverDB[choice.key]
+				StepRight()
+				local after = G.TweaksForeverDB[choice.key]
+				local nextValue = choice.values[2]
 				assert(
-					not (row.Control and row.Control.Dropdown),
-					page .. ": " .. tostring(label) .. " is still a dropdown under the gamepad UI"
+					after == nextValue,
+					label .. ": D-pad right moved " .. tostring(before) .. " to " .. tostring(after)
 				)
-				if choice then
-					local before = G.TweaksForeverDB[choice.key]
-					StepRight()
-					local after = G.TweaksForeverDB[choice.key]
-					local nextValue = choice.values[2]
-					assert(
-						after == nextValue,
-						label .. ": D-pad right moved " .. tostring(before) .. " to " .. tostring(after)
-					)
-					stepped[#stepped + 1] = label
-				end
+				stepped[#stepped + 1] = label
 			end
 		end
 	end
