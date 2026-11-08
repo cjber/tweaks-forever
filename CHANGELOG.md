@@ -12,7 +12,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- With the gamepad interface on, the Forever addons settings page can be entered from the Options list. (#382)
+## [2.4.2] - 2026-11-08
+
+- **The Forever addons settings page works with a gamepad.** With the gamepad interface on, the page can be entered from the Options list, where the cursor used to stop at its entry (cjber/tweaks-forever#382).
 
 ## [2.4.1] - 2026-11-08
 
