@@ -320,7 +320,7 @@ L["Teach with Beast Training"] = "Ensinar com Treinamento de Feras" -- mt
 L["The ranks you already know are hidden by the filter."] = "As patentes que você já conhece estão ocultas pelo filtro." -- mt
 L["Known ranks in Beast Training"] = "Graus conhecidos em Treinamento de Feras" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "No Treinamento de Feras, marca como conhecidos os graus que sua mascote já aprendeu ou que foram substituídos por um grau superior, para que não pareçam mais graus a aprender." -- mt
-L["Choice settings become sliders with the gamepad interface on."] = "As configurações de escolha viram controles deslizantes com a interface de controle ativada." -- mt
+L["The Forever addons settings page works with a gamepad."] = "A página de configurações dos addons Forever funciona com um controle." -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "O registro de depuração está desativado."
