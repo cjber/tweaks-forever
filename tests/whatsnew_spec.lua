@@ -3,6 +3,35 @@
 -- Core/SafeCall.lua installs its error handler and event frame once per addon; this stand-in client already counts
 -- this copy as installed, so the journal builds no frame and the frames here keep their order.
 ForeverErrorJournal = { installed = { TweaksForever = true } }
+
+-- Each login runs the shared files in its own environment. The chunk is parsed once: executing it again still builds
+-- every local and table fresh, and parsing the same file seven times only measured the parser.
+local chunks = {}
+local function Chunk(path)
+	local chunk = chunks[path]
+	if not chunk then
+		chunk = assert(loadfile(path))
+		chunks[path] = chunk
+	end
+	return chunk
+end
+
+-- UI/WhatsNew.lua is read and parsed once per form: the packager's keyword is substituted in the packaged copy only.
+local sources = {}
+local function Source(packaged, version)
+	local key = packaged and "packaged" or "source"
+	local chunk = sources[key]
+	if not chunk then
+		local source = assert(io.open("UI/WhatsNew.lua")):read("*a")
+		if packaged then
+			source = source:gsub("@project%-version@", version)
+		end
+		chunk = assert(loadstring(source))
+		sources[key] = chunk
+	end
+	return chunk
+end
+
 local function Login(saved, version, on, packaged)
 	local printed, frames = {}, {}
 	local env = setmetatable({
@@ -29,15 +58,11 @@ local function Login(saved, version, on, packaged)
 		end,
 	}, { __index = _G })
 	local ns = {}
-	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
-	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
-	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
-	local source = assert(io.open("UI/WhatsNew.lua")):read("*a")
-	if packaged then
-		source = source:gsub("@project%-version@", version)
-	end
-	setfenv(assert(loadstring(source)), env)("TweaksForever", ns)
+	Chunk("Locales/enUS.lua")("TweaksForever", ns)
+	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
+	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
+	setfenv(Source(packaged, version), env)("TweaksForever", ns)
 	if on == false then
 		env.TweaksForeverDB = env.TweaksForeverDB or {}
 		env.TweaksForeverDB.whatsNew = false

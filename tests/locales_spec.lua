@@ -13,15 +13,27 @@ end
 assert(#files > 0, "the TOC loads no translation")
 
 -- Loads Locales/<file>.lua into a fresh ns (English first) with the client reporting `client`, and returns ns.
+-- Each chunk is parsed once: executing it again still fills a fresh ns, and the same 43 KB translation parsed three
+-- times only measured the parser.
+local chunks = {}
+local function Chunk(file)
+	local chunk = chunks[file]
+	if not chunk then
+		chunk = assert(loadfile("Locales/" .. file .. ".lua"))
+		chunks[file] = chunk
+	end
+	return chunk
+end
+
 local function Load(file, client)
 	local ns = {}
-	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
+	Chunk("enUS")("TweaksForever", ns)
 	local env = setmetatable({
 		GetLocale = function()
 			return client
 		end,
 	}, { __index = _G })
-	setfenv(assert(loadfile("Locales/" .. file .. ".lua")), env)("TweaksForever", ns)
+	setfenv(Chunk(file), env)("TweaksForever", ns)
 	return ns
 end
 

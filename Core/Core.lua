@@ -383,10 +383,16 @@ login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
 	-- The shared error journal (Core/SafeCall.lua) lives in the saved table, so the report lists earlier sessions'
-	-- errors after a /reload. A record, not a feature: no settings row or conflict reads it.
-	db.errors = db.errors or {}
-	-- The shared log (Core/Log.lua) rides beside it, so the lines that led to a bug survive a /reload.
-	db.log = db.log or { lines = {}, pinned = false }
+	-- errors after a /reload. A record, not a feature: no settings row or conflict reads it. A value a hand edit left
+	-- unreadable is replaced, or the journal would stay in memory and be lost on the next reload.
+	if type(db.errors) ~= "table" then
+		db.errors = {}
+	end
+	-- The shared log (Core/Log.lua) rides beside it, so the lines that led to a bug survive a /reload. It repairs a
+	-- table without a ring itself; a value that is not a table has to be replaced here.
+	if type(db.log) ~= "table" then
+		db.log = { lines = {}, pinned = false }
+	end
 	for _, feature in ipairs(ns.features) do
 		if db[feature.key] == nil then
 			db[feature.key] = feature.default

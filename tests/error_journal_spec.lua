@@ -2,6 +2,18 @@
 -- The shared error journal (Core/SafeCall.lua) and debug log (Core/Log.lua) live in TweaksForeverDB, attached at
 -- PLAYER_LOGIN once the saved variables and their defaults are in, so the report lists earlier sessions' errors and
 -- the lines that led to them after a /reload.
+-- Each login runs the shared files in its own environment. The chunk is parsed once: executing it again still builds
+-- every local and table fresh, and parsing the same file for each login only measured the parser.
+local chunks = {}
+local function Chunk(path)
+	local chunk = chunks[path]
+	if not chunk then
+		chunk = assert(loadfile(path))
+		chunks[path] = chunk
+	end
+	return chunk
+end
+
 local function Login(saved)
 	local frames = {}
 	local env = setmetatable({
@@ -35,10 +47,10 @@ local function Login(saved)
 		end,
 	}, { __index = _G })
 	local ns = {}
-	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
-	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
-	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
+	Chunk("Locales/enUS.lua")("TweaksForever", ns)
+	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
+	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	-- The last frame Core.lua makes is its PLAYER_LOGIN one.
 	frames[#frames].callback()
 	return ns, env
@@ -115,5 +127,23 @@ for _, line in ipairs(reloaded.LogLines(10)) do
 	end
 end
 assert(kept, "an earlier session's log line is missing after the reload")
+
+-- A saved value a hand edit left unreadable is replaced at login, not kept: keeping it would leave the journal and
+-- the log in memory, and the next reload would drop them.
+local corrupt, corruptEnv = Login({ errors = "junk", log = 5 })
+local repairedDB = assert(corruptEnv.TweaksForeverDB)
+assert(type(repairedDB.errors) == "table", "a corrupt journal was kept instead of replaced")
+assert(type(repairedDB.log) == "table", "a corrupt log was kept instead of replaced")
+assert(type(repairedDB.log.lines) == "table", "a replaced log has no ring")
+assert(corrupt.SafeCall("corrupt journal", function()
+	error("corrupt journal failure")
+end) == false, "the failure was not caught")
+local repaired
+for _, candidate in ipairs(repairedDB.errors) do
+	if candidate.message:find("corrupt journal failure", 1, true) then
+		repaired = candidate
+	end
+end
+assert(repaired, "the replaced journal is not the one this session records into")
 
 print("error_journal_spec: ok")
