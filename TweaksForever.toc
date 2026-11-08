@@ -34,6 +34,7 @@ Data\ForeverQuests.lua
 Data\DungeonMapArt.lua
 Core\Secret.lua
 Core\SafeCall.lua
+Core\Log.lua
 Core\Core.lua
 UI\Art.lua
 UI\ForeverFamily.lua

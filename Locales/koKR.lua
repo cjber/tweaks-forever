@@ -321,3 +321,15 @@ L["The ranks you already know are hidden by the filter."] = "이미 알고 있�
 L["Known ranks in Beast Training"] = "야수 훈련의 알려진 등급" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "야수 훈련에서 펫이 이미 배운 등급이나 더 높은 등급으로 대체한 등급을 알려진 것으로 표시하여, 아직 배워야 할 등급처럼 보이지 않게 합니다." -- mt
 L["The coordinates bar steps aside for the game's own world map coordinates."] = "좌표 표시줄이 게임 자체의 세계 지도 좌표에 자리를 내줍니다." -- mt
+
+-- Shared debug log (Forever Core's Core/Log.lua).
+L["Debug log is off."] = "디버그 기록이 꺼져 있습니다."
+L["Debug log is on for this session."] = "이 세션 동안 디버그 기록이 켜져 있습니다."
+L["Debug log is on and pinned for this character."] = "이 캐릭터에 대해 디버그 기록이 켜져 있고 고정되어 있습니다."
+L["Debug log is already on and pinned for this character."] = "이 캐릭터에 대해 디버그 기록이 이미 켜져 있고 고정되어 있습니다."
+L["Debug log is off for this session; it is still pinned."] = "이 세션 동안 디버그 기록이 꺼져 있지만 여전히 고정되어 있습니다."
+L["Debug log is off and unpinned."] = "디버그 기록이 꺼져 있고 고정이 해제되었습니다."
+L["No addon has attached its log yet."] = "아직 기록을 첨부한 애드온이 없습니다."
+L["%s (last %d):"] = "%s (최근 %d개):"
+L["%s: no lines yet."] = "%s: 아직 줄이 없습니다."
+L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "사용법: /forever debug, /forever debug pin, /forever debug off, /forever debug show"

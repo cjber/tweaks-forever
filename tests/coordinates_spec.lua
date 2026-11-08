@@ -1,6 +1,9 @@
 -- World map coordinates (Map/Coordinates.lua): the player's and the cursor's map position along the bottom of the
 -- world map, from engine reads only, on our own frame, and the bar stepping aside for the game's own coordinates
 -- (#371). Core's own conflict mechanism and event frame are loaded so the CVars reach the bar as they change.
+-- Core/SafeCall.lua installs its error handler and event frame once per addon; this stand-in client already counts
+-- this copy as installed, so the journal builds no frame and the frames here keep their order.
+ForeverErrorJournal = { installed = { TweaksForever = true } }
 local frames, callbacks, errors, cvars = {}, {}, {}, {}
 local ns = {
 	L = setmetatable({}, {
@@ -121,6 +124,7 @@ local env = setmetatable({
 	end,
 }, { __index = _G })
 setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/MapCanvas.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/Coordinates.lua")), env)("TweaksForever", ns)

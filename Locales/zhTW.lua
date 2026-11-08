@@ -321,3 +321,15 @@ L["The ranks you already know are hidden by the filter."] = "你已學會的等�
 L["Known ranks in Beast Training"] = "野獸訓練中的已知等級" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "在野獸訓練中，將你的寵物已經學會或已被更高等級取代的等級標記為已知，讓它們不再看起來像尚未學習的等級。" -- mt
 L["The coordinates bar steps aside for the game's own world map coordinates."] = "座標列會讓位給遊戲自帶的世界地圖座標。" -- mt
+
+-- Shared debug log (Forever Core's Core/Log.lua).
+L["Debug log is off."] = "偵錯記錄已關閉。"
+L["Debug log is on for this session."] = "本次工作階段已開啟偵錯記錄。"
+L["Debug log is on and pinned for this character."] = "此角色的偵錯記錄已開啟並釘選。"
+L["Debug log is already on and pinned for this character."] = "此角色的偵錯記錄已經開啟並釘選。"
+L["Debug log is off for this session; it is still pinned."] = "本次工作階段已關閉偵錯記錄，但仍保持釘選。"
+L["Debug log is off and unpinned."] = "偵錯記錄已關閉並取消釘選。"
+L["No addon has attached its log yet."] = "還沒有插件附加記錄。"
+L["%s (last %d):"] = "%s（最近 %d 筆）："
+L["%s: no lines yet."] = "%s：還沒有記錄行。"
+L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "用法：/forever debug、/forever debug pin、/forever debug off、/forever debug show"

@@ -382,12 +382,21 @@ end)
 login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
+	-- The shared error journal (Core/SafeCall.lua) lives in the saved table, so the report lists earlier sessions'
+	-- errors after a /reload. A record, not a feature: no settings row or conflict reads it.
+	db.errors = db.errors or {}
+	-- The shared log (Core/Log.lua) rides beside it, so the lines that led to a bug survive a /reload.
+	db.log = db.log or { lines = {}, pinned = false }
 	for _, feature in ipairs(ns.features) do
 		if db[feature.key] == nil then
 			db[feature.key] = feature.default
 		end
 	end
 	TweaksForeverDB, ns.db = db, db
+	-- Attached once the saved variables and their defaults are in: what SafeCall recorded before this line arrives
+	-- with it, and a /reload keeps it.
+	ns.AttachErrorJournal(db.errors)
+	ns.AttachLog(db.log)
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	ns.RefreshConflicts()
 	-- Polestar applies its settings at once, so its matching features here follow them at once too.

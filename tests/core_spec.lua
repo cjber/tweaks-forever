@@ -1,4 +1,7 @@
 -- Defaults and the shared namespace must be ready before any feature initializer runs.
+-- Core/SafeCall.lua installs its error handler and event frame once per addon; this stand-in client already counts
+-- this copy as installed, so the journal builds no frame and the frames here keep their order.
+ForeverErrorJournal = { installed = { TweaksForever = true } }
 local function Load(saved)
 	local frames, errors, callbacks = {}, {}, {}
 	local env = setmetatable({
@@ -36,6 +39,7 @@ local function Load(saved)
 	}, { __index = _G })
 	local ns = {}
 	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "enabled", default = true })
 	ns.Feature({ key = "disabled", default = false })
@@ -131,6 +135,7 @@ do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but 
 	}, { __index = _G })
 	local ns = {}
 	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	local listeners = {}
 	env.Polestar.On = function(message, fn)
@@ -205,6 +210,7 @@ do -- An `openmap` conflict reads OpenMap's world map option while OpenMap is lo
 	}, { __index = _G })
 	local ns = {}
 	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.db = { coords = true, reveal = true }
 	ns.Feature({ key = "coords", default = true, conflicts = { { openmap = "coords" } } })
@@ -273,6 +279,7 @@ do -- A `naowh` conflict reads Naowh Forever's QoL switch while its QoL module i
 	}, { __index = _G })
 	local ns = {}
 	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "fastLoot", default = true, conflicts = { { naowh = "fastLoot" } } })
 	ns.Feature({ key = "sell", default = true, conflicts = { { naowh = "sellJunk" } } })
@@ -320,6 +327,7 @@ do -- Loaded at login, Polestar's own setting changes refresh the conflicts at o
 	}, { __index = _G })
 	local ns = {}
 	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	ns.Feature({ key = "fastLoot", default = true, conflicts = { { polestar = "qol.fastLoot" } } })
 	assert(ns.features[1].conflicts[1].addon == "Polestar" and ns.features[1].conflicts[1].title == "Polestar")

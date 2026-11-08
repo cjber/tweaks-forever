@@ -4,6 +4,7 @@ exclude_files = { "tools/.cache/**", ".release/**", ".types/**", "types/**", ".c
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
 	"BINDING_HEADER_TWEAKSFOREVER",
+	"ForeverErrorJournal",
 	"ForeverFamily",
 	"ForeverMapMarkers",
 	"SLASH_TWEAKSFOREVER1",
@@ -139,6 +140,7 @@ read_globals = {
 	"CreateVector2D",
 	"CursorHasItem",
 	"CurveConstants",
+	"date",
 	"debugprofilestop",
 	"debugstack",
 	"EditModeImportLayoutDialog",

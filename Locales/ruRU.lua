@@ -321,3 +321,15 @@ L["The ranks you already know are hidden by the filter."] = "Ранги, кот�
 L["Known ranks in Beast Training"] = "Известные ранги в дрессировке" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "В дрессировке отмечает известными ранги, которые ваш питомец уже знает или заменил более высоким рангом, чтобы они больше не выглядели как ранги, которые ещё нужно изучить." -- mt
 L["The coordinates bar steps aside for the game's own world map coordinates."] = "Полоса координат уступает место координатам карты мира самой игры." -- mt
+
+-- Shared debug log (Forever Core's Core/Log.lua).
+L["Debug log is off."] = "Журнал отладки выключен."
+L["Debug log is on for this session."] = "Журнал отладки включён для этого сеанса."
+L["Debug log is on and pinned for this character."] = "Журнал отладки включён и закреплён для этого персонажа."
+L["Debug log is already on and pinned for this character."] = "Журнал отладки уже включён и закреплён для этого персонажа."
+L["Debug log is off for this session; it is still pinned."] = "Журнал отладки выключен для этого сеанса; закрепление сохранено."
+L["Debug log is off and unpinned."] = "Журнал отладки выключен, закрепление снято."
+L["No addon has attached its log yet."] = "Ни один аддон ещё не подключил свой журнал."
+L["%s (last %d):"] = "%s (последние %d):"
+L["%s: no lines yet."] = "%s: строк пока нет."
+L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "Использование: /forever debug, /forever debug pin, /forever debug off, /forever debug show"

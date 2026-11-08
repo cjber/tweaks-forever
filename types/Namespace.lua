@@ -212,6 +212,8 @@
 ---@class TFDatabase : ForeverFamilyDB
 ---@field companionHints? boolean the old hint setting, read once to carry a player's "off" over to suggestFamily
 ---@field junk TFMarks
+---@field errors ForeverCaughtError[] the shared error journal (Core/SafeCall.lua): earlier sessions' errors, for the report
+---@field log ForeverDebugLogStore the shared log ring (Core/Log.lua): recent lines, for the report
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
 ---@field savedSounds? table<string, string>
 ---@field cameraZoomSaved? string
@@ -219,7 +221,7 @@
 ---@field lootSparklesSaved? table<string, string>
 ---@field lastVersion? string the addon version last logged in with
 ---@field windowLayouts? table<string, table<string, TFPosition>>
----@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>
+---@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>|ForeverCaughtError[]|ForeverDebugLogStore
 
 ---@class TFCharacterDatabase
 ---@field groups TFGroups
@@ -338,6 +340,11 @@ TweaksForeverCharDB = nil
 ---@field SafeCall fun(label: string, fn: function, ...: any): boolean, ... run fn as pcall does, keeping a failure for the report and passing it to the error handler (Core/SafeCall.lua)
 ---@field RecordError fun(label: string, message: any, stack?: string) keep an error caught some other way for the report
 ---@field CaughtErrors fun(): ForeverCaughtError[] this session's caught errors, oldest first, as copies
+---@field AttachErrorJournal fun(store: table) keep the journal in the saved table, so a /reload keeps it
+---@field Log fun(level: string, topic: string, message: any, ...: any) one line in the shared ring (Core/Log.lua)
+---@field LogLines fun(count?: integer): string[] the newest log lines, oldest first, as copies (Core/Log.lua)
+---@field AttachLog fun(store: table) keep the log ring in the saved table, so a /reload keeps it
+---@field DebugCommand fun(argument?: string): boolean `/forever debug`: toggle, pin, off or show (Core/Log.lua)
 ---@field CutText fun(text: string, limit: integer): string `text` cut to `limit` bytes on a character boundary, ending "..."
 ---@field Report ForeverReportModule the report window (UI/Report.lua)
 ---@field ReportLines fun(): string[] Tweaks Forever's own lines in the report (Core/Report.lua)

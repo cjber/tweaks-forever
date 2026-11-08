@@ -1,5 +1,8 @@
 -- Logs in with Core and WhatsNew loaded, the saved table and the addon's version given, and returns what went to
 -- chat and the saved table after.
+-- Core/SafeCall.lua installs its error handler and event frame once per addon; this stand-in client already counts
+-- this copy as installed, so the journal builds no frame and the frames here keep their order.
+ForeverErrorJournal = { installed = { TweaksForever = true } }
 local function Login(saved, version, on, packaged)
 	local printed, frames = {}, {}
 	local env = setmetatable({
@@ -28,6 +31,7 @@ local function Login(saved, version, on, packaged)
 	local ns = {}
 	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
 	local source = assert(io.open("UI/WhatsNew.lua")):read("*a")
 	if packaged then

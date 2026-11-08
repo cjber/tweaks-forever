@@ -321,3 +321,15 @@ L["The ranks you already know are hidden by the filter."] = "Die Ränge, die Ihr
 L["Known ranks in Beast Training"] = "Bekannte Ränge im Bestientraining" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "Markiert im Bestientraining die Ränge, die Euer Begleiter bereits kennt oder durch einen höheren Rang ersetzt hat, als bekannt, damit sie nicht mehr wie noch zu lernende Ränge aussehen." -- mt
 L["The coordinates bar steps aside for the game's own world map coordinates."] = "Die Koordinatenleiste weicht den eigenen Weltkartenkoordinaten des Spiels." -- mt
+
+-- Shared debug log (Forever Core's Core/Log.lua).
+L["Debug log is off."] = "Das Debug-Protokoll ist aus."
+L["Debug log is on for this session."] = "Das Debug-Protokoll ist für diese Sitzung an."
+L["Debug log is on and pinned for this character."] = "Das Debug-Protokoll ist an und für diesen Charakter dauerhaft aktiviert."
+L["Debug log is already on and pinned for this character."] = "Das Debug-Protokoll ist bereits an und für diesen Charakter dauerhaft aktiviert."
+L["Debug log is off for this session; it is still pinned."] = "Das Debug-Protokoll ist für diese Sitzung aus; es bleibt dauerhaft aktiviert."
+L["Debug log is off and unpinned."] = "Das Debug-Protokoll ist aus und nicht mehr dauerhaft aktiviert."
+L["No addon has attached its log yet."] = "Noch kein Addon hat sein Protokoll angehängt."
+L["%s (last %d):"] = "%s (letzte %d):"
+L["%s: no lines yet."] = "%s: noch keine Zeilen."
+L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "Verwendung: /forever debug, /forever debug pin, /forever debug off, /forever debug show"
