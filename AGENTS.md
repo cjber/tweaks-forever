@@ -56,8 +56,7 @@ publishes that entry as its notes.
 - Lua 5.1 in the game's sandbox: no `require`. The client loads the files `TweaksForever.toc` lists, in
   that order, each receiving `local addonName, ns = ...`; a new file goes in the TOC or never runs.
 - The specs are a headless harness with stubbed client APIs. Anything they cannot reach (frames,
-  menus, tooltips, the tracker) is checked in game: list those checks in the PR as `/reload` tests
-  for the user. Never drive the game client.
+  menus, tooltips, the tracker) is checked in game: check them in the headless client (forever-core's `wow-forever-addon/in-game.md`) and list in the PR what was checked; what waits on the player's own session goes in the PR as `/reload` tests for the user.
 - LuaLS 3.19.1 checks every TOC-loaded file against pinned Ketho API/FrameXML annotations.
   `tools/typecheck.sh` fetches them into an ignored types cache and also checks accidental `select()` expansion.
 - New host globals go in `.luacheckrc`; if upstream lacks their types, declare real types in
