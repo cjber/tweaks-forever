@@ -3,6 +3,8 @@ local function Load(options)
 	local features, inits, handlers = {}, {}, {}
 	local hooks = {}
 	local combat = options.combat or false
+	-- The Forever client defaults ActionButtonUseKeyDown to 1.
+	local keyDown = options.keyDown ~= false
 	local mutations = {}
 	local made = { buttons = {}, fonts = {} }
 	local db = { petTrainerHint = options.enabled ~= false }
@@ -51,6 +53,7 @@ local function Load(options)
 			points = {},
 			attributes = {},
 			scripts = {},
+			clicks = {},
 		}
 		function frame:CreateFontString()
 			local text = Frame(self, "FontString")
@@ -98,8 +101,22 @@ local function Load(options)
 		function frame:IsShown()
 			return self.shown
 		end
-		function frame.RegisterForClicks()
+		function frame:RegisterForClicks(...)
 			mutated("RegisterForClicks")
+			for _, kind in ipairs({ ... }) do
+				self.clicks[kind:find("Down", 1, true) and "down" or "up"] = true
+			end
+		end
+		-- SecureTemplates.lua: with no useOnKeyDown, a secure action button follows ActionButtonUseKeyDown, so
+		-- the press acts when it is registered, and nothing acts when only the release is.
+		function frame:Click()
+			local useOnKeyDown = self.attributes.useOnKeyDown
+			if useOnKeyDown == nil then
+				useOnKeyDown = keyDown
+			end
+			if self.clicks[useOnKeyDown and "down" or "up"] then
+				self.cast = self.attributes.spell
+			end
 		end
 		function frame:SetAttribute(key, value)
 			mutated("SetAttribute")
@@ -303,6 +320,10 @@ assert(
 	"it casts Beast Training"
 )
 assert(run.teach().text == "Teach with Beast Training" and run.teach().fitted == 160, "its stock label fits")
+-- A click is a press and a release. ActionButtonUseKeyDown is 1, so the secure button acts on the press:
+-- only a registered down click casts (#407).
+run.teach():Click()
+assert(run.teach().cast == "Beast Training", "a click casts Beast Training, not just the release")
 assert(run.trainer.bottomInset.shown, "the note takes the trainer's own bottom inset")
 assert(run.trainer.ScrollBox.height == 330 - 72, "the list makes room for it")
 assert(run.trainer.Inset.points.BOTTOMRIGHT.y == 26 + 72, "the inset ends above the note")

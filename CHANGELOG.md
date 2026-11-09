@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **The Teach with Beast Training button works when clicked.** At a pet trainer, clicking it now opens Beast Training; before, it looked ready but did nothing (cjber/tweaks-forever#407).
+
 ## [2.4.2] - 2026-11-08
 
 - **The Forever addons settings page works with a gamepad.** With the gamepad interface on, the page can be entered from the Options list, where the cursor used to stop at its entry (cjber/tweaks-forever#382).

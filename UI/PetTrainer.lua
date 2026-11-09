@@ -184,7 +184,10 @@ local function Make()
 	teach:SetPoint("BOTTOMRIGHT", inset, "BOTTOMRIGHT", -10, 8)
 	teach:SetText(L["Teach with Beast Training"])
 	ns.FitButton(teach, 160)
-	teach:RegisterForClicks("AnyUp")
+	-- Forever's ActionButtonUseKeyDown is 1 by default, and a secure button with no useOnKeyDown follows it:
+	-- the action runs on the down event (SecureTemplates.lua, SecureActionButton_ShouldUseOnKeyDown and
+	-- SecureActionButton_OnClick). Register both, or a click never casts.
+	teach:RegisterForClicks("AnyUp", "AnyDown")
 	teach:SetAttribute("type", "spell")
 	teach:Hide()
 end
