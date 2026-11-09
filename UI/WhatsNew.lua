@@ -12,8 +12,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "2.4.2"
-ns.WHATS_NEW = L["The Forever addons settings page works with a gamepad."]
+ns.WHATS_NEW_VERSION = "2.4.3"
+ns.WHATS_NEW = L["The Teach with Beast Training button works when clicked."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

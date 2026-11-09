@@ -320,7 +320,7 @@ L["Teach with Beast Training"] = "Обучить с помощью «Дресс�
 L["The ranks you already know are hidden by the filter."] = "Ранги, которые вы уже знаете, скрыты фильтром." -- mt
 L["Known ranks in Beast Training"] = "Известные ранги в дрессировке" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "В дрессировке отмечает известными ранги, которые ваш питомец уже знает или заменил более высоким рангом, чтобы они больше не выглядели как ранги, которые ещё нужно изучить." -- mt
-L["The Forever addons settings page works with a gamepad."] = "Страница настроек модификаций Forever работает с геймпадом." -- mt
+L["The Teach with Beast Training button works when clicked."] = "Кнопка «Обучить с помощью «Дрессировки»» теперь срабатывает по щелчку." -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "Журнал отладки выключен."

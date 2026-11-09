@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.4.3] - 2026-11-09
+
 - **The Teach with Beast Training button works when clicked.** At a pet trainer, clicking it now opens Beast Training; before, it looked ready but did nothing (cjber/tweaks-forever#407).
 
 ## [2.4.2] - 2026-11-08
