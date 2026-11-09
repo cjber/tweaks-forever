@@ -71,8 +71,6 @@ publishes that entry as its notes.
   frames out with engine calls (points, sizes, alpha) after Blizzard has. Never `hooksecurefunc(object, …)`, a
   replaced method, a field written on a Blizzard table, or a call into Blizzard's layout or lazy caches.
   To restyle a Blizzard element, draw our own frame or texture on top and set theirs to alpha 0.
-  `python3 -m tools.lint_taint` (in `tools/typecheck.sh`) enforces this; a `-- taint-ok: reason` exception
-  holds only as WFA-38 allows.
 - On a map, draw only through `Map/MapCanvas.lua`: frames of our own on the canvas, made with no parent and then
   set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`, `AddOverlayFrame` or a
   `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure code (#168).
@@ -136,7 +134,7 @@ Owner-approved exceptions to `wow-forever-addon`:
 
 ## Secure UI regression checks
 
-`tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage, `tools/lint_taint.py`, `tools/lint_secret.py` (secret values through `ns.Readable`, tooltip hooks behind `ns.Usable`), `tools/check_editorconfig.py` and `tools/check_family.py` (the shared family block between the `forever-family` markers in README.md and docs/curseforge.md).
+`tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage, `tools/lint_secret.py` (secret values through `ns.Readable`, tooltip hooks behind `ns.Usable`), `tools/check_editorconfig.py` and `tools/check_family.py` (the shared family block between the `forever-family` markers in README.md and docs/curseforge.md).
 `tools/forever_tools/` is the shared tooling (cjber/forever-core, https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-forever-addon/tooling), vendored byte for byte: never edit it here.
 `python3 tools/forever_tools/sync.py check` verifies it offline; `sync.py update --source <checkout>` is the only way to refresh it.
 Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame

@@ -20,7 +20,7 @@ repo runs before a pull request.
 ## Never
 
 - Never draw on a map outside `Map/MapCanvas.lua`, hook a Blizzard object method, or write a field on a
-  Blizzard table: `tools/lint_taint.py` refuses it, and so does the game.
+  Blizzard table: the game refuses it.
 - Never edit `Data/` (generated), `Locales/` (translations), `types/` (pinned contracts) or
   `tools/forever_tools/` (vendored byte for byte from forever-core).
 - Never start the game, Battle.net, Lutris or Wine. The headless client (forever-core's `wow-forever-addon/in-game.md`) tests the build linked into the game, not this checkout, so in-game checks belong to the agent that ships a change.
