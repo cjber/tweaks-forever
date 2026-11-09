@@ -14,8 +14,9 @@ local L = ns.L
 
 -- A row that can never carry a note gets its text, not a function. Under the gamepad interface the cursor shows a
 -- row's tooltip and then, in the same call, a dropdown or slider row pushes its footer bindings, so a tooltip function
--- of ours there taints the binding stack the gamepad action bar reads before a protected call (#168). Only a feature
--- with a conflict or a needed addon keeps a function, read as it shows; tests/sim/gamepad_settings_scenario.lua.
+-- of ours there taints the binding stack the gamepad action bar reads before a protected call (#168). With the
+-- gamepad interface on every row gets its text, read here as it registers; otherwise only a feature with a conflict
+-- or a needed addon keeps a function, read as it shows; tests/sim/gamepad_settings_scenario.lua.
 --
 -- A on a dropdown row runs the menu generator, and so our options function and the setting's value, before the menu
 -- opens; the menu then takes the gamepad focus and SmartNavigation's binding set comes off the input stack in that
@@ -26,10 +27,7 @@ local L = ns.L
 ---@return string|fun(): string?|nil
 local function Tooltip(feature)
 	local text = feature.tooltip and L[feature.tooltip]
-	if #(feature.conflicts or {}) == 0 and not feature.needs then
-		return text
-	end
-	return function()
+	local function Note()
 		local conflict, missing = ns.ConflictOf(feature.key), ns.MissingOf(feature.key)
 		if not conflict and not missing then
 			return text
@@ -40,6 +38,10 @@ local function Tooltip(feature)
 		)
 		return text and text .. "\n\n" .. note or note
 	end
+	if InputUtil.IsGamepadUIEnabled() or #(feature.conflicts or {}) == 0 and not feature.needs then
+		return Note()
+	end
+	return Note
 end
 
 -- Indent a row under a feature and grey it out while that feature is off. Not SetParentInitializer: the settings
@@ -48,10 +50,12 @@ end
 ---@param key string
 local function Nest(initializer, key)
 	initializer:Indent()
-	initializer:AddModifyPredicate(function()
-		return ns.Active(key)
-	end)
-	initializer:AddEvaluateStateCVar(ns.SettingVariable(key))
+	if not InputUtil.IsGamepadUIEnabled() then
+		initializer:AddModifyPredicate(function()
+			return ns.Active(key)
+		end)
+		initializer:AddEvaluateStateCVar(ns.SettingVariable(key))
+	end
 end
 
 ---@param category SettingsCategoryMixin
@@ -126,9 +130,11 @@ local function AddSetting(category, feature)
 	else
 		initializer = Settings.CreateCheckboxInitializer(setting, nil, Tooltip(feature))
 	end
-	initializer:AddModifyPredicate(function()
-		return not ns.ConflictOf(feature.key) and not ns.MissingOf(feature.key)
-	end)
+	if not InputUtil.IsGamepadUIEnabled() then
+		initializer:AddModifyPredicate(function()
+			return not ns.ConflictOf(feature.key) and not ns.MissingOf(feature.key)
+		end)
+	end
 	if feature.parent then
 		Nest(initializer, feature.parent)
 	end
