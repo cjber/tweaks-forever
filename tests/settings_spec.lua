@@ -47,6 +47,8 @@ end
 local opened
 local canvas
 local vertical
+-- Calls to the client's own restricted settings opener, and the secure delegates the shared opener built around it.
+local opens, delegates = 0, 0
 
 local env = setmetatable({
 	Settings = {
@@ -107,13 +109,29 @@ local env = setmetatable({
 			registered[#registered + 1] = { category = category, initializer = initializer }
 		end,
 		RegisterAddOnCategory = function() end,
-		OpenToCategory = function(id)
-			opened = id
+		-- The restricted route: the client refuses this call from addon code and blames the addon, so reaching it
+		-- fails the spec (cjber/forever-core#333).
+		OpenToCategory = function()
+			error("the settings opened through Settings.OpenToCategory, which the client refuses from addon code")
 		end,
 	},
-	CreateSettingsButtonInitializer = function(name, _, _, _, addSearchTags)
+	-- The shared opener wraps the client's own function in a secure delegate and calls that (Core/OpenSettings.lua).
+	C_SettingsUtil = {
+		OpenSettingsPanel = function(categoryID)
+			opens = opens + 1
+			opened = categoryID
+		end,
+	},
+	CreateSecureDelegate = function(fn)
+		delegates = delegates + 1
+		return fn
+	end,
+	InCombatLockdown = function()
+		return false
+	end,
+	CreateSettingsButtonInitializer = function(name, _, click, _, addSearchTags)
 		assert(addSearchTags == false, "index buttons stay out of search")
-		return { kind = "button", name = name }
+		return { kind = "button", name = name, click = click }
 	end,
 	SettingsPanel = {
 		HookScript = function(_, script, fn)
@@ -227,6 +245,9 @@ ns.Report = {
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 -- A packaged German client: features declare English, and the settings show the translation where there is one.
 ns.L["Bags"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
+-- The shared opener is loaded first, as the TOC does: the settings page asks it, not Settings.OpenToCategory.
+setfenv(assert(loadfile("Core/OpenSettings.lua")), env)("TweaksForever", ns)
+assert(ns.OpenSettingsPanel, "the shared settings opener is loaded")
 setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 
 -- Rows per page, in order: each subpage's settings, then the index's button to it.
@@ -246,6 +267,25 @@ assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Twe
 assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
 assert(canvas.frame.L == nil, "ns.Family is already bound to Tweaks' L (ForeverFamily.For)")
 assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
+
+-- The index's Open buttons, the Forever addons one included, open their page through the client's own function,
+-- carried by one secure delegate. Settings.OpenToCategory is Blizzard's Lua around the restricted call, which the
+-- client refuses from addon code (cjber/forever-core#333).
+do
+	local buttons = 0
+	for _, entry in ipairs(registered) do
+		local initializer = entry.initializer
+		if initializer.kind == "button" then
+			buttons = buttons + 1
+			local before = opens
+			initializer.click()
+			assert(opens == before + 1, initializer.name .. ": opened through the client's own opener")
+			assert(opened == initializer.name, initializer.name .. ": on its own page")
+		end
+	end
+	assert(buttons == 4, "the index has a button per subpage and the Forever addons page")
+	assert(delegates == 1, "every page opens through one secure delegate")
+end
 
 -- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
 do

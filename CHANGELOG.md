@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Opening Tweaks Forever's options no longer shows a blocked action error naming this addon.** The Open buttons on the settings index, `/tweaks` and the addon compartment entry now ask the game to open its options instead of opening them themselves, so the client does not refuse the request and blame Tweaks Forever (cjber/forever-core#333).
+
 ## [2.4.3] - 2026-11-09
 
 - **The Teach with Beast Training button works when clicked.** At a pet trainer, clicking it now opens Beast Training; before, it looked ready but did nothing (cjber/tweaks-forever#407).

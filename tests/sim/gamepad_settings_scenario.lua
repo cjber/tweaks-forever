@@ -90,8 +90,12 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 		end
 	end
 	assert(category, "Tweaks Forever is under Options > AddOns")
+	-- The page opens through the addon's own opener, which asks the client's restricted function through its secure
+	-- delegate (cjber/forever-core#333), so this path is walked too.
+	local ns = sim.loader.addons[ADDON].ns
+	assert(ns and ns.OpenSettingsPanel, "the shared settings opener is loaded")
 	sim:input(function()
-		G.Settings.OpenToCategory(category:GetID())
+		ns.OpenSettingsPanel(category:GetID())
 	end)
 	sim:advance(0.2)
 	assert(G.SettingsPanel:IsShown(), "the settings panel is open")

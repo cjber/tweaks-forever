@@ -350,6 +350,7 @@ TweaksForeverCharDB = nil
 ---@field ReportLines fun(): string[] Tweaks Forever's own lines in the report (Core/Report.lua)
 ---@field PolestarOn fun(path: string): boolean
 ---@field OpenMapOn fun(option: string): boolean
+---@field OpenSettingsPanel fun(categoryID?: integer, element?: string): boolean Blizzard's settings panel, opened through the client's secure opener (Core/OpenSettings.lua)
 ---@field NaowhOn fun(switch: string): boolean
 ---@field ConflictOf fun(key: string): string?
 ---@field MissingOf fun(key: string): string?

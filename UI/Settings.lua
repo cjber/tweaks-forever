@@ -163,11 +163,13 @@ ns.Init(function()
 		for _, feature in ipairs(bySection[section]) do
 			AddSetting(subcategory, feature)
 		end
-		-- The index is buttons that open each subpage; search finds the settings themselves instead.
+		-- The index is buttons that open each subpage; search finds the settings themselves instead. Pages open
+		-- through the shared secure opener: Settings.OpenToCategory is Blizzard's own Lua around a restricted
+		-- client call, which the client refuses when addon code makes it (cjber/forever-core#333).
 		Settings.RegisterInitializer(
 			category,
 			CreateSettingsButtonInitializer(L[section], L["Open"], function()
-				Settings.OpenToCategory(subcategory:GetID())
+				ns.OpenSettingsPanel(subcategory:GetID())
 			end, nil, false)
 		)
 	end
@@ -180,7 +182,7 @@ ns.Init(function()
 		Settings.RegisterInitializer(
 			category,
 			CreateSettingsButtonInitializer(L["Forever addons"], L["Open"], function()
-				Settings.OpenToCategory(family:GetID())
+				ns.OpenSettingsPanel(family:GetID())
 			end, nil, false)
 		)
 	end)
@@ -197,7 +199,7 @@ ns.Init(function()
 	end)
 
 	local function Open()
-		Settings.OpenToCategory(category:GetID())
+		ns.OpenSettingsPanel(category:GetID())
 	end
 	SLASH_TWEAKSFOREVER1 = "/tweaks"
 	SLASH_TWEAKSFOREVER2 = "/tweaksforever"
