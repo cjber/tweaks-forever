@@ -333,3 +333,6 @@ L["%s (last %d):"] = "%s (последние %d):"
 L["%s: no lines yet."] = "%s: строк пока нет."
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "Использование: /forever debug, /forever debug pin, /forever debug off, /forever debug show"
 L["The choices, in order: %s."] = "Варианты по порядку: %s."
+
+L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] = 
+	"Открытие настроек Tweaks Forever больше не показывает ошибку заблокированного действия с именем этого аддона." -- mt

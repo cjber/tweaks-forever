@@ -333,3 +333,6 @@ L["%s (last %d):"] = "%s（最近 %d 筆）："
 L["%s: no lines yet."] = "%s：還沒有記錄行。"
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "用法：/forever debug、/forever debug pin、/forever debug off、/forever debug show"
 L["The choices, in order: %s."] = "選項依序為：%s。"
+
+L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] = 
+	"開啟 Tweaks Forever 的選項時不再顯示指名此外掛的動作被封鎖錯誤。" -- mt

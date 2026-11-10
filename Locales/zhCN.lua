@@ -333,3 +333,6 @@ L["%s (last %d):"] = "%s（最近 %d 条）："
 L["%s: no lines yet."] = "%s：还没有日志行。"
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "用法：/forever debug、/forever debug pin、/forever debug off、/forever debug show"
 L["The choices, in order: %s."] = "选项依次为：%s。"
+
+L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] = 
+	"打开 Tweaks Forever 的选项时不再显示指名此插件的动作被阻止错误。" -- mt
