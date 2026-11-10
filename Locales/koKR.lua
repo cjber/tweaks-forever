@@ -334,5 +334,5 @@ L["%s: no lines yet."] = "%s: 아직 줄이 없습니다."
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "사용법: /forever debug, /forever debug pin, /forever debug off, /forever debug show"
 L["The choices, in order: %s."] = "선택 항목 순서: %s."
 
-L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] = 
+L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] =
 	"Tweaks Forever의 설정을 열어도 이 애드온을 지목하는 차단된 동작 오류가 더 이상 표시되지 않습니다." -- mt
