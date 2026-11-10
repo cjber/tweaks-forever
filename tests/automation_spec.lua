@@ -15,7 +15,7 @@ local TAXI, CHAT, VENDOR = 132057, 132053, 132060
 local Available, Unavailable = 0, 2
 local shift, forced = false, false
 local options, active, available = {}, {}, {}
-local selected
+local selected, selectedCount = nil, 0
 local env = setmetatable({
 	Enum = { GossipOptionStatus = { Available = Available, Unavailable = Unavailable } },
 	IsShiftKeyDown = function()
@@ -42,6 +42,7 @@ local env = setmetatable({
 		end,
 		SelectOptionByIndex = function(index)
 			selected = "option " .. index
+			selectedCount = selectedCount + 1
 		end,
 		SelectAvailableQuest = function(questID)
 			selected = "quest " .. questID
@@ -86,7 +87,7 @@ local function option(orderIndex, icon, flagged, status)
 end
 
 local function talk(list)
-	options, selected = list, nil
+	options, selected, selectedCount = list, nil, 0
 	handlers.GOSSIP_SHOW()
 	return selected
 end
@@ -109,13 +110,21 @@ shift = false
 assert(talk({ option(0, VENDOR), option(1, CHAT) }) == nil, "an innkeeper or vendor keeps its choices")
 
 assert(talk({ option(3, VENDOR) }) == "option 3", "a lone option is taken")
+assert(selectedCount == 1, "and selected once")
 assert(talk({ option(3, TAXI, true) }) == nil, "the game selects a lone flagged option itself")
+assert(selectedCount == 0, "so nothing is sent twice")
 forced = true
-assert(talk({ option(3, VENDOR) }) == nil, "a forced lone option stays open")
+assert(talk({ option(3, VENDOR) }) == "option 3", "a forced lone option is taken, since the game won't")
+assert(selectedCount == 1, "and selected once")
+assert(talk({ option(3, VENDOR, true) }) == "option 3", "even when it is flagged for the game to take")
+assert(selectedCount == 1, "and selected once")
 assert(talk({ option(3, TAXI, true) }) == "option 3", "the game leaves a forced taxi, so it is picked here")
 forced = false
+assert(talk({ option(3, VENDOR, true) }) == nil, "without the force the game takes a lone flagged option")
+assert(selectedCount == 0, "so it is not sent twice")
 
 available = { { questID = 42, isTrivial = false } }
+assert(talk({ option(3, VENDOR) }) == nil, "an NPC with an available quest keeps its gossip open")
 assert(talk(flightMaster) == nil, "offered quests keep the gossip open while quest automation is off")
 db.quests = true
 assert(talk(flightMaster) == "quest 42", "a quest is picked before the flight map")

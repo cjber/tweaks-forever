@@ -163,11 +163,15 @@ end
 -- icon (Interface\GossipFrame\TaxiGossipIcon) whatever its text or language.
 local TAXI_ICON = 132057
 
--- A lone option, or a flight master's taxi among several. The game already selects a lone option it flags
--- (selectOptionWhenOnlyOption) unless the NPC forces gossip, and selecting it again would repeat the request.
+-- A lone option, or a flight master's taxi among several. The game selects a lone option only when it flags one
+-- (selectOptionWhenOnlyOption) and the NPC does not force gossip; every other lone option is taken here, so the
+-- request is never sent twice.
 local function GossipOption(options)
-	if #options == 1 and not C_GossipInfo.ForceGossip() then
-		return not options[1].selectOptionWhenOnlyOption and options[1] or nil
+	if #options == 1 then
+		if options[1].selectOptionWhenOnlyOption and not C_GossipInfo.ForceGossip() then
+			return nil
+		end
+		return options[1]
 	end
 	for _, option in ipairs(options) do
 		if option.icon == TAXI_ICON then
