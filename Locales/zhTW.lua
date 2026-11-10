@@ -296,7 +296,6 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 
 L["The choices, in order: %s."] = "選項依序為：%s。"
 
-L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] =
-	"開啟 Tweaks Forever 的選項時不再顯示指名此外掛的動作被封鎖錯誤。" -- mt
+L["Needs Forever Core."] = "需要 Forever Core。" -- mt
 
 L["Tweaks Forever needs ForeverCore, which is missing or too old."] = "Tweaks Forever 需要 ForeverCore，但它缺少或版本過舊。"
