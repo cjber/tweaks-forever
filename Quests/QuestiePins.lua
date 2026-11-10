@@ -83,7 +83,13 @@ ns.Init(function()
 		return
 	end
 	local map = QuestieLoader:ImportModule("QuestieMap")
-	if not (map.utils and map.utils.SetDrawOrder and map.utils.RescaleIcon and map.questIdFrames) then
+	local utils = type(map) == "table" and map.utils
+	if
+		type(utils) ~= "table"
+		or type(utils.SetDrawOrder) ~= "function"
+		or type(utils.RescaleIcon) ~= "function"
+		or type(map.questIdFrames) ~= "table"
+	then
 		return
 	end
 	---@type table<TFQuestiePin, boolean>
@@ -121,8 +127,8 @@ ns.Init(function()
 		end
 		Style(frame)
 	end
-	hooksecurefunc(map.utils, "SetDrawOrder", Watch) -- taint-ok: Questie module, observes drawn pins.
-	hooksecurefunc(map.utils, "RescaleIcon", function(ref) -- taint-ok: Questie module, observes zoom resizing.
+	hooksecurefunc(utils, "SetDrawOrder", Watch) -- taint-ok: Questie module, observes drawn pins.
+	hooksecurefunc(utils, "RescaleIcon", function(ref) -- taint-ok: Questie module, observes zoom resizing.
 		local frame = type(ref) == "string" and _G[ref] or ref
 		if frame then
 			Watch(frame)
@@ -137,7 +143,7 @@ ns.Init(function()
 						Watch(frame)
 					elseif watched[frame] and Questie and Questie.usedIcons then
 						frame:UpdateTexture(Questie.usedIcons[frame.data.Icon])
-						map.utils.RescaleIcon(frame, map.GetScaleValue())
+						utils.RescaleIcon(frame, map.GetScaleValue())
 					end
 				end
 			end

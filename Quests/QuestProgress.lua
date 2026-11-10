@@ -79,8 +79,9 @@ local ICON, SIZE, GAP = "questobjective", 20, 4
 local Model = {}
 ns.QuestProgress = Model
 
--- QuestieDB's quests and items, and its hints for the quests that list one kind of objective first.
-local quests, items ---@type TFQuestieEntity?, TFQuestieEntity?
+-- QuestieDB's quests and items, its hints for the quests that list one kind of objective first, and the bit it gives
+-- each race in a quest's masks.
+local quests, items, raceMasks ---@type TFQuestieEntity?, TFQuestieEntity?, table<integer, integer>?
 ---@type table<string, table<integer, true>>
 local hints = {}
 -- [questID] = its objectives in the log's order by QuestieDB, each { kind, npcs = set of creature IDs }, read once.
@@ -97,12 +98,16 @@ local logQuests = {}
 ---@return boolean
 function Model.Attach()
 	targets = {}
-	quests, items, hints = nil, nil, {}
+	quests, items, hints, raceMasks = nil, nil, {}, nil
 	local db = Library()
 	if not db then
 		return false
 	end
 	quests, items, hints = db.Quest, db.Item, db.ObjectiveFirst or {}
+	local enum = db.Enum
+	if type(enum) == "table" and type(enum.raceMaskById) == "table" then
+		raceMasks = enum.raceMaskById
+	end
 	return true
 end
 
@@ -311,15 +316,30 @@ local function Starter(item)
 	return starters[item]
 end
 
--- Whether a QuestieDB race or class mask lets you in: 0 or none is anyone.
+-- Whether a QuestieDB race or class mask lets a bit in: 0 or none is anyone. Divided rather than shifted, because
+-- Forever's races 95 and 96 are bits 32 and 33, past what the client's 32-bit bit library holds.
 ---@param mask any
----@param id integer?
+---@param bit integer?
 ---@return boolean
-local function Allows(mask, id)
-	if type(mask) ~= "number" or mask == 0 or not id then
+local function Allows(mask, bit)
+	if type(mask) ~= "number" or mask == 0 then
 		return true
 	end
-	return bit.band(mask, bit.lshift(1, id - 1)) ~= 0
+	return bit ~= nil and mask % (2 * bit) >= bit
+end
+
+-- QuestieDB's bit for a race, from the table it publishes: Forever's races 95 and 96 are bits 32 and 33, not a shift
+-- of the race's number. A library older than that table encodes a race as 2 to the race - 1.
+---@param id integer?
+---@return number?
+local function RaceBit(id)
+	if not id then
+		return nil
+	end
+	if raceMasks then
+		return raceMasks[id]
+	end
+	return 2 ^ (id - 1)
 end
 
 -- The quest an item starts, by QuestieDB, while you can take it: not done, not in your log, not shut out by one you
@@ -333,7 +353,7 @@ function Model.Starts(item)
 	end
 	local _, _, race = UnitRace("player")
 	local _, _, class = UnitClass("player")
-	if not Allows(quest.races, race) or not Allows(quest.classes, class) then
+	if not Allows(quest.races, RaceBit(race)) or not Allows(quest.classes, class and 2 ^ (class - 1)) then
 		return nil
 	end
 	for _, other in ipairs(type(quest.exclusive) == "table" and quest.exclusive or {}) do

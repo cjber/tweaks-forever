@@ -14,6 +14,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 - **With the gamepad interface on, closing the options after browsing Tweaks Forever's page no longer makes the game refuse the next controller action and blame Tweaks Forever.** Tweaks' own rows are now handed to the game the way its own rows are, so backing out leaves nothing behind that blocks a button press (#446).
 - **Nameplates no longer fade.** Plates other than your target now darken their bar slightly, as Blizzard's own nameplates do, instead of turning see-through, so far-off enemies and enemies behind terrain no longer become hard to see.
+- **Quests no longer go missing for Forever's new Skyborne races.** QuestieDB puts races 95 and 96 in bits 32 and 33 of a quest's race mask, past what the client's 32-bit bit library holds, so an item's "Starts a quest" line and a minimap giver's quests were shown or hidden for the wrong race (cjber/tweaks-forever#443).
 
 ## [2.4.4] - 2026-11-10
 
@@ -116,7 +117,6 @@ optional `### For addon authors` subsection after a version's player bullets.
 - **A waypoint to the rare in one click.** With Rare alerts on, the rare's name in the alert line is a link: click it to set the game's waypoint on the rare's map marker, or a Shortest Path Forever journey when that addon is loaded. A key you bind under Key Bindings > AddOns, which a gamepad button can take too, does the same for the last rare found. A rare with no map marker is pinned where you stood when its nameplate appeared, which is close by.
 
 ## [1.0.10] - 2026-11-04
-
 
 - **A warning before you pull aggro.** In a group, a chat line tells you when your threat on your target has passed the tank's, so you can stop before the mob turns on you. It warns once, then again only after you drop back below the tank or change target. Turn it off under Interface in Tweaks' settings; nameplates coloured by threat are the game's own Nameplates option.
 

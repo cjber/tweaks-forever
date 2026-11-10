@@ -79,6 +79,28 @@ local function Pin(kind, mini)
 	return pin
 end
 frames.a, frames.b = Pin(6, false), Pin(8, true)
+-- Questie's pin module can be absent, or not shaped as this replaces it: nothing is hooked, and loading never errors.
+local function Probe(module)
+	local before = hooks
+	env.QuestieLoader = {
+		ImportModule = function()
+			return module
+		end,
+	}
+	setfenv(assert(loadfile("Quests/QuestiePins.lua")), env)("TweaksForever", ns)
+	init()
+	assert(hooks == before, "nothing is hooked without Questie's pin module")
+end
+Probe(nil)
+Probe(false)
+Probe({})
+Probe({ utils = 1 })
+Probe({ utils = {} })
+env.QuestieLoader = {
+	ImportModule = function()
+		return map
+	end,
+}
 setfenv(assert(loadfile("Quests/QuestiePins.lua")), env)("TweaksForever", ns)
 init()
 assert(frames.a.texture.atlas == "questnormal" and frames.a.width == 24)

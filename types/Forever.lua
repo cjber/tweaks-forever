@@ -55,6 +55,7 @@ Questie = nil
 ---@field Item? TFQuestieEntity
 ---@field ObjectiveFirst? table<string, table<integer, true>> objective kinds a quest lists first, by hint name
 ---@field Support {Get: fun(name: string): table?}
+---@field Enum? {raceMaskById: table<integer, integer>} a race's number -> its bit in a quest's requiredRaces
 
 ---@type TFQuestieDB?
 LibQuestieDB = nil
