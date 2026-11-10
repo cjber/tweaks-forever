@@ -4,8 +4,6 @@ If you already run Polestar, Naowh Forever, Leatrix Plus, OpenMap, Questie, Bliz
 
 Free, with nothing locked behind it. If it saves you time, you can [sponsor me on GitHub](https://github.com/sponsors/cjber), which takes no fees, or [buy me a coffee on Ko-fi](https://ko-fi.com/cjber).
 
-[![Sponsor me on GitHub](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/github-sponsors-button.png)](https://github.com/sponsors/cjber) [![Support me on Ko-fi](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/kofi-button.png)](https://ko-fi.com/cjber)
-
 ![Dungeon entrances, nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
 The junk coin marks what sells with your greys at a merchant. Also dungeon entrances and nameplates.
@@ -71,3 +69,5 @@ With Shortest Path Forever, Shift-clicking a dungeon or raid entrance plans the 
 For a bug report, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
 
 Built with AI assistance.
+
+[![Sponsor me on GitHub](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/github-sponsors-button.png)](https://github.com/sponsors/cjber) [![Support me on Ko-fi](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/kofi-button.png)](https://ko-fi.com/cjber)
