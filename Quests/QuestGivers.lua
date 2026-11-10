@@ -46,9 +46,11 @@ local UNREADY = ns.Art.Markup("SideInProgressquesticon", 16) .. " "
 local Model = {}
 ns.QuestGivers = Model
 
--- QuestieDB and the map each of its areas is drawn on, read in game through Integrations/QuestieSource.lua.
+-- QuestieDB and the map each of its areas is drawn on, read in game through Integrations/QuestieSource.lua, and the
+-- bit it gives each race in a quest's masks.
 local lib ---@type TFQuestieDB
 local MapOf ---@type fun(area: integer): integer?
+local raceMasks ---@type table<integer, integer>?
 -- [name] = the quest NPCs of that name with their spawns in world yards.
 ---@type table<string, TFGiverCandidate[]>
 local candidates = {}
@@ -72,6 +74,10 @@ function Model.Attach()
 		return false
 	end
 	lib, MapOf = db, mapOf
+	local enum = db.Enum
+	if type(enum) == "table" and type(enum.raceMaskById) == "table" then
+		raceMasks = enum.raceMaskById
+	end
 	return true
 end
 
@@ -157,13 +163,30 @@ local function AnyDone(list)
 	return false
 end
 
--- Whether your race or class is in a mask, where 0 is everyone.
+-- Whether a QuestieDB race or class mask lets a bit in: 0 or none is anyone. Divided rather than shifted, because
+-- Forever's races 95 and 96 are bits 32 and 33, past what the client's 32-bit bit library holds.
 ---@param mask any
----@param id integer
+---@param bit integer?
 ---@return boolean
-local function InMask(mask, id)
-	mask = tonumber(mask) or 0
-	return mask == 0 or bit.band(mask, bit.lshift(1, id - 1)) ~= 0
+local function InMask(mask, bit)
+	if type(mask) ~= "number" or mask == 0 then
+		return true
+	end
+	return bit ~= nil and mask % (2 * bit) >= bit
+end
+
+-- QuestieDB's bit for a race, from the table it publishes: Forever's races 95 and 96 are bits 32 and 33, not a shift
+-- of the race's number. A library older than that table encodes a race as 2 to the race - 1.
+---@param id integer?
+---@return number?
+local function RaceBit(id)
+	if not id then
+		return nil
+	end
+	if raceMasks then
+		return raceMasks[id]
+	end
+	return 2 ^ (id - 1)
 end
 
 -- A quest the data names a requirement for that this file cannot check for you.
@@ -218,8 +241,8 @@ function Model.Quests(npc)
 		local v = not C_QuestLog.IsQuestFlaggedCompleted(id) and not C_QuestLog.IsOnQuest(id) and Quest(id)
 		if
 			v
-			and InMask(v.requiredRaces, race)
-			and InMask(v.requiredClasses, class)
+			and InMask(v.requiredRaces, RaceBit(race))
+			and InMask(v.requiredClasses, class and 2 ^ (class - 1))
 			and AllDone(v.preQuestGroup)
 			and AnyDone(v.preQuestSingle)
 			and not Unknowable(v)
@@ -359,7 +382,8 @@ ns.Init(function()
 		return
 	end
 	-- The name index is one pass over every NPC: build it now, behind the loading screen, not on the first hover.
-	if ns.Active(KEY) then
+	-- A library without that call still builds it on the first name it is asked for.
+	if ns.Active(KEY) and type(lib.Npc.BuildNameIndex) == "function" then
 		lib.Npc.BuildNameIndex()
 	end
 

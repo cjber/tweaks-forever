@@ -32,6 +32,10 @@ local quests = {
 	[8] = { name = "Horde Only", requiredRaces = 2 },
 	[9] = { name = "Shut Out", exclusiveTo = { 7 } },
 	[10] = { name = "Humans Welcome", requiredRaces = 1, requiredClasses = 0 },
+	-- Forever's Skyborne races are bits 32 and 33, past what a 32-bit mask or shift holds.
+	[11] = { name = "Skyborne Only", requiredRaces = 2 ^ 32 },
+	[12] = { name = "Horde Skyborne", requiredRaces = 2 ^ 33 },
+	[13] = { name = "Skyborne or Human", requiredRaces = 2 ^ 33 + 1 },
 }
 -- Item 600 starts quest 6; 601 starts one you've done; 602 starts quest 1, already in your log.
 local items = {
@@ -43,6 +47,9 @@ local items = {
 	[603] = { startQuest = 8 },
 	[604] = { startQuest = 9 },
 	[605] = { startQuest = 10 },
+	[606] = { startQuest = 11 },
+	[607] = { startQuest = 12 },
+	[608] = { startQuest = 13 },
 }
 local reads = 0
 local function Entity(rows)
@@ -65,6 +72,8 @@ local library = {
 	Quest = Entity(quests),
 	Item = Entity(items),
 	ObjectiveFirst = { itemObjectiveFirst = { [2] = true } },
+	-- QuestieDB's encoding, which Forever's races 95 and 96 do not follow as a shift of the race's number.
+	Enum = { raceMaskById = { [1] = 1, [2] = 2, [95] = 2 ^ 32, [96] = 2 ^ 33 } },
 }
 
 -- The quest log, as C_QuestLog lists it: a header, then the quests with their objectives in the log's order.
@@ -126,6 +135,8 @@ local function Texture()
 end
 
 local plates, guids = {}, {}
+-- The race UnitRace reports, as the client's ChrRaces ID.
+local playerRace = 1
 local env = setmetatable({
 	C_QuestLog = {
 		GetNumQuestLogEntries = function()
@@ -187,9 +198,9 @@ local env = setmetatable({
 	NORMAL_FONT_COLOR = { r = 1, g = 0.82, b = 0 },
 	HIGHLIGHT_FONT_COLOR = { r = 1, g = 1, b = 1 },
 	GRAY_FONT_COLOR = { r = 0.5, g = 0.5, b = 0.5 },
-	-- A human (race 1) warrior (class 1).
+	-- A human (race 1) warrior (class 1), unless a test names another race.
 	UnitRace = function()
-		return "Human", "Human", 1
+		return "Human", "Human", playerRace
 	end,
 	UnitClass = function()
 		return "Warrior", "WARRIOR", 1
@@ -289,6 +300,27 @@ assert(Model.Starts(605) == "Starts a quest: Humans Welcome", "one your race and
 before = reads
 Model.Starts(605)
 assert(reads == before, "an item's quest is read once")
+
+-- Forever's races 95 and 96 are bits 32 and 33 of a mask: a 32-bit shift wraps, and the bit library drops the bit
+-- from a mask that cannot hold it.
+assert(Model.Starts(606) == nil, "a Skyborne quest is not a human's")
+playerRace = 95
+assert(Model.Starts(606) == "Starts a quest: Skyborne Only", "a Skyborne race takes its own bit")
+assert(Model.Starts(607) == nil, "and not the other Skyborne race's")
+playerRace = 96
+assert(Model.Starts(607) == "Starts a quest: Horde Skyborne", "the other Skyborne race takes its bit")
+assert(Model.Starts(608) == "Starts a quest: Skyborne or Human", "both bits of a mask either side of 32 read")
+playerRace = 95
+assert(Model.Starts(608) == nil, "the human bit alone is not a Skyborne race's")
+playerRace = 1
+assert(Model.Starts(608) == "Starts a quest: Skyborne or Human", "nor the Skyborne bit a human's")
+-- A QuestieDB older than its race table encodes a race as 2 to the race - 1.
+local raceMasks = library.Enum
+library.Enum = nil
+assert(Model.Attach())
+assert(Model.Starts(605) == "Starts a quest: Humans Welcome", "the plain encoding without that table")
+library.Enum = raceMasks
+assert(Model.Attach())
 lines = Model.Lines(702, "object")
 assert(#lines == 2 and lines[2][1] == " - 5/5 Wolf Fang", "an object the quest's item drops from")
 

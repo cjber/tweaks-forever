@@ -36,7 +36,7 @@ local quests = {
 	[304] = { name = "Neither", questLevel = 10, requiredLevel = 10, preQuestSingle = { 900, 901 } },
 }
 local NPC_FIELD = { spawns = "spawns", questStarts = "starts", questEnds = "ends" }
-local indexBuilt = false
+local indexBuilt
 local function Entity(rows, fieldOf)
 	return {
 		GetAll = function(id, keys)
@@ -71,6 +71,8 @@ local library = {
 	end,
 	Npc = Entity(npcs, NPC_FIELD),
 	Quest = Entity(quests),
+	-- QuestieDB's encoding, which Forever's races 95 and 96 do not follow as a shift of the race's number.
+	Enum = { raceMaskById = { [1] = 1, [2] = 2, [95] = 2 ^ 32, [96] = 2 ^ 33 } },
 	Support = {
 		Get = function(name)
 			assert(name == "ZoneDB")
@@ -248,6 +250,18 @@ offers = Model.Quests(ada)
 assert(#offers == 2 and offers[1].id == 301 and offers[2].id == 303)
 player.race, player.class = 1, 1
 
+-- Forever's races 95 and 96 are bits 32 and 33 of a mask: a 32-bit shift wraps, and the bit library drops the bit
+-- from a mask that cannot hold it.
+quests[305] = { name = "Skyborne Only", questLevel = 10, requiredLevel = 10, requiredRaces = 2 ^ 32 }
+ada.starts = { 305 }
+player.race = 95
+offers = Model.Quests(ada)
+assert(#offers == 1 and offers[1].id == 305, "a Skyborne race takes its own bit")
+player.race = 96
+assert(#Model.Quests(ada) == 0, "and not the other Skyborne race's")
+player.race = 1
+assert(#Model.Quests(ada) == 0, "nor another race's")
+
 -- Turn-ins: the quests in your log this NPC takes, ready ones marked.
 local bo = Model.Resolve("Bo", 0, 500, 500)
 offers, turnIns = Model.Quests(bo)
@@ -283,8 +297,21 @@ ns.Active = function(key)
 	return ns.db[key]
 end
 ns.On = function() end
+-- A QuestieDB without the name-index pre-warm still names givers on the first ask: the call is left out, not an error.
+local lazyNpc = {}
+for key, value in pairs(library.Npc) do
+	lazyNpc[key] = value
+end
+lazyNpc.BuildNameIndex = nil
+indexBuilt = false
+env.LibQuestieDB = setmetatable({ Npc = lazyNpc }, { __index = library })
+assert(Model.Attach())
 initializers[#initializers]() -- QuestGivers.lua's, after QuestieSource.lua's
-assert(indexBuilt)
+assert(not indexBuilt, "no index call on a library that has none")
+env.LibQuestieDB = library
+assert(Model.Attach())
+initializers[#initializers]()
+assert(indexBuilt, "the index is built at login")
 local added, shown = {}, false
 local tooltip = {
 	AddLine = function(_, text)
@@ -300,4 +327,16 @@ assert(#added == 3 and shown)
 ns.db.giverTooltips = false
 postCalls[21](tooltip, { lines = { { leftText = "Ada" } } })
 assert(#added == 3, "switched off")
+
+-- A QuestieDB older than its race table encodes a race as 2 to the race - 1.
+ada.starts = { 305 }
+quests[305].requiredRaces = 2
+player.race = 2
+local masks = library.Enum
+library.Enum = nil
+assert(Model.Attach())
+assert(#Model.Quests(ada) == 1, "the plain race encoding without that table")
+library.Enum = masks
+assert(Model.Attach())
+player.race = 1
 print("questgivers: ok")

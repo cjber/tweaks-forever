@@ -90,7 +90,7 @@ local function QuestItem(quest)
 		return "item:" .. id
 	end
 	local db = ns.QuestieDB()
-	local values = db and db.Quest.GetAll(quest.id, ITEM_FIELDS)
+	local values = db and db.Quest and db.Quest.GetAll(quest.id, ITEM_FIELDS)
 	if not values then
 		return nil
 	end

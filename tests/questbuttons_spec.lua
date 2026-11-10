@@ -41,6 +41,7 @@ local objectives = {
 local combat, keyDown = false, true
 -- Quest 4 (no log item) gave item 333 and needs 444 (no use); you carry both.
 local carried = { [333] = 1, [444] = 1 }
+local hasQuests = true
 local buttons = {}
 local env = setmetatable({
 	C_QuestLog = {
@@ -94,11 +95,11 @@ local env = setmetatable({
 }, { __index = _G })
 ns.QuestieDB = function()
 	return {
-		Quest = {
+		Quest = hasQuests and {
 			GetAll = function(id)
 				return id == 4 and { 333, { 444 } } or nil
 			end,
-		},
+		} or nil,
 		Npc = {
 			GetAll = function(id)
 				return { ({ [10] = "Mangy Wolf", [11] = "Timber Wolf", [12] = "Boar" })[id] }
@@ -149,6 +150,10 @@ assert(item.attributes.item == "item:111", "out of combat the next nearest")
 items[1] = nil
 Press(item)
 assert(item.attributes.item == "item:333", "else an item QuestieDB says the quest gave you, when it has a use")
+hasQuests = false
+Press(item)
+assert(item.attributes.item == nil, "a QuestieDB without quest rows leaves the log's own item out of it")
+hasQuests = true
 keyDown = false
 target.attributes.macrotext = nil
 target.scripts.PreClick(target, "LeftButton", true)
