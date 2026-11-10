@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **With the gamepad interface on, closing the options after browsing Tweaks Forever's page no longer makes the game refuse the next controller action and blame Tweaks Forever.** Tweaks' own rows are now handed to the game the way its own rows are, so backing out leaves nothing behind that blocks a button press (#446).
 - **Nameplates no longer fade.** Plates other than your target now darken their bar slightly, as Blizzard's own nameplates do, instead of turning see-through, so far-off enemies and enemies behind terrain no longer become hard to see.
 
 ## [2.4.4] - 2026-11-10
