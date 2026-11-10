@@ -24,6 +24,7 @@ python3 tools/check_generated.py --offline # omit --offline to fetch missing pin
 python3 tools/changelog.py --check
 python3 tools/check_screenshots.py   # an image older than its sources; --record after tools/screenshots.py
 python3 tools/check_menu_scroll.py # menus built from a list scroll (WFA-36); CI runs it in core-shared
+python3 tools/check_api_docs.py   # docs/api.md names every published API function and its minor
 python3 tools/repo_rules.py   # rules no linter covers; CI runs it in project-rules
 ```
 

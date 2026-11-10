@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+### For addon authors
+
+- **`TweaksForever.API` is minor 1: each read that has nothing to answer returns `nil, reason`.** `TrainableSpells()` answers `nil, "loading"` before login and in combat, and `DungeonEntrance(instanceID)` answers `nil, "none"` for an instance with no entrance. `nil` alone still means the same to existing callers. `docs/api.md` lists every published function, each read's reasons and the minor history; there is no `Subscribe()` yet (#425).
+
 ## [2.5.0] - 2026-11-10
 
 - **Needs Forever Core.** The shared tracker column, bug report and leaderboards now come from one Forever Core addon that installs with it, so every Forever addon's tracker scale, lock and position stay in step. Your tracker settings carry over.

@@ -1,6 +1,11 @@
 ---@meta
 
--- Public addon-to-addon interface.
+-- TweaksForever.API, version 3, minor 1: the contract other addons read (docs/api.md). Core/API.lua implements it.
+
+-- ForeverCore.APIKit's not-ready reasons. "loading" asks again later, "disabled" is the player's choice and "none"
+-- is nothing to answer.
+---@alias TFAPIReason "loading"|"disabled"|"none"
+
 ---@class TFAPITrainableSpell
 ---@field spellID integer the spell you learn
 ---@field name string
@@ -26,9 +31,10 @@
 
 ---@class TFPublicAPI
 ---@field version integer 3
----@field TrainableSpells fun(): TFAPITrainableSpell[]? spells your level allows that you haven't learned, each spell's next rank only, on your class's spellbook tabs and the General tab (no weapon skills or riding), in fresh tables; answers whether or not the spellbook shows them; nil before login and in combat
----@field DungeonEntrance fun(instanceID: integer): TFDungeonEntrance? instance Map.ID; fresh copy of its unclustered entrance on the first curated zone map; nil when unknown or unplaced, independent of pin settings and conflicts
----@field Trainers fun(): TFAPITrainer[], string? every class trainer of your class, with the name and one spawn QuestieDB gives it once read; safe before login and in combat; the second value is a line saying what to install when no QuestieDB can be read
+---@field minor integer 1 rises with each addition within version 3
+---@field TrainableSpells fun(): TFAPITrainableSpell[]?, TFAPIReason? spells your level allows that you haven't learned, each spell's next rank only, on your class's spellbook tabs and the General tab (no weapon skills or riding), in fresh tables; answers whether or not the spellbook shows them; nil, "loading" before login and in combat
+---@field DungeonEntrance fun(instanceID: integer): TFDungeonEntrance?, TFAPIReason? instance Map.ID; fresh copy of its unclustered entrance on the first curated zone map; nil, "none" when unknown or unplaced, independent of pin settings and conflicts
+---@field Trainers fun(): TFAPITrainer[], string? every class trainer of your class, with the name and one spawn QuestieDB gives it once read; safe before login and in combat; always a table, so it has no not-ready reason; the second value is a line saying what to install when no QuestieDB can be read
 
 ---@class TFPublicAddon
 ---@field API TFPublicAPI
