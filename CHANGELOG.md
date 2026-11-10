@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **With the gamepad interface on, closing the options after browsing Tweaks Forever's page no longer makes the game refuse the next controller action and blame Tweaks Forever.** Tweaks' own rows are now handed to the game the way its own rows are, so backing out leaves nothing behind that blocks a button press (#446).
 
 ## [2.4.4] - 2026-11-10
 
