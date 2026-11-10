@@ -1,4 +1,4 @@
-local features, initializers = {}, {}
+local features, initializers, timers = {}, {}, {}
 local ns = {
 	Feature = function(feature)
 		features[feature.key] = feature
@@ -18,6 +18,10 @@ local npcs = {
 	[5] = { name = "Di", spawns = { [10] = { { 49, 50 } }, [12] = { { 50, 50 } } }, starts = { 108 }, ends = {} },
 	[6] = { name = "Di", spawns = { [10] = { { 50, 49 } } }, starts = { 108 }, ends = {} },
 }
+-- Enough unnamed NPCs that the name index takes more than one batch, as a real QuestieDB does.
+for id = 1000, 1599 do
+	npcs[id] = { name = "Filler " .. id }
+end
 local quests = {
 	[101] = { name = "Dry Times", questLevel = 15, requiredLevel = 10 },
 	[102] = { name = "Done Before", questLevel = 12, requiredLevel = 8 },
@@ -36,7 +40,7 @@ local quests = {
 	[304] = { name = "Neither", questLevel = 10, requiredLevel = 10, preQuestSingle = { 900, 901 } },
 }
 local NPC_FIELD = { spawns = "spawns", questStarts = "starts", questEnds = "ends" }
-local indexBuilt
+local indexBuilt, indexSync, indexAsync, indexRows
 local function Entity(rows, fieldOf)
 	return {
 		GetAll = function(id, keys)
@@ -60,7 +64,24 @@ local function Entity(rows, fieldOf)
 			table.sort(ids)
 			return ids[1] and ids or nil
 		end,
+		-- The whole pass in one call, as an older QuestieDB builds it.
 		BuildNameIndex = function()
+			indexBuilt, indexSync = true, true
+		end,
+		-- QuestieDB's yielding build: a batch of names, then a frame for the rest.
+		BuildNameIndexAsync = function(iterationsPerCycle)
+			indexAsync = true
+			local ids = {}
+			for id in pairs(rows) do
+				ids[#ids + 1] = id
+			end
+			table.sort(ids)
+			for i = 1, #ids do
+				indexRows = indexRows + 1
+				if i % iterationsPerCycle == 0 and i < #ids then
+					coroutine.yield()
+				end
+			end
 			indexBuilt = true
 		end,
 	}
@@ -102,6 +123,11 @@ local env = setmetatable({
 	C_Texture = {
 		GetAtlasInfo = function()
 			return { width = 16, height = 18 }
+		end,
+	},
+	C_Timer = {
+		After = function(seconds, fn)
+			timers[#timers + 1] = { seconds = seconds, fn = fn }
 		end,
 	},
 	LibQuestieDB = library,
@@ -169,6 +195,18 @@ setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Core/Secret.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestGivers.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestGivers
+-- One frame: every timer due now runs once.
+local function Frame()
+	local due = timers
+	timers = {}
+	for _, timer in ipairs(due) do
+		if timer.seconds == 0 then
+			timer.fn()
+		else
+			timers[#timers + 1] = timer
+		end
+	end
+end
 assert(features.giverTooltips.default == true)
 
 -- Without the Forever build of a contract-2 QuestieDB there is nothing to read, and the option is greyed out.
@@ -291,27 +329,38 @@ player.x = nil
 assert(#Model.TooltipLines({ "Ada" }) == 0, "no map position, as in an instance")
 player.x = 0.5
 
--- Wired up: the name index is built at login, and the minimap tooltip gains the lines.
+-- Wired up: the name index is built a batch a frame after login, and the minimap tooltip gains the lines.
 ns.db = { giverTooltips = true }
 ns.Active = function(key)
 	return ns.db[key]
 end
 ns.On = function() end
--- A QuestieDB without the name-index pre-warm still names givers on the first ask: the call is left out, not an error.
+-- A QuestieDB without the yielding name-index call still names givers on the first ask: nothing is booked at login.
 local lazyNpc = {}
 for key, value in pairs(library.Npc) do
 	lazyNpc[key] = value
 end
 lazyNpc.BuildNameIndex = nil
-indexBuilt = false
+lazyNpc.BuildNameIndexAsync = nil
+indexBuilt, indexAsync, indexRows = false, false, 0
+timers = {}
 env.LibQuestieDB = setmetatable({ Npc = lazyNpc }, { __index = library })
 assert(Model.Attach())
 initializers[#initializers]() -- QuestGivers.lua's, after QuestieSource.lua's
-assert(not indexBuilt, "no index call on a library that has none")
+assert(not indexBuilt and not indexAsync and #timers == 0, "no index work without the yielding call")
 env.LibQuestieDB = library
 assert(Model.Attach())
+indexBuilt, indexSync, indexAsync, indexRows = false, false, false, 0
+timers = {}
 initializers[#initializers]()
-assert(indexBuilt, "the index is built at login")
+assert(not indexBuilt and not indexSync, "login does not build the whole name index")
+assert(#timers == 1, "the name index is built a batch a frame")
+Frame()
+assert(indexAsync and indexRows == 250 and not indexBuilt, "the first frame reads one batch: " .. indexRows)
+while #timers > 0 do
+	Frame()
+end
+assert(indexBuilt and indexRows == 606, "every NPC is read once across frames: " .. indexRows)
 local added, shown = {}, false
 local tooltip = {
 	AddLine = function(_, text)

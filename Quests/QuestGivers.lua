@@ -59,6 +59,33 @@ local raceMasks ---@type table<integer, integer>?
 -- [name] = the quest NPCs of that name with their spawns in world yards.
 ---@type table<string, TFGiverCandidate[]>
 local candidates = {}
+-- QuestieDB builds its name index in one pass over every NPC, which is a frame well over the addon's budget on a
+-- cold login (#411). Build it in the library's own yielding form, one batch a frame, after login has finished.
+local NAME_BATCH = 250
+
+-- Warm the NPC name index without holding the login frame. A library without the yielding call leaves its lazy build
+-- to the first hover.
+---@param npc TFQuestieEntity
+local function WarmNameIndex(npc)
+	local build = npc.BuildNameIndexAsync
+	if type(build) ~= "function" then
+		return
+	end
+	local thread = coroutine.create(function()
+		build(NAME_BATCH)
+	end)
+	local function Step()
+		local ok, err = coroutine.resume(thread)
+		if not ok then
+			ns.core.SafeCall("QuestieDB name index", function()
+				error(err, 0)
+			end)
+		elseif coroutine.status(thread) ~= "dead" then
+			C_Timer.After(0, Step)
+		end
+	end
+	C_Timer.After(0, Step)
+end
 
 -- The loaded QuestieDB with everything this file reads, and its area-to-map lookup; nil when any of it is missing or
 -- its zone tables can't be read, so a giver is never placed from partial data.
@@ -386,10 +413,9 @@ ns.Init(function()
 	if not Model.Attach() then
 		return
 	end
-	-- The name index is one pass over every NPC: build it now, behind the loading screen, not on the first hover.
-	-- A library without that call still builds it on the first name it is asked for.
-	if ns.Active(KEY) and type(lib.Npc.BuildNameIndex) == "function" then
-		lib.Npc.BuildNameIndex()
+	-- The name index is one pass over every NPC: build it a batch a frame after login, not on the first hover.
+	if ns.Active(KEY) then
+		WarmNameIndex(lib.Npc)
 	end
 
 	-- The minimap redraws its tooltip every frame the mouse is over it, so the lines are kept until what they depend

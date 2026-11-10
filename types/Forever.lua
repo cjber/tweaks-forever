@@ -46,7 +46,7 @@ Questie = nil
 ---@class TFQuestieEntity
 ---@field GetAll fun(id: integer, keys: string[]): table?
 ---@field IdsByName fun(name: string): integer[]?
----@field BuildNameIndex fun()
+---@field BuildNameIndexAsync? fun(iterationsPerCycle?: integer)
 
 ---@class TFQuestieDB
 ---@field RequireContract fun(required: integer): boolean, string?

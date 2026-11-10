@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Logging in with QuestieDB installed no longer stalls for a frame.** The quest-giver name index was built in one pass over every NPC as the world appeared, which could freeze the game for over 100 ms on a slower machine. It is now built a little at a time just after login, so the first moments in the world stay smooth (#411).
+
 ## [2.5.1] - 2026-11-10
 
 - **Forever Core now comes in the same download.** This addon needs Forever Core, and until Forever Core has its own CurseForge page every Forever addon's download carries a copy of it, so the addon loads with nothing else to install.
