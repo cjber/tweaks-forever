@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 -- Click modes: the bag actions without a modifier key, for keyboards or window managers that swallow Alt or Ctrl.

@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 local KEY = "cameraZoom"
 local CVAR = "cameraDistanceMaxZoomFactor"
 -- The game's own Max Camera Distance slider stops at 2.0; this is the same extended value Leatrix Plus sets.

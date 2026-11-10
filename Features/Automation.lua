@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- Things the game asks you to click through. Each acts only while its feature is on and not already handled
 -- by another addon; holding Shift skips quest and gossip automation for that window.
 

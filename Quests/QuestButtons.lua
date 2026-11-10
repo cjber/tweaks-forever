@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 local KEY = "questButtons"
@@ -169,7 +173,7 @@ ns.Init(function()
 	end
 	item:SetScript("PreClick", function(self, _, down)
 		if Acting(down) then
-			ns.SafeCall("quest item key", function()
+			ns.core.SafeCall("quest item key", function()
 				local found = ns.Active(KEY) and Model.Nearest(Model.Quests(), QuestItem)
 				self:SetAttribute("item", found or nil)
 			end)
@@ -177,7 +181,7 @@ ns.Init(function()
 	end)
 	target:SetScript("PreClick", function(self, _, down)
 		if Acting(down) then
-			ns.SafeCall("quest target key", function()
+			ns.core.SafeCall("quest target key", function()
 				local names = ns.Active(KEY) and Model.Nearest(Model.Quests(), KillNames)
 				lastName = names and Model.Next(names, lastName) or nil
 				self:SetAttribute("macrotext", lastName and "/targetexact " .. lastName or nil)

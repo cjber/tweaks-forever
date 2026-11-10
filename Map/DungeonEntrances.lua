@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 ns.Feature({
 	key = "dungeonEntrances",
 	category = "Maps",
@@ -26,7 +30,7 @@ ns.Feature({
 local TEMPLATE = "TweaksForeverDungeonEntrancePinTemplate"
 -- Markers of a place found through the map's pins (a read): Blizzard's flight points, and the pins of Forever addons
 -- from before they drew on frames of their own. Those that do list theirs through ForeverMapMarkers
--- (Map/MapCanvas.lua). An entrance either sits on steps aside.
+-- (Map/MapDraw.lua). An entrance either sits on steps aside.
 local NATIVE_MARKERS = {
 	"FlightPointPinTemplate",
 	"LegacyForeverPinTemplate",
@@ -109,7 +113,7 @@ end
 
 ns.Init(function()
 	local map = WorldMapFrame
-	local MapCanvas = ns.MapCanvas
+	local MapCanvas = ns.MapDraw
 
 	-- Measured at the smallest zoom, where icons crowd most.
 	local function HalfExtents()
@@ -145,7 +149,7 @@ ns.Init(function()
 
 	-- Retail's pin, fed from Data/DungeonEntrances.lua: C_EncounterJournal has no entrances without the journal's
 	-- tables, which Forever's client lacks, so Blizzard's own provider draws nothing. Drawn on a frame of our own
-	-- (Map/MapCanvas.lua) with the retail icon and tooltip; a left click opens its map or travels there in place of
+	-- (Map/MapDraw.lua) with the retail icon and tooltip; a left click opens its map or travels there in place of
 	-- retail's journal, and a right click goes through to the map to zoom out.
 	---@class TFEntrancePin : TFCanvasPin
 	---@field Texture Texture
@@ -202,8 +206,9 @@ ns.Init(function()
 
 	---@param button string
 	function Pin:OnMouseClickAction(button)
-		if button == "LeftButton" then
-			Model.Click(map:GetMapID(), self.entry, IsShiftKeyDown())
+		local mapID = map:GetMapID()
+		if button == "LeftButton" and mapID then
+			Model.Click(mapID, self.entry, IsShiftKeyDown())
 		end
 	end
 
@@ -220,7 +225,7 @@ ns.Init(function()
 	end
 
 	-- Not CVarMapCanvasDataProviderMixin or any data provider: the map's providers and pins are walked by the
-	-- gamepad interface's secure code (Map/MapCanvas.lua). A redraw in combat hides the pins and waits for its end.
+	-- gamepad interface's secure code (Map/MapDraw.lua). A redraw in combat hides the pins and waits for its end.
 	local CVAR = "showDungeonEntrancesOnMap"
 	local refreshPending = false
 

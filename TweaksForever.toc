@@ -12,6 +12,7 @@
 ## X-Donate: https://github.com/sponsors/cjber
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
+## Dependencies: ForeverCore
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
@@ -25,6 +26,7 @@ Locales\ptBR.lua
 Locales\ruRU.lua
 Locales\zhCN.lua
 Locales\zhTW.lua
+Core\Require.lua
 Data\Overlays.lua
 Data\CampBenefits.lua
 Data\ZoneLevels.lua
@@ -33,13 +35,8 @@ Data\ClassSpells.lua
 Data\ForeverQuests.lua
 Data\DungeonMapArt.lua
 Core\Secret.lua
-Core\SafeCall.lua
-Core\OpenSettings.lua
-Core\Log.lua
 Core\Core.lua
 UI\Art.lua
-UI\ForeverFamily.lua
-UI\Report.lua
 UI\Keys.lua
 Features\Automation.lua
 Features\WhisperInvite.lua
@@ -67,7 +64,7 @@ Quests\BestReward.lua
 UI\Tooltips.lua
 UI\CursorTooltip.lua
 UI\Nameplates.lua
-Map\MapCanvas.lua
+Map\MapDraw.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua
 Map\Coordinates.lua
@@ -93,5 +90,4 @@ UI\WhatsNew.lua
 Integrations\Companions.lua
 Core\Report.lua
 UI\Settings.lua
-UI\SettingsPage.lua
 Core\API.lua

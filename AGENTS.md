@@ -3,15 +3,21 @@
 Tweaks Forever is a WoW: Forever addon (Interface 16001) that replaces single-purpose addons with
 options in the game's own settings. Players install the zip the BigWigs packager builds on a `v*` tag.
 
+It requires ForeverCore (`## Dependencies: ForeverCore`), the standalone addon that owns the shared tracker
+column, report window, error journal and debug log, the minimap button, the quest log side tabs, the settings-page
+chrome and the family page. CurseForge and Wago install ForeverCore with it through `.pkgmeta`'s
+`required-dependencies`; no shared runtime file is vendored here. `Core/Require.lua` stops the addon with one
+on-screen line when an installed ForeverCore is older than API 1.
+
 ## Commands
 
 ```sh
 python3 tools/doctor.py   # first on a new machine: every tool pin below, with a fix for each problem
 stylua --check .
 luacheck .
-tools/typecheck.sh
-for spec in tests/*_spec.lua; do luajit "$spec" || exit 1; done
-python3 tools/forever_sim/fetch.py && luajit tools/forever_sim/run.lua   # tests/sim scenarios on the real Blizzard UI
+FOREVER_CORE=../forever-core tools/typecheck.sh
+for spec in tests/*_spec.lua; do FOREVER_CORE=../forever-core luajit "$spec" || exit 1; done
+FOREVER_CORE=../forever-core python3 tools/forever_sim/fetch.py && FOREVER_CORE=../forever-core luajit tools/forever_sim/run.lua   # tests/sim scenarios on the real Blizzard UI
 ruff check tools && ruff format --check tools
 uvx ty@0.0.83 check tools --extra-search-path . --extra-search-path tools
 python3 tools/check_generated.py --offline # omit --offline to fetch missing pinned inputs
@@ -35,10 +41,16 @@ regression (`.speedpatrol/instructions.md`).
 Every version needs a `CHANGELOG.md` entry (prose, bold-lead bullets) before its `v*` tag: the release
 publishes that entry as its notes.
 
+`FOREVER_CORE` names the cjber/forever-core checkout the specs and the simulator load, defaulting to the sibling
+`../forever-core`. `tools/forever-core.txt` holds the git ref CI checks out for them; it is a branch while this addon
+adopts the dependency and becomes `v1.0.0` at release.
+
 ## Layout
 
-- `Core/Core.lua` — `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, and TOC
-  order sets the settings subpage order.
+- `Core/Require.lua` is the API floor: an installed ForeverCore older than API 1 stops the addon's own files with
+  one line in `UIErrorsFrame`. `Core/Core.lua` has `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers
+  through it, and TOC order sets the settings subpage order. `ns.core = ForeverCore.Register(...)` gives the
+  addon its own error journal, log and report.
 - `Bags/`, `Quests/`, `Map/`, `Features/` — feature modules grouped by the part of the game they change.
 - `UI/` — settings, tooltips, nameplates and window helpers; `Integrations/` — companion navigation, and
   `Integrations/QuestieSource.lua`, the one place QuestieDB is opened: quests, NPC names and spawns are read from the installed
@@ -71,10 +83,10 @@ publishes that entry as its notes.
   frames out with engine calls (points, sizes, alpha) after Blizzard has. Never `hooksecurefunc(object, …)`, a
   replaced method, a field written on a Blizzard table, or a call into Blizzard's layout or lazy caches.
   To restyle a Blizzard element, draw our own frame or texture on top and set theirs to alpha 0.
-- On a map, draw only through `Map/MapCanvas.lua`: frames of our own on the canvas, made with no parent and then
-  set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`, `AddOverlayFrame` or a
-  `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure code (#168).
-  `tests/map_canvas_spec.lua` runs the files that draw on a map against maps that fail on any write.
+- On a map, draw only through `Map/MapDraw.lua`, the addon's own canvas helper: frames of our own on the canvas,
+  made with no parent and then set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`,
+  `AddOverlayFrame` or a `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure
+  code (#168). `tests/map_canvas_spec.lua` runs the files that draw on a map against maps that fail on any write.
 - Player-visible text goes through `L["whole sentence"]` (a whole format string, never joined fragments), or a
   Blizzard GlobalString that says exactly the same; `ns.Feature`/`ns.ClickMode` text stays plain English.
 - Commits are signed (`git commit -S`) with the personal email.

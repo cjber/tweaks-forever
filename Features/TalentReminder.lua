@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 local KEY = "talentReminder"
 -- A soft gold glow around the talents micro button while points wait to be spent.
 local GLOW_ATLAS = "collections-newglow"

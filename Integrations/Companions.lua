@@ -1,9 +1,13 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 -- Tweaks' hints for my other Forever addons, behind the shared "Suggest my other Forever addons" setting
--- (db.suggestFamily, on the Forever addons page that UI/ForeverFamily.lua draws).
+-- (db.suggestFamily, on the Forever addons page that ForeverCore.Family draws).
 
 local SPF = "ShortestPathForever"
 -- Family.Hint keys are shared by all five addons, so each starts with this addon's folder.
@@ -17,8 +21,9 @@ local ENTRANCE_KEY = "TweaksForever.entrance"
 ---@param shift boolean? whether a plain click opens a map, so planning takes Shift
 ---@return string?
 function ns.EntranceHint(shift)
-	local Family, db = ns.Family, ns.db
-	if not (Family and db) then
+	local Family = ForeverCore.Family --[[@as ForeverFamilyAPI]]
+	local db = ns.db
+	if not db then
 		return nil
 	end
 	if Family.Hint(db, ENTRANCE_KEY, SPF) then

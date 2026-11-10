@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- Escape closes one of our panels and every other key reaches the game, so a panel left open never takes movement
 -- or action keys. SetPropagateKeyboardInput is blocked for addon code in combat, so propagation is left on and only
 -- the Escape that closes a panel out of combat turns it off, for that key alone, and the next frame turns it back on.

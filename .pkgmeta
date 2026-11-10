@@ -1,5 +1,8 @@
 package-as: TweaksForever
 
+required-dependencies:
+  - forevercore
+
 move-folders:
   TweaksForever/LibAHTab: LibAHTab
 
@@ -15,6 +18,7 @@ ignore:
   - tests
   - types
   - docs
+  - forever-core
   - media/icon.svg
   - media/icon-400.png
   - stylua.toml

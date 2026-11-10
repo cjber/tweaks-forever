@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 ns.Feature({
 	key = "exploration",
 	category = "Maps",
@@ -145,12 +149,12 @@ end
 ---@param map TFMapCanvas
 ---@return fun()
 local function Attach(map)
-	-- Drawn on a frame of our own on the map's canvas (Map/MapCanvas.lua), at the frame level the map gives its
+	-- Drawn on a frame of our own on the map's canvas (Map/MapDraw.lua), at the frame level the map gives its
 	-- exploration pin, with the map's mask applied here. Never on Blizzard's pin, through a data provider or in the
 	-- map's tables: the gamepad interface's secure code walks those, and hooking the pin's methods once made
 	-- Blizzard's own map code fail with "attempt to call a nil value".
-	local view = ns.MapCanvas.Watch(map)
-	local tint = ns.MapCanvas.FrameUnder("Frame", view.host)
+	local view = ns.MapDraw.Watch(map)
+	local tint = ns.MapDraw.FrameUnder("Frame", view.host)
 	tint:SetAllPoints(view.host)
 	tint:EnableMouse(false)
 	local pool = CreateTexturePool(tint, "ARTWORK")
@@ -220,7 +224,7 @@ local function Attach(map)
 	end
 
 	-- Every map opened, turned to or resized redraws, and a zoom that changes the art layer.
-	ns.MapCanvas.Watch(map, function(_, what)
+	ns.MapDraw.Watch(map, function(_, what)
 		if what == "scale" then
 			if drawnLayer and drawnLayer ~= map:GetCanvasContainer():GetCurrentLayerIndex() then
 				Draw()

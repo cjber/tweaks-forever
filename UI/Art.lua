@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- Art at its native aspect (AGENTS.md: never stretch art): an atlas takes its shape from C_Texture.GetAtlasInfo,
 -- as a texture fitted inside its box or as markup in a line of text.
 

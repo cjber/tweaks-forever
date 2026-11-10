@@ -1,5 +1,5 @@
 -- Run from the repository root: luajit tests/map_canvas_spec.lua
--- Map/MapCanvas.lua, Map/DungeonEntrances.lua and Map/Exploration.lua on a world map and a zone map that fail on any
+-- Map/MapDraw.lua, Map/DungeonEntrances.lua and Map/Exploration.lua on a world map and a zone map that fail on any
 -- write (tests/strict_map.lua): Tweaks draws its entrances and its unexplored tint on frames of its own, adds no data
 -- provider, acquires no pin and writes nothing of the maps' (#168), and keeps each pin's placing, scaling, tooltip,
 -- click, step-aside and combat behaviour.
@@ -111,11 +111,13 @@ local ns = {
 	EntranceHint = function()
 		return nil
 	end,
-	SafeCall = function(_, fn, ...)
-		return true, fn(...)
-	end,
+	core = {
+		SafeCall = function(_, fn, ...)
+			return true, fn(...)
+		end,
+	},
 }
-assert(loadfile("Map/MapCanvas.lua"))("TweaksForever", ns)
+assert(loadfile("Map/MapDraw.lua"))("TweaksForever", ns)
 -- No painted sheet here, so a click travels: tests/dungeonmaps_spec.lua runs the sheets.
 ns.DungeonMaps = {
 	FloorsOf = function()

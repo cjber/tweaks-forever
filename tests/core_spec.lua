@@ -1,7 +1,23 @@
--- Defaults and the shared namespace must be ready before any feature initializer runs.
--- Core/SafeCall.lua installs its error handler and event frame once per addon; this stand-in client already counts
--- this copy as installed, so the journal builds no frame and the frames here keep their order.
-ForeverErrorJournal = { installed = { TweaksForever = true } }
+-- Defaults and the shared namespace must be ready before any feature initializer runs. ForeverCore provides the
+-- per-addon services Core/Core.lua registers and calls; this stand-in records what it is handed.
+local function Core(env)
+	env.ForeverCore = {
+		Register = function(_, spec)
+			assert(type(spec.title) == "string" or spec.title == nil, "the report title is text")
+			return {
+				SafeCall = function(_, fn, ...)
+					return pcall(fn, ...)
+				end,
+				Attach = function() end,
+				Report = {
+					Command = function()
+						return false
+					end,
+				},
+			}
+		end,
+	}
+end
 
 -- Each scenario runs the shared files in its own environment. The chunk is parsed once: executing it again still
 -- builds every local and table fresh, and parsing the same file five times only measured the parser.
@@ -51,8 +67,7 @@ local function Load(saved)
 		end,
 	}, { __index = _G })
 	local ns = {}
-	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
-	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	Core(env)
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	ns.Feature({ key = "enabled", default = true })
 	ns.Feature({ key = "disabled", default = false })
@@ -147,8 +162,7 @@ do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but 
 		end,
 	}, { __index = _G })
 	local ns = {}
-	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
-	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	Core(env)
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	local listeners = {}
 	env.Polestar.On = function(message, fn)
@@ -222,8 +236,7 @@ do -- An `openmap` conflict reads OpenMap's world map option while OpenMap is lo
 		end,
 	}, { __index = _G })
 	local ns = {}
-	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
-	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	Core(env)
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	ns.db = { coords = true, reveal = true }
 	ns.Feature({ key = "coords", default = true, conflicts = { { openmap = "coords" } } })
@@ -291,8 +304,7 @@ do -- A `naowh` conflict reads Naowh Forever's QoL switch while its QoL module i
 		},
 	}, { __index = _G })
 	local ns = {}
-	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
-	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	Core(env)
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	ns.Feature({ key = "fastLoot", default = true, conflicts = { { naowh = "fastLoot" } } })
 	ns.Feature({ key = "sell", default = true, conflicts = { { naowh = "sellJunk" } } })
@@ -339,8 +351,7 @@ do -- Loaded at login, Polestar's own setting changes refresh the conflicts at o
 		end,
 	}, { __index = _G })
 	local ns = {}
-	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
-	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	Core(env)
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	ns.Feature({ key = "fastLoot", default = true, conflicts = { { polestar = "qol.fastLoot" } } })
 	assert(ns.features[1].conflicts[1].addon == "Polestar" and ns.features[1].conflicts[1].title == "Polestar")
@@ -362,6 +373,7 @@ do
 			return { RegisterEvent = function() end, SetScript = function() end }
 		end,
 	}, { __index = _G })
+	Core(env)
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	local button = { text = 40 }
 	function button:GetTextWidth()

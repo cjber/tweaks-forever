@@ -5,9 +5,11 @@ local ns = {
 			return key
 		end,
 	}),
-	SafeCall = function(_, fn, ...)
-		return assert(pcall(fn, ...))
-	end,
+	core = {
+		SafeCall = function(_, fn, ...)
+			return assert(pcall(fn, ...))
+		end,
+	},
 	QuestTitle = function(_, title)
 		return title
 	end,

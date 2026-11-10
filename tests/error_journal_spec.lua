@@ -1,9 +1,9 @@
 -- Run from the repository root: luajit tests/error_journal_spec.lua
--- The shared error journal (Core/SafeCall.lua) and debug log (Core/Log.lua) live in TweaksForeverDB, attached at
--- PLAYER_LOGIN once the saved variables and their defaults are in, so the report lists earlier sessions' errors and
--- the lines that led to them after a /reload.
--- Each login runs the shared files in its own environment. The chunk is parsed once: executing it again still builds
--- every local and table fresh, and parsing the same file for each login only measured the parser.
+-- ForeverCore's shared error journal and debug log live in TweaksForeverDB, attached at PLAYER_LOGIN once the saved
+-- variables and their defaults are in, so the report lists earlier sessions' errors and the lines that led to them
+-- after a /reload.
+-- Each login runs ForeverCore and then the addon in its own environment, as the client loads a required dependency
+-- first. The chunk is parsed once: executing it again still builds every local and table fresh.
 local chunks = {}
 local function Chunk(path)
 	local chunk = chunks[path]
@@ -46,10 +46,16 @@ local function Login(saved)
 			return "2026-11-08 12:00:00"
 		end,
 	}, { __index = _G })
+	local core = dofile("tests/forever_core.lua")
+	core.install(env, {
+		"Core/SafeCall.lua",
+		"Core/Log.lua",
+		"UI/Report.lua",
+		"UI/MapCanvas.lua",
+		"Expose.lua",
+	})
 	local ns = {}
 	Chunk("Locales/enUS.lua")("TweaksForever", ns)
-	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
-	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	-- The last frame Core.lua makes is its PLAYER_LOGIN one.
 	frames[#frames].callback()
@@ -63,8 +69,8 @@ local db = assert(env.TweaksForeverDB, "the saved table was not made")
 assert(type(db.errors) == "table", "the saved table has no error journal")
 assert(type(db.log) == "table", "the saved table has no debug log")
 
--- An error caught by ns.SafeCall is recorded in the saved journal, which is where the next session reads it.
-local ok = ns.SafeCall("error journal spec", function()
+-- An error caught by ns.core.SafeCall is recorded in the saved journal, which is where the next session reads it.
+local ok = ns.core.SafeCall("error journal spec", function()
 	error("error journal spec failure")
 end)
 assert(ok == false, "the failure was not caught")
@@ -79,7 +85,7 @@ assert(entry.kind == "error" and entry.count == 1, "the journal entry is not one
 assert(type(entry.firstSeen) == "number" and type(entry.lastSeen) == "number", "the journal entry has no times")
 
 -- The log rides in the same saved table, so the lines that led to a bug survive a /reload too.
-ns.Log("info", "error journal spec", "a line before the reload")
+ns.core.Log("info", "error journal spec", "a line before the reload")
 local logged
 for _, line in ipairs(db.log.lines or {}) do
 	if line:find("a line before the reload", 1, true) then
@@ -113,7 +119,7 @@ assert(reloadedEnv.TweaksForeverDB == saved, "the saved table was replaced")
 assert(reloadedEnv.TweaksForeverDB.errors == saved.errors, "the journal is not the saved errors table")
 assert(reloadedEnv.TweaksForeverDB.log == saved.log, "the log is not the saved log table")
 local earlier
-for _, candidate in ipairs(reloaded.CaughtErrors()) do
+for _, candidate in ipairs(reloaded.core.CaughtErrors()) do
 	if candidate.message == "error from an earlier session" then
 		earlier = candidate
 	end
@@ -121,7 +127,7 @@ end
 assert(earlier and earlier.fromSession == false, "an earlier session's error is missing from the report")
 assert(earlier.count == 2, "the earlier session's count was lost")
 local kept
-for _, line in ipairs(reloaded.LogLines(10)) do
+for _, line in ipairs(reloaded.core.LogLines(10)) do
 	if line:find("line from an earlier session", 1, true) then
 		kept = line
 	end
@@ -135,7 +141,7 @@ local repairedDB = assert(corruptEnv.TweaksForeverDB)
 assert(type(repairedDB.errors) == "table", "a corrupt journal was kept instead of replaced")
 assert(type(repairedDB.log) == "table", "a corrupt log was kept instead of replaced")
 assert(type(repairedDB.log.lines) == "table", "a replaced log has no ring")
-assert(corrupt.SafeCall("corrupt journal", function()
+assert(corrupt.core.SafeCall("corrupt journal", function()
 	error("corrupt journal failure")
 end) == false, "the failure was not caught")
 local repaired

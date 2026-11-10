@@ -2,6 +2,7 @@
 -- A pet trainer beside the class trainer: the stock frame, with the client's own future spells on the pet bank,
 -- then combat. The trainer is Blizzard's real one, loaded on demand as the client loads it.
 scenario("a pet trainer names what the pet has not learned", function(sim)
+	dofile("tests/sim/forever_core.lua").install(sim)
 	sim:login()
 	local G = sim.G
 	local filters = { available = true, unavailable = true, used = false }

@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- Secret values. The client can hand an addon a value it may hold but not read: a unit's GUID or name in some
 -- combat and instance states. Keep this file free of other addon state so the pattern copies across the Forever
 -- addons as is.

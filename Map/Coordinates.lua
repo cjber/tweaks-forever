@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 local KEY = "mapCoords"
@@ -90,7 +94,7 @@ ns.Init(function()
 	local container = WorldMapFrame.ScrollContainer
 	-- Our own frame, centred along the bottom of the map, clear of the dungeon map's corner button and above the
 	-- map's pins; it runs only while the map shows.
-	local bar = ns.MapCanvas.FrameUnder("Frame", WorldMapFrame)
+	local bar = ns.MapDraw.FrameUnder("Frame", WorldMapFrame)
 	bar:SetPoint("BOTTOM", container, "BOTTOM", 0, 6)
 	bar:SetSize(320, 16)
 	bar:SetFrameLevel(container:GetFrameLevel() + 500)

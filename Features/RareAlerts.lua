@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 local KEY = "rareAlerts"
@@ -254,7 +258,7 @@ if EventRegistry then
 	EventRegistry:RegisterCallback("SetItemRef", function(_, link)
 		local guid = type(link) == "string" and link:sub(1, #LINK) == LINK and link:sub(#LINK + 1)
 		if guid then
-			ns.SafeCall("rare waypoint", Waypoint, places[guid])
+			ns.core.SafeCall("rare waypoint", Waypoint, places[guid])
 		end
 	end, places)
 end
@@ -263,5 +267,5 @@ end
 local BUTTON = "TweaksForeverRareWaypointButton"
 _G["BINDING_NAME_CLICK " .. BUTTON .. ":LeftButton"] = L["Set a waypoint to the last rare found"]
 CreateFrame("Button", BUTTON):SetScript("OnClick", function()
-	ns.SafeCall("rare waypoint", Waypoint, lastPlace)
+	ns.core.SafeCall("rare waypoint", Waypoint, lastPlace)
 end)

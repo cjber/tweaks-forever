@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 -- Public addon-to-addon interface. It answers with the facts whether or not the spellbook shows Future Spells: a

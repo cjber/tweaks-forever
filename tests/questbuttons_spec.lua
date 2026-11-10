@@ -18,9 +18,11 @@ local ns = {
 	Active = function(key)
 		return db[key]
 	end,
-	SafeCall = function(_, fn, ...)
-		return assert(pcall(fn, ...))
-	end,
+	core = {
+		SafeCall = function(_, fn, ...)
+			return assert(pcall(fn, ...))
+		end,
+	},
 }
 -- Quest 1 (far) has an item; quest 2 (near) has an item and wolves and bears to kill; quest 3 (nearest) is done.
 local log = {
