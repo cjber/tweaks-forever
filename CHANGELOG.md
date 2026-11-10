@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.5.1] - 2026-11-10
+
+- **Forever Core now comes in the same download.** This addon needs Forever Core, and until Forever Core has its own CurseForge page every Forever addon's download carries a copy of it, so the addon loads with nothing else to install.
+
 ### For addon authors
 
 - **`TweaksForever.API` is minor 1: each read that has nothing to answer returns `nil, reason`.** `TrainableSpells()` answers `nil, "loading"` before login and in combat, and `DungeonEntrance(instanceID)` answers `nil, "none"` for an instance with no entrance. `nil` alone still means the same to existing callers. `docs/api.md` lists every published function, each read's reasons and the minor history; there is no `Subscribe()` yet (#425).

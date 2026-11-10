@@ -21,7 +21,7 @@ ROOT = Path(__file__).resolve().parent.parent
 # repository layout (the package ships it as its own folder, which the TOC check above covers).
 REPO_ONLY = {"tests/auctionator_spec.lua"}
 POLICY = package.Policy(
-    addons=("TweaksForever", "LibAHTab"),
+    addons=("TweaksForever", "LibAHTab", "ForeverCore"),
     specs=tuple(
         spec
         for spec in sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("tests/*_spec.lua"))
