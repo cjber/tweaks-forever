@@ -37,9 +37,10 @@ local QUEST_FIELDS = {
 	"requiredSpell",
 }
 local NPC_FIELDS = { "spawns", "questStarts", "questEnds" }
-local OFFER = "|TInterface\\GossipFrame\\AvailableQuestIcon:0|t " -- art-ok: a square file, square at the text's height
-local READY = "|TInterface\\GossipFrame\\ActiveQuestIcon:0|t " -- art-ok: a square file, square at the text's height
--- The in-progress "?" is 16 by 18 (UiTextureAtlasMember, 1.60.1.70009), never squared: 14 wide by 16 tall.
+-- The quest symbols are square atlases, drawn square at the text's height like the in-progress "?" (16 by 18,
+-- UiTextureAtlasMember 1.60.1.70009, never squared).
+local OFFER = ns.Art.Markup("questnormal", 16) .. " "
+local READY = ns.Art.Markup("questturnin", 16) .. " "
 local UNREADY = ns.Art.Markup("SideInProgressquesticon", 16) .. " "
 
 ---@class TFQuestGivers
