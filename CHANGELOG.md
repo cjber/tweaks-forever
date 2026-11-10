@@ -12,6 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Nameplates no longer fade.** Plates other than your target now darken their bar slightly, as Blizzard's own nameplates do, instead of turning see-through, so far-off enemies and enemies behind terrain no longer become hard to see.
 
 ## [2.4.4] - 2026-11-10
 

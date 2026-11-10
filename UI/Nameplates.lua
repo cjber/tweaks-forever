@@ -8,8 +8,8 @@ ns.Feature({
 	category = "Interface",
 	name = "Larger, clearer nameplates",
 	tooltip = "Nameplates get a taller health bar in the retail frame, with the full name centred above it and the "
-		.. "level, coloured by difficulty, after the name. Your target is outlined and the others fade back while you "
-		.. "have one. "
+		.. "level, coloured by difficulty, after the name. Your target is outlined and the bars of the others are "
+		.. "slightly darker. "
 		.. "Casts show in a slimmer bar with the spell's icon and name inside it. Health numbers follow the game's "
 		.. "Nameplates options. Switching this on or off takes effect after the next reload.",
 	default = true,
@@ -29,7 +29,6 @@ ns.Feature({
 -- Blizzard reserves each plate's height from its own style's sizes; this layout is no taller than Forever's
 -- default Thin style, 1 unit shorter, so plates stack as before. Sizes are at Medium and scale with the setting.
 local HEALTH, CAST, GAP, NAME_GAP, HEALTH_TEXT = 16, 12, 2, 4, 11
-local DIMMED = 0.6
 
 -- Unit frames already hooked. They are pooled, so each is hooked once and reused for many units. Script hooks only:
 -- hooksecurefunc on a unit frame's methods writes into Blizzard's frame, and its own calls then run tainted.
@@ -37,33 +36,34 @@ local DIMMED = 0.6
 local styled = setmetatable({}, { __mode = "k" })
 
 -- Retail's selection outline, which Blizzard switches off for the Classic style, white round the target and gold round
--- the focus, and the other plates faded back while you have a target. Asks the game rather than reading the frame's
--- cached isTarget. In dungeons and raids
--- UnitIsUnit answers with a secret boolean that addon code cannot test, so there the engine's FromBoolean setters
--- take it as it is and the focus goes unmarked.
+-- the focus, and its deselected overlay, which darkens the bar of every plate that is neither. Asks the game rather
+-- than reading the frame's cached isTarget. In dungeons and raids UnitIsUnit answers with a secret boolean that addon
+-- code cannot test, so there the engine's FromBoolean setters take it as it is and the focus goes unmarked.
 ---@param frame NamePlateUnitFrame
 local function Highlight(frame)
 	local unit = frame.unit
-	local border = frame.HealthBarsContainer.healthBar.selectedBorder
+	local bar = frame.HealthBarsContainer.healthBar
+	local border = bar.selectedBorder
+	local overlay = bar.deselectedOverlay
 	if not unit then
 		border:Hide()
-		frame:SetAlpha(1)
+		overlay:Hide()
 		return
 	end
 	local target, focus = UnitIsUnit(unit, "target"), UnitIsUnit(unit, "focus")
-	local fade = UnitExists("target") and DIMMED or 1
 	border:SetVertexColor(1, 1, 1)
 	border:Show()
+	overlay:Show()
 	if not (canaccessvalue(target) and canaccessvalue(focus)) then
 		border:SetAlphaFromBoolean(target, 1, 0)
-		frame:SetAlphaFromBoolean(target, 1, fade)
+		overlay:SetAlphaFromBoolean(target, 0, 1)
 		return
 	end
 	if focus and not target then
 		border:SetVertexColor(NORMAL_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 	end
 	border:SetAlpha((target or focus) and 1 or 0)
-	frame:SetAlpha((target or focus) and 1 or fade)
+	overlay:SetAlpha((target or focus) and 0 or 1)
 end
 
 -- Retail's own bar art, as its default style lays it out: the cooldown-manager fill inside its bronze-rimmed trough,
@@ -81,8 +81,6 @@ local function HealthArt(bar)
 	border:ClearAllPoints()
 	border:SetPoint("TOPLEFT", trough, "TOPLEFT", -1, 1)
 	border:SetPoint("BOTTOMRIGHT", trough, "BOTTOMRIGHT", -3, 3)
-	-- The others fade back as a whole instead, so the darkening would dim them twice.
-	bar.deselectedOverlay:SetAlpha(0)
 end
 
 ---@param frame NamePlateUnitFrame
@@ -179,13 +177,6 @@ local function Style(frame)
 end
 
 ---@param frame NamePlateUnitFrame
-local function Refresh(frame)
-	if styled[frame] then
-		Highlight(frame)
-	end
-end
-
----@param frame NamePlateUnitFrame
 local function Relayout(frame)
 	if styled[frame] then
 		Layout(frame)
@@ -223,7 +214,5 @@ ns.Init(function()
 			ForEachPlate(Relayout)
 		end)
 	end)
-	-- Blizzard resets a unit frame's alpha here; nameplates never fade for range, so it always sets 1.
-	hooksecurefunc("CompactUnitFrame_UpdateCenterStatusIcon", Refresh)
 	ForEachPlate(Style)
 end)

@@ -570,8 +570,9 @@ def editmode(ui):
 
 
 # UI/Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
-# and a 12 cast bar, name and level 4 above the bar, the selection outline on the target, the others at 0.6 alpha.
-PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP, PLATE_DIMMED = 166, 16, 12, 2, 0.6
+# and a 12 cast bar, name and level 4 above the bar, the target outlined and every other plate's bar darkened by
+# Blizzard's own deselected overlay.
+PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP = 166, 16, 12, 2
 QUEST_ICON, QUEST_GAP = 20, 4
 HOSTILE, ROGUE = (1.0, 0.0, 0.0), (1.0, 0.96, 0.41)
 FAIR, EASY = (1.0, 0.82, 0.0), (0.25, 0.75, 0.25)
@@ -617,6 +618,10 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
     c.draw(ui.atlas("UI-HUD-CoolDownManager-Bar"), x, y, w * health, PLATE_HEALTH, color=(*colour, 1))
     if target:
         c.draw(ui.atlas("UI-HUD-Nameplates-Selected"), x - 3, y - 4, w + 6, PLATE_HEALTH + 7)
+    else:
+        # Blizzard's own darkening of a bar that is neither the target nor the focus, 1 beyond the bar's top and
+        # bottom as its XML anchors it.
+        c.draw(ui.atlas("ui-hud-nameplates-deselected-overlay"), x, y - 1, w, PLATE_HEALTH + 2)
     if quest:
         # Quests/QuestProgress.lua: the 20-square questobjective atlas 4 right of the health bar, centred on it.
         c.draw(
@@ -667,8 +672,6 @@ def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuf
         c.draw(ui.atlas("ui-castingbar-pip"), x + w * progress - 2, cast_y, 4, PLATE_CAST)
         spell_icon(ui, c, fdid, x, cast_y, PLATE_CAST)
         c.text(x + PLATE_CAST + 3, cast_y, spell, Font(FRIZQT, 10, (1, 1, 1), None, True), box_height=PLATE_CAST)
-    if not target:
-        c.image.putalpha(c.image.getchannel("A").point(lambda a: round(a * PLATE_DIMMED)))
     return c
 
 
