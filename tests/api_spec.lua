@@ -111,6 +111,20 @@ local env = setmetatable({
 		return false
 	end,
 }, { __index = _G })
+-- ForeverCore's shared API kit, loaded from the checkout FOREVER_CORE names, with the one service it needs from
+-- the core's namespace: SafeCallFor. It builds the hub that a later minor's Subscribe will publish.
+local core = dofile("tests/forever_core.lua")
+local coreNs = {
+	SafeCallFor = function()
+		return {
+			SafeCall = function(_, _, fn, ...)
+				return fn(...)
+			end,
+		}
+	end,
+}
+setfenv(assert(loadfile(core.directory() .. "/Core/APIKit.lua")), env)("ForeverCore", coreNs)
+env.ForeverCore = { API = 1, APIKit = coreNs.APIKit }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 for _, file in ipairs({
 	"Data/ClassSpells.lua",
@@ -123,6 +137,9 @@ for _, file in ipairs({
 end
 local API = env.TweaksForever.API
 assert(API.version == 3, "v2 adds Trainers, v3 reads their names and places from QuestieDB")
+assert(API.minor == 1, "minor 1 adds each read's not-ready reason")
+assert(env.ForeverCore.APIKit ~= nil, "the shared API kit is available at load")
+assert(API.Subscribe == nil, "this minor has no Subscribe yet")
 local entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "first curated zone, before login")
 local another = API.DungeonEntrance(230)
@@ -180,13 +197,18 @@ assert(#cluster.instances == 3 and cluster.x ~= entrance.x and cluster.y ~= entr
 cluster.x, cluster.y = 0.1, 0.2
 entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "pin changes cannot move the destination")
-assert(API.DungeonEntrance(999999) == nil, "unknown instance")
-assert(API.DungeonEntrance(533) == nil, "Naxxramas has no placed entrance")
-assert(API.DungeonEntrance(44) == nil, "unused Monastery has no real entrance")
-assert(API.TrainableSpells() == nil, "before login the spellbook isn't known yet")
+local unknown, unknownReason = API.DungeonEntrance(999999)
+assert(unknown == nil and unknownReason == "none", "unknown instance has nothing to answer")
+local naxx, naxxReason = API.DungeonEntrance(533)
+assert(naxx == nil and naxxReason == "none", "Naxxramas has no placed entrance")
+local monastery, monasteryReason = API.DungeonEntrance(44)
+assert(monastery == nil and monasteryReason == "none", "unused Monastery has no real entrance")
+local beforeLogin, beforeLoginReason = API.TrainableSpells()
+assert(beforeLogin == nil and beforeLoginReason == "loading", "before login the spellbook isn't known yet")
 ns.db = {}
 combat = true
-assert(API.TrainableSpells() == nil, "not in combat")
+local inCombat, inCombatReason = API.TrainableSpells()
+assert(inCombat == nil and inCombatReason == "loading", "not in combat")
 assert(API.DungeonEntrance(230).map == 1427, "entrance lookup also works in combat")
 combat = false
 
@@ -238,4 +260,34 @@ assert(Find(API.TrainableSpells(), 915).general == false, "and a class tab's is 
 class = "DEATHKNIGHT"
 env.TweaksForeverCharDB = nil
 assert(#API.TrainableSpells() == 0, "no list, no answer")
+
+-- No Subscribe is published yet, but the kit a later minor will use is ForeverCore's. Its next frame, one call per
+-- burst and fresh changes table are pinned here with the harness's C_Timer, as docs/api.md describes the shared
+-- shape.
+local notices, heard = 0, {}
+local hub = env.ForeverCore.APIKit.Hub("TweaksForever", {
+	notice = function()
+		return notices
+	end,
+})
+local unsubscribe = hub.Subscribe(function(changes)
+	heard[#heard + 1] = changes
+end)
+assert(#heard == 0, "the first subscriber starts from what the channels answer now")
+notices = notices + 1
+hub.Queue()
+hub.Queue()
+assert(#timers == 1 and #heard == 0, "two queues in one frame arm one timer and call nothing yet")
+Frame()
+assert(#heard == 1 and heard[1].notice == true, "the next frame sends one call, naming the change")
+notices = notices + 1
+hub.Queue()
+Frame()
+assert(#heard == 2 and heard[2] ~= heard[1] and heard[2].notice == true, "a later burst sends a fresh table")
+unsubscribe()
+unsubscribe()
+notices = notices + 1
+hub.Queue()
+Frame()
+assert(#heard == 2, "unsubscribing, even twice, stops the callbacks")
 print("api: ok")
