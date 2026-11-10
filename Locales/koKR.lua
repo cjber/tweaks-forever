@@ -333,3 +333,4 @@ L["No addon has attached its log yet."] = "아직 기록을 첨부한 애드온�
 L["%s (last %d):"] = "%s (최근 %d개):"
 L["%s: no lines yet."] = "%s: 아직 줄이 없습니다."
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "사용법: /forever debug, /forever debug pin, /forever debug off, /forever debug show"
+L["The choices, in order: %s."] = "선택 항목 순서: %s."

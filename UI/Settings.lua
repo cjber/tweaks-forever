@@ -12,6 +12,26 @@ local L = ns.L
 -- Feature files declare their category, name, tooltip and option labels in English; they are translated here, where
 -- they are shown (tools/phrases.py lists them for translators).
 
+-- Blizzard's row data, built in secure execution. CreateSecureDelegate wraps a client function so a call from our
+-- code runs as the client, not as the addon: without it, what we hand Blizzard to read in its secure row build
+-- carries our taint, and the gamepad navigation fields the build then writes taint the binding stack when the panel
+-- closes (#433). The delegate is absent on some Forever builds (cjber/adventure-guide-forever#592); there the direct
+-- call is all there is, as in Core/OpenSettings.lua.
+local delegates = setmetatable({}, { __mode = "k" })
+---@param fn function
+---@return function
+local function Secure(fn)
+	if type(CreateSecureDelegate) ~= "function" then
+		return fn
+	end
+	local delegate = delegates[fn]
+	if not delegate then
+		delegate = CreateSecureDelegate(fn)
+		delegates[fn] = delegate
+	end
+	return delegate
+end
+
 -- A row that can never carry a note gets its text, not a function. Under the gamepad interface the cursor shows a
 -- row's tooltip and then, in the same call, a dropdown or slider row pushes its footer bindings, so a tooltip function
 -- of ours there taints the binding stack the gamepad action bar reads before a protected call (#168). With the
@@ -23,10 +43,24 @@ local L = ns.L
 -- same tainted call, so the action bar's next protected call is blocked and blamed on us (#168). With the gamepad
 -- interface on, a feature with options is a slider instead, which never opens a menu; the mouse and keyboard keep the
 -- dropdown.
+--
+-- The choice slider has no label formatter of ours. A formatter runs inside Blizzard's secure row build, and a
+-- function of ours there taints the row's gamepad fields the same way (#433). The option names go in the row's
+-- tooltip instead, in slider order, which the cursor shows; players still see Modern, Retail and the rest, never
+-- just a number.
 ---@param feature TFFeature
 ---@return string|fun(): string?|nil
 local function Tooltip(feature)
 	local text = feature.tooltip and L[feature.tooltip]
+	local gamepad = InputUtil.IsGamepadUIEnabled()
+	if gamepad and feature.options then
+		local labels = {}
+		for _, option in ipairs(feature.options) do
+			labels[#labels + 1] = L[option[2]]
+		end
+		local choices = L["The choices, in order: %s."]:format(table.concat(labels, ", "))
+		text = text and text .. "\n\n" .. choices or choices
+	end
 	local function Note()
 		local conflict, missing = ns.ConflictOf(feature.key), ns.MissingOf(feature.key)
 		if not conflict and not missing then
@@ -38,7 +72,7 @@ local function Tooltip(feature)
 		)
 		return text and text .. "\n\n" .. note or note
 	end
-	if InputUtil.IsGamepadUIEnabled() or #(feature.conflicts or {}) == 0 and not feature.needs then
+	if gamepad or #(feature.conflicts or {}) == 0 and not feature.needs then
 		return Note()
 	end
 	return Note
@@ -46,10 +80,11 @@ end
 
 -- Indent a row under a feature and grey it out while that feature is off. Not SetParentInitializer: the settings
 -- search reads that link from every row, so ours tainted it and Social's Discord Sign In in the results was blocked.
+-- Indent writes data.indent, which Blizzard's secure row build reads, so it runs as the client (#433).
 ---@param initializer any
 ---@param key string
 local function Nest(initializer, key)
-	initializer:Indent()
+	Secure(initializer.Indent)(initializer)
 	if not InputUtil.IsGamepadUIEnabled() then
 		initializer:AddModifyPredicate(function()
 			return ns.Active(key)
@@ -106,12 +141,10 @@ local function AddSetting(category, feature)
 	end
 	local initializer
 	if gamepadOptions then
-		-- The D-pad steps the same list the dropdown's arrows did, with the option's label on the right.
-		local sliderOptions = Settings.CreateSliderOptions(1, #options, 1)
-		sliderOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
-			return L[Option(value)[2]]
-		end)
-		initializer = Settings.CreateSliderInitializer(setting, sliderOptions, Tooltip(feature))
+		-- The D-pad steps the same list the dropdown's arrows did. The option names are in the row's tooltip
+		-- (Tooltip above): a label formatter of ours would run inside Blizzard's row build (#433).
+		local sliderOptions = Secure(Settings.CreateSliderOptions)(1, #options, 1)
+		initializer = Secure(Settings.CreateSliderInitializer)(setting, sliderOptions, Tooltip(feature))
 	elseif options then
 		initializer = Settings.CreateDropdownInitializer(setting, function()
 			local container = Settings.CreateControlTextContainer()
@@ -121,12 +154,20 @@ local function AddSetting(category, feature)
 			return container:GetData()
 		end, Tooltip(feature))
 	elseif slider then
-		-- A number the player drags, in the stock slider style, with the value shown as a percentage.
-		local sliderOptions = Settings.CreateSliderOptions(slider.min, slider.max, slider.step or 1)
-		sliderOptions:SetLabelFormatter(MinimalSliderWithSteppersMixin.Label.Right, function(value)
-			return string.format("%d%%", math.floor(value + 0.5))
-		end)
-		initializer = Settings.CreateSliderInitializer(setting, sliderOptions, Tooltip(feature))
+		-- A number the player drags, in the stock slider style, shown as a percentage. Under the gamepad interface a
+		-- formatter of ours would run inside Blizzard's row build (#433), so there the client's own label shows the
+		-- number; the mouse and keyboard keep the percentage.
+		local sliderOptions = Secure(Settings.CreateSliderOptions)(slider.min, slider.max, slider.step or 1)
+		if not InputUtil.IsGamepadUIEnabled() then
+			Secure(sliderOptions.SetLabelFormatter)(
+				sliderOptions,
+				MinimalSliderWithSteppersMixin.Label.Right,
+				function(value)
+					return string.format("%d%%", math.floor(value + 0.5))
+				end
+			)
+		end
+		initializer = Secure(Settings.CreateSliderInitializer)(setting, sliderOptions, Tooltip(feature))
 	else
 		initializer = Settings.CreateCheckboxInitializer(setting, nil, Tooltip(feature))
 	end

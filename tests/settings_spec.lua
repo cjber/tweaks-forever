@@ -47,8 +47,11 @@ end
 local opened
 local canvas
 local vertical
--- Calls to the client's own restricted settings opener, and the secure delegates the shared opener built around it.
-local opens, delegates = 0, 0
+-- Calls to the client's own restricted settings opener.
+local opens = 0
+-- [function] = how many secure delegates the settings built around it. Blizzard data the secure row build reads is
+-- written through one, never by our code directly (#433).
+local delegated = {}
 
 local env = setmetatable({
 	Settings = {
@@ -95,6 +98,7 @@ local env = setmetatable({
 			local options = { min = minValue, max = maxValue, step = step }
 			function options:SetLabelFormatter(_, formatter)
 				self.formatter = formatter
+				self.formatterSet = true
 			end
 			return options
 		end,
@@ -123,8 +127,10 @@ local env = setmetatable({
 		end,
 	},
 	CreateSecureDelegate = function(fn)
-		delegates = delegates + 1
-		return fn
+		delegated[fn] = (delegated[fn] or 0) + 1
+		return function(...)
+			return fn(...)
+		end
 	end,
 	InCombatLockdown = function()
 		return false
@@ -284,7 +290,7 @@ do
 		end
 	end
 	assert(buttons == 4, "the index has a button per subpage and the Forever addons page")
-	assert(delegates == 1, "every page opens through one secure delegate")
+	assert(delegated[env.C_SettingsUtil.OpenSettingsPanel] == 1, "every page opens through one secure delegate")
 end
 
 -- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
@@ -320,6 +326,10 @@ local function Modifiable(initializer)
 end
 assert(Modifiable(repair) and not repair.indented, "conflict-free rows stay modifiable")
 assert(guildRepair.indented and guildRepair.evaluate == "TweaksForever_repair", "a child row sits under its parent")
+assert(
+	delegated[guildRepair.Indent],
+	"the row indents through a secure delegate, so Blizzard's row build reads no taint of ours (#433)"
+)
 assert(Modifiable(guildRepair), "a child row is modifiable while its parent is on")
 ns.db.repair = false
 assert(not Modifiable(guildRepair) and Modifiable(repair), "a child row greys out with its parent off")
@@ -338,6 +348,20 @@ assert(
 	"a slider is a number setting"
 )
 assert(size.options.min == 50 and size.options.max == 200 and size.options.step == 5, "the slider takes its bounds")
+assert(
+	size.options.formatterSet and type(size.options.formatter) == "function",
+	"without the gamepad UI the slider keeps its percentage label formatter"
+)
+assert(
+	size.options.formatter(50) == "50%"
+		and size.options.formatter(75.4) == "75%"
+		and size.options.formatter(75.5) == "76%",
+	"the percentage formatter rounds to the nearest whole number"
+)
+assert(
+	delegated[env.Settings.CreateSliderOptions] and delegated[env.Settings.CreateSliderInitializer],
+	"the slider's Blizzard row data is built through secure delegates (#433)"
+)
 
 -- /tweaks opens the settings; /tweaks report shows the report instead.
 env.SlashCmdList.TWEAKSFOREVER("")
@@ -386,6 +410,28 @@ do
 	)
 	local choice = Choice(registered)
 	assert(choice and choice.kind == "slider", "with the gamepad UI on a choice is a slider")
+	local child
+	for _, entry in ipairs(registered) do
+		local rowSetting = entry.initializer.setting
+		if rowSetting and rowSetting.variable == "TweaksForever_guildRepair" then
+			child = entry.initializer
+		end
+	end
+	assert(
+		child and child.indented and delegated[child.Indent],
+		"with the gamepad UI on a nested row still indents through a secure delegate (#433)"
+	)
+	local numberSlider
+	for _, entry in ipairs(registered) do
+		local rowSetting = entry.initializer.setting
+		if rowSetting and rowSetting.variable == "TweaksForever_iconSize" then
+			numberSlider = entry.initializer
+		end
+	end
+	assert(
+		numberSlider and numberSlider.options.formatter == nil and numberSlider.options.formatterSet == nil,
+		"with the gamepad UI on the number slider has no label formatter of ours (#433)"
+	)
 	local setting = choice.setting
 	assert(setting.proxy and setting.varType == "number", "the choice is a number proxy setting")
 	assert(setting.variable == "TweaksForever_gearMark" and setting.name == "Mark", "it keeps its variable and name")
@@ -394,13 +440,20 @@ do
 		choice.options.min == 1 and choice.options.max == 3 and choice.options.step == 1,
 		"one step per option, from 1 to the last"
 	)
+	-- The option names are text in the row's tooltip: a formatter of ours would run inside Blizzard's secure row
+	-- build and taint the gamepad rows (#433). The names stay visible, in slider order; no number replaces them.
 	assert(
-		choice.options.formatter(1) == "Strip" and choice.options.formatter(2) == "Border",
-		"the labels are the options"
+		choice.options.formatter == nil and choice.options.formatterSet == nil,
+		"the row build runs no label formatter of ours (#433)"
+	)
+	assert(type(choice.tooltip) == "string", "the choice's tooltip is text, not a function (#424)")
+	assert(
+		choice.tooltip:find("The choices, in order: Strip, Border, Dots.", 1, true),
+		"the option names are in the tooltip, in slider order (#433)"
 	)
 	assert(
-		choice.options.formatter(2.4) == "Border" and choice.options.formatter(3) == "Dots",
-		"the value rounds to an index"
+		delegated[env.Settings.CreateSliderOptions] and delegated[env.Settings.CreateSliderInitializer],
+		"the choice's Blizzard row data is built through secure delegates (#433)"
 	)
 	ns.db.gearMark = "dots"
 	assert(setting.getValue() == 3, "the saved string maps to its index")

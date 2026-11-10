@@ -333,3 +333,4 @@ L["No addon has attached its log yet."] = "Noch kein Addon hat sein Protokoll an
 L["%s (last %d):"] = "%s (letzte %d):"
 L["%s: no lines yet."] = "%s: noch keine Zeilen."
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "Verwendung: /forever debug, /forever debug pin, /forever debug off, /forever debug show"
+L["The choices, in order: %s."] = "Die Auswahlmöglichkeiten, der Reihe nach: %s."
