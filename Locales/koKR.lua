@@ -296,7 +296,6 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 
 L["The choices, in order: %s."] = "선택 항목 순서: %s."
 
-L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] =
-	"Tweaks Forever의 설정을 열어도 이 애드온을 지목하는 차단된 동작 오류가 더 이상 표시되지 않습니다." -- mt
+L["Needs Forever Core."] = "Forever Core가 필요합니다." -- mt
 
 L["Tweaks Forever needs ForeverCore, which is missing or too old."] = "Tweaks Forever에는 ForeverCore가 필요합니다. 설치되어 있지 않거나 너무 오래되었습니다."
