@@ -150,7 +150,7 @@ local function AddSetting(category, feature)
 		local sliderOptions = Secure(Settings.CreateSliderOptions)(1, #options, 1)
 		initializer = Secure(Settings.CreateSliderInitializer)(setting, sliderOptions, Tooltip(feature))
 	elseif options then
-		initializer = Settings.CreateDropdownInitializer(setting, function()
+		initializer = Secure(Settings.CreateDropdownInitializer)(setting, function()
 			local container = Settings.CreateControlTextContainer()
 			for _, option in ipairs(options) do
 				container:Add(option[1], L[option[2]])
@@ -173,7 +173,7 @@ local function AddSetting(category, feature)
 		end
 		initializer = Secure(Settings.CreateSliderInitializer)(setting, sliderOptions, Tooltip(feature))
 	else
-		initializer = Settings.CreateCheckboxInitializer(setting, nil, Tooltip(feature))
+		initializer = Secure(Settings.CreateCheckboxInitializer)(setting, nil, Tooltip(feature))
 	end
 	if not InputUtil.IsGamepadUIEnabled() then
 		initializer:AddModifyPredicate(function()
@@ -186,7 +186,8 @@ local function AddSetting(category, feature)
 	Settings.RegisterInitializer(category, initializer)
 	-- A button opening a panel the feature needs, indented under it and greyed while it is off.
 	if feature.button then
-		local button = CreateSettingsButtonInitializer(L["Spells to track"], L["Choose"], feature.button, nil, false)
+		local button =
+			Secure(CreateSettingsButtonInitializer)(L["Spells to track"], L["Choose"], feature.button, nil, false)
 		Nest(button, feature.key)
 		Settings.RegisterInitializer(category, button)
 	end
@@ -213,7 +214,7 @@ ns.Init(function()
 		-- client call, which the client refuses when addon code makes it (cjber/forever-core#333).
 		Settings.RegisterInitializer(
 			category,
-			CreateSettingsButtonInitializer(L[section], L["Open"], function()
+			Secure(CreateSettingsButtonInitializer)(L[section], L["Open"], function()
 				ForeverCore.OpenSettingsPanel(subcategory:GetID())
 			end, nil, false)
 		)
@@ -226,7 +227,7 @@ ns.Init(function()
 		local family = ForeverCore.Family.Register(category, ns.db, addonName, ns.core.SafeCall)
 		Settings.RegisterInitializer(
 			category,
-			CreateSettingsButtonInitializer(L["Forever addons"], L["Open"], function()
+			Secure(CreateSettingsButtonInitializer)(L["Forever addons"], L["Open"], function()
 				ForeverCore.OpenSettingsPanel(family:GetID())
 			end, nil, false)
 		)

@@ -13,6 +13,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 
 - **Needs Forever Core.** The shared tracker column, bug report and leaderboards now come from one Forever Core addon that installs with it, so every Forever addon's tracker scale, lock and position stay in step. Your tracker settings carry over.
+- **With the gamepad interface on, closing the options after browsing Tweaks Forever's page no longer makes the game refuse the next controller action and blame Tweaks Forever.** Tweaks' own rows are now handed to the game the way its own rows are, so backing out leaves nothing behind that blocks a button press (#446).
 
 ## [2.4.4] - 2026-11-10
 
