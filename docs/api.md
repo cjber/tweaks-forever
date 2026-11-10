@@ -1,15 +1,18 @@
 # TweaksForever.API
 
 Other addons can read Tweaks Forever's class trainer spells, the class trainers to visit and a dungeon or raid
-entrance through the global `TweaksForever.API`. It is version 3, minor 1: check `version == 3` and that each
-function exists before calling it. The full types are in [`types/API.lua`](../types/API.lua).
+entrance through the global `TweaksForever.API`, and hear about the moments it watches through `Subscribe()`. It is
+version 3, minor 2: check `version == 3` and that each function exists before calling it. The full types are in
+[`types/API.lua`](../types/API.lua).
 
-Every call returns fresh tables that you may keep or change. Trainer names and places, and entrance places, use
-UiMapIDs and coordinates from 0 to 1.
+Every read that answers with a table returns a fresh one that you may keep or change. Trainer names and places, and
+entrance places, use UiMapIDs and coordinates from 0 to 1.
 
 ## Published functions
 
-`TrainableSpells()`, `Trainers()` and `DungeonEntrance(instanceID)`, each described below.
+`TrainableSpells()`, `Trainers()`, `DungeonEntrance(instanceID)`, `Subscribe(callback)`, `IsJunk(itemID)`,
+`JunkMarks()`, `BestReward()`, `ZoneLevels(map)`, `XPRate()`, `LastRare()` and `Unexplored(map)`, each described
+below.
 
 ## Minor history
 
@@ -22,6 +25,8 @@ member it wants with `type(api.Name) == "function"`.
   returns a second value.
 - minor 1: each read that has nothing to answer returns a second value, the reason, through
   `ForeverCore.APIKit.NotReady`.
+- minor 2: `Subscribe()` (change names `trainable`, `junk`, `rare` and `explored`), `IsJunk(itemID)`, `JunkMarks()`,
+  `BestReward()`, `ZoneLevels(map)`, `XPRate()`, `LastRare()` and `Unexplored(map)`. Version stays 3.
 
 ## Not ready
 
@@ -34,6 +39,7 @@ unchanged.
 | `"loading"` | Tweaks Forever is still reading the game, so ask again later |
 | `"disabled"` | the player turned the feature off |
 | `"none"` | there is nothing to answer, such as an instance with no entrance |
+| `"invalid"` | the argument is not one the read takes, such as a non-integer item or map ID |
 
 `TrainableSpells()` answers `nil, "loading"` before login, while the spellbook is not known yet, and in combat, when
 the work waits. It never answers `"disabled"` or `"none"`: it answers whether or not the spellbook's Future Spells
@@ -41,10 +47,34 @@ display is on, and a class with nothing to learn answers `{}`. `DungeonEntrance(
 an instance the client has no entrance for, or one that has none. `Trainers()` always answers a table, so it has no
 not-ready reason; a trainer QuestieDB has not placed yet simply has no name, `map`, `x` or `y`.
 
-## No Subscribe yet
+## `Subscribe(callback) -> unsubscribe`
 
-Version 3 minor 1 has no `Subscribe()`. Read a function again when you need a fresh answer; a later minor will add
-`Subscribe()` through `ForeverCore.APIKit.Hub` and list its change names here. Until then there are no change names.
+`callback(changes)` runs on the frame after a change, never inside the call that caused it. One burst sends at most
+one call, however many changes it holds, and `changes` is a fresh table each time with only the names that changed
+set to `true`. Read the API again rather than replaying the change. A callback added by a callback waits for the next
+burst, each callback runs under the addon's own error guard, and the returned unsubscribe function is safe to call
+twice. The first subscriber takes the channels' current answers as its baseline, so it hears only later changes.
+
+The change names:
+
+| name | true when |
+|---|---|
+| `trainable` | the answer `TrainableSpells()` gives changed, by its sorted spell IDs: a level up, or a spell learned |
+| `junk` | a junk mark was added or removed, by Alt+Right-click, the bag portrait menu or the click mode |
+| `rare` | a rare alert fired and printed its chat line |
+| `explored` | the player explored a new area, from the client's `MAP_EXPLORATION_UPDATED` |
+
+An event that changes nothing stays quiet. In particular `trainable` compares the sorted spell IDs, so a level up
+that brings no new spell sends nothing, and entering combat is not itself a change. A spell learned during combat is
+heard when combat ends, once the read can answer again.
+
+```lua
+local unsubscribe = TweaksForever.API.Subscribe(function(changes)
+	if changes.junk then
+		RedrawBagMarks()
+	end
+end)
+```
 
 ## `TrainableSpells() -> TFAPITrainableSpell[]?, TFAPIReason?`
 
@@ -77,3 +107,63 @@ Takes an instance's Map ID (230 for Blackrock Depths) and returns a fresh `{map,
 UiMapID and 0 to 1 coordinates, not the shared pin for Blackrock Mountain or the Gates of Ahn'Qiraj. It works before
 login and in combat, and returns `nil, "none"` for an instance with no entrance in the client, such as Naxxramas, or
 one whose entrance the client doesn't place.
+
+## `IsJunk(itemID) -> boolean?, TFAPIReason?`
+
+Whether the player marked the item as junk, account-wide, as a boolean. This is their own mark, not a grey: greys
+are junk to the game's own Sell All Junk, and a bag addon should keep treating poor quality as junk itself. The mark
+is the one the bag's coin is drawn from, so the answer does not depend on the bag frames being open.
+
+It answers `nil, "loading"` before login, `nil, "disabled"` while Mark items as junk is off (there are no marks to
+read then), and `nil, "invalid"` for an item ID that is not an integer.
+
+## `JunkMarks() -> integer[]?, TFAPIReason?`
+
+Every item ID the player marked as junk, in a fresh sorted list, for a bag addon that draws the marks itself. Greys
+are not in it, for the same reason as `IsJunk`. The not-ready reasons are the same: `nil, "loading"` before login,
+`nil, "disabled"` while Mark items as junk is off.
+
+## `BestReward() -> integer?, TFAPIReason?`
+
+The index, among the quest reward choices on the panel now on screen, of the choice that sells to a merchant for
+strictly the most. It is the choice the gold coin marks, and it is not chosen for the player. It answers whether or
+not Mark the best-selling quest reward is on.
+
+It returns `nil, "loading"` while a choice's price is unknown, and `nil, "none"` when no reward panel is open, the
+quest offers fewer than two choices, or the top value is a tie or nothing worth selling.
+
+## `ZoneLevels(map) -> TFAPILevelRange?, TFAPIReason?`
+
+A zone's level range as a fresh `{low, high}`, from the client where it has one and from Tweaks Forever's data
+otherwise. `map` is a UiMapID, or `nil` for the zone the player is in. It answers whether or not Zone level ranges on
+the map is on.
+
+It returns `nil, "none"` for a map with no range, such as a city or an instance, and `nil, "invalid"` for a map ID
+that is not an integer.
+
+## `XPRate() -> TFAPIXPRate?, TFAPIReason?`
+
+The player's XP per hour over the last 15 minutes as a fresh `{perHour, toLevel}`, the same figures the experience
+bar's tooltip shows. `toLevel` is the seconds to the next level at that pace, and it is missing while the rate is
+zero.
+
+It returns `nil, "loading"` before login and in the first five minutes of a session, and `nil, "disabled"` while XP
+per hour on the experience bar is off: XP is only counted while that feature runs.
+
+## `LastRare() -> TFAPIRare?, TFAPIReason?`
+
+The most recent rare alert as a fresh `{name, map, x, y}`: the creature's name, and its map marker's current position
+as a UiMapID and 0 to 1 coordinates while the marker is still up, else where it last was.
+
+It returns `nil, "none"` when no rare has alerted since login, `nil, "disabled"` while Rare alerts is off, and
+`nil, "loading"` before login.
+
+## `Unexplored(map) -> TFAPIUnexploredArea[]?, TFAPIReason?`
+
+A zone map's unexplored areas as fresh `{left, top, right, bottom}` rectangles in the same 0 to 1 coordinates as a
+map position, for an addon that draws its own reveal. They come from the same decoded overlay data the dim tint draws,
+with the client's explored textures removed. `map` is a UiMapID, or `nil` for the zone the player is in. It answers
+whether or not Reveal unexplored areas is on.
+
+It returns `nil, "none"` for a map that is not a zone or whose art has no overlay data, and `nil, "invalid"` for a
+map ID that is not an integer. A zone whose every area is explored answers `{}`.

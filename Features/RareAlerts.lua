@@ -130,6 +130,21 @@ local function Position(vignette)
 	return map, position or C_Map.GetPlayerMapPosition(map, "player")
 end
 
+-- Where the rare is now: its marker's position while the marker is up and living, else where it last was.
+---@param place TFRarePlace
+---@return number x
+---@return number y
+local function Live(place)
+	local info = place.vignette and C_VignetteInfo.GetVignetteInfo(place.vignette)
+	if info and not info.isDead then
+		local position = C_VignetteInfo.GetVignettePosition(place.vignette, place.map)
+		if position then
+			return position.x, position.y
+		end
+	end
+	return place.x, place.y
+end
+
 -- Sets a waypoint to `place` (Shortest Path Forever's journey when it takes it), at the marker's current position
 -- while it is still up.
 ---@param place TFRarePlace?
@@ -138,14 +153,23 @@ local function Waypoint(place)
 		ns.Print(L["No rare has been found nearby yet."])
 		return
 	end
-	local info = place.vignette and C_VignetteInfo.GetVignetteInfo(place.vignette)
-	if info and not info.isDead then
-		local position = C_VignetteInfo.GetVignettePosition(place.vignette, place.map)
-		if position then
-			place.x, place.y = position.x, position.y
-		end
-	end
+	place.x, place.y = Live(place)
 	ns.Navigate(place.map, place.x, place.y, place.name)
+end
+
+---@class TFRareAlerts
+local Model = {}
+ns.RareAlerts = Model
+
+-- The most recent rare alert as fresh values, at the marker's current position while it is still up.
+---@return { name: string, map: integer, x: number, y: number }?
+function Model.Last()
+	local place = lastPlace
+	if not place then
+		return nil
+	end
+	local x, y = Live(place)
+	return { name = place.name, map = place.map, x = x, y = y }
 end
 
 local LINK = "addon:TweaksForever:rare:"
@@ -165,6 +189,8 @@ local function Alert(guid, name, vignette, now)
 		shown = NORMAL_FONT_COLOR:WrapTextInColorCode(("|H%s%s|h[%s]|h"):format(LINK, guid, name))
 	end
 	ns.Print(L["rare nearby: %s."]:format(shown))
+	-- Tell API.Subscribe's `rare` channel, once per alert.
+	ns.APIChanged("rare")
 	if not chimed or now - chimed >= CHIME_GAP then
 		-- A sound the client refuses to play leaves the next rare free to try.
 		if PlaySoundFile(SOUND, "Master") ~= false then

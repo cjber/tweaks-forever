@@ -1,5 +1,7 @@
 local features, init = {}, nil
 local ns = {
+	-- Core/API.lua's change signal, which this spec does not load.
+	APIChanged = function() end,
 	Feature = function(feature)
 		features[feature.key] = feature
 	end,

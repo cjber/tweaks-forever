@@ -91,7 +91,7 @@ Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian a
 
 ## For addon authors
 
-`TweaksForever.API` (`version = 3`, minor 1) gives the class trainer spells you can learn, your class's trainers and where they stand, and each dungeon's own entrance. [docs/api.md](docs/api.md) has the details.
+`TweaksForever.API` (`version = 3`, minor 2) gives the class trainer spells you can learn, your class's trainers and where they stand, each dungeon's own entrance, junk marks, zone ranges, the XP rate, the last rare, unexplored areas and the best quest reward, and tells other addons when those change. [docs/api.md](docs/api.md) has the details.
 
 ## Works alongside
 

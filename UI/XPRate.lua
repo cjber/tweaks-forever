@@ -165,6 +165,15 @@ function Model.Rate(now)
 	return sum / math.min(WINDOW, now - started) * 3600
 end
 
+-- The seconds to `max` from `xp` at `rate`, the figure the tooltip's time line shows.
+---@param rate number
+---@param xp number
+---@param max number
+---@return number
+function Model.ToLevel(rate, xp, max)
+	return (max - xp) / rate * 3600
+end
+
 -- The tooltip lines for `xp` of `max` at `now`.
 ---@param now number
 ---@param xp number
@@ -176,7 +185,7 @@ function Model.Lines(now, xp, max)
 	local left = max - xp
 	if rate and rate > 0 then
 		lines[#lines + 1] = L["XP per hour: %s"]:format(BreakUpLargeNumbers(math.floor(rate + 0.5)))
-		lines[#lines + 1] = L["Time to level: %s"]:format(SecondsToTime(math.floor(left / rate * 3600 + 0.5)))
+		lines[#lines + 1] = L["Time to level: %s"]:format(SecondsToTime(math.floor(Model.ToLevel(rate, xp, max) + 0.5)))
 	end
 	local kill, quest = Median(kills), Median(quests)
 	if kill and kill > 0 then

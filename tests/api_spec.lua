@@ -1,11 +1,17 @@
 local inits = {}
+local active = {}
+local handlers = {}
 local ns = {
 	Feature = function() end,
 	Init = function(fn)
 		inits[#inits + 1] = fn
 	end,
-	Active = function()
-		return false
+	Active = function(key)
+		return active[key] == true
+	end,
+	On = function(event, fn)
+		handlers[event] = handlers[event] or {}
+		table.insert(handlers[event], fn)
 	end,
 }
 local NAMES = { [403] = "Lightning Bolt", [529] = "Lightning Bolt", [548] = "Lightning Bolt", [915] = "Lightning Bolt" }
@@ -43,11 +49,25 @@ local questie = {
 	},
 }
 local timers = {}
+-- The client state the added reads see: a quest reward panel, a zone map with overlay art, the experience bar and a
+-- rare's nameplate and marker.
+local now, xp, maxXP = 1000, 0, 1000
+local rewardItems, rewardOpen, hooks = {}, false, {}
+local playerMap, mapTypes, mapArt, artLayers, mapLevels, exploredTextures = nil, {}, {}, {}, {}, {}
+local rareUnits, vignettes, markerAt = {}, {}, {}
+-- The click mode Bags/Junk.lua registers, its Toggle behind it.
+local clickMode
 local function Frame()
 	local due = timers
 	timers = {}
 	for _, fn in ipairs(due) do
 		fn()
+	end
+end
+-- Fires every handler a loaded file registered for an event, as Core/Core.lua's frame does.
+local function Fire(event, ...)
+	for _, fn in ipairs(handlers[event] or {}) do
+		fn(...)
 	end
 end
 local env = setmetatable({
@@ -100,7 +120,145 @@ local env = setmetatable({
 			return "Line " .. lineID
 		end,
 	},
-	Enum = { SpellBookSkillLineIndex = { General = 1 } },
+	-- The experience bar and the clock XPRate reads.
+	GetTime = function()
+		return now
+	end,
+	UnitXP = function()
+		return xp
+	end,
+	UnitXPMax = function()
+		return maxXP
+	end,
+	UnitAffectingCombat = function()
+		return combat
+	end,
+	-- Hook targets: Quests/BestReward.lua's QuestInfo_Display, Bags/Junk.lua's MerchantFrame_Update and the like.
+	hooksecurefunc = function(target, name, fn)
+		if type(name) == "function" then
+			hooks[target] = name
+		elseif type(fn) == "function" then
+			hooks[name] = fn
+		end
+	end,
+	CreateFrame = function()
+		return {
+			SetScript = function() end,
+		}
+	end,
+	PlaySoundFile = function()
+		return true
+	end,
+	NORMAL_FONT_COLOR = {
+		WrapTextInColorCode = function(_, text)
+			return text
+		end,
+	},
+	-- A bag slot Bags/Junk.lua's Toggle reads, and the merchant frame it updates.
+	C_Container = {
+		GetContainerItemInfo = function(bag, slot)
+			assert(bag == 0, "the backpack")
+			return slot == 1 and { itemID = 7001, quality = 2 } or nil
+		end,
+	},
+	MerchantFrame = {
+		IsShown = function()
+			return false
+		end,
+	},
+	MerchantSellAllJunkButton = {
+		HookScript = function() end,
+	},
+	-- The quest reward panel BestReward reads: two choices whose prices, counts and panel visibility vary.
+	QuestFrameRewardPanel = {
+		IsVisible = function()
+			return rewardOpen
+		end,
+	},
+	QuestInfoRewardsFrame = { RewardButtons = {} },
+	QUEST_TEMPLATE_REWARD = {},
+	GetNumQuestChoices = function()
+		return #rewardItems
+	end,
+	GetQuestItemLink = function(_, index)
+		return rewardItems[index] and rewardItems[index].link
+	end,
+	GetQuestItemInfo = function(_, index)
+		return "Choice", 0, rewardItems[index] and rewardItems[index].count or 1
+	end,
+	C_Item = {
+		GetItemInfo = function(link)
+			for _, item in ipairs(rewardItems) do
+				if item.link == link then
+					return nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, item.price
+				end
+			end
+		end,
+	},
+	-- Maps, their art layers and the client's explored textures.
+	C_Map = {
+		GetBestMapForUnit = function(unit)
+			assert(unit == "player")
+			return playerMap
+		end,
+		GetPlayerMapPosition = function()
+			return { x = 0.5, y = 0.5 }
+		end,
+		GetMapInfo = function(mapID)
+			return { mapType = mapTypes[mapID] }
+		end,
+		GetMapArtID = function(mapID)
+			return mapArt[mapID]
+		end,
+		GetMapArtLayers = function(mapID)
+			return artLayers[mapID]
+		end,
+		GetMapLevels = function(mapID)
+			local range = mapLevels[mapID]
+			return range and range[1] or 0, range and range[2] or 0
+		end,
+	},
+	C_MapExplorationInfo = {
+		GetExploredMapTextures = function(mapID)
+			return exploredTextures[mapID]
+		end,
+	},
+	C_NamePlate = {
+		GetNamePlates = function()
+			return {}
+		end,
+	},
+	-- A rare's nameplate, and the map marker that carries the same GUID.
+	UnitClassification = function(unit)
+		return rareUnits[unit].class
+	end,
+	UnitGUID = function(unit)
+		return rareUnits[unit].guid
+	end,
+	UnitName = function(unit)
+		return rareUnits[unit].name
+	end,
+	C_VignetteInfo = {
+		GetVignettes = function()
+			return { "v1" }
+		end,
+		GetVignetteInfo = function(id)
+			return vignettes[id]
+		end,
+		GetVignettePosition = function(id)
+			return markerAt[id]
+		end,
+	},
+	C_EventUtils = {
+		IsEventValid = function()
+			return true
+		end,
+	},
+	Enum = {
+		SpellBookSkillLineIndex = { General = 1 },
+		UIMapType = { Zone = 3 },
+		TooltipDataType = { Item = 0 },
+	},
 	GENERAL = "General",
 	tContains = function(list, value)
 		for _, item in ipairs(list) do
@@ -111,6 +269,27 @@ local env = setmetatable({
 		return false
 	end,
 }, { __index = _G })
+-- The services the feature files register at load, stubbed as Core/Core.lua and ForeverCore provide them.
+ns.ClickMode = function(mode)
+	clickMode = mode
+end
+ns.HookBagButtons = function() end
+ns.OnTooltip = function() end
+ns.ForEachBagButton = function() end
+ns.IsBagActionClick = function()
+	return false
+end
+ns.OnSettingChanged = function() end
+ns.Readable = function(value)
+	return value
+end
+ns.Print = function() end
+ns.Navigate = function() end
+ns.core = {
+	SafeCall = function(_, fn, ...)
+		return fn(...)
+	end,
+}
 -- ForeverCore's shared API kit, loaded from the checkout FOREVER_CORE names, with the one service it needs from
 -- the core's namespace: SafeCallFor. It builds the hub that a later minor's Subscribe will publish.
 local core = dofile("tests/forever_core.lua")
@@ -126,20 +305,37 @@ local coreNs = {
 setfenv(assert(loadfile(core.directory() .. "/Core/APIKit.lua")), env)("ForeverCore", coreNs)
 env.ForeverCore = { API = 1, APIKit = coreNs.APIKit }
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
-for _, file in ipairs({
-	"Data/ClassSpells.lua",
-	"Data/DungeonEntrances.lua",
-	"Integrations/QuestieSource.lua",
-	"UI/Spellbook.lua",
-	"Core/API.lua",
-}) do
+ns.Overlays = { [1] = "1,10,20,100,80,123;1,64,64,32,32,456;" }
+-- Loads one feature file and returns a function that runs the initializers it added, so each test runs only the
+-- startup it needs.
+local function Load(file)
+	local before = #inits
 	setfenv(assert(loadfile(file)), env)("TweaksForever", ns)
+	local after = #inits
+	return function(...)
+		for index = before + 1, after do
+			inits[index](...)
+		end
+	end
 end
+Load("Data/ClassSpells.lua")
+Load("Data/DungeonEntrances.lua")
+Load("Data/ZoneLevels.lua")
+local loadQuestie = Load("Integrations/QuestieSource.lua")
+Load("UI/Spellbook.lua")
+local loadJunk = Load("Bags/Junk.lua")
+Load("Features/RareAlerts.lua")
+Load("Map/Exploration.lua")
+Load("Map/ZoneLevels.lua")
+local loadBestReward = Load("Quests/BestReward.lua")
+Load("UI/XPRate.lua")
+local loadAPI = Load("Core/API.lua")
 local API = env.TweaksForever.API
+loadJunk()
 assert(API.version == 3, "v2 adds Trainers, v3 reads their names and places from QuestieDB")
-assert(API.minor == 1, "minor 1 adds each read's not-ready reason")
+assert(API.minor == 2, "minor 2 adds Subscribe and the reads below it")
 assert(env.ForeverCore.APIKit ~= nil, "the shared API kit is available at load")
-assert(API.Subscribe == nil, "this minor has no Subscribe yet")
+assert(type(API.Subscribe) == "function", "minor 2 publishes Subscribe")
 local entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "first curated zone, before login")
 local another = API.DungeonEntrance(230)
@@ -164,8 +360,8 @@ assert(Trainer(3030).name == nil and Trainer(3030).map == nil, "no name or place
 assert(#timers == 0, "and nothing booked")
 -- With QuestieDB the names and places are its own, read over the frames after login, not in the caller's frame.
 env.LibQuestieDB = questie
-inits[1]() -- QuestieSource.lua's: login opens the read
-inits[#inits]() -- API.lua's: books the player's own trainers
+loadQuestie() -- login opens the read
+loadAPI() -- API.lua's initializer: books the player's own trainers
 assert(#timers == 1, "the read is booked at login")
 trainers, install = API.Trainers()
 assert(install == nil and Trainer(3030).name == nil, "installed and not read yet: ask again later")
@@ -205,7 +401,16 @@ local monastery, monasteryReason = API.DungeonEntrance(44)
 assert(monastery == nil and monasteryReason == "none", "unused Monastery has no real entrance")
 local beforeLogin, beforeLoginReason = API.TrainableSpells()
 assert(beforeLogin == nil and beforeLoginReason == "loading", "before login the spellbook isn't known yet")
-ns.db = {}
+-- Every new read that needs the saved settings says so before they exist.
+local junkBefore, junkBeforeReason = API.IsJunk(1)
+assert(junkBefore == nil and junkBeforeReason == "loading", "no junk marks before login")
+local marksBefore, marksBeforeReason = API.JunkMarks()
+assert(marksBefore == nil and marksBeforeReason == "loading", "no junk list before login")
+local rateBefore, rateBeforeReason = API.XPRate()
+assert(rateBefore == nil and rateBeforeReason == "loading", "no XP rate before login")
+local rareBefore, rareBeforeReason = API.LastRare()
+assert(rareBefore == nil and rareBeforeReason == "loading", "no rare before login")
+ns.db = { junk = {} }
 combat = true
 local inCombat, inCombatReason = API.TrainableSpells()
 assert(inCombat == nil and inCombatReason == "loading", "not in combat")
@@ -261,33 +466,265 @@ class = "DEATHKNIGHT"
 env.TweaksForeverCharDB = nil
 assert(#API.TrainableSpells() == 0, "no list, no answer")
 
--- No Subscribe is published yet, but the kit a later minor will use is ForeverCore's. Its next frame, one call per
--- burst and fresh changes table are pinned here with the harness's C_Timer, as docs/api.md describes the shared
--- shape.
-local notices, heard = 0, {}
+-- The player's own junk marks: the feature's off answer, then the marks the bag coin is drawn from.
+active.markJunk = false
+local marksOff, marksOffReason = API.JunkMarks()
+assert(marksOff == nil and marksOffReason == "disabled", "marks are off with the feature")
+local junkOff, junkOffReason = API.IsJunk(7001)
+assert(junkOff == nil and junkOffReason == "disabled", "and no item is marked")
+active.markJunk = true
+assert(#API.JunkMarks() == 0, "the player has marked nothing yet")
+clickMode.Apply(nil, 0, 1)
+assert(API.IsJunk(7001) == true, "the toggled slot's item is marked")
+assert(API.IsJunk(7002) == false, "another item is not")
+local listed = API.JunkMarks()
+assert(#listed == 1 and listed[1] == 7001, "the marks as item IDs")
+listed[1] = 1
+assert(API.JunkMarks()[1] == 7001, "a fresh list on every call")
+local badItem, badItemReason = API.IsJunk(1.5)
+assert(badItem == nil and badItemReason == "invalid", "an item ID is a whole number")
+clickMode.Apply(nil, 0, 1)
+assert(API.IsJunk(7001) == false and #API.JunkMarks() == 0, "toggling again takes the mark away")
+
+-- A zone's level range: the current zone, the client's own range where it has one, and nothing for a city.
+playerMap = 1439
+local range = API.ZoneLevels(nil)
+assert(range.low == 10 and range.high == 20, "Darkshore, the current zone")
+local ranged = API.ZoneLevels(1439)
+assert(ranged ~= range and ranged.low == 10, "a fresh table on every call")
+range.low = 1
+assert(API.ZoneLevels(1439).low == 10, "callers cannot change the source")
+mapLevels[1439] = { 12, 22 }
+assert(API.ZoneLevels(1439).low == 12 and API.ZoneLevels(1439).high == 22, "the client's range wins")
+local city, cityReason = API.ZoneLevels(1454)
+assert(city == nil and cityReason == "none", "a city has no range")
+local badMap, badMapReason = API.ZoneLevels(1.5)
+assert(badMap == nil and badMapReason == "invalid", "a map ID is a whole number")
+playerMap = nil
+local noZone, noZoneReason = API.ZoneLevels(nil)
+assert(noZone == nil and noZoneReason == "none", "nowhere to ask about")
+
+-- XP per hour and the time to the next level, the figures the tooltip's lines show.
+active.xpRate = false
+local rateOff, rateOffReason = API.XPRate()
+assert(rateOff == nil and rateOffReason == "disabled", "XP is not counted while the feature is off")
+active.xpRate = true
+local started = now
+maxXP = 1000
+ns.XPRate.Start(started, 0, maxXP)
+now = started + 299
+local early, earlyReason = API.XPRate()
+assert(early == nil and earlyReason == "loading", "no rate in the first five minutes")
+now = started + 300
+local zero = API.XPRate()
+assert(zero.perHour == 0 and zero.toLevel == nil, "a zero rate has no time to level")
+ns.XPRate.Update(started + 100, 100, maxXP, true)
+xp = 100
+now = started + 300
+local measured = API.XPRate()
+assert(measured.perHour == 1200 and measured.toLevel == 2700, "the tooltip's own figures")
+local measuredAgain = API.XPRate()
+assert(measuredAgain ~= measured, "a fresh table on every call")
+measured.perHour = 1
+assert(API.XPRate().perHour == 1200, "callers cannot change the source")
+active.xpRate = false
+local rateAfter, rateAfterReason = API.XPRate()
+assert(rateAfter == nil and rateAfterReason == "disabled", "off again")
+
+-- The last rare alert: the feature's off answer, nothing yet, then the marker's live position.
+active.rareAlerts = false
+local rareOff, rareOffReason = API.LastRare()
+assert(rareOff == nil and rareOffReason == "disabled", "no rare alerts while the feature is off")
+active.rareAlerts = true
+local noRare, noRareReason = API.LastRare()
+assert(noRare == nil and noRareReason == "none", "none has alerted yet")
+playerMap = 1439
+rareUnits.rare1 = { class = "rare", guid = "Creature-0-1-0-1-61-AAA", name = "Old Griz" }
+vignettes.v1 = { atlasName = "VignetteKill", objectGUID = "Creature-0-1-0-1-61-AAA", name = "Old Griz" }
+markerAt.v1 = { x = 0.4, y = 0.6 }
+now = now + 10
+Fire("NAME_PLATE_UNIT_ADDED", "rare1")
+local rare = API.LastRare()
+assert(rare.name == "Old Griz" and rare.map == 1439 and rare.x == 0.4 and rare.y == 0.6, "the rare at its marker")
+markerAt.v1 = { x = 0.45, y = 0.5 }
+local moved = API.LastRare()
+assert(moved.x == 0.45 and moved.y == 0.5, "the marker's current position")
+vignettes.v1.isDead = true
+local gone = API.LastRare()
+assert(gone.x == 0.4 and gone.y == 0.6, "where it was last seen")
+gone.name = "Changed by caller"
+assert(API.LastRare().name == "Old Griz", "a fresh table on every call")
+
+-- A zone's unexplored areas as 0 to 1 rectangles, over the same decoded art the tint draws.
+mapTypes[5000] = 3
+mapArt[5000] = 1
+artLayers[5000] = { { layerWidth = 256, layerHeight = 256 } }
+exploredTextures[5000] = { { offsetX = 64, offsetY = 64, textureWidth = 32, textureHeight = 32 } }
+local areas = API.Unexplored(5000)
+assert(#areas == 1, "the explored area is left out")
+local area = areas[1]
+assert(area.left == 10 / 256 and area.top == 20 / 256, "art pixels as fractions")
+assert(area.right == 110 / 256 and area.bottom == 100 / 256, "its far corner too")
+for _, rectangle in ipairs(areas) do
+	assert(
+		rectangle.left >= 0
+			and rectangle.left <= 1
+			and rectangle.top >= 0
+			and rectangle.top <= 1
+			and rectangle.right >= 0
+			and rectangle.right <= 1
+			and rectangle.bottom >= 0
+			and rectangle.bottom <= 1,
+		"every rectangle is inside 0 to 1"
+	)
+end
+playerMap = 5000
+local currentAreas = API.Unexplored(nil)
+assert(#currentAreas == 1 and currentAreas[1] ~= area, "the current zone, in a fresh table")
+exploredTextures[5000] = {
+	{ offsetX = 10, offsetY = 20, textureWidth = 100, textureHeight = 80 },
+	{ offsetX = 64, offsetY = 64, textureWidth = 32, textureHeight = 32 },
+}
+local allExplored = API.Unexplored(5000)
+assert(type(allExplored) == "table" and #allExplored == 0, "every area explored answers an empty list")
+mapTypes[5001] = 3
+local noArt, noArtReason = API.Unexplored(5001)
+assert(noArt == nil and noArtReason == "none", "a zone the client has no overlay art for")
+mapTypes[5002] = 0
+local notZone, notZoneReason = API.Unexplored(5002)
+assert(notZone == nil and notZoneReason == "none", "not a zone")
+local badUnexplored, badUnexploredReason = API.Unexplored(1.5)
+assert(badUnexplored == nil and badUnexploredReason == "invalid", "a map ID is a whole number")
+
+-- The best-selling reward choice: an index while the panel is up, a price still loading, and none for a tie, fewer
+-- than two choices or no panel.
+loadBestReward()
+local noPanel, noPanelReason = API.BestReward()
+assert(noPanel == nil and noPanelReason == "none", "no reward panel on screen")
+rewardItems = {
+	{ link = "item:1", count = 1, price = 100 },
+	{ link = "item:2", count = 2, price = 60 },
+}
+rewardOpen = true
+hooks.QuestInfo_Display(env.QUEST_TEMPLATE_REWARD)
+assert(API.BestReward() == 2, "the choice that sells for the most")
+assert(not active.bestReward, "answered with the marker feature off")
+rewardItems[2].price = false
+local pending, pendingReason = API.BestReward()
+assert(pending == nil and pendingReason == "loading", "a price the client hasn't read yet")
+rewardItems[2].price = 50
+local tied, tiedReason = API.BestReward()
+assert(tied == nil and tiedReason == "none", "a tie at the top")
+rewardItems = { { link = "item:1", count = 1, price = 100 } }
+local lone, loneReason = API.BestReward()
+assert(lone == nil and loneReason == "none", "a lone reward is no choice")
+rewardOpen = false
+local closed, closedReason = API.BestReward()
+assert(closed == nil and closedReason == "none", "the panel closed")
+
+-- Subscribe: trainable only when the sorted spell IDs change, and junk once on the frame after a mark toggles.
+class = "SHAMAN"
+level = 18
+known = { [403] = true, [529] = true }
+env.TweaksForeverCharDB = nil
+local heard = {}
+local unsubscribe = API.Subscribe(function(changes)
+	heard[#heard + 1] = changes
+end)
+assert(#heard == 0, "the first subscriber starts from what the channels answer now")
+Fire("SPELLS_CHANGED")
+Frame()
+assert(#heard == 0, "a spell event that changes nothing stays quiet")
+known[548] = true
+Fire("SPELLS_CHANGED")
+assert(#timers == 1 and #heard == 0, "the next frame, not the event")
+Frame()
+assert(#heard == 1 and heard[1].trainable == true and heard[1].junk == nil, "a learned spell names trainable")
+level = 20
+Fire("PLAYER_LEVEL_UP")
+Frame()
+assert(#heard == 2 and heard[2].trainable == true, "a level up brings the next spells")
+Fire("PLAYER_LEVEL_UP")
+Frame()
+assert(#heard == 2, "nothing new at the same level")
+combat = true
+Fire("SPELLS_CHANGED")
+Frame()
+assert(#heard == 2, "entering combat is not a change")
+known[915] = true
+Fire("SPELLS_CHANGED")
+Frame()
+assert(#heard == 2, "a change during combat waits")
+combat = false
+Fire("PLAYER_REGEN_ENABLED")
+Frame()
+assert(#heard == 3 and heard[3].trainable == true, "and is heard once combat ends")
+unsubscribe()
+unsubscribe()
+level = 22
+Fire("PLAYER_LEVEL_UP")
+Frame()
+assert(#heard == 3, "unsubscribing, even twice, stops the callbacks")
+
+active.markJunk = true
+local junkHeard = {}
+local unsubscribeJunk = API.Subscribe(function(changes)
+	junkHeard[#junkHeard + 1] = changes
+end)
+assert(#junkHeard == 0, "the junk channel starts from the marks now")
+clickMode.Apply(nil, 0, 1)
+assert(#timers == 1 and #junkHeard == 0, "a mark toggled now is heard on the next frame")
+Frame()
+assert(#junkHeard == 1 and junkHeard[1].junk == true and junkHeard[1].trainable == nil, "one call, naming junk")
+clickMode.Apply(nil, 0, 1)
+clickMode.Apply(nil, 0, 1)
+assert(#timers == 1, "two toggles in one frame arm one dispatch")
+Frame()
+assert(#junkHeard == 2 and junkHeard[2].junk == true, "a later burst names junk again")
+assert(junkHeard[2] ~= junkHeard[1], "and sends a fresh table")
+unsubscribeJunk()
+unsubscribeJunk()
+
+-- A rare alert raises its own channel, once per alert.
+local rareHeard = {}
+local unsubscribeRare = API.Subscribe(function(changes)
+	rareHeard[#rareHeard + 1] = changes
+end)
+now = now + 601
+vignettes.v1.isDead = nil
+markerAt.v1 = { x = 0.5, y = 0.5 }
+Fire("NAME_PLATE_UNIT_ADDED", "rare1")
+Frame()
+assert(#rareHeard == 1 and rareHeard[1].rare == true, "an alert names rare")
+unsubscribeRare()
+
+-- The shared kit itself: its next frame, one call per burst and fresh changes table are pinned here with the
+-- harness's C_Timer, as docs/api.md describes the shared shape.
+local notices, notifyHeard = 0, {}
 local hub = env.ForeverCore.APIKit.Hub("TweaksForever", {
 	notice = function()
 		return notices
 	end,
 })
-local unsubscribe = hub.Subscribe(function(changes)
-	heard[#heard + 1] = changes
+local unsubscribeKit = hub.Subscribe(function(changes)
+	notifyHeard[#notifyHeard + 1] = changes
 end)
-assert(#heard == 0, "the first subscriber starts from what the channels answer now")
+assert(#notifyHeard == 0, "the first subscriber starts from what the channels answer now")
 notices = notices + 1
 hub.Queue()
 hub.Queue()
-assert(#timers == 1 and #heard == 0, "two queues in one frame arm one timer and call nothing yet")
+assert(#timers == 1 and #notifyHeard == 0, "two queues in one frame arm one timer and call nothing yet")
 Frame()
-assert(#heard == 1 and heard[1].notice == true, "the next frame sends one call, naming the change")
+assert(#notifyHeard == 1 and notifyHeard[1].notice == true, "the next frame sends one call, naming the change")
 notices = notices + 1
 hub.Queue()
 Frame()
-assert(#heard == 2 and heard[2] ~= heard[1] and heard[2].notice == true, "a later burst sends a fresh table")
-unsubscribe()
-unsubscribe()
+assert(#notifyHeard == 2 and notifyHeard[2].notice == true, "a later burst names the change")
+assert(notifyHeard[2] ~= notifyHeard[1], "and sends a fresh table")
+unsubscribeKit()
+unsubscribeKit()
 notices = notices + 1
 hub.Queue()
 Frame()
-assert(#heard == 2, "unsubscribing, even twice, stops the callbacks")
+assert(#notifyHeard == 2, "unsubscribing, even twice, stops the callbacks")
 print("api: ok")

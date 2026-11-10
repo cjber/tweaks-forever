@@ -55,7 +55,7 @@ end
 -- A choice's sell value, nil while unknown. A currency choice (loot type 1) sells for nothing.
 ---@param index integer
 ---@return number?
-local function Value(index)
+function Model.Value(index)
 	if GetQuestItemInfoLootType and GetQuestItemInfoLootType("choice", index) == 1 then
 		return 0
 	end
@@ -72,6 +72,24 @@ end
 local marker
 -- The reward panel is the quest display on screen; a price is still loading.
 local onReward, waiting = false, false
+
+-- The choices the reward panel on screen offers, as the marker and the public API read them: nil when no reward
+-- panel is open or it offers fewer than two choices.
+---@return TFRewardChoice[]?
+function Model.Choices()
+	if not (onReward and QuestFrameRewardPanel:IsVisible()) then
+		return nil
+	end
+	local count = GetNumQuestChoices()
+	if count < 2 then
+		return nil
+	end
+	local choices = {}
+	for index = 1, count do
+		choices[index] = { index = index, value = Model.Value(index) }
+	end
+	return choices
+end
 
 ---@return Frame
 local function Marker()
@@ -111,13 +129,9 @@ local function Update()
 	if not (onReward and ns.Active(KEY) and QuestFrameRewardPanel:IsVisible()) then
 		return
 	end
-	local count = GetNumQuestChoices()
-	if count < 2 then
+	local choices = Model.Choices()
+	if not choices then
 		return
-	end
-	local choices = {}
-	for index = 1, count do
-		choices[index] = { index = index, value = Value(index) }
 	end
 	local best, pending = Model.Best(choices)
 	waiting = pending

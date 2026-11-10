@@ -83,6 +83,8 @@ end
 local initializers, events, settings, travelled = {}, {}, {}, {}
 local active = { dungeonEntrances = true, exploration = true }
 local ns = {
+	-- Core/API.lua's change signal, which this spec does not load.
+	APIChanged = function() end,
 	Feature = function() end,
 	Init = function(fn)
 		initializers[#initializers + 1] = fn

@@ -2,6 +2,8 @@
 -- off by default, never in combat, once per rare for ten minutes, and never from a secret GUID or name.
 local features, handlers, db, printed, sounds, initializers = {}, {}, {}, {}, 0, {}
 local ns = {
+	-- Core/API.lua's change signal, which this spec does not load.
+	APIChanged = function() end,
 	L = setmetatable({}, {
 		__index = function(_, key)
 			return key

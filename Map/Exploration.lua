@@ -83,6 +83,14 @@ function Model.Decode(encoded)
 	return layers
 end
 
+-- An art ID's decoded overlay tables by layer: the one decode the tint and the public API share. A new table on
+-- every call, as the source strings stay compact at login.
+---@param art integer
+---@return table<integer, TFOverlay[]>
+function Model.Layers(art)
+	return ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
+end
+
 ---@param total number
 ---@param size number
 ---@param index integer
@@ -169,7 +177,7 @@ local function Attach(map)
 	local function Areas(art, layer)
 		if cachedArt ~= art then
 			cachedArt = art
-			cachedLayers = ns.Overlays[art] and Model.Decode(ns.Overlays[art]) or {}
+			cachedLayers = Model.Layers(art)
 		end
 		return cachedLayers[layer] or {}
 	end
@@ -266,8 +274,12 @@ ns.Init(function()
 			end
 		end)
 	end
-	-- Discovering an area clears its tint at once, and the setting and conflicts apply at once.
-	ns.On("MAP_EXPLORATION_UPDATED", RedrawAll)
+	-- Discovering an area clears its tint at once, and the setting and conflicts apply at once. API.Subscribe's
+	-- `explored` channel hears the discovery whether or not the tint is on.
+	ns.On("MAP_EXPLORATION_UPDATED", function()
+		ns.APIChanged("explored")
+		RedrawAll()
+	end)
 	ns.OnSettingChanged("exploration", RedrawAll)
 	hooksecurefunc(ns, "RefreshConflicts", RedrawAll)
 end)

@@ -44,6 +44,10 @@ local function Client(slots, db)
 	c.features = features
 
 	local ns = {
+
+		-- Core/API.lua's change signal, which this spec does not load.
+
+		APIChanged = function() end,
 		db = c.db,
 		Feature = function(feature)
 			features[feature.key] = feature

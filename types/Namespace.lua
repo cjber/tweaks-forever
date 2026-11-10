@@ -289,6 +289,7 @@ TweaksForeverCharDB = nil
 ---@field Tooltips TFTooltips
 ---@field WhisperInvite TFWhisperInvite
 ---@field Exploration TFExploration
+---@field RareAlerts TFRareAlerts
 ---@field CombinedBag TFCombinedBag
 ---@field Sections TFSections
 ---@field Reagents TFReagents
@@ -337,6 +338,7 @@ TweaksForeverCharDB = nil
 ---@field QuestButtons TFQuestButtons
 ---@field Coordinates TFCoordinates
 ---@field BestReward TFBestReward
+---@field APIChanged fun(name: "junk"|"rare"|"explored") a producer tells API.Subscribe's event channels
 ---@field core ForeverCoreAddon this addon's shared services: its journal, log, report window and map canvas
 ---@field ReportLines fun(): string[] Tweaks Forever's own lines in the report (Core/Report.lua)
 ---@field PolestarOn fun(path: string): boolean

@@ -174,6 +174,8 @@ local function Toggle(bag, slot)
 	end
 	local marks = ns.db.junk
 	marks[info.itemID] = not marks[info.itemID] or nil
+	-- Tell API.Subscribe's `junk` channel, for bag addons that redraw a mark with the bags.
+	ns.APIChanged("junk")
 	RefreshBags()
 	UpdateMerchantButton()
 	return true
