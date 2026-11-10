@@ -26,9 +26,11 @@ local ns = {
 	Usable = function()
 		return true
 	end,
-	SafeCall = function(_, fn, ...)
-		return fn(...)
-	end,
+	core = {
+		SafeCall = function(_, fn, ...)
+			return fn(...)
+		end,
+	},
 }
 
 -- A quest log with a header, a quest worth no XP and three rewarded quests, two of them ready to hand in.

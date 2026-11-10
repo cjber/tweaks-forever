@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- The combined bag's layout after Blizzard's own: one pass, owned here, with two parts behind it. The reagent bag's
 -- rows go along the bottom (Reagents.lua) and grouped gear gathers under headings at the top (Sections.lua).
 ---@class TFCombinedBag

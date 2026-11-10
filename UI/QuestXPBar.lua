@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 local KEY = "questXPBar"
@@ -303,7 +307,7 @@ ns.Init(function()
 		end
 		scheduled = true
 		C_Timer.After(THROTTLE, function()
-			ns.SafeCall("quest XP bar", Update)
+			ns.core.SafeCall("quest XP bar", Update)
 		end)
 	end
 

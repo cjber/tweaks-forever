@@ -1,8 +1,23 @@
 ---@type string, TFNamespace
-local _, ns = ...
+local addonName, ns = ...
+
+if ns.broken then
+	return
+end
+
 if ns.L then
 	ns.ReportTitle = ns.L["Tweaks Forever report"]
 end
+
+-- The shared services, registered once: the report window's title, this addon's own report lines, and later the
+-- journal and log that live in TweaksForeverDB. Core/Report.lua defines the lines after this file loads, so they are
+-- read when the window opens.
+ns.core = ForeverCore.Register(addonName, {
+	title = ns.ReportTitle,
+	lines = function()
+		return ns.ReportLines()
+	end,
+})
 
 -- Features, in declaration order, and by key. Each is { key, category, name, tooltip, default, conflicts }, plus
 -- `options` ({ { value, label } }) for a choice rather than an on/off switch, `parent` (a key) to indent it
@@ -96,7 +111,7 @@ function ns.OnTooltip(dataType, getters, fn)
 		local info = tooltip:GetProcessingTooltipInfo()
 		local args = info and info.getterArgs
 		if info and getters[info.getterName] then
-			ns.SafeCall(
+			ns.core.SafeCall(
 				"tooltip",
 				fn,
 				GameTooltip,
@@ -272,17 +287,17 @@ end
 ---@param fn function
 function ns.OnSettingChanged(key, fn)
 	Settings.SetOnValueChangedCallback(ns.SettingVariable(key), function(...)
-		ns.SafeCall("setting " .. key, fn, ...)
+		ns.core.SafeCall("setting " .. key, fn, ...)
 	end)
 end
 
 local handlers = {}
 local events = CreateFrame("Frame")
--- Each handler runs through ns.SafeCall: one that fails is kept for /tweaks report, reaches the game's error
+-- Each handler runs through ns.core.SafeCall: one that fails is kept for /tweaks report, reaches the game's error
 -- handler, and doesn't stop the rest.
 events:SetScript("OnEvent", function(_, event, ...)
 	for _, fn in ipairs(handlers[event]) do
-		ns.SafeCall(event, fn, ...)
+		ns.core.SafeCall(event, fn, ...)
 	end
 end)
 
@@ -334,14 +349,14 @@ function ns.HookBagButtons(update, click)
 		hooked[button] = true
 		button:HookScript("OnClick", function(self, mouseButton)
 			if IsModifiedBagClick(self, mouseButton) then
-				ns.SafeCall("bag click", click, self, mouseButton)
+				ns.core.SafeCall("bag click", click, self, mouseButton)
 			end
 		end)
 	end
 	hooksecurefunc("ContainerFrame_GenerateFrame", function(container)
 		for _, button in ns.BagItems(container) do
 			Hook(button)
-			ns.SafeCall("bag update", update, button)
+			ns.core.SafeCall("bag update", update, button)
 		end
 	end)
 	for container in ns.ContainerFrames() do
@@ -365,7 +380,7 @@ end
 ---@param fn fun()
 function ns.Init(fn)
 	if ready then
-		ns.SafeCall("startup", fn)
+		ns.core.SafeCall("startup", fn)
 	else
 		pending[#pending + 1] = fn
 	end
@@ -382,17 +397,6 @@ end)
 login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
-	-- The shared error journal (Core/SafeCall.lua) lives in the saved table, so the report lists earlier sessions'
-	-- errors after a /reload. A record, not a feature: no settings row or conflict reads it. A value a hand edit left
-	-- unreadable is replaced, or the journal would stay in memory and be lost on the next reload.
-	if type(db.errors) ~= "table" then
-		db.errors = {}
-	end
-	-- The shared log (Core/Log.lua) rides beside it, so the lines that led to a bug survive a /reload. It repairs a
-	-- table without a ring itself; a value that is not a table has to be replaced here.
-	if type(db.log) ~= "table" then
-		db.log = { lines = {}, pinned = false }
-	end
 	for _, feature in ipairs(ns.features) do
 		if db[feature.key] == nil then
 			db[feature.key] = feature.default
@@ -400,9 +404,9 @@ login:SetScript("OnEvent", function()
 	end
 	TweaksForeverDB, ns.db = db, db
 	-- Attached once the saved variables and their defaults are in: what SafeCall recorded before this line arrives
-	-- with it, and a /reload keeps it.
-	ns.AttachErrorJournal(db.errors)
-	ns.AttachLog(db.log)
+	-- with it, and a /reload keeps it. The journal and the log ring are ForeverCore's, under `errors` and `log` in
+	-- this same table, which Attach makes when they are missing and merges into when an older save has them.
+	ns.core.Attach(db)
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
 	ns.RefreshConflicts()
 	-- Polestar applies its settings at once, so its matching features here follow them at once too.
@@ -421,7 +425,7 @@ login:SetScript("OnEvent", function()
 	end
 	ready = true
 	for _, fn in ipairs(pending) do
-		ns.SafeCall("startup", fn)
+		ns.core.SafeCall("startup", fn)
 	end
 	pending = nil
 end)

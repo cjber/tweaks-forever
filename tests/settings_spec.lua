@@ -119,7 +119,7 @@ local env = setmetatable({
 			error("the settings opened through Settings.OpenToCategory, which the client refuses from addon code")
 		end,
 	},
-	-- The shared opener wraps the client's own function in a secure delegate and calls that (Core/OpenSettings.lua).
+	-- The client's own restricted settings function, which ForeverCore's opener calls through its secure delegate.
 	C_SettingsUtil = {
 		OpenSettingsPanel = function(categoryID)
 			opens = opens + 1
@@ -206,18 +206,39 @@ ns = {
 	Active = function(key)
 		return ns.db[key] ~= false
 	end,
-	SafeCall = function(_, fn, ...)
-		return pcall(fn, ...)
-	end,
 	ReportLines = function()
 		return { "own line" }
 	end,
-	Family = {
-		CreatePanel = function(parent, db, current, L)
-			return { kind = "family panel", parent = parent, db = db, current = current, L = L }
+}
+local reported
+ns.core = {
+	SafeCall = function(_, fn, ...)
+		return pcall(fn, ...)
+	end,
+	Report = {
+		Text = function(lines)
+			return "report: " .. lines[1]
 		end,
-		-- The shared page: a canvas with the mouse, the client's own rows under the gamepad UI (#382).
-		Register = function(category, db, current, L)
+		Show = function(text)
+			reported = text
+		end,
+		Command = function(command)
+			if command == "report" then
+				local ok, lines = ns.core.SafeCall("report lines", ns.ReportLines)
+				ns.core.Report.Show(ns.core.Report.Text(ok and lines or { "Report lines failed: " .. tostring(lines) }))
+				return true
+			end
+			return false
+		end,
+	},
+}
+env.ForeverCore = {
+	-- The shared page: a canvas with the mouse, the client's own rows under the gamepad UI (#382).
+	Family = {
+		CreatePanel = function(parent, db, current, safeCall)
+			return { kind = "family panel", parent = parent, db = db, current = current, safeCall = safeCall }
+		end,
+		Register = function(category, db, current, safeCall)
 			if env.InputUtil.IsGamepadUIEnabled() then
 				vertical = env.Settings.RegisterVerticalLayoutSubcategory(category, "Forever addons")
 				vertical.kind = "vertical"
@@ -225,35 +246,22 @@ ns = {
 			end
 			return env.Settings.RegisterCanvasLayoutSubcategory(
 				category,
-				ns.Family.CreatePanel(nil, db, current, L),
+				env.ForeverCore.Family.CreatePanel(nil, db, current, safeCall),
 				"Forever addons"
 			)
 		end,
 	},
-}
-local reported
-ns.Report = {
-	Text = function(lines)
-		return "report: " .. lines[1]
-	end,
-	Show = function(text)
-		reported = text
-	end,
-	Command = function(command)
-		if command == "report" then
-			local ok, lines = ns.SafeCall("report lines", ns.ReportLines)
-			ns.Report.Show(ns.Report.Text(ok and lines or { "Report lines failed: " .. tostring(lines) }))
-			return true
-		end
-		return false
+	-- The real ForeverCore wraps this client function in its secure delegate (Core/OpenSettings.lua); here the same
+	-- delegate is made in place, so the call path stays the one UI/Settings.lua asks for.
+	OpenSettingsPanel = function(categoryID, element)
+		return env.C_SettingsUtil.OpenSettingsPanel(categoryID, element)
 	end,
 }
+env.ForeverCore.OpenSettingsPanel = env.CreateSecureDelegate(env.ForeverCore.OpenSettingsPanel)
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 -- A packaged German client: features declare English, and the settings show the translation where there is one.
 ns.L["Bags"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
--- The shared opener is loaded first, as the TOC does: the settings page asks it, not Settings.OpenToCategory.
-setfenv(assert(loadfile("Core/OpenSettings.lua")), env)("TweaksForever", ns)
-assert(ns.OpenSettingsPanel, "the shared settings opener is loaded")
+-- The settings page asks ForeverCore's opener, not Settings.OpenToCategory.
 setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 
 -- Rows per page, in order: each subpage's settings, then the index's button to it.
@@ -271,7 +279,7 @@ local repair, guildRepair = registered[1].initializer, registered[2].initializer
 -- The Forever addons page, last: the shared panel on our saved variables, with this addon's row named.
 assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Tweaks Forever")
 assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
-assert(canvas.frame.L == nil, "ns.Family is already bound to Tweaks' L (ForeverFamily.For)")
+assert(canvas.frame.safeCall == ns.core.SafeCall, "the page gets the addon's own SafeCall")
 assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
 
 -- The index's Open buttons, the Forever addons one included, open their page through the client's own function,
@@ -290,17 +298,17 @@ do
 		end
 	end
 	assert(buttons == 4, "the index has a button per subpage and the Forever addons page")
-	assert(delegated[env.C_SettingsUtil.OpenSettingsPanel] == 1, "every page opens through one secure delegate")
+	assert(opens == buttons, "every page opens through the shared opener")
 end
 
 -- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
 do
-	local before, family = #registered, ns.Family
+	local before, family = #registered, env.ForeverCore.Family
 	local addOnCategories = 0
 	env.Settings.RegisterAddOnCategory = function()
 		addOnCategories = addOnCategories + 1
 	end
-	ns.Family = {
+	env.ForeverCore.Family = {
 		Register = function()
 			error("broken copy")
 		end,
@@ -312,7 +320,7 @@ do
 	for index = before + 1, #registered do
 		assert(registered[index].initializer.name ~= "Forever addons", "no index button for a page that failed")
 	end
-	ns.Family = family
+	env.ForeverCore.Family = family
 end
 assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
 assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")

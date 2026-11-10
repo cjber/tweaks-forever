@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 ns.Feature({
 	key = "zoneLevels",
 	category = "Maps",
@@ -69,13 +73,16 @@ ns.Init(function()
 	local byName, namedMap = {}, nil
 	local function Zone(name)
 		local mapID = WorldMapFrame:GetMapID()
-		if mapID ~= namedMap then
+		if mapID and mapID ~= namedMap then
 			namedMap = mapID
 			wipe(byName)
 			for _, child in ipairs(C_Map.GetMapChildrenInfo(mapID, Enum.UIMapType.Zone) or {}) do
-				local low, high = Model.Range(child.mapID)
-				if low then
-					byName[child.name] = { low = low, high = high }
+				local id = child.mapID
+				if id then
+					local low, high = Model.Range(id)
+					if low and high then
+						byName[child.name] = { low = low, high = high }
+					end
 				end
 			end
 		end

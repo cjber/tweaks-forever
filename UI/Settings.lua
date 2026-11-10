@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local addonName, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 -- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
@@ -16,7 +20,7 @@ local L = ns.L
 -- code runs as the client, not as the addon: without it, what we hand Blizzard to read in its secure row build
 -- carries our taint, and the gamepad navigation fields the build then writes taint the binding stack when the panel
 -- closes (#433). The delegate is absent on some Forever builds (cjber/adventure-guide-forever#592); there the direct
--- call is all there is, as in Core/OpenSettings.lua.
+-- call is all there is, as in ForeverCore's OpenSettings.
 local delegates = setmetatable({}, { __mode = "k" })
 ---@param fn function
 ---@return function
@@ -211,20 +215,20 @@ ns.Init(function()
 		Settings.RegisterInitializer(
 			category,
 			Secure(CreateSettingsButtonInitializer)(L[section], L["Open"], function()
-				ns.OpenSettingsPanel(subcategory:GetID())
+				ForeverCore.OpenSettingsPanel(subcategory:GetID())
 			end, nil, false)
 		)
 	end
-	-- The Forever addons page is shared by all five addons (UI/ForeverFamily.lua), with the hint setting on it. With
-	-- the gamepad interface on it is the client's own rows so the Options navigation can enter it (#382); otherwise
-	-- our canvas frame, and nothing of ours goes into the settings search. The copy in use may be another addon's
-	-- newer one, so a failure there is caught and leaves the rest of the settings and /tweaks working.
-	ns.SafeCall("Forever addons page", function()
-		local family = ns.Family.Register(category, ns.db, addonName)
+	-- The Forever addons page is ForeverCore's, with the hint setting on it. With the gamepad interface on it is the
+	-- client's own rows so the Options navigation can enter it (#382); otherwise its canvas frame, and nothing of
+	-- ours goes into the settings search. A failure there is caught and leaves the rest of the settings and /tweaks
+	-- working.
+	ns.core.SafeCall("Forever addons page", function()
+		local family = ForeverCore.Family.Register(category, ns.db, addonName, ns.core.SafeCall)
 		Settings.RegisterInitializer(
 			category,
 			Secure(CreateSettingsButtonInitializer)(L["Forever addons"], L["Open"], function()
-				ns.OpenSettingsPanel(family:GetID())
+				ForeverCore.OpenSettingsPanel(family:GetID())
 			end, nil, false)
 		)
 	end)
@@ -241,14 +245,14 @@ ns.Init(function()
 	end)
 
 	local function Open()
-		ns.OpenSettingsPanel(category:GetID())
+		ForeverCore.OpenSettingsPanel(category:GetID())
 	end
 	SLASH_TWEAKSFOREVER1 = "/tweaks"
 	SLASH_TWEAKSFOREVER2 = "/tweaksforever"
 	-- `/tweaks report` shows the report to copy into a bug report; anything else opens the settings.
 	local function Slash(message)
 		local command = strtrim(message or ""):lower()
-		if ns.Report and ns.Report.Command and ns.Report.Command(command) then
+		if ns.core.Report.Command(command) then
 			return
 		elseif command == "help" then
 			ns.Print(L["/tw report - show a report to copy into a bug report"])
@@ -258,7 +262,7 @@ ns.Init(function()
 		end
 	end
 	SlashCmdList.TWEAKSFOREVER = function(message)
-		ns.SafeCall("slash command", Slash, message)
+		ns.core.SafeCall("slash command", Slash, message)
 	end
 	-- The minimap's addon compartment calls this by name (## AddonCompartmentFunc).
 	TweaksForever_OnAddonCompartmentClick = Open

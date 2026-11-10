@@ -1,4 +1,4 @@
--- Tweaks' Forever family hints (Integrations/Companions.lua) on the shared module (UI/ForeverFamily.lua).
+-- Tweaks' Forever family hints (Integrations/Companions.lua) on ForeverCore's family module.
 local loaded, exists = {}, {}
 local env = setmetatable({
 	C_AddOns = {
@@ -9,6 +9,23 @@ local env = setmetatable({
 			return exists[addon] == true
 		end,
 	},
+	-- The client pieces ForeverCore's own files install against.
+	CreateFrame = function()
+		return { RegisterEvent = function() end, SetScript = function() end }
+	end,
+	geterrorhandler = function()
+		return function() end
+	end,
+	seterrorhandler = function() end,
+	strtrim = function(text)
+		return (text:gsub("^%s+", ""):gsub("%s+$", ""))
+	end,
+	GetTime = function()
+		return 0
+	end,
+	date = function()
+		return "2026-11-10 12:00:00"
+	end,
 }, { __index = _G })
 local initializers = {}
 local ns = {
@@ -21,10 +38,18 @@ local ns = {
 		initializers[#initializers + 1] = fn
 	end,
 }
-setfenv(assert(loadfile("UI/ForeverFamily.lua")), env)("TweaksForever", ns)
+-- ForeverCore first, as the client loads a required dependency, then the addon's own file.
+local core = dofile("tests/forever_core.lua")
+core.install(env, {
+	"Core/SafeCall.lua",
+	"Core/Log.lua",
+	"UI/Report.lua",
+	"UI/MapCanvas.lua",
+	"UI/ForeverFamily.lua",
+	"Expose.lua",
+})
 setfenv(assert(loadfile("Integrations/Companions.lua")), env)("TweaksForever", ns)
-assert(env.ForeverFamily and ns.Family and ns.Family.Hint, "ns.Family is the shared module")
-assert(ns.Family ~= env.ForeverFamily, "a view bound to our L (ForeverFamily.For), not the shared table itself")
+assert(env.ForeverCore.Family and type(env.ForeverCore.Family.Hint) == "function", "the shared family module")
 
 local MISSING = "With Shortest Path Forever, click to plan the way there."
 local MISSING_SHIFT = "With Shortest Path Forever, Shift-click plans the way there."

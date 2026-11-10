@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- Tweaks Forever's own lines in /tweaks report: settings that differ from today's defaults (a saved value from
 -- before a default changed counts too), and which switched-on features are standing down for another addon or
 -- missing one they need. Feature keys rather than their names, so the report

@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- QuestieDB, read in game through its public API (contract 2) for the Forever flavour. Nothing of it is copied into
 -- this addon: it carries no licence. QuestGivers.lua and QuestProgress.lua read quests through the same library.
 local ADDON, CONTRACT = "QuestieDB", 2

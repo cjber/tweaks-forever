@@ -1,9 +1,7 @@
 -- Logs in with Core and WhatsNew loaded, the saved table and the addon's version given, and returns what went to
 -- chat and the saved table after.
--- Core/SafeCall.lua installs its error handler and event frame once per addon; this stand-in client already counts
--- this copy as installed, so the journal builds no frame and the frames here keep their order.
-ForeverErrorJournal = { installed = { TweaksForever = true } }
-
+-- ForeverCore provides the per-addon services Core/Core.lua registers and calls; this stand-in records what it is
+-- handed and makes no frame of its own, so the addon's own frames keep their order.
 -- Each login runs the shared files in its own environment. The chunk is parsed once: executing it again still builds
 -- every local and table fresh, and parsing the same file seven times only measured the parser.
 local chunks = {}
@@ -59,8 +57,21 @@ local function Login(saved, version, on, packaged)
 	}, { __index = _G })
 	local ns = {}
 	Chunk("Locales/enUS.lua")("TweaksForever", ns)
-	setfenv(Chunk("Core/SafeCall.lua"), env)("TweaksForever", ns)
-	setfenv(Chunk("Core/Log.lua"), env)("TweaksForever", ns)
+	env.ForeverCore = {
+		Register = function()
+			return {
+				SafeCall = function(_, fn, ...)
+					return pcall(fn, ...)
+				end,
+				Attach = function() end,
+				Report = {
+					Command = function()
+						return false
+					end,
+				},
+			}
+		end,
+	}
 	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
 	setfenv(Source(packaged, version), env)("TweaksForever", ns)
 	if on == false then

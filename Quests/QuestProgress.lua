@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 local TOOLTIP, PLATES = "questTooltips", "questPlates"
@@ -517,26 +521,26 @@ ns.Init(function()
 		end
 		Add(tooltip, lines)
 	end
-	-- Each runs through ns.SafeCall: a QuestieDB read that fails is kept for /tweaks report, never the tooltip's.
+	-- Each runs through ns.core.SafeCall: a QuestieDB read that fails is kept for /tweaks report, never the tooltip's.
 	local types = Enum.TooltipDataType
 	TooltipDataProcessor.AddTooltipPostCall(types.Unit, function(tooltip, data)
 		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
 			return
 		end
-		ns.SafeCall("quest tooltip", Add, tooltip, Model.Lines(Model.NpcId(data.guid)))
+		ns.core.SafeCall("quest tooltip", Add, tooltip, Model.Lines(Model.NpcId(data.guid)))
 	end)
 	TooltipDataProcessor.AddTooltipPostCall(types.Item, function(tooltip, data)
 		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
 			return
 		end
-		ns.SafeCall("quest item tooltip", Item, tooltip, data)
+		ns.core.SafeCall("quest item tooltip", Item, tooltip, data)
 	end)
 	-- World objects (a chest, a crate, a shrine), as Map/Campsites.lua reads them.
 	TooltipDataProcessor.AddTooltipPostCall(types.Object, function(tooltip, data)
 		if not ns.Usable(tooltip) or not Wanted(tooltip, data) then
 			return
 		end
-		ns.SafeCall("quest object tooltip", function()
+		ns.core.SafeCall("quest object tooltip", function()
 			Add(tooltip, Model.Lines(Model.ObjectId(ns.Readable(data.guid)), "object"))
 		end)
 	end)

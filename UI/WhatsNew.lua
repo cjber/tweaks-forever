@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local addonName, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 ns.Feature({

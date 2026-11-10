@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 local KEY = "screenGlow"
 local CVAR = "ffxGlow"
 local OFF = "0"

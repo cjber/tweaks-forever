@@ -1,5 +1,9 @@
 ---@type string, TFNamespace
 local _, ns = ...
+
+if ns.broken then
+	return
+end
 local L = ns.L
 
 local KEY = "petTrainerHint"

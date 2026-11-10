@@ -137,10 +137,12 @@ env.C_AddOns = {
 env.hooksecurefunc = function(_, name, fn)
 	hooks[name] = fn
 end
-ns.SafeCall = function(_, fn, ...)
-	return true, fn(...)
-end
-setfenv(assert(loadfile("Map/MapCanvas.lua")), env)("TweaksForever", ns)
+ns.core = {
+	SafeCall = function(_, fn, ...)
+		return true, fn(...)
+	end,
+}
+setfenv(assert(loadfile("Map/MapDraw.lua")), env)("TweaksForever", ns)
 env.WorldMapFrame = Canvas(1)
 init()
 env.BattlefieldMapFrame = Canvas(2)

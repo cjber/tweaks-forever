@@ -251,7 +251,7 @@ assert(Model.Inside("party", 36, nil, nil) == nil)
 assert(Model.Inside("raid", 409, 1, 1) == 409 and Model.Inside("none", 0, 1, 1) == nil)
 assert(Model.Floor(3, nil) == 1 and Model.Floor(3, 2) == 2 and Model.Floor(3, 9) == 3 and Model.Floor(1, 0) == 1)
 
--- The feature starts from ns.Init and reaches the map only through a view of our own (Map/MapCanvas.lua, stubbed
+-- The feature starts from ns.Init and reaches the map only through a view of our own (Map/MapDraw.lua, stubbed
 -- here: tests/map_canvas_spec.lua runs it) and its own hooks. Every frame is made with no parent, then set on the
 -- map: the gamepad interface follows frames created inside an open window.
 assert(#initializers == 1)
@@ -265,7 +265,7 @@ env.CreateFrame = function(kind, _, parent, template)
 	return frame
 end
 local watched
-ns.MapCanvas = {
+ns.MapDraw = {
 	FrameUnder = function(kind, parent, template)
 		local frame = env.CreateFrame(kind, nil, nil, template)
 		frame.parent = parent

@@ -1,9 +1,8 @@
 -- World map coordinates (Map/Coordinates.lua): the player's and the cursor's map position along the bottom of the
 -- world map, from engine reads only, on our own frame, and the bar stepping aside for the game's own coordinates
 -- (#371). Core's own conflict mechanism and event frame are loaded so the CVars reach the bar as they change.
--- Core/SafeCall.lua installs its error handler and event frame once per addon; this stand-in client already counts
--- this copy as installed, so the journal builds no frame and the frames here keep their order.
-ForeverErrorJournal = { installed = { TweaksForever = true } }
+-- ForeverCore provides the per-addon services Core/Core.lua registers and calls; this stand-in makes no frame of
+-- its own, so the frames here keep their order.
 local frames, callbacks, errors, cvars = {}, {}, {}, {}
 local ns = {
 	L = setmetatable({}, {
@@ -86,7 +85,7 @@ local env = setmetatable({
 		end,
 	},
 	CreateFrame = function(_, _, parent)
-		assert(parent == nil, "frames are made with no parent, then set on the map (Map/MapCanvas.lua)")
+		assert(parent == nil, "frames are made with no parent, then set on the map (Map/MapDraw.lua)")
 		local frame = Region()
 		frames[#frames + 1] = frame
 		return frame
@@ -123,10 +122,23 @@ local env = setmetatable({
 		end
 	end,
 }, { __index = _G })
-setfenv(assert(loadfile("Core/SafeCall.lua")), env)("TweaksForever", ns)
-setfenv(assert(loadfile("Core/Log.lua")), env)("TweaksForever", ns)
+env.ForeverCore = {
+	Register = function()
+		return {
+			SafeCall = function(_, fn, ...)
+				return pcall(fn, ...)
+			end,
+			Attach = function() end,
+			Report = {
+				Command = function()
+					return false
+				end,
+			},
+		}
+	end,
+}
 setfenv(assert(loadfile("Core/Core.lua")), env)("TweaksForever", ns)
-setfenv(assert(loadfile("Map/MapCanvas.lua")), env)("TweaksForever", ns)
+setfenv(assert(loadfile("Map/MapDraw.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Map/Coordinates.lua")), env)("TweaksForever", ns)
 
 local feature

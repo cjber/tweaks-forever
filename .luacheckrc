@@ -1,11 +1,9 @@
 std = "lua51"
 max_line_length = 120
-exclude_files = { "tools/.cache/**", ".release/**", ".types/**", "types/**", ".claude/**", ".bugpatrol/runs/**", ".speedpatrol/runs/**", ".sloppatrol/runs/**" }
+exclude_files = { "forever-core/**", "tools/.cache/**", ".release/**", ".types/**", "types/**", ".claude/**", ".bugpatrol/runs/**", ".speedpatrol/runs/**", ".sloppatrol/runs/**" }
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
 	"BINDING_HEADER_TWEAKSFOREVER",
-	"ForeverErrorJournal",
-	"ForeverFamily",
 	"ForeverMapMarkers",
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER2",
@@ -149,6 +147,7 @@ read_globals = {
 	"EditModeSystemSettingsDialog",
 	"Enum",
 	"ERR_NOT_IN_COMBAT",
+	"ForeverCore",
 	"EventRegistry",
 	"FACTION_ALLIANCE",
 	"FACTION_BAR_COLORS",
@@ -325,7 +324,6 @@ read_globals = {
 	"UIPanelWindows",
 	"UIParent",
 	"UnitAffectingCombat",
-	"UISpecialFrames",
 	"UnitClass",
 	"UnitClassification",
 	"UnitCreatureFamily",
@@ -396,6 +394,5 @@ files["tests/auctionator_spec.lua"] = {
 		"AuctionHouseFrame",
 	},
 }
--- Core/OpenSettings.lua: the client's secure settings panel opener.
+-- UI/Settings.lua: the client's secure delegate for its settings rows.
 read_globals[#read_globals + 1] = "CreateSecureDelegate"
-read_globals[#read_globals + 1] = "C_SettingsUtil"

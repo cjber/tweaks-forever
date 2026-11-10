@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local addonName, ns = ...
 
+if ns.broken then
+	return
+end
+
 local KEY, STYLE = "retailTooltips", "tooltipStyle"
 
 ns.Feature({

@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 local KEY = "beastTrainingKnown"
 -- How far a known row fades, matching the way the client dims something already learned.
 local KNOWN_ALPHA = 0.5

@@ -2,7 +2,7 @@
 -- dofile("tests/strict_map.lua") returns the kit; Kit.NewMap() makes a map and Kit.Install(env) sets the client
 -- globals the map files read.
 --
--- A map lets through only the reads Map/MapCanvas.lua lists: a field written on it, or any other method (such as
+-- A map lets through only the reads Map/MapDraw.lua lists: a field written on it, or any other method (such as
 -- AddDataProvider, AcquirePin, AddOverlayFrame, RemoveAllPinsByTemplate or HookScript), raises an error naming it.
 -- That is the proof that Forever's gamepad code, walking the map's own tables, never meets a value of ours.
 local Kit = {}
@@ -282,7 +282,7 @@ function Kit.NewMap(state)
 		end,
 	})
 	state.mask = Kit.Region()
-	-- The reads Map/MapCanvas.lua names, and nothing else.
+	-- The reads Map/MapDraw.lua names, and nothing else.
 	local reads = {
 		GetMapID = function()
 			return state.mapID

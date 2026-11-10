@@ -271,7 +271,7 @@ C_InputInterfaceStyle = nil
 ---@type Frame
 SoftCursor = nil
 
--- The Forever addons' world map markers, for each other (Map/MapCanvas.lua): each addon's function gives its shown
+-- The Forever addons' world map markers, for each other (Map/MapDraw.lua): each addon's function gives its shown
 -- markers on a map, as map fractions.
 ---@type table<string, fun(map: WorldMapFrame): {x: number, y: number, kind: string}[]>
 ForeverMapMarkers = nil

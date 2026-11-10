@@ -14,3 +14,6 @@ __pycache__/
 
 # Speedpatrol: local run data
 .speedpatrol/runs/
+
+# The ForeverCore checkout the specs and typecheck read, as CI does.
+forever-core/

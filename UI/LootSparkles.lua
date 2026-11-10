@@ -1,6 +1,10 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 local KEY = "lootSparkles"
 -- ForeverLootSparkles uses these same client settings for the native quest object effect.
 local WANTED = {

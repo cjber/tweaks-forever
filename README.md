@@ -76,7 +76,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 
 ## Install
 
-Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into the WoW: Forever client's `Interface/AddOns/` folder (`_forever_` on the live client, `_classic_beta_` on the beta), so you end up with `AddOns/TweaksForever/TweaksForever.toc`. Questie features are greyed out until Questie (or QuestieDB) is installed.
+Download the zip from [Releases](https://github.com/cjber/tweaks-forever/releases) and extract it into the WoW: Forever client's `Interface/AddOns/` folder (`_forever_` on the live client, `_classic_beta_` on the beta), so you end up with `AddOns/TweaksForever/TweaksForever.toc`. Tweaks Forever needs [Forever Core](https://www.curseforge.com/wow/addons/forevercore), which CurseForge and Wago install with it. Questie features are greyed out until Questie (or QuestieDB) is installed.
 
 ## Usage
 

@@ -22,9 +22,11 @@ local ns = {
 	Print = function(message)
 		printed[#printed + 1] = message
 	end,
-	SafeCall = function(_, fn, ...)
-		return fn(...)
-	end,
+	core = {
+		SafeCall = function(_, fn, ...)
+			return fn(...)
+		end,
+	},
 }
 local navigated = {}
 function ns.Navigate(map, x, y, title)

@@ -19,7 +19,7 @@ repo runs before a pull request.
 
 ## Never
 
-- Never draw on a map outside `Map/MapCanvas.lua`, hook a Blizzard object method, or write a field on a
+- Never draw on a map outside `Map/MapDraw.lua`, hook a Blizzard object method, or write a field on a
   Blizzard table: the game refuses it.
 - Never edit `Data/` (generated), `Locales/` (translations), `types/` (pinned contracts) or
   `tools/forever_tools/` (vendored byte for byte from forever-core).

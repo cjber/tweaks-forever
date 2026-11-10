@@ -1,8 +1,13 @@
 ---@type string, TFNamespace
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- Tweaks' drawings on the world map and the zone map (Shift+M), on frames of its own, with nothing written into
--- either map.
+-- either map. This is the addon's own canvas helper, not ForeverCore's: it reads the map's own pins, keeps the
+-- suite's marker registry and hides each section on its own, which ForeverCore's shared canvas does not.
 --
 -- Forever's gamepad interface runs the map's Lua from secure code: every frame MapCanvasMixin:UpdateGamepadCursor walks
 -- each pin in map.pinPools and keeps the ones under its cursor in map.currentPoIPins. A data provider an addon adds
@@ -34,7 +39,7 @@ local _, ns = ...
 
 ---@class TFMapCanvasModule
 local MapCanvas = {}
-ns.MapCanvas = MapCanvas
+ns.MapDraw = MapCanvas
 
 -- How near the gamepad's map cursor comes to a pin to point at it, in UI units (the map's MIN_PIN_DISTANCE_SQUARED).
 local CURSOR_REACH = 12
@@ -93,7 +98,7 @@ local function Fire(view, what)
 		end
 	end
 	for _, listener in ipairs(view.listeners) do
-		ns.SafeCall("map canvas " .. what, listener, view, what)
+		ns.core.SafeCall("map canvas " .. what, listener, view, what)
 	end
 end
 
@@ -490,7 +495,7 @@ clicks:SetScript("OnEvent", function(_, event, button)
 	local pin = pressed
 	pressed = nil
 	if pin and pin == hovered and button == pressedButton and pin:IsVisible() and pin:IsMouseOver() then
-		ns.SafeCall("map pin click", Click, pin, button)
+		ns.core.SafeCall("map pin click", Click, pin, button)
 	end
 end)
 
