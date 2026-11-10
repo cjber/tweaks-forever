@@ -16,6 +16,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 - **With the gamepad interface on, closing the options after browsing Tweaks Forever's page no longer makes the game refuse the next controller action and blame Tweaks Forever.** Tweaks' own rows are now handed to the game the way its own rows are, so backing out leaves nothing behind that blocks a button press (#446).
 - **Nameplates no longer fade.** Plates other than your target now darken their bar slightly, as Blizzard's own nameplates do, instead of turning see-through, so far-off enemies and enemies behind terrain no longer become hard to see.
 - **Quests no longer go missing for Forever's new Skyborne races.** QuestieDB puts races 95 and 96 in bits 32 and 33 of a quest's race mask, past what the client's 32-bit bit library holds, so an item's "Starts a quest" line and a minimap giver's quests were shown or hidden for the wrong race (cjber/tweaks-forever#443).
+- **Skip single-option gossip works again.** Most NPCs open their chat window on purpose, and those were left for you to click even with only one thing to say. The lone option is taken now, and a flight master still opens its flight map (#448).
 
 ## [2.4.4] - 2026-11-10
 
