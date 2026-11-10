@@ -37,6 +37,7 @@ python3 tools/check_editorconfig.py
 # locale is at 100%, so adding an English string means translating it in the same change.
 python3 tools/check_locales.py --release
 python3 tools/check_family.py
+python3 tools/check_store_page.py
 python3 -m tools.phrases --check
 # A fresh output path prevents a crashed checker from reusing an earlier green report.
 report=$(mktemp -d "${TMPDIR:-/tmp}/tweaks-typecheck.XXXXXX")

@@ -1,12 +1,10 @@
-Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
+Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game's settings.
 
 It needs [Forever Core](https://www.curseforge.com/wow/addons/forevercore), which CurseForge and Wago install with it.
 
 If you already run Polestar, Naowh Forever, Leatrix Plus, OpenMap, Questie, BlizzMove, Peddler or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
 
 Free, with nothing locked behind it. If it saves you time, you can [sponsor me on GitHub](https://github.com/sponsors/cjber), which takes no fees, or [buy me a coffee on Ko-fi](https://ko-fi.com/cjber). For help and each day's release notes, [join me on Discord](https://discord.gg/FpHugGxRJY).
-
-[![Join me on Discord](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/discord-button.png)](https://discord.gg/FpHugGxRJY) [![Sponsor me on GitHub](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/github-sponsors-button.png)](https://github.com/sponsors/cjber) [![Support me on Ko-fi](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/kofi-button.png)](https://ko-fi.com/cjber)
 
 ![Dungeon entrances, nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
@@ -24,28 +22,26 @@ Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists a
 
 Nameplates in retail's own frame, with your target outlined.
 
+These images are generated previews of the Tweaks UI.
+
 ## Features
 
-- **Automation**: accept and turn in quests (hold Shift to talk normally), skip single-option gossip, open the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), accept party invites from friends or decline strangers'. All off by default.
-- **Vendors**: repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback. Alt+Right-click marks anything as junk when turned on. Hold Shift as a merchant opens to skip both.
-- **Rares and levelling**: optional rare alerts in chat, XP per hour and time to level on the experience bar, and the XP your quest log is worth shaded onto the bar.
-- **Gear groups**: Ctrl+Right-click a bag item to put it in a coloured group, then equip the group in one click.
-- **Maps**: every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside or click their entrance.
-- **Nameplates and tooltips**: a taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside.
-- **Windows**: move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
-- **Quests and camps**: quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so.
-- **Spellbook, trainer and bags**: unlearned spells in the spellbook, the Pet tab's future abilities, a pet trainer note naming what your pet has not learned with a button to Beast Training, known ranks marked in Beast Training, Train all for what you can afford, and the reagent bag in the combined bag.
-- **Fishing**: double right-click to cast or apply a lure, with a warning when you have none.
-- **Quest item sparkles**: the game's own effect, as in Forever Loot Sparkles. Off by default; turns outlines off, and removing sparkles needs a restart.
-- **Also**: a page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names, an unspent talent and pet training point glow, and `/rl`.
+- **Automation.** Accept and turn in quests (hold Shift to talk normally), skip single-option gossip, open the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), and accept party invites from friends or decline strangers'. All off by default.
+- **Vendors and gear groups.** Repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback; Alt+Right-click marks anything as junk when turned on, and holding Shift as a merchant opens skips both. Ctrl+Right-click a bag item to put it in a coloured group, then equip the group in one click.
+- **Rares and levelling.** Optional rare alerts in chat, XP per hour and time to level on the experience bar, and the XP your quest log is worth shaded onto the bar.
+- **Maps.** Every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside or click their entrance.
+- **Nameplates, tooltips and windows.** A taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
+- **Quests and camps.** Quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so. Quest item sparkles use the game's own effect, as in Forever Loot Sparkles: off by default, they turn outlines off, and removing them needs a restart.
+- **Spellbook, trainers and fishing.** Unlearned spells in the spellbook, the Pet tab's future abilities, a pet trainer note naming what your pet has not learned with a button to Beast Training, known ranks marked in Beast Training, Train all for what you can afford, and the reagent bag in the combined bag. Double right-click to cast or apply a lure, with a warning when you have none.
+- **Also.** A page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names, an unspent talent and pet training point glow, and `/rl`.
 
 ## Usage
 
 Everything is under Options → AddOns → Tweaks Forever, or type `/tweaks`.
 
-For a bug report, type `/tweaks report` and paste what it shows. Type `/tweaks issue` to show a filled-in GitHub issue link, selected for copying, for a bug or feature request.
+For a bug report, paste `/tweaks report`. Type `/tweaks issue` to show a filled-in GitHub issue link, selected for copying, for a bug or feature request.
 
-Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian and Chinese (machine translated; [corrections welcome](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml)).
+Translated into German, French, Spanish, Brazilian Portuguese, Russian, Korean and Chinese (machine translated; corrections welcome through the [translation form](https://github.com/cjber/tweaks-forever/issues/new?template=translation.yml)).
 
 <!-- forever-family:start -->
 
@@ -72,6 +68,8 @@ For help, ideas and each day's release notes, join [cjber's Workshop on Discord]
 
 With Shortest Path Forever, Shift-clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for Legacy Forever.
 
-For a bug report, type `/tweaks report` and paste what it shows. Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever) (GPL-3.0).
+Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever). Licence: GPL-3.0-or-later.
 
 Built with AI assistance.
+
+[![Join me on Discord](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/discord-button.png)](https://discord.gg/FpHugGxRJY) [![Sponsor me on GitHub](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/github-sponsors-button.png)](https://github.com/sponsors/cjber) [![Support me on Ko-fi](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/kofi-button.png)](https://ko-fi.com/cjber)
