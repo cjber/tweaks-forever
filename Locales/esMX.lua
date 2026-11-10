@@ -320,7 +320,6 @@ L["Teach with Beast Training"] = "Enseñar con Entrenamiento de bestias" -- mt
 L["The ranks you already know are hidden by the filter."] = "Los rangos que ya conoces están ocultos por el filtro." -- mt
 L["Known ranks in Beast Training"] = "Rangos conocidos en Entrenamiento de bestias" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "En Entrenamiento de bestias, marca como conocidos los rangos que tu mascota ya sabe o que ha sustituido por un rango superior, para que dejen de parecer rangos que aún debe aprender." -- mt
-L["The Teach with Beast Training button works when clicked."] = "El botón «Enseñar con Entrenamiento de bestias» ya funciona al hacer clic." -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "El registro de depuración está desactivado."
@@ -334,3 +333,6 @@ L["%s (last %d):"] = "%s (últimas %d):"
 L["%s: no lines yet."] = "%s: aún no hay líneas."
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "Uso: /forever debug, /forever debug pin, /forever debug off, /forever debug show"
 L["The choices, in order: %s."] = "Las opciones, en orden: %s."
+
+L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] =
+	"Abrir las opciones de Tweaks Forever ya no muestra un error de acción bloqueada que nombre este addon." -- mt

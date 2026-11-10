@@ -320,7 +320,6 @@ L["Teach with Beast Training"] = "야수 훈련으로 가르치기" -- mt
 L["The ranks you already know are hidden by the filter."] = "이미 알고 있는 등급은 필터에 가려져 있습니다." -- mt
 L["Known ranks in Beast Training"] = "야수 훈련의 알려진 등급" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "야수 훈련에서 펫이 이미 배운 등급이나 더 높은 등급으로 대체한 등급을 알려진 것으로 표시하여, 아직 배워야 할 등급처럼 보이지 않게 합니다." -- mt
-L["The Teach with Beast Training button works when clicked."] = "'야수 훈련으로 가르치기' 버튼이 이제 클릭하면 작동합니다." -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "디버그 기록이 꺼져 있습니다."
@@ -334,3 +333,6 @@ L["%s (last %d):"] = "%s (최근 %d개):"
 L["%s: no lines yet."] = "%s: 아직 줄이 없습니다."
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "사용법: /forever debug, /forever debug pin, /forever debug off, /forever debug show"
 L["The choices, in order: %s."] = "선택 항목 순서: %s."
+
+L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] =
+	"Tweaks Forever의 설정을 열어도 이 애드온을 지목하는 차단된 동작 오류가 더 이상 표시되지 않습니다." -- mt

@@ -12,6 +12,9 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+
+## [2.4.4] - 2026-11-10
+
 - **Opening Tweaks Forever's options no longer shows a blocked action error naming this addon.** The Open buttons on the settings index, `/tweaks` and the addon compartment entry now ask the game to open its options instead of opening them themselves, so the client does not refuse the request and blame Tweaks Forever (cjber/forever-core#333).
 - **With the gamepad interface on, backing out of Tweaks Forever's options no longer makes the game refuse a gamepad action and blame Tweaks Forever.** The choice rows still name their options, Modern, Retail and the rest, in their tooltip (#433).
 

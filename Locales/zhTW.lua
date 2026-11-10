@@ -320,7 +320,6 @@ L["Teach with Beast Training"] = "用野獸訓練教導" -- mt
 L["The ranks you already know are hidden by the filter."] = "你已學會的等級被篩選器隱藏了。" -- mt
 L["Known ranks in Beast Training"] = "野獸訓練中的已知等級" -- mt
 L["In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, so they no longer look like ranks still to learn."] = "在野獸訓練中，將你的寵物已經學會或已被更高等級取代的等級標記為已知，讓它們不再看起來像尚未學習的等級。" -- mt
-L["The Teach with Beast Training button works when clicked."] = "「用野獸訓練教導」按鈕現在點擊即可使用。" -- mt
 
 -- Shared debug log (Forever Core's Core/Log.lua).
 L["Debug log is off."] = "偵錯記錄已關閉。"
@@ -334,3 +333,6 @@ L["%s (last %d):"] = "%s（最近 %d 筆）："
 L["%s: no lines yet."] = "%s：還沒有記錄行。"
 L["Usage: /forever debug, /forever debug pin, /forever debug off, /forever debug show"] = "用法：/forever debug、/forever debug pin、/forever debug off、/forever debug show"
 L["The choices, in order: %s."] = "選項依序為：%s。"
+
+L["Opening Tweaks Forever's options no longer shows a blocked action error naming this addon."] =
+	"開啟 Tweaks Forever 的選項時不再顯示指名此外掛的動作被封鎖錯誤。" -- mt
