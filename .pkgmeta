@@ -1,7 +1,6 @@
 package-as: TweaksForever
 
 move-folders:
-  TweaksForever/ForeverCore: ForeverCore
   TweaksForever/LibAHTab: LibAHTab
 
 manual-changelog:
@@ -31,7 +30,6 @@ optional-dependencies:
   - questiedb
   - questie
 
-# ForeverCore ships inside this zip as its own folder, from the release tools/forever-core.txt pins, because
-# its CurseForge project is not yet approved and so cannot be a required-dependencies relation.
-externals:
-  ForeverCore: https://github.com/cjber/forever-core/releases/download/v1.1.0/ForeverCore-v1.1.0-forever.zip
+# ForeverCore is the CurseForge project forevercore (1796337), installed with the addon.
+required-dependencies:
+  - forevercore

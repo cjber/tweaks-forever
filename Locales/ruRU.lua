@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "От вашей группы и не от того, кто в бою, чтобы момент боевого воскрешения выбирали вы. Выжидает задержку игры, если вы скоро снова погибнете. Удерживайте Shift, чтобы ответить самому."
 L["Future Spells"] = "Будущие заклинания"
 L["Future spells in spellbook"] = "Будущие заклинания в книге заклинаний"
-	L["Game data now matches Forever build 1.60.1.70888."] = "Игровые данные теперь соответствуют сборке Forever 1.60.1.70888." -- mt
+	L["Forever Core now installs alongside it."] = "Forever Core теперь устанавливается вместе с аддоном." -- mt
 L["Game menu"] = "Главное меню"
 L["Gather grouped gear in bags"] = "Собирать сгруппированную экипировку в сумках"
 L["Gear"] = "Экипировка"
