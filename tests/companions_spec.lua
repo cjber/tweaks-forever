@@ -45,6 +45,8 @@ core.install(env, {
 	"Core/Log.lua",
 	"UI/Report.lua",
 	"UI/MapCanvas.lua",
+	"Data/Credits.lua",
+	"UI/Credits.lua",
 	"UI/ForeverFamily.lua",
 	"Expose.lua",
 })

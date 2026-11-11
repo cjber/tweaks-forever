@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "De votre groupe, et pas de quelqu'un en combat, pour que vous choisissiez toujours le moment d'une résurrection en combat. Attend le délai du jeu si vous mourez à nouveau peu après. Maintenez Maj pour répondre vous-même."
 L["Future Spells"] = "Sorts à venir"
 L["Future spells in spellbook"] = "Sorts à venir dans le grimoire"
-	L["Tells you which addon to update."] = "Vous indique quel addon mettre à jour." -- mt
+	L["A window you moved opens in its place."] = "Une fenêtre que vous avez déplacée s'ouvre à sa place." -- mt
 L["Game menu"] = "Menu de jeu"
 L["Gather grouped gear in bags"] = "Rassembler l'équipement groupé dans les sacs"
 L["Gear"] = "Équipement"
