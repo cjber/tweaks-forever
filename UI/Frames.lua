@@ -516,6 +516,9 @@ local function Attach(record)
 	-- must retain occupancy and close rules.
 	frame:HookScript("OnShow", function()
 		if Active() then
+			-- Before the frame draws: a deferred pass alone leaves one frame at Blizzard's own spot (#507). Apply
+			-- queues this in combat, so nothing moves while the client forbids it.
+			Apply(record)
 			Schedule()
 		end
 	end)
@@ -797,9 +800,23 @@ local function Install()
 			Schedule()
 		end
 	end
-	hooksecurefunc("ShowUIPanel", Moved)
-	hooksecurefunc("HideUIPanel", Moved)
-	hooksecurefunc("UpdateUIPanelPositions", Moved)
+	-- ShowUIPanel shows the window, then UpdateUIPanelPositions puts it where the game thinks it goes, all inside one
+	-- call. Applying the shown windows on the way out of that call leaves the saved point in place before the window
+	-- draws; Schedule() still runs for a placement the manager's private delegate makes later.
+	local function PanelsMoved()
+		if Active() then
+			for _, record in ipairs(records) do
+				local frame = record.frame
+				if frame and frame:IsShown() then
+					Apply(record)
+				end
+			end
+		end
+		Moved()
+	end
+	hooksecurefunc("ShowUIPanel", PanelsMoved)
+	hooksecurefunc("HideUIPanel", PanelsMoved)
+	hooksecurefunc("UpdateUIPanelPositions", PanelsMoved)
 	EventRegistry:RegisterCallback("EditMode.Enter", Enter, Model)
 	EventRegistry:RegisterCallback("EditMode.Exit", function()
 		editing = false

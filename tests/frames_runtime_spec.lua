@@ -1,6 +1,6 @@
 -- Exercise UI/Frames.lua's real installation, lazy addon discovery and Edit Mode controls.
 local function Run(installed, early, fromEditor)
-	local callbacks, events, initializers, pending, frames = {}, {}, {}, {}, {}
+	local callbacks, events, initializers, pending, frames, panelHooks = {}, {}, {}, {}, {}, {}
 	local combat, gamepad = false, false
 	local methods = {}
 	local function noop() end
@@ -265,6 +265,21 @@ local function Run(installed, early, fromEditor)
 				old(...)
 				fn(...)
 			end
+		else
+			-- A global function's post-hook, called by the spec's own panel manager calls.
+			panelHooks[target] = panelHooks[target] or {}
+			table.insert(panelHooks[target], key)
+		end
+	end
+	local shownAt
+	-- As the client's panel manager does: show the window, then put it where the game thinks it belongs.
+	env.ShowUIPanel = function(window)
+		window:Show()
+		shownAt = window.points[1] and window.points[1][1]
+		window:ClearAllPoints()
+		window:SetPoint("TOPLEFT", root, "TOPLEFT", 16, -116)
+		for _, hooked in ipairs(panelHooks.ShowUIPanel or {}) do
+			hooked(window)
 		end
 	end
 	setfenv(assert(loadfile("Locales/enUS.lua")), env)("TweaksForever", ns)
@@ -366,6 +381,16 @@ local function Run(installed, early, fromEditor)
 	reset.scripts.OnClick(reset)
 	assert(layout.AdventureGuideForeverWindow == nil and guide.scale == 1, "reset clears saved position and scale")
 	assert(guide.attributes["UIPanelLayout-area"] == "doublewide", "reset preserves panel ownership")
+	-- #507: a moved window is at its saved spot the moment the panel manager shows it, before any deferred pass, so it
+	-- never draws one frame at Blizzard's own placement and then jumps.
+	layout.AdventureGuideForeverWindow = { x = 0.6, y = 0.4, scale = 1.2 }
+	guide:Hide()
+	shownAt = nil
+	env.ShowUIPanel(guide)
+	assert(shownAt == "CENTER", "OnShow sets the saved point before the panel manager places the window")
+	assert(guide.scale == 1.2 and guide.points[1][1] == "CENTER", "shown at the saved spot without a timer pass")
+	flush()
+	assert(guide.scale == 1.2 and guide.points[1][1] == "CENTER", "the deferred pass keeps it there")
 end
 Run(false, false)
 Run(true, false)
