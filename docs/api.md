@@ -3,7 +3,8 @@
 Other addons can read Tweaks Forever's class trainer spells, the class trainers to visit and a dungeon or raid
 entrance through the global `TweaksForever.API`, and hear about the moments it watches through `Subscribe()`. It is
 version 3, minor 2: check `version == 3` and that each function exists before calling it. The full types are in
-[`types/API.lua`](../types/API.lua).
+[`types/API.lua`](../types/API.lua). On ForeverCore 1.3.2 or later, the API is also listed by
+`ForeverCore.APIKit.Addons()`.
 
 Every read that answers with a table returns a fresh one that you may keep or change. Trainer names and places, and
 entrance places, use UiMapIDs and coordinates from 0 to 1.

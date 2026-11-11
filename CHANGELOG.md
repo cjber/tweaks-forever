@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+### For addon authors
+
+- **`TweaksForever.API` is listed by `ForeverCore.APIKit.Addons()`.** On ForeverCore 1.3.2 or later the addon publishes its API table at load, so a suite-wide reader finds it and can subscribe through it. The API's own `version` and `minor` do not change (#490).
+
 ## [2.6.1] - 2026-11-11
 
 - **Game data now matches Forever build 1.60.1.70888.** The map overlays, zone level ranges, dungeon and raid entrances, class trainer spells, camp benefit texts and the quests Forever added are regenerated from the newer client build. Every row is the same as the previous build's, so nothing a player sees changes and only the build stamp in each file moves.

@@ -329,6 +329,19 @@ Load("Map/Exploration.lua")
 Load("Map/ZoneLevels.lua")
 local loadBestReward = Load("Quests/BestReward.lua")
 Load("UI/XPRate.lua")
+-- A core whose kit is minor 1 has no Publish: the addon loads cleanly and publishes nothing.
+local CoreKit = env.ForeverCore.APIKit
+local publishCalls = {}
+local publish = CoreKit.Publish
+CoreKit.minor = 1
+CoreKit.Publish = function(addonName)
+	publishCalls[#publishCalls + 1] = addonName
+end
+Load("Core/API.lua")
+assert(#publishCalls == 0, "an older kit's Publish is not called")
+assert(#CoreKit.Addons() == 0, "and nothing is published on it")
+CoreKit.minor = 2
+CoreKit.Publish = publish
 local loadAPI = Load("Core/API.lua")
 local API = env.TweaksForever.API
 loadJunk()
@@ -336,6 +349,16 @@ assert(API.version == 3, "v2 adds Trainers, v3 reads their names and places from
 assert(API.minor == 2, "minor 2 adds Subscribe and the reads below it")
 assert(env.ForeverCore.APIKit ~= nil, "the shared API kit is available at load")
 assert(type(API.Subscribe) == "function", "minor 2 publishes Subscribe")
+-- The suite's own list carries this addon's API, at the version and minor it publishes.
+local entry
+for _, candidate in ipairs(env.ForeverCore.APIKit.Addons()) do
+	if candidate.name == "TweaksForever" then
+		entry = candidate
+	end
+end
+assert(entry ~= nil, "Addons() lists TweaksForever")
+assert(entry.version == API.version and entry.minor == API.minor, "with the API's version and minor")
+assert(entry.api == API, "and the API's own table, not a copy")
 local entrance = API.DungeonEntrance(230)
 assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "first curated zone, before login")
 local another = API.DungeonEntrance(230)

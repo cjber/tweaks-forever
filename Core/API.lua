@@ -331,5 +331,11 @@ ns.On("PLAYER_REGEN_ENABLED", TrainableChanged)
 TweaksForever = TweaksForever or {}
 TweaksForever.API = API
 
+-- Hands the API to the suite's own list, so a reader finds every Forever addon's through
+-- ForeverCore.APIKit.Addons(). Publish arrived in kit minor 2, so an older core leaves it out and still loads.
+if (ForeverCore.APIKit.minor or 1) >= 2 then
+	ForeverCore.APIKit.Publish("TweaksForever", API)
+end
+
 -- Books the read of the player's own trainers at login, so the first caller usually finds them placed.
 ns.Init(API.Trainers)
