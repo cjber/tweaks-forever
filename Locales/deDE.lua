@@ -96,6 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "Aus Eurer Gruppe und nicht von jemandem im Kampf, damit Ihr eine Kampfwiederbelebung weiterhin selbst timen könnt. Wartet die Verzögerung des Spiels ab, wenn Ihr bald erneut sterbt. Haltet Umschalt gedrückt, um selbst zu antworten."
 L["Future Spells"] = "Künftige Zauber"
 L["Future spells in spellbook"] = "Künftige Zauber im Zauberbuch"
+	L["Game data now matches Forever build 1.60.1.70888."] = "Spieldaten entsprechen jetzt dem Forever-Build 1.60.1.70888." -- mt
 L["Game menu"] = "Spielmenü"
 L["Gather grouped gear in bags"] = "Gruppierte Ausrüstung in Taschen sammeln"
 L["Gear"] = "Ausrüstung"
@@ -296,6 +297,5 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 
 L["The choices, in order: %s."] = "Die Auswahlmöglichkeiten, der Reihe nach: %s."
 
-L["Needs Forever Core."] = "Benötigt Forever Core." -- mt
 
 L["Tweaks Forever needs ForeverCore, which is missing or too old."] = "Tweaks Forever benötigt ForeverCore, das fehlt oder zu alt ist."

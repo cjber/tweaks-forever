@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-11-11
+
+- **Game data now matches Forever build 1.60.1.70888.** The map overlays, zone level ranges, dungeon and raid entrances, class trainer spells, camp benefit texts and the quests Forever added are regenerated from the newer client build. Every row is the same as the previous build's, so nothing a player sees changes and only the build stamp in each file moves.
+
 ## [2.6.0] - 2026-11-11
 
 <!-- discord-image: docs/screenshots/menu.png -->

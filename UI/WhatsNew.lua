@@ -16,8 +16,8 @@ ns.Feature({
 
 -- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
 -- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "2.6.0"
-ns.WHATS_NEW = L["Needs Forever Core."]
+ns.WHATS_NEW_VERSION = "2.6.1"
+ns.WHATS_NEW = L["Game data now matches Forever build 1.60.1.70888."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
