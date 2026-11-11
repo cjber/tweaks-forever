@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "파티원의 부활만 수락하며, 전투 중인 사람의 부활은 수락하지 않아 전투 부활 시점은 직접 정할 수 있습니다. 곧 다시 죽으면 게임의 대기 시간을 기다립니다. 직접 응답하려면 Shift를 누르고 있으세요."
 L["Future Spells"] = "앞으로 배울 주문"
 L["Future spells in spellbook"] = "마법책에 앞으로 배울 주문 표시"
-	L["Forever Core now installs alongside it."] = "이제 Forever Core가 함께 설치됩니다." -- mt
+	L["Tells you which addon to update."] = "업데이트할 애드온을 알려줍니다." -- mt
 L["Game menu"] = "게임 메뉴"
 L["Gather grouped gear in bags"] = "묶은 장비를 가방에서 모아 두기"
 L["Gear"] = "장비"
@@ -298,4 +298,6 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 L["The choices, in order: %s."] = "선택 항목 순서: %s."
 
 
-L["Tweaks Forever needs ForeverCore, which is missing or too old."] = "Tweaks Forever에는 ForeverCore가 필요합니다. 설치되어 있지 않거나 너무 오래되었습니다."
+L["%s: %s is out of date. Update it to fix this."] = "%s: %s 버전이 오래되었습니다. 문제를 해결하려면 업데이트하세요." -- mt
+L["%s: %s are out of date. Update them to fix this."] = "%s: %s 버전이 오래되었습니다. 문제를 해결하려면 모두 업데이트하세요." -- mt
+L["%s could not start. Reinstall %s to fix this."] = "%s을(를) 시작할 수 없습니다. 문제를 해결하려면 %s을(를) 다시 설치하세요." -- mt

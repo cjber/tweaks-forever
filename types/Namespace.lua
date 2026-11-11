@@ -274,7 +274,8 @@ TweaksForeverCharDB = nil
 ---@field Apply fun(owner: Button, bag: integer, slot: integer)
 
 ---@class TFNamespace
----@field broken? boolean true when ForeverCore is missing or older than API 1, so the addon's own files stop
+---@field broken? boolean true when ForeverCore is missing a member this addon calls, so the addon's own files stop
+---@field ForeverRequire fun(ready: boolean): boolean the shared out-of-date warning, from Core/ForeverRequire.lua
 ---@field ReportTitle string the localized title shown by ForeverCore's report window
 ---@field ForeverQuests table<integer, true>
 ---@field QuestLog TFQuestLog
@@ -328,8 +329,8 @@ TweaksForeverCharDB = nil
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
 ---@field NavigateHint fun(shift: boolean?): string
 ---@field EntranceHint fun(shift: boolean?): string? the grey line about Shortest Path Forever on a dungeon entrance (Integrations/Companions.lua)
----@field WHATS_NEW string
----@field WHATS_NEW_VERSION string
+---@field WHATS_NEW string the headline of the release WHATS_NEW_VERSION names
+---@field WHATS_NEW_VERSION string the newest release in CHANGELOG.md with a bold headline
 ---@field WhatsNew TFWhatsNew
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
