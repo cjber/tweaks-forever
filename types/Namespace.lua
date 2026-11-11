@@ -274,6 +274,7 @@ TweaksForeverCharDB = nil
 ---@field Apply fun(owner: Button, bag: integer, slot: integer)
 
 ---@class TFNamespace
+---@field Credits ForeverCreditsData the player credits Data/Credits.lua generates for the shared Thanks page
 ---@field broken? boolean true when ForeverCore is missing a member this addon calls, so the addon's own files stop
 ---@field ForeverRequire fun(ready: boolean): boolean the shared out-of-date warning, from Core/ForeverRequire.lua
 ---@field ReportTitle string the localized title shown by ForeverCore's report window
