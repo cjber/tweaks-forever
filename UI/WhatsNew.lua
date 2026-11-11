@@ -18,8 +18,8 @@ ns.Feature({
 -- core sync's maintenance entry has no headline, so these stay on the release before it: an update to a maintenance
 -- version says nothing new but still moves the remembered version on. Rewrite both lines for each release that has a
 -- headline (whatsnew_spec checks them against CHANGELOG.md).
-ns.WHATS_NEW_VERSION = "2.6.5"
-ns.WHATS_NEW = L["A window you moved opens in its place."]
+ns.WHATS_NEW_VERSION = "2.6.7"
+ns.WHATS_NEW = L["The players who helped are on the Thanks page."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

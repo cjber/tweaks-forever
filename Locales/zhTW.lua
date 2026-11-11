@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "來自你的隊伍，且不來自戰鬥中的人，因此戰鬥復活的時機仍由你決定。如果你很快再次死亡，會等待遊戲的延遲。按住Shift可自己回應。"
 L["Future Spells"] = "未來法術"
 L["Future spells in spellbook"] = "法術書中的未來法術"
-	L["A window you moved opens in its place."] = "你移動過的視窗會在你放置的位置開啟。" -- mt
+	L["The players who helped are on the Thanks page."] = "幫助過的玩家都列在致謝頁面上。" -- mt
 L["Game menu"] = "遊戲選項"
 L["Gather grouped gear in bags"] = "在背包中集中已分組的裝備"
 L["Gear"] = "裝備"

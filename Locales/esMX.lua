@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "De tu grupo, y no de alguien en combate, para que sigas eligiendo cuándo aceptar una resurrección en combate. Espera el retraso del juego si vuelves a morir pronto. Mantén Mayús para responder tú."
 L["Future Spells"] = "Hechizos futuros"
 L["Future spells in spellbook"] = "Hechizos futuros en el libro de hechizos"
-	L["A window you moved opens in its place."] = "Una ventana que hayas movido se abre en su sitio." -- mt
+	L["The players who helped are on the Thanks page."] = "Los jugadores que ayudaron aparecen en la página de Agradecimientos." -- mt
 L["Game menu"] = "Menú de juego"
 L["Gather grouped gear in bags"] = "Reunir equipo agrupado en las bolsas"
 L["Gear"] = "Equipo"
