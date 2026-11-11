@@ -1,8 +1,9 @@
 """List the addon's translatable phrases as a template for translators, and reject text that skips them.
 
-Every phrase is its English text: `L["..."]` in the shipped Lua, plus the category, name, tooltip and option
-labels an `ns.Feature` declares and the label and tooltip an `ns.ClickMode` declares, which UI/Settings.lua and
-Core/Modes.lua translate where they show them. With no argument this prints a translation template:
+Every phrase is its English text: `L["..."]` in the shipped Lua, or the text a shared file passes to its `phrase("...")`
+helper, plus the category, name, tooltip and option labels an `ns.Feature` declares and the label and tooltip an
+`ns.ClickMode` declares, which UI/Settings.lua and Core/Modes.lua translate where they show them. With no argument this
+prints a translation template:
 a Locales/<locale>.lua
 with an `L["x"] = "x"` line per phrase. `--write` saves it to Locales/phrases.txt, and `--check` fails when that file
 is stale, when shipped code hands a literal with words in it straight to a UI call, when a translation is missing
@@ -64,6 +65,9 @@ MARKUP = re.compile(r"\|c[0-9a-fA-F]{8}|\|r|\|T.*?\|t|\|A.*?\|a|%%|%[-+ #0]*\d*(
 ESCAPES = {"n": "\n", "t": "\t", "\\": "\\", '"': '"', "'": "'"}
 # The addon's own name, shown as it is in every language.
 NAMES = {"Tweaks Forever"}
+# A shared Forever file may choose its English text with a helper, `phrase("%s is out of date.", name)`, and read
+# ns.L by that same key, so those strings are phrases too.
+PHRASE_HELPER = "phrase"
 
 
 @dataclass(frozen=True)
@@ -195,6 +199,14 @@ def scan(path: Path, source: str) -> tuple[set[str], list[Finding]]:
             if text is not None and tokens[after].text == "]":
                 phrases.add(text)
                 translated.update(range(index + 2, after))
+    for index, token in enumerate(tokens):
+        if token.text == PHRASE_HELPER and token.kind == "name" and tokens[index + 1].text == "(":
+            args = arguments(tokens, index + 1)
+            if args:
+                start, end = args[0]
+                text, after = literal(tokens, start)
+                if text is not None and after == end:
+                    phrases.add(text)
     for index, token in enumerate(tokens):
         if (
             token.text in DECLARATIONS

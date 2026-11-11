@@ -14,6 +14,7 @@
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
 ## Dependencies: ForeverCore
+## X-Forever-Core: v1.5.0
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
@@ -27,6 +28,7 @@ Locales\ptBR.lua
 Locales\ruRU.lua
 Locales\zhCN.lua
 Locales\zhTW.lua
+Core\ForeverRequire.lua
 Core\Require.lua
 Data\Overlays.lua
 Data\CampBenefits.lua

@@ -29,6 +29,15 @@ class PhrasesTest(unittest.TestCase):
         self.assertEqual(phrases(source), {"Maps", "Show it", "Built", "A strip", "Nothing", "Mark", "Click items."})
         self.assertEqual(phrases('f(L["say \\"hi\\"\\n"])'), {'say "hi"\n'})
 
+    def test_a_shared_files_phrase_helper_is_found(self):
+        source = (
+            "local function phrase(key, ...)\n"
+            "\treturn string.format((ns.L or {})[key] or key, ...)\n"
+            "end\n"
+            'text = phrase("%s is out of date. Update it to fix this.", name)\n'
+        )
+        self.assertEqual(phrases(source), {"%s is out of date. Update it to fix this."})
+
     def test_declared_text_must_be_literal(self):
         self.assertEqual(findings('ns.Feature({ key = "x", name = NAME })'), [1])
         self.assertEqual(findings('ns.Feature({ key = "x", name = "A" .. suffix })'), [1])

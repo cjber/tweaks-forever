@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "De votre groupe, et pas de quelqu'un en combat, pour que vous choisissiez toujours le moment d'une résurrection en combat. Attend le délai du jeu si vous mourez à nouveau peu après. Maintenez Maj pour répondre vous-même."
 L["Future Spells"] = "Sorts à venir"
 L["Future spells in spellbook"] = "Sorts à venir dans le grimoire"
-	L["Forever Core now installs alongside it."] = "Forever Core s'installe désormais avec l'addon." -- mt
+	L["Tells you which addon to update."] = "Vous indique quel addon mettre à jour." -- mt
 L["Game menu"] = "Menu de jeu"
 L["Gather grouped gear in bags"] = "Rassembler l'équipement groupé dans les sacs"
 L["Gear"] = "Équipement"
@@ -298,4 +298,6 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 L["The choices, in order: %s."] = "Les choix, dans l'ordre : %s."
 
 
-L["Tweaks Forever needs ForeverCore, which is missing or too old."] = "Tweaks Forever a besoin de ForeverCore, qui est absent ou trop ancien."
+L["%s: %s is out of date. Update it to fix this."] = "%s : %s est obsolète. Mettez-le à jour pour corriger cela." -- mt
+L["%s: %s are out of date. Update them to fix this."] = "%s : %s sont obsolètes. Mettez-les à jour pour corriger cela." -- mt
+L["%s could not start. Reinstall %s to fix this."] = "%s n'a pas pu démarrer. Réinstallez %s pour corriger cela." -- mt

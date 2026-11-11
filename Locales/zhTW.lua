@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "來自你的隊伍，且不來自戰鬥中的人，因此戰鬥復活的時機仍由你決定。如果你很快再次死亡，會等待遊戲的延遲。按住Shift可自己回應。"
 L["Future Spells"] = "未來法術"
 L["Future spells in spellbook"] = "法術書中的未來法術"
-	L["Forever Core now installs alongside it."] = "Forever Core 現在會隨插件一起安裝。" -- mt
+	L["Tells you which addon to update."] = "告訴你需要更新哪個插件。" -- mt
 L["Game menu"] = "遊戲選項"
 L["Gather grouped gear in bags"] = "在背包中集中已分組的裝備"
 L["Gear"] = "裝備"
@@ -298,4 +298,6 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 L["The choices, in order: %s."] = "選項依序為：%s。"
 
 
-L["Tweaks Forever needs ForeverCore, which is missing or too old."] = "Tweaks Forever 需要 ForeverCore，但它缺少或版本過舊。"
+L["%s: %s is out of date. Update it to fix this."] = "%s：%s 已過時。請更新它以解決此問題。" -- mt
+L["%s: %s are out of date. Update them to fix this."] = "%s：%s 已過時。請更新它們以解決此問題。" -- mt
+L["%s could not start. Reinstall %s to fix this."] = "%s 無法啟動。請重新安裝 %s 以解決此問題。" -- mt

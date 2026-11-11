@@ -14,10 +14,12 @@ ns.Feature({
 	default = true,
 })
 
--- The headline of this version's changes in CHANGELOG.md, said once in chat after an update. The version is the
--- TOC's, filled in by the packager; rewrite both lines with each release's entry (whatsnew_spec checks the version).
-ns.WHATS_NEW_VERSION = "2.6.3"
-ns.WHATS_NEW = L["Forever Core now installs alongside it."]
+-- The newest release in CHANGELOG.md with a bold headline, and that headline, said once in chat after an update. A
+-- core sync's maintenance entry has no headline, so these stay on the release before it: an update to a maintenance
+-- version says nothing new but still moves the remembered version on. Rewrite both lines for each release that has a
+-- headline (whatsnew_spec checks them against CHANGELOG.md).
+ns.WHATS_NEW_VERSION = "2.6.4"
+ns.WHATS_NEW = L["Tells you which addon to update."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"
@@ -26,12 +28,13 @@ local UNPACKAGED = "@" .. "project-version@"
 local Model = {}
 ns.WhatsNew = Model
 
--- The chat line for coming from `seen` to `version`, if any: none on a first install or the same version.
+-- The chat line for coming from `seen` to `version`, if any: none on a first install, the same version, or a
+-- maintenance release, whose version has no headline.
 ---@param seen string?
 ---@param version string
 ---@return string?
 function Model.Message(seen, version)
-	if seen and seen ~= version then
+	if seen and seen ~= version and version == ns.WHATS_NEW_VERSION then
 		return L["updated to %s. %s"]:format(version, ns.WHATS_NEW)
 	end
 end
