@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "파티원의 부활만 수락하며, 전투 중인 사람의 부활은 수락하지 않아 전투 부활 시점은 직접 정할 수 있습니다. 곧 다시 죽으면 게임의 대기 시간을 기다립니다. 직접 응답하려면 Shift를 누르고 있으세요."
 L["Future Spells"] = "앞으로 배울 주문"
 L["Future spells in spellbook"] = "마법책에 앞으로 배울 주문 표시"
-	L["Game data now matches Forever build 1.60.1.70888."] = "게임 데이터가 이제 Forever 빌드 1.60.1.70888과 일치합니다." -- mt
+	L["Forever Core now installs alongside it."] = "이제 Forever Core가 함께 설치됩니다." -- mt
 L["Game menu"] = "게임 메뉴"
 L["Gather grouped gear in bags"] = "묶은 장비를 가방에서 모아 두기"
 L["Gear"] = "장비"

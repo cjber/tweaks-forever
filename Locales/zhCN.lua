@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "来自你的队伍，且不来自战斗中的人，因此战斗复活的时机仍由你决定。如果你很快再次死亡，会等待游戏的延迟。按住Shift可自己回应。"
 L["Future Spells"] = "未来法术"
 L["Future spells in spellbook"] = "法术书中的未来法术"
-	L["Game data now matches Forever build 1.60.1.70888."] = "游戏数据现已与 Forever 版本 1.60.1.70888 一致。" -- mt
+	L["Forever Core now installs alongside it."] = "Forever Core 现在会随插件一起安装。" -- mt
 L["Game menu"] = "游戏菜单"
 L["Gather grouped gear in bags"] = "在背包中集中已分组的装备"
 L["Gear"] = "装备"

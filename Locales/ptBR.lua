@@ -96,7 +96,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "Do seu grupo, e não de alguém em combate, para que o momento de uma ressurreição em combate continue sendo seu. Espera o atraso do jogo se você morrer de novo logo depois. Segure Shift para responder você mesmo."
 L["Future Spells"] = "Feitiços futuros"
 L["Future spells in spellbook"] = "Feitiços futuros no grimório"
-	L["Game data now matches Forever build 1.60.1.70888."] = "Os dados do jogo agora correspondem à build 1.60.1.70888 do Forever." -- mt
+	L["Forever Core now installs alongside it."] = "O Forever Core agora é instalado junto com o addon." -- mt
 L["Game menu"] = "Menu do Jogo"
 L["Gather grouped gear in bags"] = "Reunir equipamento agrupado nas bolsas"
 L["Gear"] = "Equipamento"
