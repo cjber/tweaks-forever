@@ -12,6 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-11-11
+
+<!-- discord-image: docs/screenshots/menu.png -->
+
 - **Logging in with QuestieDB installed no longer stalls for a frame.** The quest-giver name index was built in one pass over every NPC as the world appeared, which could freeze the game for over 100 ms on a slower machine. It is now built a little at a time just after login, so the first moments in the world stay smooth (#411).
 
 ### For addon authors
