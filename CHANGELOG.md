@@ -14,6 +14,12 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 - **A window you moved opens in its place.** Windows moved with the Windows tab in Edit Mode could appear for a frame where the game would have put them, then jump to your spot. They are now in the right place from the first frame (#507).
 
+## [2.6.5] - 2026-11-11
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
 ## [2.6.4] - 2026-11-11
 
 - **Tells you which addon to update.** If another Forever addon you have installed is older than this one and stops it starting, the message now names that addon, so you know exactly what to update.
