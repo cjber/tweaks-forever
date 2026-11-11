@@ -70,12 +70,12 @@ For help, ideas and each day's release notes, join [cjber's Workshop on Discord]
 
 With Shortest Path Forever, Shift-clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for Legacy Forever.
 
-Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever). Licence: GPL-3.0-or-later.
-
 <!-- forever-credits:start -->
 
 Thanks to Sojiro84, Mouchoir, SirGooie and everyone who reported a bug or asked for a feature.
 
 <!-- forever-credits:end -->
+
+Source code and issues: [github.com/cjber/tweaks-forever](https://github.com/cjber/tweaks-forever). Licence: GPL-3.0-or-later.
 
 Built with AI assistance.
