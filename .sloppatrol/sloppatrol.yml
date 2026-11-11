@@ -12,6 +12,7 @@ checks:
   # check_generated.py --offline is left out: it reads the gitignored tools/.cache, which a run checkout
   # does not have.
   - { name: rules, run: "python3 tools/repo_rules.py" }
+  - { name: credits, run: "python3 tools/forever_tools/credits.py --check" }
 focus: [Core/**, UI/**, Map/**, Features/**, Integrations/**]
 ignore: [Data/**, Locales/**, Libs/**, types/**, tools/forever_tools/**]
 guards: { maxFiles: 8, maxLines: 400 }

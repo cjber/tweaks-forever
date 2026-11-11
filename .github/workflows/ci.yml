@@ -90,6 +90,8 @@ jobs:
           key: regeneration-${{ runner.os }}-${{ hashFiles('tools/gen_*.py') }}
           restore-keys: regeneration-${{ runner.os }}-
       - run: python3 tools/check_generated.py
+      # Data/Credits.lua and the README and store thanks blocks are generated from THIRD_PARTY.md (WFA-31).
+      - run: python3 tools/forever_tools/credits.py --check
       - run: python3 -m tools.phrases --check
 
   typecheck:

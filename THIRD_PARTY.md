@@ -40,18 +40,27 @@ refresh that moves the pin never leaves this file behind. The addon itself is GP
 
 CI tools (StyLua, ruff, ty, luacheck, lua-language-server, actionlint, zizmor, gitleaks, the BigWigs packager) are pinned in `.github/workflows/` and `tools/typecheck.sh`, except luajit and luacheck, which come from the runner's apt; they build and check the addon and are never part of it.
 
-## Ideas and contributors
+## Players
 
-Credit for the ideas and reports behind the addon.
+Credit for the reports and requests behind the addon.
 
 | Who | What | Notes |
 |---|---|---|
-| [Polestar](https://github.com/fitzforge/polestar) by Fitz | The ideas for not paying quest gold or taking PvP quests unasked (#153), retrying a repair after junk sales (#154), friend and guild exceptions and party invites (#155), stronger summon, resurrection and release guards (#156), marking the best reward (#157), quest progress on item and object tooltips (#158), bindable quest buttons (#159), world map coordinates (#160), a calmer fast loot (#161), unexplored areas on the zone map (#162), Shift to skip the merchant (#163), rare alerts (#165), quest levels in greetings (#166), XP per hour (#167) and drawing the maps on frames of its own, which the maps never touch (#168). From cjber/adventure-guide-forever's issues: `/tweaks report` with its copy box and caught errors (#156), the issue forms (#157), the zip check (#158), `tools/doctor.py` (#160), the stale-screenshot check (#161), this file (#162), the "For addon authors" changelog subsection (#163) and `.editorconfig` (#165). | GPL-3.0. Inspired only; no code was copied. Fitz is welcome to use our code. |
-| [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior (svengabr) | Quest item sparkles set the same five graphics settings it sets | GPL-3.0. The settings are the client's; no code was copied |
-| [Omen](https://www.curseforge.com/wow/addons/omen-threat-meter) and [Threat Plates](https://www.curseforge.com/wow/addons/tidy-plates-threat-plates) | The pull warning, a chat line before your threat takes a mob off the tank (#300) | Inspired only; no code was copied |
-| [RareScanner](https://www.curseforge.com/wow/addons/rarescanner) | A waypoint to a rare after its alert (#302) | Inspired only; no code was copied |
-| A CurseForge player | Reported the game crashing when backing out of the addon settings with a gamepad (#168) | |
-| Sojiro84 | Asked for tooltips anchored to the cursor (#108) and found the Abandon quests button showing inside a quest (#109) | |
-| [Mouchoir](https://github.com/Mouchoir) | Found the login error from Rare alerts reading the settings before they load, with the event order, a spec and the fix (#202) | |
+| SirGooie | Fixed the gamepad crash leaving the addon settings | CurseForge; #168 |
+| Sojiro84 | Tooltips anchored to the cursor | GitHub; #108 |
+| Sojiro84 | Abandon Quests button hides with quest details | GitHub; #109 |
+| [Mouchoir](https://github.com/Mouchoir) | Fixed the login Lua error (code) | GitHub; #202 |
+| [Mouchoir](https://github.com/Mouchoir) | Questie icon sizes follow its sliders (code) | GitHub; #217, PR #216 |
+
+## Inspired by
+
+Credit for the addons and projects an idea came from.
+
+| Who | What | Notes |
+|---|---|---|
+| [Polestar](https://github.com/fitzforge/polestar) by Fitz | Ideas for many features | Quest automation, repairs, social invites, guards, reward marking, tooltips, bindable buttons, coordinates, fast loot, zone maps, rare alerts, XP per hour, and the shared report window and tooling. GPL-3.0. Inspired only; no code was copied. Fitz is welcome to use our code. |
+| [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior (svengabr) | Quest item sparkles set the same five graphics settings | GPL-3.0. The settings are the client's; no code was copied |
+| [Omen](https://www.curseforge.com/wow/addons/omen-threat-meter) and [Threat Plates](https://www.curseforge.com/wow/addons/tidy-plates-threat-plates) | The pull warning before your threat takes a mob off the tank | Inspired only; no code was copied. |
+| [RareScanner](https://www.curseforge.com/wow/addons/rarescanner) | A waypoint to a rare after its alert | Inspired only; no code was copied. |
 
 Thanks also to everyone else who reported a bug, here or on CurseForge.

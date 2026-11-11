@@ -51,6 +51,7 @@ local function Login(saved)
 		"Core/SafeCall.lua",
 		"Core/Log.lua",
 		"UI/Report.lua",
+		"UI/Credits.lua",
 		"UI/MapCanvas.lua",
 		"Data/Credits.lua",
 		"UI/Credits.lua",

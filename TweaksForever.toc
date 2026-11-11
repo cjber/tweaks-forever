@@ -37,6 +37,7 @@ Data\DungeonEntrances.lua
 Data\ClassSpells.lua
 Data\ForeverQuests.lua
 Data\DungeonMapArt.lua
+Data\Credits.lua
 Core\Secret.lua
 Core\Core.lua
 UI\Art.lua

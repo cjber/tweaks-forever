@@ -19,6 +19,12 @@ ns.core = ForeverCore.Register(addonName, {
 	end,
 })
 
+-- Hands the generated player credits to the shared Thanks page (WFA-31). An older core has no Credits module, and the
+-- addon loads as before.
+if type(ForeverCore.Credits) == "table" then
+	ns.core.SafeCall("credits", ForeverCore.Credits.Register, "Tweaks Forever", ns.Credits)
+end
+
 -- Features, in declaration order, and by key. Each is { key, category, name, tooltip, default, conflicts }, plus
 -- `options` ({ { value, label } }) for a choice rather than an on/off switch, `parent` (a key) to indent it
 -- under that feature and grey it out while the parent is off, and `needs` ({ title, check }) for another addon it
