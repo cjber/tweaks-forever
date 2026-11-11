@@ -12,7 +12,10 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.6.7] - 2026-11-11
+
 - **The players who helped are on the Thanks page.** Settings, Forever addons, Thanks lists everyone whose report or idea shipped in Tweaks Forever, ranked by how much they gave. (#498)
+
 ## [2.6.6] - 2026-11-11
 
 <!-- forever-core-sync -->
