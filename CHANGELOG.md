@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.6.4] - 2026-11-11
+
 - **A window you moved opens in its place.** Windows moved with the Windows tab in Edit Mode could appear for a frame where the game would have put them, then jump to your spot. They are now in the right place from the first frame (#507).
 
 ## [2.6.3] - 2026-11-11
