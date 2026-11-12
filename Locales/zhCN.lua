@@ -301,3 +301,10 @@ L["The choices, in order: %s."] = "选项依次为：%s。"
 L["%s: %s is out of date. Update it to fix this."] = "%s：%s 已过时。请更新它以解决此问题。" -- mt
 L["%s: %s are out of date. Update them to fix this."] = "%s：%s 已过时。请更新它们以解决此问题。" -- mt
 L["%s could not start. Reinstall %s to fix this."] = "%s 无法启动。请重新安装 %s 以解决此问题。" -- mt
+
+L["Hunter range strip"] = "猎人距离条" -- mt
+L["For hunters, a strip on top of the game's swing timers that names the range band your target is in: Melee, Dead zone (too close to shoot, too far to strike), Shoot, or Too far. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "对猎人而言，这是一条位于游戏挥击计时器上方的距离条，显示目标所处的距离区间：近战、死区（太近无法射击，太远无法近战）、射击或过远。只要挥击计时器显示（使用游戏界面选项和编辑模式），它就会显示。" -- mt
+L["Melee"] = "近战" -- mt
+L["Dead zone"] = "死区" -- mt
+L["Shoot"] = "射击" -- mt
+L["Too far"] = "过远" -- mt

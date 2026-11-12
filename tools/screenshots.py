@@ -12,6 +12,7 @@ import math
 import os
 import re
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 from PIL import Image  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
@@ -569,6 +570,98 @@ def editmode(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).save(OUT / "editmode.png")
 
 
+# UI/RangeStrip.lua: a band label and three 13-tall segments over Blizzard's own swing timer bars, at their width.
+RANGE_BAR_W, RANGE_BAR_H, RANGE_BAR_GAP = 240, 15, 6
+RANGE_SEGMENT_H, RANGE_SEGMENT_GAP = 13, 3
+RANGE_COL_W = 260
+RANGE_GOLD, RANGE_GREEN, RANGE_RED, RANGE_GREY = (1, 0.82, 0), (0.25, 0.75, 0.25), (1, 0.13, 0.13), (0.55, 0.55, 0.55)
+# The strip's own font objects: GameFontNormal for the band label, GameFontHighlightSmall for the segment names,
+# both in enUS's Friz Quadrata, coloured per band.
+RANGE_LABEL_FONT, RANGE_NAME_FONT = FONTS["GameFontNormal"], FONTS["GameFontHighlightSmall"]
+# (band label, colour, lit segment index or None)
+RANGE_STATES = [
+    ("Melee", RANGE_GOLD, 0),
+    ("Dead zone", RANGE_RED, 1),
+    ("Shoot", RANGE_GREEN, 2),
+    ("Too far", RANGE_GREY, None),
+]
+
+
+def swing_bar(ui, canvas, x, y, label, fill, progress, time, out_of_range):
+    """One SwingTimerFrameTemplate bar, with its own out of range look: 40% alpha and red labels."""
+    bar = ui.canvas(RANGE_BAR_W, RANGE_BAR_H)
+    bar.draw(ui.atlas("ui-swingtimerbar-background"), 0, 0, RANGE_BAR_W, RANGE_BAR_H)
+    bar.draw(ui.atlas("ui-swingtimerbar-frame"), 0, 0, RANGE_BAR_W, RANGE_BAR_H)
+    inner_w, inner_h = RANGE_BAR_W - 10, RANGE_BAR_H - 8
+    if progress:
+        bar.draw(ui.atlas(fill), 5, 4, inner_w * progress, inner_h)
+        bar.draw(ui.atlas("ui-swingtimerbar-pip"), 5 + inner_w * progress - 2, 2, 4, inner_h + 4)
+    colour = RANGE_RED if out_of_range else (1, 1, 1)
+    bar.text(15, 0, label, Font(FRIZQT, 10, colour, (1, -1)), box_height=RANGE_BAR_H)
+    bar.text(5, 0, time, Font(FRIZQT, 10, colour, (1, -1)), box_height=RANGE_BAR_H, justify="RIGHT", width=inner_w - 10)
+    if out_of_range:
+        bar.image.putalpha(bar.image.getchannel("A").point(lambda a: round(a * 0.4)))
+    canvas.paste(bar, x, y)
+
+
+def swing_timers(ui, canvas, y, lit):
+    """Blizzard's Main Hand and Ranged bars, each faded while that swing cannot reach."""
+    swing_bar(ui, canvas, 0, y, "Main Hand", "ui-swingtimerbar-filling-mainhand", 0, "0.0", lit != 0)
+    swing_bar(
+        ui,
+        canvas,
+        0,
+        y + RANGE_BAR_H + RANGE_BAR_GAP,
+        "Ranged",
+        "ui-swingtimerbar-filling-ranged",
+        0.45,
+        "1.2",
+        lit != 2,
+    )
+
+
+def rangestrip_state(ui, state):
+    """The strip in one band, docked 6 above the swing timers as UI/RangeStrip.lua docks it."""
+    label, colour, lit = state
+    segment_w = (RANGE_BAR_W - 2 * RANGE_SEGMENT_GAP) / 3
+    c = ui.canvas(RANGE_BAR_W, 20 + RANGE_SEGMENT_H + 6 + 2 * RANGE_BAR_H + RANGE_BAR_GAP)
+    c.text(0, 0, label, replace(RANGE_LABEL_FONT, color=colour), justify="CENTER", width=RANGE_BAR_W)
+    y = 20
+    for index, name in enumerate(("Melee", "Dead zone", "Shoot")):
+        sx = index * (segment_w + RANGE_SEGMENT_GAP)
+        c.draw(ui.atlas("ui-swingtimerbar-background"), sx, y, segment_w, RANGE_SEGMENT_H)
+        if index == lit:
+            c.draw(
+                ui.atlas("UI-HUD-CoolDownManager-Bar"),
+                sx + 4,
+                y + 3,
+                segment_w - 8,
+                RANGE_SEGMENT_H - 6,
+                color=(*colour, 1),
+            )
+        c.draw(ui.atlas("ui-swingtimerbar-frame"), sx, y, segment_w, RANGE_SEGMENT_H)
+        text_colour = (1, 1, 1) if index == lit else (0.5, 0.5, 0.5)
+        c.text(
+            sx,
+            y,
+            name,
+            replace(RANGE_NAME_FONT, color=text_colour),
+            box_height=RANGE_SEGMENT_H,
+            justify="CENTER",
+            width=segment_w,
+        )
+    swing_timers(ui, c, y + RANGE_SEGMENT_H + 6, lit)
+    return c
+
+
+def rangestrip(ui):
+    layers = []
+    for index, state in enumerate(RANGE_STATES):
+        widget = rangestrip_state(ui, state)
+        layers.append((widget, index * RANGE_COL_W + (RANGE_COL_W - widget.width) / 2, 0))
+    scene(ui, layers, MARGIN).save(OUT / "rangestrip.png")
+
+
 # UI/Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
 # and a 12 cast bar, name and level 4 above the bar, the target outlined and every other plate's bar darkened by
 # Blizzard's own deselected overlay.
@@ -874,6 +967,7 @@ def main():
     campsite(ui)
     campfire_buff(ui)
     editmode(ui)
+    rangestrip(ui)
     nameplates(ui)
     tooltips(ui)
     frames, size = demo(ui)

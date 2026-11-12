@@ -301,3 +301,10 @@ L["The choices, in order: %s."] = "Las opciones, en orden: %s."
 L["%s: %s is out of date. Update it to fix this."] = "%s: %s está desactualizado. Actualízalo para solucionarlo." -- mt
 L["%s: %s are out of date. Update them to fix this."] = "%s: %s están desactualizados. Actualízalos para solucionarlo." -- mt
 L["%s could not start. Reinstall %s to fix this."] = "%s no pudo iniciarse. Reinstala %s para solucionarlo." -- mt
+
+L["Hunter range strip"] = "Franja de alcance del cazador" -- mt
+L["For hunters, a strip on top of the game's swing timers that names the range band your target is in: Melee, Dead zone (too close to shoot, too far to strike), Shoot, or Too far. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Para cazadores, una franja sobre los temporizadores de golpe del juego que indica el rango de alcance de tu objetivo: cuerpo a cuerpo, zona muerta (demasiado cerca para disparar y demasiado lejos para golpear), disparo o demasiado lejos. Se muestra mientras se ven los temporizadores de golpe, con la opción de interfaz del juego y el modo de edición." -- mt
+L["Melee"] = "Cuerpo a cuerpo" -- mt
+L["Dead zone"] = "Zona muerta" -- mt
+L["Shoot"] = "Disparo" -- mt
+L["Too far"] = "Demasiado lejos" -- mt

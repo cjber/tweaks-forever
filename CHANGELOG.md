@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Hunters get a range strip on their swing timers.** A three-part strip above the game's own swing timers names the band your target is in: Melee, Dead zone, Shoot or Too far, so you know when to close in and when to back off (#413).
+
 ## [2.6.9] - 2026-11-12
 
 <!-- forever-core-sync -->
