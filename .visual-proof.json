@@ -1,29 +1,31 @@
 {
-  "input_digest": "70b3fd206e4c221bbbf25262e9e3c64b2fd99c75bd940987ff40323678cfe08b",
-  "runtime_sha256": "70b3fd206e4c221bbbf25262e9e3c64b2fd99c75bd940987ff40323678cfe08b",
-  "candidate": "494af1612b8db7f74ecdd162f35952dc6ccb7deb389b51d4186c32f3df8a8558",
+  "input_digest": "0e0d3d23b2f0c8d0a9739e699b2efa551897c7def27676115ecffe6f3bda67f4",
+  "runtime_sha256": "0e0d3d23b2f0c8d0a9739e699b2efa551897c7def27676115ecffe6f3bda67f4",
+  "candidate": "3a3ce1dccc9a5ca1f7f1a2a9bc96b967503a6e0608b21773e5c8dfff98e555c7",
   "tested_artifact": "release-package",
   "client_build": "1.60.1.70888 (Interface 16001)",
+  "source_commit": "af5d5f8bae653db533cd608b6370056f082907e9",
+  "notes": "Recorded on Hel Io in the player's live client from the packager's release build of this commit (TweaksForever and LibAHTab from a local BigWigs packager -d -z run; compare_package equivalent), with ForeverCore v1.8.2 from CurseForge. Every other Forever addon's ForeverCore 1.8.2 sync build was loaded in the same session. BugGrabber recorded no addon errors (the session's two errors were the recorder's own /run lines calling a missing client API).",
   "flows": [
     {
-      "name": "Tweaks' settings open through ForeverCore 1.8.1's opener",
+      "name": "Tweaks' settings open on ForeverCore 1.8.2",
       "steps": [
-        "Install the packaged candidate with its bundled ForeverCore v1.8.1 and /reload",
-        "Print the loaded versions: ForeverCore v1.8.1 and TweaksForever v2.6.9-3-g3194fef, both loaded, ProfessionTabs.minor 2",
+        "Install the candidate with ForeverCore v1.8.2 and /reload",
+        "Print every Forever addon's loaded version into a chat tab with no channels: ForeverCore v1.8.2 plus this candidate, all loaded",
         "Type /tweaks",
-        "Confirm the game's Options open on the Tweaks Forever page with its group buttons and no action-blocked message"
+        "The game's Options open on the Tweaks Forever page with its group buttons and no action-blocked message"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/328823e9708f8e8ea7847dc01bd53905/raw/55de9fd8b9c4d5fdf425aa1a72db5386128d3749/sync181-versions.png",
-      "sha256": "68bb8f958f2dab34bbf7a541f311f8141db7ebeaca4a51e39fbe9bf4c725e7c6"
+      "url": "https://gist.githubusercontent.com/cjber/5cd61b138c1e01654d7aadd509568514/raw/82bfd62fbba753c8cc0a35be3f8e1c07fb2ac713/sync182-tweaks-settings.png",
+      "sha256": "5d78b9d281363e8069d1af17d048961aa866799d6dbd5529b1db971bb60d6c82"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/328823e9708f8e8ea7847dc01bd53905/raw/55de9fd8b9c4d5fdf425aa1a72db5386128d3749/sync181-tweaks-settings-494af16.png",
-      "sha256": "d943ecaee0bf4880aa1cff4d22bc67c64f83ade962a7f5010cffeefa3277f613"
+      "url": "https://gist.githubusercontent.com/cjber/5cd61b138c1e01654d7aadd509568514/raw/82bfd62fbba753c8cc0a35be3f8e1c07fb2ac713/sync182-versions.png",
+      "sha256": "0a95af5dcd4392712f85093832d05c14411d76b4099d3b60185209cbdf0e1e1b"
     }
   ]
 }
