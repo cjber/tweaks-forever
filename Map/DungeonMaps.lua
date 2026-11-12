@@ -14,7 +14,9 @@ ns.Feature({
 	default = true,
 })
 
-local PAD, HEADER, COLUMNS, ROWS = 12, 46, 4, 3
+local PAD, COLUMNS, ROWS = 12, 4, 3
+-- Native map art uses a 1002x668 canvas in padded 256px tiles (UiMapArtStyleLayer style 1).
+local ART_WIDTH, ART_HEIGHT, TILE_SIZE = 1002, 668, 256
 local PICKER_WIDTH = 200
 
 local WINGS = {
@@ -132,19 +134,15 @@ ns.Init(function()
 
 	local function Layout()
 		local width, height = host:GetWidth(), host:GetHeight()
-		local sheetWidth = math.max(1, math.min(width - PAD * 2, (height - HEADER - PAD) * COLUMNS / ROWS))
-		local sheetHeight = sheetWidth * ROWS / COLUMNS
 		for index, tile in ipairs(tiles) do
 			local column, row = (index - 1) % COLUMNS, math.floor((index - 1) / COLUMNS)
-			tile:SetSize(sheetWidth / COLUMNS, sheetHeight / ROWS)
+			local left, top = column * TILE_SIZE, row * TILE_SIZE
+			local tileWidth = math.min(TILE_SIZE, ART_WIDTH - left)
+			local tileHeight = math.min(TILE_SIZE, ART_HEIGHT - top)
+			tile:SetSize(width * tileWidth / ART_WIDTH, height * tileHeight / ART_HEIGHT)
+			tile:SetTexCoord(0, tileWidth / TILE_SIZE, 0, tileHeight / TILE_SIZE)
 			tile:ClearAllPoints()
-			tile:SetPoint(
-				"TOPLEFT",
-				host,
-				"TOPLEFT",
-				PAD + column * sheetWidth / COLUMNS,
-				-HEADER - row * sheetHeight / ROWS
-			)
+			tile:SetPoint("TOPLEFT", host, "TOPLEFT", width * left / ART_WIDTH, -height * top / ART_HEIGHT)
 		end
 	end
 
@@ -175,7 +173,7 @@ ns.Init(function()
 		local floor = floors[selected]
 		heading:SetText(floor.title)
 		for index, tile in ipairs(tiles) do
-			tile:SetTexture(floor.pattern .. floor.separator .. index) -- art-ok: native 256px square tile in a square cell
+			tile:SetTexture(floor.pattern .. floor.separator .. index) -- art-ok: native map tile, padded edges cropped by Layout
 		end
 		picker:SetShown(#floors > 1)
 		picker:SetText(floor.title)
@@ -204,7 +202,7 @@ ns.Init(function()
 		local background = host:CreateTexture(nil, "BACKGROUND")
 		background:SetAllPoints()
 		background:SetColorTexture(0, 0, 0, 1)
-		heading = host:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+		heading = host:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 		heading:SetPoint("TOPLEFT", PAD, -PAD)
 		heading:SetJustifyH("LEFT")
 		for index = 1, COLUMNS * ROWS do

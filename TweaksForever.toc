@@ -89,7 +89,6 @@ UI\BeastTraining.lua
 Features\Fishing.lua
 UI\Reload.lua
 UI\WhatsNew.lua
-Integrations\Companions.lua
 Core\Report.lua
 UI\Settings.lua
 Core\API.lua

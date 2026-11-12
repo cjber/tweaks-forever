@@ -13,7 +13,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 
 - **Dungeon entrance icons no longer cover the world map.** Dungeon maps remain available inside instances. (#525)
-- **Dungeon map controls stay above the zone map.** Progress badges and quest counts no longer cover the dungeon heading. (#524)
+- **Dungeon maps fill the map window.** Padded tile edges no longer leave unused strips, and progress badges and quest counts stay behind the dungeon heading. (#524)
 
 ## [2.6.9] - 2026-11-12
 
