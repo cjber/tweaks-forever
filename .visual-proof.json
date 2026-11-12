@@ -1,0 +1,29 @@
+{
+  "input_digest": "70b3fd206e4c221bbbf25262e9e3c64b2fd99c75bd940987ff40323678cfe08b",
+  "runtime_sha256": "70b3fd206e4c221bbbf25262e9e3c64b2fd99c75bd940987ff40323678cfe08b",
+  "candidate": "494af1612b8db7f74ecdd162f35952dc6ccb7deb389b51d4186c32f3df8a8558",
+  "tested_artifact": "release-package",
+  "client_build": "1.60.1.70888 (Interface 16001)",
+  "flows": [
+    {
+      "name": "Tweaks' settings open through ForeverCore 1.8.1's opener",
+      "steps": [
+        "Install the packaged candidate with its bundled ForeverCore v1.8.1 and /reload",
+        "Print the loaded versions: ForeverCore v1.8.1 and TweaksForever v2.6.9-3-g3194fef, both loaded, ProfessionTabs.minor 2",
+        "Type /tweaks",
+        "Confirm the game's Options open on the Tweaks Forever page with its group buttons and no action-blocked message"
+      ],
+      "result": "pass"
+    }
+  ],
+  "images": [
+    {
+      "url": "https://gist.githubusercontent.com/cjber/328823e9708f8e8ea7847dc01bd53905/raw/55de9fd8b9c4d5fdf425aa1a72db5386128d3749/sync181-versions.png",
+      "sha256": "68bb8f958f2dab34bbf7a541f311f8141db7ebeaca4a51e39fbe9bf4c725e7c6"
+    },
+    {
+      "url": "https://gist.githubusercontent.com/cjber/328823e9708f8e8ea7847dc01bd53905/raw/55de9fd8b9c4d5fdf425aa1a72db5386128d3749/sync181-tweaks-settings-494af16.png",
+      "sha256": "d943ecaee0bf4880aa1cff4d22bc67c64f83ade962a7f5010cffeefa3277f613"
+    }
+  ]
+}
