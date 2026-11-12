@@ -56,7 +56,7 @@ through `UiMapAssignment` exactly as Legacy Forever places its instance pins. Wh
 map shows an entrance is curated in the script (zone rectangles overlap); continents
 take every entrance on them. `ns.InstanceEntrances` preserves each instance's first
 curated zone projection for the public API before clustering. Entrances whose icons
-would overlap on the minimized map at its smallest zoom merge into one pin at their centre, and the curated
+would overlap on the minimized map at its smallest zoom merge into one entry at their centre, and the curated
 complexes (Blackrock Mountain, the Gates of Ahn'Qiraj) always do, named by their
 area. An instance with an entrance but no curated zone fails the run; instances
 with no entrance at all are listed. Same cache and flags as `gen_overlays.py`.
@@ -100,7 +100,7 @@ the addon's own modules draw them, using the `wowmock` library from the
 [forever-core/tools/wowmock](https://github.com/cjber/forever-core/tree/main/tools/wowmock)
 skill. It looks for the library in `$FOREVER_CORE`, else
 the sibling `forever-core/tools/wowmock` checkout, and needs Pillow. `demo.gif` strings the
-dungeon, nameplate and junk scenes together, and the script fails if it passes 3 MB.
+nameplate and junk scenes together, and the script fails if it passes 3 MB.
 Two runs give byte-identical images.
 
 `tooltip_border.py` draws `media/TooltipBorderModern.tga` and

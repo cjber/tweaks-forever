@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Dungeon and raid entrance icons are gone from the world map.** The castle icons no longer cover zone and continent labels; the painted dungeon maps and the Dungeon map button stay. (#525)
+
 ## [2.6.9] - 2026-11-12
 
 <!-- forever-core-sync -->

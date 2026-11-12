@@ -403,6 +403,13 @@ end)
 login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
+	-- Settings retired with a feature that no longer exists: the entrance pins' switch, and the old companion hint
+	-- switch, whose "off" carries over once to the shared Forever family setting.
+	if db.companionHints == false and db.suggestFamily == nil then
+		db.suggestFamily = false
+	end
+	db.companionHints = nil
+	db.dungeonEntrances = nil
 	for _, feature in ipairs(ns.features) do
 		if db[feature.key] == nil then
 			db[feature.key] = feature.default

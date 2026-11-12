@@ -19,16 +19,6 @@ local function ShortestPath()
 	end
 end
 
--- Names what a click tries first; Navigate still falls back when Shortest Path declines.
----@return string
-function ns.NavigateHint(shift)
-	if shift then
-		return ShortestPath() and L["Shift-click to travel here with Shortest Path Forever"]
-			or L["Shift-click to set a waypoint here"]
-	end
-	return ShortestPath() and L["Click to travel here with Shortest Path Forever"] or L["Click to set a waypoint here"]
-end
-
 -- Shortest Path's journey when it takes one (it declines in combat, with journeys switched off or with no player
 -- position), else the game's own waypoint, else the place in chat, so a click always leaves the player a pointer.
 ---@param uiMapID integer

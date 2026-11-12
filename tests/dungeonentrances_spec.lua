@@ -1,45 +1,7 @@
-local features = {}
-local ns = {
-	Feature = function(feature)
-		features[feature.key] = feature
-	end,
-	Init = function() end,
-}
-local inCombat = false
-local env = setmetatable({
-	InCombatLockdown = function()
-		return inCombat
-	end,
-	GetRealZoneText = function(instance)
-		return "instance " .. instance
-	end,
-	C_Map = {
-		GetAreaInfo = function(area)
-			return "area " .. area
-		end,
-	},
-	C_Texture = {
-		GetAtlasInfo = function()
-			return { width = 32, height = 32 }
-		end,
-	},
-}, { __index = _G })
-setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
+local ns = {}
 assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
-setfenv(assert(loadfile("Map/DungeonEntrances.lua")), env)("TweaksForever", ns)
-local Model = ns.Entrances
-assert(features.dungeonEntrances.default == true)
 
--- Leatrix Maps draws entrances with its points of interest unless that option is explicitly off.
-local leatrix = features.dungeonEntrances.conflicts[1]
-assert(leatrix.addon == "Leatrix_Maps" and leatrix.when())
-env.LeaMapsDB = { ShowPointsOfInterest = "Off" }
-assert(not leatrix.when())
--- OpenMap marks every entrance with its "Dungeons, travel and more" icons.
-local openmap = features.dungeonEntrances.conflicts[2]
-assert(openmap.openmap == "icons" and not openmap.when, "read by Core through ns.OpenMapOn")
-
--- Every pin sits on its map, and every instance has a zone-map pin as well as a continent one.
+-- Every entrance sits on its map, and every instance has a zone-map entry as well as a continent one.
 local shown = {}
 for mapID, entries in pairs(ns.DungeonEntrances) do
 	for _, entry in ipairs(entries) do
@@ -53,59 +15,9 @@ for _, instance in ipairs({ 33, 36, 43, 189, 229, 249, 309, 389, 409, 469, 509, 
 	assert((shown[instance] or 0) >= 2, instance)
 end
 
--- A raid-only pin takes the raid icon; anything with a dungeon in it, the dungeon icon.
-assert(Model.Atlas({ x = 0, y = 0, instances = { 509, 531 } }) == "Raid")
-assert(Model.Atlas({ x = 0, y = 0, instances = { 229, 409 } }) == "Dungeon")
-assert(Model.Atlas({ x = 0, y = 0, instances = { 36 } }) == "Dungeon")
-
--- A lone instance is its own title; a complex is named by its area and lists its instances, iconned when mixed.
-assert(Model.Describe({ x = 0, y = 0, instances = { 36 } }) == "instance 36")
-local title, lines = Model.Describe({ x = 0, y = 0, instances = { 229, 409 }, area = 25 })
-assert(title == "area 25" and lines == "|A:Dungeon:16:16|a instance 229\n|A:Raid:16:16|a instance 409", lines)
-title, lines = Model.Describe({ x = 0, y = 0, instances = { 509, 531 }, area = 3478 })
-assert(title == "area 3478" and lines == "instance 509\ninstance 531", lines)
-title, lines = Model.Describe({ x = 0, y = 0, instances = { 47, 129 } })
-assert(title == "instance 47" and lines == "instance 129")
-
--- A marker covers an entrance only within the half extents on both axes.
-assert(Model.Covers(0.5, 0.5, 0.505, 0.49, 0.01, 0.02))
-assert(not Model.Covers(0.5, 0.5, 0.52, 0.5, 0.01, 0.02))
-assert(not Model.Covers(0.5, 0.5, 0.5, 0.53, 0.01, 0.02))
-
--- A click travels to the entrance's own coordinates on the map it is drawn on, named as its tooltip names it.
-local travelled
-function ns.Navigate(uiMapID, x, y, name)
-	travelled = { uiMapID, x, y, name }
+-- The public API opens each instance's own door from the unclustered table.
+for instance, entrance in pairs(ns.InstanceEntrances) do
+	assert(entrance.map and entrance.x >= 0 and entrance.x <= 1 and entrance.y >= 0 and entrance.y <= 1, instance)
 end
-Model.Travel(1415, { x = 0.47, y = 0.61, instances = { 229, 409 }, area = 25 })
-assert(travelled[1] == 1415 and travelled[2] == 0.47 and travelled[3] == 0.61 and travelled[4] == "area 25")
-Model.Travel(1427, { x = 0.35, y = 0.84, instances = { 36 } })
-assert(travelled[1] == 1427 and travelled[4] == "instance 36")
 
--- A click opens the entrance's map; Shift, or an entrance with no map, travels instead.
-local opened
-ns.DungeonMaps = {
-	Open = function(uiMapID, instances)
-		opened = { uiMapID, instances }
-		return instances[1] ~= 999
-	end,
-	FloorsOf = function(_, instances)
-		return instances[1] == 999 and {} or { {} }
-	end,
-}
-ns.Active = function()
-	return true
-end
-travelled = nil
-Model.Click(1427, { x = 0.3, y = 0.8, instances = { 36 } }, false)
-assert(opened[1] == 1427 and opened[2][1] == 36 and not travelled, "a click opened the map and did not travel")
-Model.Click(1427, { x = 0.3, y = 0.8, instances = { 999 } }, false)
-assert(travelled and travelled[1] == 1427, "an entrance with no map still travels")
-opened, travelled = nil, nil
-Model.Click(1427, { x = 0.3, y = 0.8, instances = { 36 } }, true)
-assert(travelled and not opened, "Shift travels without opening the map")
-assert(Model.HasMap({ instances = { 36 } }) and not Model.HasMap({ instances = { 999 } }))
-inCombat = true
-assert(not Model.HasMap({ instances = { 36 } }), "in combat a click travels, so the tooltip must not promise the map")
-inCombat = false
-print("dungeonentrances: ok")
+print("dungeonentrances data: ok")

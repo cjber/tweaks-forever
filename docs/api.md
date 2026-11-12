@@ -105,7 +105,7 @@ table, so it has no not-ready reason. Versions before 3 always gave a name.
 ## `DungeonEntrance(instanceID) -> TFDungeonEntrance?, TFAPIReason?`
 
 Takes an instance's Map ID (230 for Blackrock Depths) and returns a fresh `{map, x, y}`: its own entrance as a
-UiMapID and 0 to 1 coordinates, not the shared pin for Blackrock Mountain or the Gates of Ahn'Qiraj. It works before
+UiMapID and 0 to 1 coordinates, not the shared entry for Blackrock Mountain or the Gates of Ahn'Qiraj. It works before
 login and in combat, and returns `nil, "none"` for an instance with no entrance in the client, such as Naxxramas, or
 one whose entrance the client doesn't place.
 

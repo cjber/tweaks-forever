@@ -45,9 +45,8 @@ end
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Integrations/Navigate.lua")), env)("TweaksForever", ns)
 
--- Shortest Path present and accepting: it alone guides, with the entrance's own map, place and name.
+-- Shortest Path present and accepting: it alone guides, with the place's own map, position and name.
 Install(1)
-assert(ns.NavigateHint() == "Click to travel here with Shortest Path Forever")
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 local journey = journeys[1]
 assert(journey.owner == "TweaksForever" and journey.map == 1427 and journey.x == 0.35 and journey.y == 0.84)
@@ -60,9 +59,8 @@ ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 assert(#journeys == 2 and #waypoints == 1 and superTracked[1] == true)
 assert(waypoints[1].uiMapID == 1427 and waypoints[1].x == 0.35 and waypoints[1].y == 0.84)
 
--- Shortest Path absent, or a major version this addon does not know: the waypoint, and a hint that says so.
+-- Shortest Path absent, or a major version this addon does not know: the waypoint instead.
 env.ShortestPathForever = nil
-assert(ns.NavigateHint() == "Click to set a waypoint here")
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 assert(#journeys == 2 and #waypoints == 2)
 Install(2)
@@ -71,7 +69,6 @@ assert(#journeys == 2 and #waypoints == 3)
 
 -- A version-1 API without Navigate, or the addon without its API: the waypoint, never an error.
 env.ShortestPathForever = { API = { version = 1 } }
-assert(ns.NavigateHint() == "Click to set a waypoint here")
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 env.ShortestPathForever = {}
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
