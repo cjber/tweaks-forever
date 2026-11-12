@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **A range band beside your target frame.** A hunter's target frame carries a small spell icon: Raptor Strike when the target is within melee reach, Auto Shot when it is in shooting range, and Auto Shot greyed and red in the dead zone between. It follows the game's own reach check, updates as you and the target move, and hides without a hostile target. On by default (#413).
+
 ## [2.6.10] - 2026-11-12
 
 <!-- forever-core-sync -->

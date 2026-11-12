@@ -315,6 +315,7 @@ read_globals = {
 	"TextureKitConstants",
 	"TitanGetVar",
 	"TalentMicroButton",
+	"TargetFrame",
 	"TOOLTIP_DEFAULT_BACKGROUND_COLOR",
 	"TooltipDataProcessor",
 	"TRADE",

@@ -74,6 +74,7 @@ All off until you turn them on, except faster auto loot.
 - Modern tooltips: a thin grey border with rounded corners in place of the beige one, over a neutral charcoal that keeps the text crisp over any scenery. Tooltip style switches to the retail game's navy, or keeps the game's own border. A player's name is in their class colour, with the guild in brackets, race and class on one line and the faction in its colour. A unit's health bar sits inside its tooltip in the retail game's own bar and frame, in class or reaction colour, with health as numbers for players and a percentage for others, and a comparison tooltip's Equipped label moves inside it in grey. On by default.
 - Tooltip at the cursor (off by default). The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them.
 - Larger, clearer nameplates. A taller health bar in the retail game's own frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined in white and your focus in gold, and the other plates' bars are slightly darker. Casts show in a slim bar with the spell's icon and name inside, grey with a shield when they can't be interrupted. Health numbers inside the bar follow the game's own Nameplates options. Friendly plates in dungeons are the game's own and can't be restyled. On by default; turning it off takes effect after a reload.
+- Range band beside the target. A small spell icon beside the target frame names a hunter's range band: Raptor Strike when the target is within melee reach, Auto Shot when it is in shooting range, and Auto Shot greyed and red in the dead zone between. The two reaches come from the game's own spell range check on the ranks in your spellbook, with no distance estimate. The icon follows a target change and updates while a hostile target exists, and stays hidden while you have none, while you or the target are dead, or for a class without a dead zone. On by default.
 
 ## Fishing
 
@@ -137,4 +138,5 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac, Leatrix Plus |
 | Tooltip at the cursor | Leatrix Plus |
 | Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
+| Range band beside the target | RangeLens, RangeDisplay |
 | Fishing | FishingBuddy, FishingAce |

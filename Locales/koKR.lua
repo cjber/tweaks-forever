@@ -21,6 +21,7 @@ L["A coloured border"] = "색상 테두리"
 L["A coloured strip"] = "색상 띠"
 L["A message when you log in or equip a fishing pole without a lure, and each time you cast without one."] = "접속할 때나 미끼 없는 낚싯대를 장착할 때, 그리고 미끼 없이 낚시를 던질 때마다 메시지를 표시합니다."
 L["A shorter /reload. Switching this on or off takes effect after the next reload."] = "더 짧은 /reload 명령어입니다. 켜거나 끄면 다음 UI 재시작 후에 적용됩니다."
+L["A small spell icon beside the target frame shows how your target sits in your range: Raptor Strike when it is within melee reach, Auto Shot when it is in shooting range, and Auto Shot greyed and red in the dead zone between. Nothing shows without a hostile target, while you are dead, or for a class with no dead zone."] = "대상 프레임 옆의 작은 주문 아이콘이 대상이 사거리 어디에 있는지 보여줍니다: 근접 사거리 안이면 랩터의 일격, 사격 사거리 안이면 자동 사격, 그 사이의 사각지대에서는 자동 사격이 회색으로 바래고 빨갛게 표시됩니다. 적대적인 대상이 없거나, 죽었거나, 사각지대가 없는 직업이면 아무것도 표시되지 않습니다." -- mt
 L["A small quest icon sits beside the nameplate of each creature you still need for a quest in your log, to kill or for an item it drops, and goes once you have enough. Needs Questie, or its QuestieDB addon on its own."] = "퀘스트 목록의 퀘스트에 아직 필요한 몬스터(처치 대상이거나 필요한 아이템을 떨어뜨리는 몬스터)의 이름표 옆에 작은 퀘스트 아이콘을 표시하고, 충분히 모으면 사라집니다. Questie 또는 QuestieDB 애드온 단독 설치가 필요합니다."
 L["A soft gold background marks quests added in WoW: Forever in the quest log and quest text."] = "WoW: Forever에서 추가된 퀘스트를 퀘스트 목록과 퀘스트 본문에서 은은한 금색 배경으로 표시합니다."
 L["A whisper that is exactly the keyword you pick below invites its sender to your group. You must be ungrouped, the group leader or a raid assistant. Nothing is sent until such a whisper arrives."] = "아래에서 고른 단어와 정확히 일치하는 귓속말을 보낸 사람을 파티에 초대합니다. 파티에 속해 있지 않거나 파티장 또는 부공격대장이어야 합니다. 그런 귓속말이 오기 전에는 아무것도 보내지 않습니다."
@@ -171,6 +172,7 @@ L["Quests are accepted and turned in for you as you talk to an NPC. Hold Shift w
 L["Quests on minimap givers"] = "미니맵 퀘스트 NPC의 퀘스트"
 L["Quests to level: about %d"] = "레벨업까지 퀘스트 수: 약 %d"
 L["Quiet repeated combat errors"] = "반복되는 전투 오류 숨기기"
+L["Range band beside the target"] = "대상 옆 사거리 표시" -- mt
 L["Rare alerts"] = "희귀 몬스터 알림"
 L["Pull warning"] = "어그로 경고" -- mt
 L["In a group, a chat line when your threat on your target passes the tank's, just before it turns on you. Once each time, until you drop back below the tank or change target. To colour nameplates by threat, use the game's own Nameplates options."] = "파티 중일 때 대상에 대한 내 위협 수준이 탱커를 넘어서면, 대상이 나에게 돌아서기 직전에 대화창에 알립니다. 탱커 아래로 다시 내려가거나 대상을 바꿀 때까지 한 번만 알립니다. 위협 수준에 따라 이름표 색을 바꾸려면 게임의 이름표 설정을 사용하세요." -- mt

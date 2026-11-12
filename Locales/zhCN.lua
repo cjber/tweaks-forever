@@ -21,6 +21,7 @@ L["A coloured border"] = "彩色边框"
 L["A coloured strip"] = "彩色条"
 L["A message when you log in or equip a fishing pole without a lure, and each time you cast without one."] = "登录或装备没有鱼饵的鱼竿时，以及每次不带鱼饵抛竿时，显示一条提示。"
 L["A shorter /reload. Switching this on or off takes effect after the next reload."] = "更短的/reload命令。开启或关闭后，下次重新加载时生效。"
+L["A small spell icon beside the target frame shows how your target sits in your range: Raptor Strike when it is within melee reach, Auto Shot when it is in shooting range, and Auto Shot greyed and red in the dead zone between. Nothing shows without a hostile target, while you are dead, or for a class with no dead zone."] = "目标框体旁的小型法术图标显示目标处于你射程的哪个位置：近战范围内显示猛禽一击，射击范围内显示自动射击，两者之间的盲区显示灰色泛红的自动射击。没有敌对目标、你处于死亡状态或职业没有盲区时不显示。" -- mt
 L["A small quest icon sits beside the nameplate of each creature you still need for a quest in your log, to kill or for an item it drops, and goes once you have enough. Needs Questie, or its QuestieDB addon on its own."] = "在你任务日志中仍需要的每个生物（需要击杀或需要其掉落物品）的姓名板旁显示一个小任务图标，数量足够后消失。需要Questie，或单独安装其QuestieDB插件。"
 L["A soft gold background marks quests added in WoW: Forever in the quest log and quest text."] = "在任务日志和任务文本中，用柔和的金色背景标出WoW: Forever新增的任务。"
 L["A whisper that is exactly the keyword you pick below invites its sender to your group. You must be ungrouped, the group leader or a raid assistant. Nothing is sent until such a whisper arrives."] = "内容恰好是下方所选关键词的悄悄话，会邀请发送者加入你的队伍。你必须不在队伍中，或是队长或团队助理。收到这样的悄悄话之前不会发送任何东西。"
@@ -171,6 +172,7 @@ L["Quests are accepted and turned in for you as you talk to an NPC. Hold Shift w
 L["Quests on minimap givers"] = "小地图任务NPC的任务"
 L["Quests to level: about %d"] = "升级所需任务：约%d"
 L["Quiet repeated combat errors"] = "屏蔽重复的战斗错误"
+L["Range band beside the target"] = "目标旁的射程提示" -- mt
 L["Rare alerts"] = "稀有生物提醒"
 L["Pull warning"] = "仇恨警告" -- mt
 L["In a group, a chat line when your threat on your target passes the tank's, just before it turns on you. Once each time, until you drop back below the tank or change target. To colour nameplates by threat, use the game's own Nameplates options."] = "在队伍中，当你对目标的仇恨超过坦克、目标即将转向你时，在聊天框提示一行。每次只提示一次，直到你的仇恨回落到坦克之下或更换目标。要按仇恨为姓名板着色，请使用游戏自带的姓名板选项。" -- mt

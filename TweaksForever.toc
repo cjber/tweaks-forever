@@ -68,6 +68,7 @@ Quests\BestReward.lua
 UI\Tooltips.lua
 UI\CursorTooltip.lua
 UI\Nameplates.lua
+UI\RangeBand.lua
 Map\MapDraw.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua

@@ -14,7 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
+from PIL import Image, ImageOps  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
 
 FOREVER_CORE = Path(os.environ.get("FOREVER_CORE", Path(__file__).resolve().parents[2] / "forever-core")).expanduser()
 WOWMOCK = FOREVER_CORE / "tools" / "wowmock"
@@ -597,12 +597,15 @@ PLATES = [
 PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
 
 
-def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
+def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08, dead=False):
     image = ui.texture(fdid)
     w, h = image.size
-    canvas.draw(
-        image.crop((round(crop * w), round(crop * h), round((1 - crop) * w), round((1 - crop) * h))), x, y, size, size
-    )
+    icon = image.crop((round(crop * w), round(crop * h), round((1 - crop) * w), round((1 - crop) * h)))
+    if dead:
+        # UI/RangeBand.lua sets the icon desaturated with a red vertex colour: grey first, then red, so the icon's
+        # own colours do not show through the tint.
+        icon = ImageOps.colorize(ImageOps.grayscale(icon), (0, 0, 0), (255, 20, 20)).convert("RGBA")
+    canvas.draw(icon, x, y, size, size)
 
 
 def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest):
@@ -681,6 +684,55 @@ def nameplates(ui):
 
 def nameplates_scene(ui):
     layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(PLATES, PLATE_POSITIONS, strict=True)]
+    return scene(ui, layers, MARGIN)
+
+
+# UI/RangeBand.lua anchors its 28-square icon 6 right of the target frame's portrait, centred on it.
+RANGE_ICON, RANGE_GAP = 28, 6
+RAPTOR_STRIKE, AUTO_SHOT = 132223, 132369
+# (name, level, health, icon, dead zone) for the three bands, in the order the setting describes them.
+RANGE_TARGETS = [
+    ("Warsong Grunt", 13, 0.82, RAPTOR_STRIKE, False),
+    ("Warsong Grunt", 13, 0.58, AUTO_SHOT, True),
+    ("Warsong Grunt", 13, 0.91, AUTO_SHOT, False),
+]
+# The client's own class icon, as its portrait replacement option draws a player's portrait inside the target frame.
+RANGE_PORTRAIT = "groupfinder-icon-class-warrior"
+
+
+def target_frame(ui, name, level, health, icon, dead):
+    """A target frame as Camelot's TargetFrame lays it out, with UI/RangeBand.lua's icon beside its portrait."""
+    c = ui.canvas(252, 100)
+    # Portrait 58 square at TOPRIGHT (-26, -19), its class icon 40 square centred in it and cut to the circle mask.
+    portrait = ui.canvas(252, 100)
+    portrait.draw(ui.atlas(RANGE_PORTRAIT), 157, 28, 40, 40)
+    portrait.mask(ui.atlas("CircleMask").image, 148, 19, 58, 58)
+    c.paste(portrait, 0, 0)
+    # FrameTexture 192x67 at CENTER of the 232x100 frame.
+    c.draw(ui.atlas("UI-HUD-UnitFrame-Target-PortraitOn"), 20, 16, 192, 67)
+    # HealthBarsContainer is moved by TargetFrameMixin:UpdateHealthBarVisuals to 126x15, 147 left of the frame's
+    # middle and 9 below it, with the bar's own 126x20 health fill.
+    c.draw(
+        ui.atlas("UI-HUD-UnitFrame-Target-PortraitOn-Bar-Health"),
+        21,
+        44,
+        126 * health,
+        20,
+        color=(0.8, 0.1, 0.1, 1),
+    )
+    c.draw(ui.atlas("UI-HUD-UnitFrame-SmallCircle"), 180, 54, 39, 39)
+    c.text(180, 54, str(level), FONTS["GameFontNormal"], (1, 1, 1), justify="CENTER", width=39, box_height=39)
+    c.text(22, 28, name, FONTS["GameFontNormalSmall"], (1, 1, 1))
+    spell_icon(ui, c, icon, 148 + 58 + RANGE_GAP, 19 + (58 - RANGE_ICON) / 2, RANGE_ICON, crop=0, dead=dead)
+    return c
+
+
+def rangeband(ui):
+    rangeband_scene(ui).save(OUT / "rangeband.png")
+
+
+def rangeband_scene(ui):
+    layers = [(target_frame(ui, *target), index * (252 + 24), 0) for index, target in enumerate(RANGE_TARGETS)]
     return scene(ui, layers, MARGIN)
 
 
@@ -875,6 +927,7 @@ def main():
     campfire_buff(ui)
     editmode(ui)
     nameplates(ui)
+    rangeband(ui)
     tooltips(ui)
     frames, size = demo(ui)
     print(f"demo.gif: {frames} frames, {size} bytes")

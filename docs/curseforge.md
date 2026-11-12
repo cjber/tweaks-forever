@@ -22,6 +22,10 @@ Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists a
 
 Nameplates in retail's own frame, with your target outlined.
 
+![Three target frames showing a hunter's melee, dead zone and ranged icons](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangeband.png)
+
+A hunter's target frame shows Raptor Strike in melee reach, Auto Shot red in the dead zone, and Auto Shot in shooting range.
+
 These images are generated previews of the Tweaks UI.
 
 ## Features
@@ -30,7 +34,7 @@ These images are generated previews of the Tweaks UI.
 - **Vendors and gear groups.** Repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback; Alt+Right-click marks anything as junk when turned on, and holding Shift as a merchant opens skips both. Ctrl+Right-click a bag item to put it in a coloured group, then equip the group in one click.
 - **Rares and levelling.** Optional rare alerts in chat, XP per hour and time to level on the experience bar, and the XP your quest log is worth shaded onto the bar.
 - **Maps.** Every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside or click their entrance.
-- **Nameplates, tooltips and windows.** A taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
+- **Nameplates, tooltips and windows.** A taller plate with name and level above, your target outlined and casts in a slim bar; a hunter's target frame carries a small spell icon for melee reach, the dead zone and shooting range; tooltips with a thin rounded border, class-coloured names and the health bar inside. Move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
 - **Quests and camps.** Quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so. Quest item sparkles use the game's own effect, as in Forever Loot Sparkles: off by default, they turn outlines off, and removing them needs a restart.
 - **Spellbook, trainers and fishing.** Unlearned spells in the spellbook, the Pet tab's future abilities, a pet trainer note naming what your pet has not learned with a button to Beast Training, known ranks marked in Beast Training, Train all for what you can afford, and the reagent bag in the combined bag. Double right-click to cast or apply a lure, with a warning when you have none.
 - **Also.** A page listing my five Forever addons, camp tooltips, camera zoom past the game's limit, no screen glow, quiet macro errors, hidden macro names, an unspent talent and pet training point glow, and `/rl`.

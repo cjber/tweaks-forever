@@ -44,6 +44,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Dungeon maps.** Inside a dungeon or raid, or when you click its entrance, the world map shows the client's own painted map, with its area names and boss rooms, a button for the floor and a Back to map button. The maps come with WoW: Forever; no extra addon is needed.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout (not with the gamepad UI).
 - **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
+- **Hunter range.** A small spell icon beside the target frame shows Raptor Strike in melee reach, Auto Shot in shooting range, and Auto Shot greyed and red in the dead zone between. It follows your target and hides while there is none.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
 - **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
 - **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Turn on **Quest XP on the experience bar** (off by default) to shade the bar with the XP your quest log is worth, the ready hand-ins first, and the tooltip then adds the level they reach. Rare alerts (off by default) name nearby rares in chat; click the name, or press a bound key, to set a waypoint to it. In a group, a pull warning says in chat when your threat passes the tank's. A soft glow on the talents button reminds you while talent or pet training points are unspent.
@@ -61,6 +62,12 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 </p>
 
 <p align="center">Nameplates in retail's own frame, with your target outlined and a quest icon on what you still need.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangeband.png" width="828" alt="Three target frames showing a hunter's melee, dead zone and ranged icons">
+</p>
+
+<p align="center">A hunter's target frame shows Raptor Strike in melee reach, Auto Shot greyed and red in the dead zone, and Auto Shot in shooting range.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png" width="394" alt="An enemy's and a shaman's tooltip with health bars">

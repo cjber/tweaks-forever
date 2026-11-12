@@ -105,6 +105,11 @@
 ---@field spell TFTrainerSpell
 ---@field ready boolean your level allows it: waiting at the trainer
 
+---@class TFRangeBand
+---@field Band fun(melee: boolean?, ranged: boolean?): "melee"|"ranged"|"dead"|nil
+---@field Rank fun(base: integer, ranks: table<integer, integer>, known: fun(id: integer): boolean): integer?
+---@field First fun(bases: integer[], ranks: table<integer, integer>, known: fun(id: integer): boolean): integer?
+
 ---@class TFGrid
 ---@field views integer
 ---@field width number
@@ -336,6 +341,7 @@ TweaksForeverCharDB = nil
 ---@field Feature fun(feature: TFFeature)
 ---@field RefreshConflicts fun()
 ---@field XPRate TFXPRate
+---@field RangeBand TFRangeBand
 ---@field QuestXPBar TFQuestXPBar
 ---@field QuestButtons TFQuestButtons
 ---@field Coordinates TFCoordinates
