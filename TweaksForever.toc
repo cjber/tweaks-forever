@@ -14,7 +14,7 @@
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
 ## Dependencies: ForeverCore
-## X-Forever-Core: v1.7.3
+## X-Forever-Core: v1.7.4
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
