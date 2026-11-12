@@ -1,17 +1,17 @@
 {
-  "input_digest": "0e0d3d23b2f0c8d0a9739e699b2efa551897c7def27676115ecffe6f3bda67f4",
-  "runtime_sha256": "0e0d3d23b2f0c8d0a9739e699b2efa551897c7def27676115ecffe6f3bda67f4",
-  "candidate": "3a3ce1dccc9a5ca1f7f1a2a9bc96b967503a6e0608b21773e5c8dfff98e555c7",
+  "input_digest": "727bcf83af95dd742d6c3e6121f0b938833279411cf6b08851cb6a41b02336dc",
+  "runtime_sha256": "727bcf83af95dd742d6c3e6121f0b938833279411cf6b08851cb6a41b02336dc",
+  "candidate": "81e9374afcaa2b4dfd3de42066eb443dcecee9e047151005485132cfe5592045",
   "tested_artifact": "release-package",
   "client_build": "1.60.1.70888 (Interface 16001)",
-  "source_commit": "af5d5f8bae653db533cd608b6370056f082907e9",
-  "notes": "Recorded on Hel Io in the player's live client from the packager's release build of this commit (TweaksForever and LibAHTab from a local BigWigs packager -d -z run; compare_package equivalent), with ForeverCore v1.8.2 from CurseForge. Every other Forever addon's ForeverCore 1.8.2 sync build was loaded in the same session. BugGrabber recorded no addon errors (the session's two errors were the recorder's own /run lines calling a missing client API).",
+  "source_commit": "9a470b77afabcb3c262aa8094895c92c1efb57fe",
+  "notes": "Recorded on Hel Io in the player's live client from the packager's release build of this commit (TweaksForever and LibAHTab from a local BigWigs packager -d -z run; --compare-package equivalent). Every other Forever addon's 1.9.0 sync build was loaded in the same session. The only BugGrabber entries this session were the recorder's own over-long /run lines.",
   "flows": [
     {
-      "name": "Tweaks' settings open on ForeverCore 1.8.2",
+      "name": "Tweaks' settings open on ForeverCore 1.9.0",
       "steps": [
-        "Install the candidate with ForeverCore v1.8.2 and /reload",
-        "Print every Forever addon's loaded version into a chat tab with no channels: ForeverCore v1.8.2 plus this candidate, all loaded",
+        "Install the candidate with the store ForeverCore v1.9.0 and /reload",
+        "Print every Forever addon's loaded version into a chat tab with no channels: store ForeverCore v1.9.0 plus each 1.9.0 sync build, all loaded, and BugGrabber shows no addon errors this session",
         "Type /tweaks",
         "The game's Options open on the Tweaks Forever page with its group buttons and no action-blocked message"
       ],
@@ -20,12 +20,12 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/5cd61b138c1e01654d7aadd509568514/raw/82bfd62fbba753c8cc0a35be3f8e1c07fb2ac713/sync182-tweaks-settings.png",
-      "sha256": "5d78b9d281363e8069d1af17d048961aa866799d6dbd5529b1db971bb60d6c82"
+      "url": "https://gist.githubusercontent.com/cjber/627a1b4cf36d973bb26ba262c81eb601/raw/67bd0b623f26040eed9f66dd363a477dbb684579/sync190-tweaks-settings.png",
+      "sha256": "43f0e687f947733819e6c8cee69ea12798e6886be0d7897ffd5df5ea1e921b7e"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/5cd61b138c1e01654d7aadd509568514/raw/82bfd62fbba753c8cc0a35be3f8e1c07fb2ac713/sync182-versions.png",
-      "sha256": "0a95af5dcd4392712f85093832d05c14411d76b4099d3b60185209cbdf0e1e1b"
+      "url": "https://gist.githubusercontent.com/cjber/627a1b4cf36d973bb26ba262c81eb601/raw/67bd0b623f26040eed9f66dd363a477dbb684579/sync190-versions.png",
+      "sha256": "9731b84977a7daf94152f9129b9ea996b4c467006f822f7acc430332fa8f08ec"
     }
   ]
 }
