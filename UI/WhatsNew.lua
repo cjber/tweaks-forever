@@ -19,7 +19,7 @@ ns.Feature({
 -- version says nothing new but still moves the remembered version on. Rewrite both lines for each release that has a
 -- headline (whatsnew_spec checks them against CHANGELOG.md).
 ns.WHATS_NEW_VERSION = "2.6.10"
-ns.WHATS_NEW = L["Dungeon maps fill the map window."]
+ns.WHATS_NEW = L["Dungeon entrance icons no longer cover the world map."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

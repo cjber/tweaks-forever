@@ -93,7 +93,7 @@ L["From your friends, Battle.net friends and guild. Not while you are queued for
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "Aus Eurer Gruppe und nicht von jemandem im Kampf, damit Ihr eine Kampfwiederbelebung weiterhin selbst timen könnt. Wartet die Verzögerung des Spiels ab, wenn Ihr bald erneut sterbt. Haltet Umschalt gedrückt, um selbst zu antworten."
 L["Future Spells"] = "Künftige Zauber"
 L["Future spells in spellbook"] = "Künftige Zauber im Zauberbuch"
-	L["Dungeon maps fill the map window."] = "Dungeon maps fill the map window." -- mt
+	L["Dungeon entrance icons no longer cover the world map."] = "Dungeon entrance icons no longer cover the world map." -- mt
 L["Game menu"] = "Spielmenü"
 L["Gather grouped gear in bags"] = "Gruppierte Ausrüstung in Taschen sammeln"
 L["Gear"] = "Ausrüstung"
