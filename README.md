@@ -14,22 +14,10 @@ Tweaks Forever can accept and turn in quests, standing down while Polestar does.
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Dungeon entrances, nameplates and a junk coin">
-</p>
-
-<p align="center">The junk coin marks what sells with your greys at a merchant. Also dungeon entrances and nameplates.</p>
-
-<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png" width="768" alt="The world map inside Blackfathom Deeps, showing the client's painted dungeon floor">
 </p>
 
-<p align="center">Inside a dungeon or raid the map opens on its painted sheet, and a click on an entrance shows it from outside, with a button for each floor.</p>
-
-<p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png" width="768" alt="The Eastern Kingdoms with a dungeon icon at every entrance">
-</p>
-
-<p align="center">Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.</p>
+<p align="center">Inside a dungeon or raid the map opens on its painted sheet, with a button for each floor.</p>
 
 ## Features
 
@@ -95,7 +83,7 @@ Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian a
 
 ## Works alongside
 
-A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever): click a dungeon entrance on the map and it plans the way there. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
 
 <!-- forever-family:start -->
 
@@ -120,9 +108,8 @@ For help, ideas and each day's release notes, join [cjber's Workshop on Discord]
 
 <!-- forever-family:end -->
 
-With Shortest Path Forever, clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses
-Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for
-Legacy Forever.
+Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint steps
+aside for Legacy Forever.
 
 ## Development
 

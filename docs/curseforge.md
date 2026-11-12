@@ -6,17 +6,9 @@ Free, with nothing locked behind it. If it saves you time, you can [sponsor me o
 
 [![Join me on Discord](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/discord-button.png)](https://discord.gg/FpHugGxRJY) [![Sponsor me on GitHub](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/github-sponsors-button.png)](https://github.com/sponsors/cjber) [![Support me on Ko-fi](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/kofi-button.png)](https://ko-fi.com/cjber)
 
-![Dungeon entrances, nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
-
-The junk coin marks what sells with your greys at a merchant. Also dungeon entrances and nameplates.
-
 ![The world map inside Blackfathom Deeps with its floor and legend](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png)
 
-Inside a dungeon or raid the map opens on its painted parchment sheet. Click an entrance to see one from outside.
-
-![The Eastern Kingdoms with a dungeon icon at every entrance](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png)
-
-Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.
+Inside a dungeon or raid the map opens on its painted parchment sheet, with a button for each floor.
 
 ![Three enemy nameplates with a Fireball cast](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
 
@@ -66,7 +58,7 @@ For help, ideas and each day's release notes, join [cjber's Workshop on Discord]
 
 <!-- forever-family:end -->
 
-With Shortest Path Forever, Shift-clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for Legacy Forever.
+Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint steps aside for Legacy Forever.
 
 <!-- forever-credits:start -->
 

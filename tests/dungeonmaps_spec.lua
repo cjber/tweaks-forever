@@ -1,3 +1,9 @@
+local toc = assert(io.open("TweaksForever.toc", "r"))
+local loadedFiles = toc:read("*a")
+toc:close()
+assert(not loadedFiles:find("Map\\DungeonEntrances.lua", 1, true), "castle entrance pins must not load")
+assert(not loadedFiles:find("Map\\DungeonEntrances.xml", 1, true), "castle entrance art must not load")
+
 local features, initializers, events, handlers = {}, {}, {}, {}
 local active = true
 local ns = {
@@ -106,6 +112,9 @@ local function Frame(kind)
 		end,
 		GetFrameLevel = function()
 			return 1
+		end,
+		SetFrameStrata = function(self, strata)
+			self.strata = strata
 		end,
 		CreateTexture = function()
 			local texture = Frame("Texture")
@@ -316,6 +325,7 @@ for _, frame in ipairs(frames) do
 end
 host = frames[1] -- the first frame built is the one over the map canvas
 assert(host and host.shown and back and reopen and picker and popup)
+assert(host.strata == "DIALOG", "the dungeon sheet is above map and addon controls")
 assert(reopen.text == "Dungeon map" and not reopen.shown)
 assert(back.fitted == 112 and reopen.fitted == 112, "both buttons widen to a longer translated label")
 local heading = fontStrings[1]

@@ -9,8 +9,8 @@ ns.Feature({
 	key = "dungeonMaps",
 	category = "Maps",
 	name = "Dungeon interior maps",
-	tooltip = "Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a "
-		.. "floor picker and a Back to map button.",
+	tooltip = "Inside a dungeon or raid, the world map shows its painted map, with a floor picker and a "
+		.. "Back to map button.",
 	default = true,
 })
 
@@ -197,6 +197,8 @@ ns.Init(function()
 		local canvas = map.ScrollContainer
 		host = ns.MapDraw.FrameUnder("Frame", canvas)
 		host:SetAllPoints(canvas)
+		-- The sheet is a modal surface over the map and its addon controls, not a child-level overlay.
+		host:SetFrameStrata("DIALOG")
 		host:SetFrameLevel(canvas:GetFrameLevel() + 100)
 		host:EnableMouse(true)
 		local background = host:CreateTexture(nil, "BACKGROUND")
