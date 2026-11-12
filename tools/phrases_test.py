@@ -76,6 +76,7 @@ class PhrasesTest(unittest.TestCase):
 
     def test_layout(self):
         with tempfile.TemporaryDirectory() as root:
+            Path(root, "TweaksForever.toc").write_text("## Interface: 16001\nOld.lua\n")
             keyword = Path(root, "Old.lua")
             keyword.write_text("--" + PACKAGER_KEYWORD + '(locale="deDE")@\n')
             tracked = ["Locales/enUS.lua", "Locales/deDE.lua", "Old.lua"]
@@ -87,13 +88,24 @@ class PhrasesTest(unittest.TestCase):
     def test_keyword_follows_packager_selection_and_text_filters(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / ".pkgmeta").write_text("ignore:\n  - tools\nplain-copy:\n  - Raw.lua\n")
+            (root / ".pkgmeta").write_text("package-as: Example\nignore:\n  - tools\nplain-copy:\n  - Raw.lua\n")
             (root / "tools").mkdir()
-            names = ["Runtime.lua", "Raw.lua", "tools/check.lua", "checker.py", "asset.png"]
+            names = [
+                "Runtime.lua",
+                "Raw.lua",
+                "tools/check.lua",
+                "checker.py",
+                "asset.png",
+                "README.md",
+                "notes.txt",
+                "Panel.xml",
+                "Other.toc",
+                "Example.toc",
+            ]
             for name in names:
-                (root / name).write_text(PACKAGER_KEYWORD)
+                (root / name).write_text(("## Interface: 16001\n" if name == "Example.toc" else "") + PACKAGER_KEYWORD)
             found = layout([], names, root)
-            self.assertEqual([finding.path.as_posix() for finding in found], ["Runtime.lua"])
+            self.assertEqual([finding.path.as_posix() for finding in found], ["Runtime.lua", "Example.toc"])
 
 
 if __name__ == "__main__":

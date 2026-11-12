@@ -254,13 +254,14 @@ def layout(paths: list[Path], tracked: list[str], root: Path = Path(".")) -> lis
     findings = []
     listed = set(paths)
     manifest = pkgmeta.read(root)
+    project_tocs = set(pkgmeta.localization_toc_files(root))
     for name in tracked:
         path = Path(name)
         if path.parent == Path("Locales") and path.suffix == ".lua" and path not in listed:
             findings.append(Finding(path, 1, "not in TweaksForever.toc, so the game never loads it"))
         source = root / path
         if (
-            path.suffix in {".lua", ".md", ".toc", ".txt", ".xml"}
+            (path.suffix == ".lua" or source.resolve() in project_tocs)
             and (manifest is None or (manifest.keeps(name) and not manifest.kept_bytes(name)))
             and source.is_file()
             and PACKAGER_KEYWORD in source.read_text(errors="ignore")
