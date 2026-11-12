@@ -132,7 +132,7 @@ LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab)
 
 <!-- forever-credits:start -->
 
-Thanks to Sojiro84, Mouchoir, SirGooie and everyone who reported a bug or asked for a feature.
+Thanks to Sojiro84, Mouchoir, SirGooie, NightIsolation and everyone who reported a bug or asked for a feature.
 
 <!-- forever-credits:end -->
 
