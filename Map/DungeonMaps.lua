@@ -237,6 +237,8 @@ ns.Init(function()
 		picker = ns.MapDraw.FrameUnder("Button", host, "SharedButtonSmallTemplate") --[[@as Button]]
 		picker:SetSize(PICKER_WIDTH, 24)
 		picker:SetPoint("TOPRIGHT", back, "TOPLEFT", -8, 0)
+		heading:SetPoint("TOPRIGHT", picker, "TOPLEFT", -8, 0)
+		heading:SetWordWrap(false)
 		popup = ns.MapDraw.FrameUnder("Frame", picker)
 		popup:SetFrameStrata("DIALOG")
 		popup:SetPoint("TOPRIGHT", picker, "BOTTOMRIGHT", 0, -2)

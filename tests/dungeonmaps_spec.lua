@@ -101,6 +101,9 @@ local function Frame(kind)
 		SetPoint = function(self, ...)
 			self.point = { ... }
 		end,
+		SetWordWrap = function(self, enabled)
+			self.wordWrap = enabled
+		end,
 		SetTexCoord = function(self, ...)
 			self.texCoord = { ... }
 		end,
@@ -336,6 +339,8 @@ assert(reopen.text == "Dungeon map" and not reopen.shown)
 assert(back.fitted == 112 and reopen.fitted == 112, "both buttons widen to a longer translated label")
 local heading = fontStrings[1]
 assert(heading.text == "The Deadmines 1")
+assert(heading.point[1] == "TOPRIGHT" and heading.point[2] == picker, "heading stops before the floor picker")
+assert(heading.wordWrap == false, "long dungeon titles stay within the header row")
 assert(textures[2].texture == "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1_1")
 assert(textures[13].texture == "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1_12")
 local function CheckMapBounds(width, height)
