@@ -14,6 +14,10 @@ Inside a dungeon or raid the map opens on its painted parchment sheet, with a bu
 
 Nameplates in retail's own frame, with your target outlined.
 
+![Enemy and player tooltips with health bars](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png)
+
+Health bars in creature and player tooltips.
+
 These images are generated previews of the Tweaks UI.
 
 ## Features
