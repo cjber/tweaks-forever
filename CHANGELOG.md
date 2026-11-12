@@ -12,7 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- **Every class gets a range strip on its swing timers.** A strip above the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap, so you know when to close in and when to back off (#413).
+- **Every class gets a range strip on its swing timers.** A strip above the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap, so you know when to close in and when to back off. Each segment leads with its attack's own icon, and the band's name sits above the strip in its colour; Show icons and Show band label turn either off (#413).
 
 ## [2.6.10] - 2026-11-12
 

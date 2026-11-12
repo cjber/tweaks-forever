@@ -179,6 +179,7 @@ read_globals = {
 	"GetGuildBankWithdrawMoney",
 	"GetInstanceInfo",
 	"GetInventoryItemID",
+	"GetInventoryItemTexture",
 	"GetLocale",
 	"GetMoney",
 	"GetMoneyString",

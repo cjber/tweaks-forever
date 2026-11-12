@@ -570,9 +570,12 @@ def editmode(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).save(OUT / "editmode.png")
 
 
-# UI/RangeStrip.lua: a band label and 13-tall segments over Blizzard's own swing timer bars, at their width.
+# UI/RangeStrip.lua: a 20-high band label and 15-high segments over Blizzard's own swing timer bars, at their width,
+# each segment leading with its attack's icon as a square tile of the segment's height and 1 clear before its bar.
 RANGE_BAR_W, RANGE_BAR_H, RANGE_BAR_GAP = 240, 15, 6
-RANGE_SEGMENT_H, RANGE_SEGMENT_GAP = 13, 3
+RANGE_LABEL_H = 20
+RANGE_SEGMENT_H, RANGE_SEGMENT_GAP = 15, 3
+RANGE_ICON_GAP = 1
 # UI/RangeStrip.lua's SEGMENT_TEXT_INSET: 3 clear on either side of a segment name.
 RANGE_TEXT_INSET = 3
 RANGE_COL_W = 260
@@ -582,6 +585,27 @@ RANGE_GOLD, RANGE_GREEN, RANGE_RED, RANGE_GREY = (1, 0.82, 0), (0.25, 0.75, 0.25
 # The strip's own font objects: GameFontNormal for the band label, GameFontHighlightSmall for the segment names,
 # both in enUS's Friz Quadrata, coloured per band.
 RANGE_LABEL_FONT, RANGE_NAME_FONT = FONTS["GameFontNormal"], FONTS["GameFontHighlightSmall"]
+# The client's own spell icon for each segment, from SpellMisc's SpellIconFileDataID in the pinned build. Melee heads
+# with the main-hand weapon's own icon, the file the game's Attack button draws: INV_Sword_04 stands in for the weapon
+# a player has equipped. Dead zone names no attack, so it has no tile.
+RANGE_WEAPON = "Interface/Icons/INV_Sword_04.blp"
+RANGE_ICONS = {
+    "Charge": 132337,
+    "Shoot Gun": 132222,
+    "Shoot Bow": 132222,
+    "Auto Shot": 132369,
+    "Feral Charge": 132183,
+    "Wrath": 136006,
+    "Judgement": 135959,
+    "Fire Blast": 135807,
+    "Frostbolt": 135846,
+    "Fireball": 135812,
+    "Smite": 135924,
+    "Fear": 136183,
+    "Shadow Bolt": 136197,
+    "Earth Shock": 136026,
+    "Lightning Bolt": 136048,
+}
 # The hunter's four bands: (band label, colour, lit segment index or None), with the strip's segment names.
 RANGE_HUNTER = ("Melee", "Dead zone", "Auto Shot")
 RANGE_STATES = [
@@ -667,30 +691,46 @@ def fit_range_name(canvas, name, font, width):
     return name[:low] + ellipsis
 
 
+def range_segments(names):
+    """A strip's segments as (name, icon): each names a spell, and Melee the equipped main-hand weapon."""
+    return [(name, RANGE_WEAPON if name == "Melee" else RANGE_ICONS.get(name)) for name in names]
+
+
 def rangestrip_widget(ui, names, lit, label, colour):
-    """The strip in one band: its label above equal segments, the lit one filled in the band's colour."""
-    segment_w = (RANGE_BAR_W - (len(names) - 1) * RANGE_SEGMENT_GAP) / len(names)
-    c = ui.canvas(RANGE_BAR_W, 20 + RANGE_SEGMENT_H)
+    """The strip in one band: its label above equal segments, each leading with its attack's icon, the lit one
+    filled in the band's colour."""
+    segments = range_segments(names)
+    segment_w = (RANGE_BAR_W - (len(segments) - 1) * RANGE_SEGMENT_GAP) / len(segments)
+    c = ui.canvas(RANGE_BAR_W, RANGE_LABEL_H + RANGE_SEGMENT_H)
     c.text(0, 0, label, replace(RANGE_LABEL_FONT, color=colour), justify="CENTER", width=RANGE_BAR_W)
-    y = 20
-    for index, name in enumerate(names):
+    y = RANGE_LABEL_H
+    for index, (name, icon) in enumerate(segments):
         sx = index * (segment_w + RANGE_SEGMENT_GAP)
-        c.draw(ui.atlas("ui-swingtimerbar-background"), sx, y, segment_w, RANGE_SEGMENT_H)
+        # The icon tile is the segment's height square, 1 clear of the bar, and only a segment with an attack has one.
+        tile = RANGE_SEGMENT_H if icon else 0
+        bx = sx + tile + (RANGE_ICON_GAP if tile else 0)
+        bw = segment_w - tile - (RANGE_ICON_GAP if tile else 0)
+        if tile:
+            spell_icon(ui, c, icon, sx, y, tile)
+            if index != lit:
+                c.fill(sx, y, tile, tile, (0, 0, 0, 0.6))
+            c.draw(ui.atlas("ui-swingtimerbar-frame"), sx, y, tile, tile)
+        c.draw(ui.atlas("ui-swingtimerbar-background"), bx, y, bw, RANGE_SEGMENT_H)
         if index == lit:
             c.draw(
                 ui.atlas("UI-HUD-CoolDownManager-Bar"),
-                sx + 4,
+                bx + 4,
                 y + 3,
-                segment_w - 8,
+                bw - 8,
                 RANGE_SEGMENT_H - 6,
                 color=(*colour, 1),
             )
-        c.draw(ui.atlas("ui-swingtimerbar-frame"), sx, y, segment_w, RANGE_SEGMENT_H)
+        c.draw(ui.atlas("ui-swingtimerbar-frame"), bx, y, bw, RANGE_SEGMENT_H)
         text_colour = (1, 1, 1) if index == lit else (0.5, 0.5, 0.5)
         font = replace(RANGE_NAME_FONT, color=text_colour)
-        name_w = segment_w - 2 * RANGE_TEXT_INSET
+        name_w = bw - 2 * RANGE_TEXT_INSET
         c.text(
-            sx + RANGE_TEXT_INSET,
+            bx + RANGE_TEXT_INSET,
             y,
             fit_range_name(c, name, font, name_w),
             font,
