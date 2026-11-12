@@ -302,9 +302,8 @@ L["%s: %s is out of date. Update it to fix this."] = "%s: %s ist veraltet. Aktua
 L["%s: %s are out of date. Update them to fix this."] = "%s: %s sind veraltet. Aktualisiere sie, um dies zu beheben." -- mt
 L["%s could not start. Reinstall %s to fix this."] = "%s konnte nicht starten. Installiere %s neu, um dies zu beheben." -- mt
 
-L["Hunter range strip"] = "Reichweitenleiste für Jäger" -- mt
-L["For hunters, a strip on top of the game's swing timers that names the range band your target is in: Melee, Dead zone (too close to shoot, too far to strike), Shoot, or Too far. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Für Jäger: ein Streifen über den Schwung-Timern des Spiels, der den Reichweitenbereich Eures Ziels nennt: Nahkampf, Toter Bereich (zu nah zum Schießen, zu weit zum Schlagen), Schuss oder Zu weit. Er erscheint, solange die Schwung-Timer angezeigt werden, mit der Option des Spiels unter Interface und im Editiermodus." -- mt
+L["Range strip"] = "Reichweitenleiste"
+L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Ein Streifen über den Schwung-Timern des Spiels, der nennt, welche Eurer Angriffe Euer Ziel erreichen, vom Nahkampf bis zu Eurer größten Reichweite, mit einem Toten Bereich, wo eine Mindestreichweite eine Lücke lässt. Er erscheint, solange die Schwung-Timer angezeigt werden, mit der Option des Spiels unter Interface und im Editiermodus."
 L["Melee"] = "Nahkampf" -- mt
 L["Dead zone"] = "Toter Bereich" -- mt
-L["Shoot"] = "Schuss" -- mt
 L["Too far"] = "Zu weit" -- mt

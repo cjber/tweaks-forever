@@ -570,20 +570,50 @@ def editmode(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).save(OUT / "editmode.png")
 
 
-# UI/RangeStrip.lua: a band label and three 13-tall segments over Blizzard's own swing timer bars, at their width.
+# UI/RangeStrip.lua: a band label and 13-tall segments over Blizzard's own swing timer bars, at their width.
 RANGE_BAR_W, RANGE_BAR_H, RANGE_BAR_GAP = 240, 15, 6
 RANGE_SEGMENT_H, RANGE_SEGMENT_GAP = 13, 3
+# UI/RangeStrip.lua's SEGMENT_TEXT_INSET: 3 clear on either side of a segment name.
+RANGE_TEXT_INSET = 3
 RANGE_COL_W = 260
+RANGE_CLASS_W = 110
+RANGE_ROW_GAP = 10
 RANGE_GOLD, RANGE_GREEN, RANGE_RED, RANGE_GREY = (1, 0.82, 0), (0.25, 0.75, 0.25), (1, 0.13, 0.13), (0.55, 0.55, 0.55)
 # The strip's own font objects: GameFontNormal for the band label, GameFontHighlightSmall for the segment names,
 # both in enUS's Friz Quadrata, coloured per band.
 RANGE_LABEL_FONT, RANGE_NAME_FONT = FONTS["GameFontNormal"], FONTS["GameFontHighlightSmall"]
-# (band label, colour, lit segment index or None)
+# The hunter's four bands: (band label, colour, lit segment index or None), with the strip's segment names.
+RANGE_HUNTER = ("Melee", "Dead zone", "Auto Shot")
 RANGE_STATES = [
     ("Melee", RANGE_GOLD, 0),
     ("Dead zone", RANGE_RED, 1),
-    ("Shoot", RANGE_GREEN, 2),
+    ("Auto Shot", RANGE_GREEN, 2),
     ("Too far", RANGE_GREY, None),
+]
+# RAID_CLASS_COLORS, for the class names down the left of rangestrip-classes.png.
+RAID_CLASS_COLORS = {
+    "WARRIOR": (0.78, 0.61, 0.43),
+    "PALADIN": (0.96, 0.55, 0.73),
+    "HUNTER": (0.67, 0.83, 0.45),
+    "ROGUE": (1.0, 0.96, 0.41),
+    "PRIEST": (1.0, 1.0, 1.0),
+    "SHAMAN": (0.0, 0.44, 0.87),
+    "MAGE": (0.41, 0.8, 0.94),
+    "WARLOCK": (0.58, 0.51, 0.79),
+    "DRUID": (1.0, 0.49, 0.04),
+}
+# One row per class: the segments the class shows, and the band lit. The warrior carries a gun, the rogue and the
+# hunter a bow, and the druid knows Feral Charge, so the rows show the same shapes the addon draws.
+RANGE_CLASSES = [
+    ("WARRIOR", ("Melee", "Dead zone", "Charge", "Shoot Gun"), 2),
+    ("ROGUE", ("Melee", "Dead zone", "Shoot Bow"), 1),
+    ("HUNTER", ("Melee", "Dead zone", "Auto Shot"), 2),
+    ("DRUID", ("Melee", "Dead zone", "Feral Charge", "Wrath"), 3),
+    ("PALADIN", ("Melee", "Judgement"), 1),
+    ("MAGE", ("Melee", "Fire Blast", "Frostbolt", "Fireball"), 1),
+    ("PRIEST", ("Melee", "Smite"), 1),
+    ("WARLOCK", ("Melee", "Fear", "Shadow Bolt"), 1),
+    ("SHAMAN", ("Melee", "Earth Shock", "Lightning Bolt"), 2),
 ]
 
 
@@ -620,14 +650,30 @@ def swing_timers(ui, canvas, y, lit):
     )
 
 
-def rangestrip_state(ui, state):
-    """The strip in one band, docked 6 above the swing timers as UI/RangeStrip.lua docks it."""
-    label, colour, lit = state
-    segment_w = (RANGE_BAR_W - 2 * RANGE_SEGMENT_GAP) / 3
-    c = ui.canvas(RANGE_BAR_W, 20 + RANGE_SEGMENT_H + 6 + 2 * RANGE_BAR_H + RANGE_BAR_GAP)
+def fit_range_name(canvas, name, font, width):
+    """A segment name as its FontString shows it: one line, cut with an ellipsis where it no longer fits."""
+    if canvas.text_width(name, font) <= width:
+        return name
+    ellipsis = "..."
+    if canvas.text_width(ellipsis, font) > width:
+        return ""
+    low, high = 0, len(name)
+    while low < high:
+        middle = (low + high + 1) // 2
+        if canvas.text_width(name[:middle] + ellipsis, font) <= width:
+            low = middle
+        else:
+            high = middle - 1
+    return name[:low] + ellipsis
+
+
+def rangestrip_widget(ui, names, lit, label, colour):
+    """The strip in one band: its label above equal segments, the lit one filled in the band's colour."""
+    segment_w = (RANGE_BAR_W - (len(names) - 1) * RANGE_SEGMENT_GAP) / len(names)
+    c = ui.canvas(RANGE_BAR_W, 20 + RANGE_SEGMENT_H)
     c.text(0, 0, label, replace(RANGE_LABEL_FONT, color=colour), justify="CENTER", width=RANGE_BAR_W)
     y = 20
-    for index, name in enumerate(("Melee", "Dead zone", "Shoot")):
+    for index, name in enumerate(names):
         sx = index * (segment_w + RANGE_SEGMENT_GAP)
         c.draw(ui.atlas("ui-swingtimerbar-background"), sx, y, segment_w, RANGE_SEGMENT_H)
         if index == lit:
@@ -641,16 +687,27 @@ def rangestrip_state(ui, state):
             )
         c.draw(ui.atlas("ui-swingtimerbar-frame"), sx, y, segment_w, RANGE_SEGMENT_H)
         text_colour = (1, 1, 1) if index == lit else (0.5, 0.5, 0.5)
+        font = replace(RANGE_NAME_FONT, color=text_colour)
+        name_w = segment_w - 2 * RANGE_TEXT_INSET
         c.text(
-            sx,
+            sx + RANGE_TEXT_INSET,
             y,
-            name,
-            replace(RANGE_NAME_FONT, color=text_colour),
+            fit_range_name(c, name, font, name_w),
+            font,
             box_height=RANGE_SEGMENT_H,
             justify="CENTER",
-            width=segment_w,
+            width=name_w,
         )
-    swing_timers(ui, c, y + RANGE_SEGMENT_H + 6, lit)
+    return c
+
+
+def rangestrip_state(ui, state):
+    """The strip in one band, docked 6 above the swing timers as UI/RangeStrip.lua docks it."""
+    label, colour, lit = state
+    widget = rangestrip_widget(ui, RANGE_HUNTER, lit, label, colour)
+    c = ui.canvas(RANGE_BAR_W, widget.height + 6 + 2 * RANGE_BAR_H + RANGE_BAR_GAP)
+    c.paste(widget, 0, 0)
+    swing_timers(ui, c, widget.height + 6, lit)
     return c
 
 
@@ -660,6 +717,36 @@ def rangestrip(ui):
         widget = rangestrip_state(ui, state)
         layers.append((widget, index * RANGE_COL_W + (RANGE_COL_W - widget.width) / 2, 0))
     scene(ui, layers, MARGIN).save(OUT / "rangestrip.png")
+
+
+def rangestrip_class_row(ui, class_name, names, lit):
+    """One class's strip docked on its Main Hand bar, its name in the class colour down the left."""
+    label = names[lit]
+    colour = RANGE_RED if label == "Dead zone" else RANGE_GREEN
+    widget = rangestrip_widget(ui, names, lit, label, colour)
+    c = ui.canvas(RANGE_CLASS_W + RANGE_BAR_W, widget.height + 6 + RANGE_BAR_H)
+    c.text(
+        0,
+        0,
+        class_name.title(),
+        Font(FRIZQT, 14, RAID_CLASS_COLORS[class_name], (1, -1)),
+        box_height=widget.height,
+        width=RANGE_CLASS_W - 12,
+    )
+    c.paste(widget, RANGE_CLASS_W, 0)
+    swing_bar(ui, c, RANGE_CLASS_W, widget.height + 6, "Main Hand", "ui-swingtimerbar-filling-mainhand", 0, "0.0", True)
+    return c
+
+
+def rangestrip_classes(ui):
+    rows = [rangestrip_class_row(ui, *row) for row in RANGE_CLASSES]
+    height = sum(row.height for row in rows) + RANGE_ROW_GAP * (len(rows) - 1)
+    c = ui.canvas(max(row.width for row in rows), height)
+    y = 0
+    for row in rows:
+        c.paste(row, 0, y)
+        y += row.height + RANGE_ROW_GAP
+    scene(ui, [(c, 0, 0)], MARGIN).save(OUT / "rangestrip-classes.png")
 
 
 # UI/Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
@@ -968,6 +1055,7 @@ def main():
     campfire_buff(ui)
     editmode(ui)
     rangestrip(ui)
+    rangestrip_classes(ui)
     nameplates(ui)
     tooltips(ui)
     frames, size = demo(ui)

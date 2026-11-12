@@ -302,9 +302,8 @@ L["%s: %s is out of date. Update it to fix this."] = "%s: %s está desatualizado
 L["%s: %s are out of date. Update them to fix this."] = "%s: %s estão desatualizados. Atualize-os para corrigir isto." -- mt
 L["%s could not start. Reinstall %s to fix this."] = "%s não pôde iniciar. Reinstale %s para corrigir isto." -- mt
 
-L["Hunter range strip"] = "Faixa de alcance do caçador" -- mt
-L["For hunters, a strip on top of the game's swing timers that names the range band your target is in: Melee, Dead zone (too close to shoot, too far to strike), Shoot, or Too far. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Para caçadores, uma faixa sobre os cronômetros de golpe do jogo que indica o alcance do seu alvo: corpo a corpo, zona morta (perto demais para atirar e longe demais para golpear), tiro ou longe demais. Ela aparece enquanto os cronômetros de golpe estiverem visíveis, com a opção de interface do jogo e o modo de edição." -- mt
+L["Range strip"] = "Faixa de alcance"
+L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Uma faixa sobre os cronômetros de golpe do jogo que indica quais dos seus ataques alcançam o alvo, do corpo a corpo até o seu maior alcance, com uma zona morta onde um alcance mínimo deixa uma lacuna. Ela aparece enquanto os cronômetros de golpe estiverem visíveis, com a opção de interface do jogo e o modo de edição."
 L["Melee"] = "Corpo a corpo" -- mt
 L["Dead zone"] = "Zona morta" -- mt
-L["Shoot"] = "Tiro" -- mt
 L["Too far"] = "Longe demais" -- mt

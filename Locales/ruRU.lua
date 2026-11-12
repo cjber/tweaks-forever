@@ -302,9 +302,8 @@ L["%s: %s is out of date. Update it to fix this."] = "%s: %s устарел. О�
 L["%s: %s are out of date. Update them to fix this."] = "%s: %s устарели. Обновите их, чтобы исправить это." -- mt
 L["%s could not start. Reinstall %s to fix this."] = "Не удалось запустить %s. Переустановите %s, чтобы исправить это." -- mt
 
-L["Hunter range strip"] = "Полоса дальности охотника" -- mt
-L["For hunters, a strip on top of the game's swing timers that names the range band your target is in: Melee, Dead zone (too close to shoot, too far to strike), Shoot, or Too far. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Для охотников: полоса над таймерами ударов игры, показывающая зону дальности вашей цели: ближний бой, мёртвая зона (слишком близко для выстрела и слишком далеко для удара), выстрел или слишком далеко. Показывается, пока видны таймеры ударов, с игровой опцией интерфейса и режимом редактирования." -- mt
+L["Range strip"] = "Полоса дальности"
+L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Полоса над таймерами ударов игры, показывающая, какие из ваших атак достают до цели — от ближнего боя до самой большой дальности, с мёртвой зоной там, где минимальная дальность оставляет разрыв. Показывается, пока видны таймеры ударов, с игровой опцией интерфейса и режимом редактирования."
 L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
-L["Shoot"] = "Выстрел" -- mt
 L["Too far"] = "Слишком далеко" -- mt

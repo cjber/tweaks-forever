@@ -302,9 +302,8 @@ L["%s: %s is out of date. Update it to fix this."] = "%s: %s 버전이 오래되
 L["%s: %s are out of date. Update them to fix this."] = "%s: %s 버전이 오래되었습니다. 문제를 해결하려면 모두 업데이트하세요." -- mt
 L["%s could not start. Reinstall %s to fix this."] = "%s을(를) 시작할 수 없습니다. 문제를 해결하려면 %s을(를) 다시 설치하세요." -- mt
 
-L["Hunter range strip"] = "사냥꾼 사거리 표시줄" -- mt
-L["For hunters, a strip on top of the game's swing timers that names the range band your target is in: Melee, Dead zone (too close to shoot, too far to strike), Shoot, or Too far. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "사냥꾼의 경우, 게임의 공격 타이머 위에 대상이 있는 사거리 구간을 표시하는 표시줄입니다: 근접, 사각지대(사격하기엔 너무 가깝고 근접 공격하기엔 너무 멂), 사격 또는 사거리 밖. 게임의 인터페이스 옵션과 편집 모드에서 공격 타이머가 표시되는 동안 나타납니다." -- mt
+L["Range strip"] = "사거리 표시줄"
+L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "게임의 공격 타이머 위에 표시되는 표시줄로, 근접 공격부터 가장 긴 사거리까지 어떤 공격이 대상을 사거리 안에 두는지 알려 주며, 최소 사거리 때문에 생기는 빈 구간은 사각지대로 표시합니다. 게임의 인터페이스 옵션과 편집 모드에서 공격 타이머가 표시되는 동안 나타납니다."
 L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
-L["Shoot"] = "사격" -- mt
 L["Too far"] = "사거리 밖" -- mt
