@@ -211,7 +211,7 @@ L["Spells you have not learned yet appear greyed out after the ones you know, as
 L["Starts a quest: %s"] = "開始任務：%s"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "一次拿走所有物品，不等待拾取視窗。僅在自動拾取生效時。"
 L["Target a creature for the nearest quest"] = "選取最近任務所需的生物"
-L["The band's name in its colour above the strip."] = "區段名稱以其顏色顯示在距離條上方。"
+L["The band's name in its colour under the strip."] = "區段名稱以其顏色顯示在距離條下方。"
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "鏡頭可以拉得比遊戲的「鏡頭最遠距離」設定更遠。關閉此功能後會恢復你之前的值。"
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Tweaks Forever更新後首次登入時，聊天視窗中會有一行說明有哪些變化。"
 L["The game itself"] = "遊戲本身" -- mt
@@ -307,7 +307,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s：%s 已過時。請
 L["%s could not start. Reinstall %s to fix this."] = "%s 無法啟動。請重新安裝 %s 以解決此問題。" -- mt
 
 L["Range strip"] = "距離條"
-L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "在遊戲揮擊計時器上方顯示一條距離條，標明你的哪些攻擊能觸及目標，從近戰一路到最遠的射程；最小射程留下的空檔會顯示為死區。只要揮擊計時器顯示（使用遊戲介面選項和編輯模式），它就會顯示。"
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "在遊戲揮擊計時器下方顯示一條距離條，標明你的哪些攻擊能觸及目標，從近戰一路到最遠的射程；最小射程留下的空檔會顯示為死區。只要揮擊計時器顯示（使用遊戲介面選項和編輯模式），它就會顯示。"
 L["Melee"] = "近戰" -- mt
 L["Dead zone"] = "死區" -- mt
 L["Too far"] = "過遠" -- mt

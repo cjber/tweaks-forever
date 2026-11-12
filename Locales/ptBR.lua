@@ -211,7 +211,7 @@ L["Spells you have not learned yet appear greyed out after the ones you know, as
 L["Starts a quest: %s"] = "Inicia uma missão: %s"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Pega tudo de uma vez em vez de esperar a janela de saque. Só quando o saque automático se aplica."
 L["Target a creature for the nearest quest"] = "Selecionar uma criatura para a missão mais próxima"
-L["The band's name in its colour above the strip."] = "O nome da faixa na sua cor acima da barra."
+L["The band's name in its colour under the strip."] = "O nome da faixa na sua cor abaixo da barra."
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "A câmera se afasta mais do que a opção Distância máxima da câmera do jogo permite. O valor que você tinha volta quando você desliga isto."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Na primeira vez que você entra depois que o Tweaks Forever é atualizado, uma linha no bate-papo diz o que mudou."
 L["The game itself"] = "O próprio jogo" -- mt
@@ -307,7 +307,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s estão desatuali
 L["%s could not start. Reinstall %s to fix this."] = "%s não pôde iniciar. Reinstale %s para corrigir isto." -- mt
 
 L["Range strip"] = "Faixa de alcance"
-L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Uma faixa sobre os cronômetros de golpe do jogo que indica quais dos seus ataques alcançam o alvo, do corpo a corpo até o seu maior alcance, com uma zona morta onde um alcance mínimo deixa uma lacuna. Ela aparece enquanto os cronômetros de golpe estiverem visíveis, com a opção de interface do jogo e o modo de edição."
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Uma faixa abaixo dos cronômetros de golpe do jogo que indica quais dos seus ataques alcançam o alvo, do corpo a corpo até o seu maior alcance, com uma zona morta onde um alcance mínimo deixa uma lacuna. Ela aparece enquanto os cronômetros de golpe estiverem visíveis, com a opção de interface do jogo e o modo de edição."
 L["Melee"] = "Corpo a corpo" -- mt
 L["Dead zone"] = "Zona morta" -- mt
 L["Too far"] = "Longe demais" -- mt

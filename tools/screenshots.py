@@ -570,11 +570,12 @@ def editmode(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).save(OUT / "editmode.png")
 
 
-# UI/RangeStrip.lua: a 20-high band label and 15-high segments over Blizzard's own swing timer bars, at their width,
-# each segment leading with its attack's icon as a square tile of the segment's height and 1 clear before its bar.
+# UI/RangeStrip.lua: segments 17 high over Blizzard's own swing timer bars, at their width, each segment leading with
+# its attack's icon as a square tile of the segment's height and 1 clear before its bar, with the 20-high band label
+# row under them.
 RANGE_BAR_W, RANGE_BAR_H, RANGE_BAR_GAP = 240, 15, 6
 RANGE_LABEL_H = 20
-RANGE_SEGMENT_H, RANGE_SEGMENT_GAP = 15, 3
+RANGE_SEGMENT_H, RANGE_SEGMENT_GAP = 17, 3
 RANGE_ICON_GAP = 1
 # UI/RangeStrip.lua's SEGMENT_TEXT_INSET: 3 clear on either side of a segment name.
 RANGE_TEXT_INSET = 3
@@ -697,13 +698,12 @@ def range_segments(names):
 
 
 def rangestrip_widget(ui, names, lit, label, colour):
-    """The strip in one band: its label above equal segments, each leading with its attack's icon, the lit one
-    filled in the band's colour."""
+    """The strip in one band: equal segments along its top, each leading with its attack's icon, the lit one filled
+    in the band's colour, and the band's name in its colour in the row under them."""
     segments = range_segments(names)
     segment_w = (RANGE_BAR_W - (len(segments) - 1) * RANGE_SEGMENT_GAP) / len(segments)
-    c = ui.canvas(RANGE_BAR_W, RANGE_LABEL_H + RANGE_SEGMENT_H)
-    c.text(0, 0, label, replace(RANGE_LABEL_FONT, color=colour), justify="CENTER", width=RANGE_BAR_W)
-    y = RANGE_LABEL_H
+    c = ui.canvas(RANGE_BAR_W, RANGE_SEGMENT_H + RANGE_LABEL_H)
+    y = 0
     for index, (name, icon) in enumerate(segments):
         sx = index * (segment_w + RANGE_SEGMENT_GAP)
         # The icon tile is the segment's height square, 1 clear of the bar, and only a segment with an attack has one.
@@ -738,16 +738,26 @@ def rangestrip_widget(ui, names, lit, label, colour):
             justify="CENTER",
             width=name_w,
         )
+    c.text(
+        0,
+        RANGE_SEGMENT_H,
+        label,
+        replace(RANGE_LABEL_FONT, color=colour),
+        box_height=RANGE_LABEL_H,
+        justify="CENTER",
+        width=RANGE_BAR_W,
+    )
     return c
 
 
 def rangestrip_state(ui, state):
-    """The strip in one band, docked 6 above the swing timers as UI/RangeStrip.lua docks it."""
+    """The strip in one band, 6 below the lowest shown swing timer as UI/RangeStrip.lua docks it."""
     label, colour, lit = state
     widget = rangestrip_widget(ui, RANGE_HUNTER, lit, label, colour)
-    c = ui.canvas(RANGE_BAR_W, widget.height + 6 + 2 * RANGE_BAR_H + RANGE_BAR_GAP)
-    c.paste(widget, 0, 0)
-    swing_timers(ui, c, widget.height + 6, lit)
+    timers = 2 * RANGE_BAR_H + RANGE_BAR_GAP
+    c = ui.canvas(RANGE_BAR_W, timers + 6 + widget.height)
+    swing_timers(ui, c, 0, lit)
+    c.paste(widget, 0, timers + 6)
     return c
 
 
@@ -760,21 +770,21 @@ def rangestrip(ui):
 
 
 def rangestrip_class_row(ui, class_name, names, lit):
-    """One class's strip docked on its Main Hand bar, its name in the class colour down the left."""
+    """One class's strip 6 below its Main Hand bar, its name in the class colour down the left."""
     label = names[lit]
     colour = RANGE_RED if label == "Dead zone" else RANGE_GREEN
     widget = rangestrip_widget(ui, names, lit, label, colour)
-    c = ui.canvas(RANGE_CLASS_W + RANGE_BAR_W, widget.height + 6 + RANGE_BAR_H)
+    c = ui.canvas(RANGE_CLASS_W + RANGE_BAR_W, RANGE_BAR_H + 6 + widget.height)
+    swing_bar(ui, c, RANGE_CLASS_W, 0, "Main Hand", "ui-swingtimerbar-filling-mainhand", 0, "0.0", True)
+    c.paste(widget, RANGE_CLASS_W, RANGE_BAR_H + 6)
     c.text(
         0,
-        0,
+        RANGE_BAR_H + 6,
         class_name.title(),
         Font(FRIZQT, 14, RAID_CLASS_COLORS[class_name], (1, -1)),
         box_height=widget.height,
         width=RANGE_CLASS_W - 12,
     )
-    c.paste(widget, RANGE_CLASS_W, 0)
-    swing_bar(ui, c, RANGE_CLASS_W, widget.height + 6, "Main Hand", "ui-swingtimerbar-filling-mainhand", 0, "0.0", True)
     return c
 
 

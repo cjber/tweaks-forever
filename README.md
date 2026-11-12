@@ -79,7 +79,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip.png" width="100%" alt="The range strip in each band, docked on the swing timers">
 </p>
 
-<p align="center">The range strip above the swing timers: melee, dead zone, auto shot and too far.</p>
+<p align="center">The range strip under the swing timers: melee, dead zone, auto shot and too far.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip-classes.png" width="100%" alt="The range strip for each class, docked on its Main Hand swing timer">

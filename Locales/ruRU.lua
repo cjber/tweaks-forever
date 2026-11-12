@@ -211,7 +211,7 @@ L["Spells you have not learned yet appear greyed out after the ones you know, as
 L["Starts a quest: %s"] = "Начинает задание: %s"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Забирает все сразу, не дожидаясь окна добычи. Только когда действует автоматический сбор добычи."
 L["Target a creature for the nearest quest"] = "Выбрать существо для ближайшего задания"
-L["The band's name in its colour above the strip."] = "Название зоны её цветом над полосой."
+L["The band's name in its colour under the strip."] = "Название зоны её цветом под полосой."
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "Камера отдаляется дальше, чем позволяет настройка игры «Максимальная дистанция камеры». Прежнее значение вернется, когда вы это выключите."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "При первом входе после обновления Tweaks Forever строка в чате сообщает, что изменилось."
 L["The game itself"] = "Сама игра" -- mt
@@ -307,7 +307,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s устарели
 L["%s could not start. Reinstall %s to fix this."] = "Не удалось запустить %s. Переустановите %s, чтобы исправить это." -- mt
 
 L["Range strip"] = "Полоса дальности"
-L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Полоса над таймерами ударов игры, показывающая, какие из ваших атак достают до цели — от ближнего боя до самой большой дальности, с мёртвой зоной там, где минимальная дальность оставляет разрыв. Показывается, пока видны таймеры ударов, с игровой опцией интерфейса и режимом редактирования."
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Полоса под таймерами ударов игры, показывающая, какие из ваших атак достают до цели — от ближнего боя до самой большой дальности, с мёртвой зоной там, где минимальная дальность оставляет разрыв. Показывается, пока видны таймеры ударов, с игровой опцией интерфейса и режимом редактирования."
 L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt

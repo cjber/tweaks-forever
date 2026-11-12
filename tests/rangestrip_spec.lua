@@ -1,6 +1,7 @@
--- Range strip (UI/RangeStrip.lua): each class's reaches from the client's own spell ranges, the band rule from
--- the nearest reach that answers true, the dead zone only when a shown reach has a minimum range, and a ticker
--- while Melee is not the answer. The file is compiled once, and a Load only gives it a fresh environment.
+-- Range strip (UI/RangeStrip.lua): each class's reaches from the client's own spell ranges, melee from the client's
+-- own spell range checks, the band rule from the nearest reach that answers true, the dead zone only when a shown
+-- reach has a minimum range, and a ticker while the strip shows. The file is compiled once, and a Load only gives it
+-- a fresh environment.
 local CHUNK = assert(loadfile("UI/RangeStrip.lua"))
 
 -- C_Spell's name and range answers for the spells these checks use, in yards, before any talent. A check moves one
@@ -76,7 +77,9 @@ function FontString.SetFontObject(self, object)
 	self.fontObject = object
 end
 function FontString.SetJustifyH() end
-function FontString.SetJustifyV() end
+function FontString.SetJustifyV(self, just)
+	self.justifyV = just
+end
 function FontString.SetHeight() end
 function FontString.SetWidth(self, width)
 	self.width = width
@@ -126,8 +129,8 @@ local Timer = {}
 function Timer.IsShown(self)
 	return self.shown
 end
-function Timer.GetTop(self)
-	return self.top
+function Timer.GetBottom(self)
+	return self.bottom
 end
 function Timer.GetEffectiveScale(self)
 	return self.scale
@@ -141,8 +144,8 @@ local function Load(class, knownSpells)
 	local settingChanged = {}
 
 	local tickers = {}
-	local enableRangeChecks, interactCalls = 0, 0
-	local melee, interact, target = true, true, true
+	local interactCalls = 0
+	local interact, target = true, true
 	local uiScale = 1
 	knownSpells = knownSpells or {}
 	local answers = {}
@@ -163,8 +166,8 @@ local function Load(class, knownSpells)
 		fontStrings = {},
 		textOrder = 0,
 	}, { __index = Strip })
-	local mainHand = setmetatable({ top = 300, shown = true, scale = 1, scripts = {} }, { __index = Timer })
-	local ranged = setmetatable({ top = 200, shown = true, scale = 1, scripts = {} }, { __index = Timer })
+	local mainHand = setmetatable({ bottom = 300, shown = true, scale = 1, scripts = {} }, { __index = Timer })
+	local ranged = setmetatable({ bottom = 200, shown = true, scale = 1, scripts = {} }, { __index = Timer })
 
 	local function interactCheck()
 		interactCalls = interactCalls + 1
@@ -216,16 +219,6 @@ local function Load(class, knownSpells)
 		UnitCanAttack = function()
 			return target
 		end,
-		Enum = { PlayerSwingType = { MainHand = 0, Ranged = 2 } },
-		C_SwingTimer = {
-			IsTargetWithinSwingRange = function(swingType)
-				assert(swingType == 0, "melee reads the main-hand swing")
-				return melee
-			end,
-			EnableRangeCheck = function()
-				enableRangeChecks = enableRangeChecks + 1
-			end,
-		},
 		CheckInteractDistance = interactCheck,
 		C_Spell = {
 			IsSpellInRange = function(spell)
@@ -306,14 +299,8 @@ local function Load(class, knownSpells)
 		mainHand = mainHand,
 		ranged = ranged,
 		tickers = tickers,
-		enableRangeChecks = function()
-			return enableRangeChecks
-		end,
 		interactCalls = function()
 			return interactCalls
-		end,
-		setMelee = function(value)
-			melee = value
 		end,
 		setInteract = function(value)
 			interact = value
@@ -382,7 +369,9 @@ local function joined(list)
 end
 
 -- The strip's shape: its width, the gap between segments, and an icon tile's own size and clear before the bar.
-local WIDTH, SEGMENT_GAP, TILE, ICON_GAP = 240, 3, 15, 1
+local WIDTH, SEGMENT_GAP, TILE, ICON_GAP = 240, 3, 17, 1
+-- The segments without icons are 15 high, and the band label row under them is 20.
+local PLAIN_SEGMENT, LABEL = 15, 20
 -- The hunter's three segments, equal across the strip.
 local SEGMENT_WIDTH = (WIDTH - 2 * SEGMENT_GAP) / 3
 
@@ -400,8 +389,9 @@ local function art(harness, index)
 	}
 end
 
--- The hunter's harness answers the model's questions directly, before its frame is initialized.
-local hunter = Load("HUNTER", { [75] = true })
+-- The hunter's harness answers the model's questions directly, before its frame is initialized: Auto Shot is a
+-- reach and Raptor Strike a known melee spell.
+local hunter = Load("HUNTER", { [75] = true, [2973] = true })
 local M = hunter.model
 
 -- The feature is on by default and lives on the Interface page, for every class.
@@ -409,7 +399,7 @@ local feature = hunter.features.rangeStrip
 assert(feature.default == true and feature.category == "Interface", "on by default on the Interface page")
 assert(feature.name == "Range strip", "named for every class")
 
--- Two options under it, both on by default: each segment's own icon, and the band's name above the strip.
+-- Two options under it, both on by default: each segment's own icon, and the band's name under the strip.
 local icons, label = hunter.features.rangeStripIcons, hunter.features.rangeStripLabel
 assert(icons and icons.parent == "rangeStrip" and icons.default == true, "icons on by default, under the strip")
 assert(
@@ -467,6 +457,41 @@ assert(M.MainHandTexture() == SWORD, "the main-hand weapon's icon heads Melee")
 hunter.setMainHand(nil)
 assert(M.MainHandTexture() == nil, "an empty main hand has no icon")
 hunter.setMainHand(SWORD)
+
+-- Melee reach from the class's own melee spells and the game's Attack: true from any that reaches, false when a
+-- known spell answered and none reaches, and nil when nothing answered. A spell the player has not learned is
+-- skipped, and an answer of nil decides nothing.
+local function said(map)
+	return function(spell)
+		return map[spell]
+	end
+end
+
+local warrior = known({ [78] = true })
+assert(M.Melee("WARRIOR", warrior, said({ [78] = true })) == true, "a melee spell that reaches is melee")
+assert(M.Melee("WARRIOR", warrior, said({ [78] = false })) == false, "every known spell out of reach is not melee")
+assert(M.Melee("WARRIOR", warrior, said({})) == nil, "a known spell that answered nothing decides nothing")
+assert(M.Melee("WARRIOR", known({}), said({ [78] = true })) == nil, "a spell the player has not learned is skipped")
+assert(
+	M.Melee("HUNTER", known({ [2974] = true }), said({ [2973] = true, [2974] = false })) == false,
+	"Raptor Strike is not learned, so its answer is skipped"
+)
+assert(
+	M.Melee("HUNTER", known({ [2973] = true, [2974] = true }), said({ [2974] = false })) == false,
+	"a melee spell that answered nothing leaves the other's false standing"
+)
+-- Attack is checked by every class, whether or not it has a melee spell of its own.
+assert(
+	M.Melee("WARRIOR", known({ [78] = true, [6603] = true }), said({ [78] = false, [6603] = true })) == true,
+	"Attack that reaches is melee"
+)
+assert(M.Melee("MAGE", known({}), said({ [6603] = true })) == nil, "Attack is skipped while it is not known")
+assert(M.Melee("MAGE", known({ [6603] = true }), said({ [6603] = true })) == true, "a class with only Attack")
+assert(M.Melee("MAGE", known({ [6603] = true }), said({ [6603] = false })) == false, "Attack out of reach")
+assert(
+	M.Melee("WARRIOR", known({ [78] = true, [6603] = true }), said({ [78] = false })) == false,
+	"Attack answering nothing leaves the melee spell's false standing"
+)
 
 -- The client's own ranges decide order and merging: equal maxima are one segment named by the first spell in table
 -- order, and a talent that extends one splits them.
@@ -549,7 +574,6 @@ assert(
 -- A hunter's strip: Melee, the Dead zone its Auto Shot minimum leaves, then Auto Shot.
 hunter.initializers[1]()
 for _, event in ipairs({
-	"PLAYER_SWING_RANGE_UPDATE",
 	"PLAYER_TARGET_CHANGED",
 	"PLAYER_EQUIPMENT_CHANGED",
 	"SPELLS_CHANGED",
@@ -565,24 +589,38 @@ assert(hunter.ranged.scripts.OnShow and hunter.ranged.scripts.OnHide and hunter.
 
 hunter.db.rangeStrip = true
 hunter.db.rangeStripIcons, hunter.db.rangeStripLabel = true, true
+hunter.setAnswer(2973, true)
 hunter.changed()
 assert(hunter.strip.shown, "on, the strip shows")
-assert(hunter.strip.points[1][2] == hunter.mainHand, "docked on the timer higher on screen")
-assert(hunter.strip.points[1][5] == 6, "6 above the timer")
+-- The game stacks its timers, so the strip docks under the lowest one: the Ranged timer, whose bottom is lower.
+assert(hunter.strip.points[1][2] == hunter.ranged, "docked under the timer lowest on screen")
+assert(hunter.strip.points[1][3] == "BOTTOMLEFT" and hunter.strip.points[1][5] == -6, "6 below the timer")
+assert(hunter.strip.points[2][3] == "BOTTOMRIGHT", "the strip takes the timer's width")
 assert(joined(segments(hunter)) == "Melee | Dead zone | Auto Shot", "hunter's three segments")
 assert(hunter.fontStrings[1].string == "Melee", "the band label")
+-- The band label is its own row under the segments, so it stays clear of the timers above.
+assert(
+	hunter.fontStrings[1].points[1][1] == "BOTTOMLEFT" and hunter.fontStrings[1].points[1][2] == hunter.strip,
+	"the band label sits under the segments"
+)
 -- Segment art is made in segment order: Melee, Dead zone, Auto Shot, six textures each.
 assert(art(hunter, 1).fill.shown and not art(hunter, 2).fill.shown and not art(hunter, 3).fill.shown, "only Melee lit")
-assert(#hunter.tickers == 0, "no ticker while Melee is lit")
+assert(
+	#hunter.tickers == 1 and hunter.tickers[1].interval == 0.2,
+	"a ticker runs while the strip shows, Melee included"
+)
 assert(hunter.interactCalls() == 0, "no 8-yard check while a reach answers")
 
 -- Icons on: a spell segment leads with its spell's icon, a square tile of the segment's height, and its bar
 -- starts 1 after the tile. Melee heads with the equipped weapon's icon, Auto Shot with its own, and Dead zone has
 -- no attack, so it keeps its whole width.
-assert(hunter.strip.height == 20 + TILE, "the label row above the taller segments")
+assert(hunter.strip.height == LABEL + TILE, "the label row under the 17-high segments")
 local meleeArt, deadArt, shotArt = art(hunter, 1), art(hunter, 2), art(hunter, 3)
 assert(meleeArt.icon.shown and meleeArt.icon.file == SWORD, "Melee leads with the main-hand weapon's icon")
-assert(meleeArt.icon.width == TILE and meleeArt.icon.points[1][4] == 0, "a square tile at the segment's left")
+assert(
+	meleeArt.icon.width == TILE and meleeArt.icon.height == TILE and meleeArt.icon.points[1][4] == 0,
+	"a square tile at the segment's left"
+)
 assert(meleeArt.background.points[1][4] == TILE + ICON_GAP, "Melee's bar starts after its tile")
 assert(shotArt.icon.shown and shotArt.icon.file == SPELL_ICONS[75], "Auto Shot leads with its own icon")
 assert(
@@ -594,25 +632,45 @@ assert(
 	shotArt.background.points[2][4] - shotArt.background.points[1][4] == SEGMENT_WIDTH - TILE - ICON_GAP,
 	"the bar takes the rest of the segment"
 )
+-- The segments sit at the strip's top, one tile high; the name is given the bar's height and both anchors, so the
+-- glyphs centre on the bar.
+assert(
+	meleeArt.background.points[1][5] == 0 and meleeArt.background.points[2][5] == LABEL,
+	"the segments take the strip's top, above the label row"
+)
+local meleeName = hunter.fontStrings[2]
+assert(
+	meleeName.points[1][1] == "TOPLEFT"
+		and meleeName.points[1][2] == meleeArt.background
+		and meleeName.points[1][4] == 3
+		and meleeName.points[2][1] == "BOTTOMRIGHT"
+		and meleeName.points[2][2] == meleeArt.background
+		and meleeName.points[2][4] == -3,
+	"the name spans its bar's height, 3 clear on either side"
+)
+assert(meleeName.justifyV == "MIDDLE", "the name is centred vertically on the bar")
 
--- The other shown timer is higher now, and the strip follows it.
-hunter.mainHand.top, hunter.ranged.top = 100, 400
+-- The other shown timer is lowest now, and the strip follows it.
+hunter.mainHand.bottom, hunter.ranged.bottom = 100, 400
 hunter.changed()
-assert(hunter.strip.points[1][2] == hunter.ranged, "the higher timer takes the strip")
+assert(hunter.strip.points[1][2] == hunter.mainHand, "the lower timer takes the strip")
 
--- Auto Shot reaches: its band is named and the ticker follows it until Melee reaches again.
-hunter.setMelee(false)
+-- Auto Shot reaches: its band is named by the spell while the ticker keeps running.
+hunter.setAnswer(2973, false)
 hunter.setAnswer(75, true)
 hunter.changed()
 assert(hunter.fontStrings[1].string == "Auto Shot", "the reach that answers names the band")
 assert(art(hunter, 3).fill.shown and not art(hunter, 1).fill.shown, "only the spell band is lit")
-assert(#hunter.tickers == 1 and hunter.tickers[1].interval == 0.2, "a ticker while a spell band is lit")
-hunter.setMelee(true)
+assert(#hunter.tickers == 1 and not hunter.tickers[1].cancelled, "the ticker keeps running in a spell band")
+hunter.setAnswer(2973, true)
 hunter.changed()
-assert(hunter.fontStrings[1].string == "Melee" and hunter.tickers[1].cancelled, "the ticker stops once Melee reaches")
+assert(
+	hunter.fontStrings[1].string == "Melee" and not hunter.tickers[1].cancelled,
+	"the ticker runs in Melee too, which no event reports"
+)
 
 -- Out of reach but inside 8 yards: the Dead zone. Beyond it: Too far. With no 8-yard answer: no label at all.
-hunter.setMelee(false)
+hunter.setAnswer(2973, false)
 hunter.setAnswer(75, false)
 hunter.setInteract(true)
 hunter.changed()
@@ -628,7 +686,7 @@ assert(not hunter.fontStrings[1].shown, "no label when the 8-yard check answered
 -- No attackable target hides the strip and stops the ticker.
 hunter.setTarget(false)
 hunter.changed()
-assert(not hunter.strip.shown and hunter.tickers[2].cancelled, "no strip and no ticker without a target")
+assert(not hunter.strip.shown and hunter.tickers[1].cancelled, "no strip and no ticker without a target")
 
 -- No shown timer hides it too.
 hunter.setTarget(true)
@@ -636,32 +694,33 @@ hunter.mainHand.shown, hunter.ranged.shown = false, false
 hunter.changed()
 assert(not hunter.strip.shown, "no strip without a shown timer")
 
--- With a timer again the strip takes its timer's scale, and with nothing beyond Melee it hides.
+-- With a timer again the strip takes its timer's scale and starts a fresh ticker.
 hunter.ranged.shown = true
 hunter.ranged.scale = 0.7
 hunter.setUIScale(0.5)
-hunter.setMelee(true)
+hunter.setAnswer(2973, true)
 hunter.changed()
 assert(hunter.strip.shown and math.abs(hunter.strip.scale - 1.4) < 1e-9, "the strip takes its timer's scale")
+assert(#hunter.tickers == 2 and not hunter.tickers[2].cancelled, "shown again, a new ticker starts")
 
--- The band label off: no label and no 20-unit row, so the segments take the strip's top and it still docks 6
--- above the timer, while the tiles keep their height.
+-- The band label off: no label and no 20-unit row, so the segments fill the strip and it still docks 6 below the
+-- timer, while the tiles keep their height.
 hunter.db.rangeStripLabel = false
 hunter.changed("rangeStripLabel")
 assert(not hunter.fontStrings[1].shown, "no band label")
 assert(hunter.strip.height == TILE, "the label row is gone")
 assert(art(hunter, 1).background.points[1][5] == 0, "the segments take the strip's top")
-assert(hunter.strip.points[1][5] == 6, "still 6 above the timer")
+assert(hunter.strip.points[1][5] == -6, "still 6 below the timer")
 hunter.db.rangeStripLabel = true
 hunter.changed("rangeStripLabel")
-assert(hunter.fontStrings[1].shown and hunter.strip.height == 20 + TILE, "the label row comes back")
+assert(hunter.fontStrings[1].shown and hunter.strip.height == LABEL + TILE, "the label row comes back")
 
--- Icons off: 13-high segments with no tile, so each bar takes its whole segment, and changing the option lays the
+-- Icons off: 15-high segments with no tile, so each bar takes its whole segment, and changing the option lays the
 -- strip out at once.
 hunter.db.rangeStripIcons = false
 hunter.changed("rangeStripIcons")
 assert(not art(hunter, 1).icon.shown and not art(hunter, 3).icon.shown, "no tiles with icons off")
-assert(hunter.strip.height == 20 + 13, "13-high segments without icons")
+assert(hunter.strip.height == LABEL + PLAIN_SEGMENT, "15-high segments without icons")
 assert(
 	art(hunter, 1).background.points[1][4] == 0
 		and art(hunter, 3).background.points[1][4] == 2 * (SEGMENT_WIDTH + SEGMENT_GAP),
@@ -690,14 +749,13 @@ assert(art(hunter, 1).icon.file == SWORD, "the weapon is back")
 hunter.setKnown(75, false)
 hunter.handlers.SPELLS_CHANGED()
 assert(not hunter.strip.shown, "no strip with nothing beyond Melee")
-assert(hunter.enableRangeChecks() == 0, "never calls the game's EnableRangeCheck")
+assert(hunter.tickers[2].cancelled, "hiding the strip stops the ticker")
 
 -- The mage's reaches, near to far, and no gap: the game's own bands name the nearest reach.
 local mage = Load("MAGE", { [2136] = true, [116] = true, [133] = true })
 mage.initializers[1]()
 mage.db.rangeStrip = true
 mage.db.rangeStripIcons, mage.db.rangeStripLabel = true, true
-mage.setMelee(false)
 mage.setAnswer(2136, true)
 mage.changed()
 assert(joined(segments(mage)) == "Melee | Fire Blast | Frostbolt | Fireball", "the mage's reaches near to far")
@@ -710,8 +768,8 @@ mage.handlers.CHARACTER_POINTS_CHANGED()
 assert(joined(segments(mage)) == "Melee | Frostbolt | Fire Blast", "a talent reorders and merges the mage strip")
 assert(mage.fontStrings[1].string == "Fire Blast", "the talented reach still names the band")
 assert(
-	mage.fontStrings[2].width == SEGMENT_WIDTH - TILE - ICON_GAP - 6,
-	"the narrower row is laid out again, each name inside its bar"
+	mage.fontStrings[2].points[1][4] == 3 and mage.fontStrings[2].points[2][4] == -3,
+	"the narrower row is laid out again, each name 3 clear inside its bar"
 )
 
 print("rangestrip: ok")

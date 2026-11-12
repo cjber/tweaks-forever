@@ -211,7 +211,7 @@ L["Spells you have not learned yet appear greyed out after the ones you know, as
 L["Starts a quest: %s"] = "Beginnt eine Quest: %s"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "Nimmt alles auf einmal, statt auf das Beutefenster zu warten. Nur wenn Schnell-Plündern greift."
 L["Target a creature for the nearest quest"] = "Kreatur für die nächste Quest anvisieren"
-L["The band's name in its colour above the strip."] = "Der Name des Bereichs in seiner Farbe über der Leiste."
+L["The band's name in its colour under the strip."] = "Der Name des Bereichs in seiner Farbe unter der Leiste."
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "Die Kamera zieht weiter zurück, als die Einstellung „Max. Kameraentfernung“ des Spiels erlaubt. Euer vorheriger Wert kehrt zurück, wenn Ihr dies ausschaltet."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Beim ersten Einloggen nach einem Update von Tweaks Forever sagt eine Chatzeile, was sich geändert hat."
 L["The game itself"] = "Das Spiel selbst" -- mt
@@ -307,7 +307,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s sind veraltet. A
 L["%s could not start. Reinstall %s to fix this."] = "%s konnte nicht starten. Installiere %s neu, um dies zu beheben." -- mt
 
 L["Range strip"] = "Reichweitenleiste"
-L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Ein Streifen über den Schwung-Timern des Spiels, der nennt, welche Eurer Angriffe Euer Ziel erreichen, vom Nahkampf bis zu Eurer größten Reichweite, mit einem Toten Bereich, wo eine Mindestreichweite eine Lücke lässt. Er erscheint, solange die Schwung-Timer angezeigt werden, mit der Option des Spiels unter Interface und im Editiermodus."
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Ein Streifen unter den Schwung-Timern des Spiels, der nennt, welche Eurer Angriffe Euer Ziel erreichen, vom Nahkampf bis zu Eurer größten Reichweite, mit einem Toten Bereich, wo eine Mindestreichweite eine Lücke lässt. Er erscheint, solange die Schwung-Timer angezeigt werden, mit der Option des Spiels unter Interface und im Editiermodus."
 L["Melee"] = "Nahkampf" -- mt
 L["Dead zone"] = "Toter Bereich" -- mt
 L["Too far"] = "Zu weit" -- mt

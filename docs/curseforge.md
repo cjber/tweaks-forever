@@ -24,7 +24,7 @@ Nameplates in retail's own frame, with your target outlined.
 
 ![The range strip in each band, docked on the swing timers](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip.png)
 
-The range strip above the swing timers: melee, dead zone, auto shot and too far.
+The range strip under the swing timers: melee, dead zone, auto shot and too far.
 
 These images are generated previews of the Tweaks UI.
 

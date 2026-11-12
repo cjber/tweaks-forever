@@ -211,7 +211,7 @@ L["Spells you have not learned yet appear greyed out after the ones you know, as
 L["Starts a quest: %s"] = "퀘스트 시작: %s"
 L["Takes everything at once instead of waiting for the loot window. Only while auto loot applies."] = "전리품 창을 기다리지 않고 한 번에 모두 가져옵니다. 자동 전리품 획득이 적용될 때만 작동합니다."
 L["Target a creature for the nearest quest"] = "가장 가까운 퀘스트의 몬스터 대상 지정"
-L["The band's name in its colour above the strip."] = "구간의 이름을 해당 색으로 표시줄 위에 표시합니다."
+L["The band's name in its colour under the strip."] = "구간의 이름을 해당 색으로 표시줄 아래에 표시합니다."
 L["The camera pulls back further than the game's own Max Camera Distance setting allows. The value you had before is put back when you switch this off."] = "게임의 최대 시야 거리 설정보다 시점이 더 멀리 물러납니다. 이 기능을 끄면 이전 값으로 돌아갑니다."
 L["The first time you log in after Tweaks Forever updates, one line in chat says what changed."] = "Tweaks Forever가 업데이트된 뒤 처음 접속하면 대화창에 무엇이 바뀌었는지 한 줄로 알려 줍니다."
 L["The game itself"] = "게임 자체" -- mt
@@ -307,7 +307,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s 버전이 오래
 L["%s could not start. Reinstall %s to fix this."] = "%s을(를) 시작할 수 없습니다. 문제를 해결하려면 %s을(를) 다시 설치하세요." -- mt
 
 L["Range strip"] = "사거리 표시줄"
-L["A strip on top of the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "게임의 공격 타이머 위에 표시되는 표시줄로, 근접 공격부터 가장 긴 사거리까지 어떤 공격이 대상을 사거리 안에 두는지 알려 주며, 최소 사거리 때문에 생기는 빈 구간은 사각지대로 표시합니다. 게임의 인터페이스 옵션과 편집 모드에서 공격 타이머가 표시되는 동안 나타납니다."
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "게임의 공격 타이머 아래에 표시되는 표시줄로, 근접 공격부터 가장 긴 사거리까지 어떤 공격이 대상을 사거리 안에 두는지 알려 주며, 최소 사거리 때문에 생기는 빈 구간은 사각지대로 표시합니다. 게임의 인터페이스 옵션과 편집 모드에서 공격 타이머가 표시되는 동안 나타납니다."
 L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt

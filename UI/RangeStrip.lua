@@ -13,7 +13,7 @@ ns.Feature({
 	key = KEY,
 	category = "Interface",
 	name = "Range strip",
-	tooltip = "A strip on top of the game's swing timers naming which of your attacks reach your target, from "
+	tooltip = "A strip under the game's swing timers naming which of your attacks reach your target, from "
 		.. "melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the "
 		.. "swing timers show, with the game's own Interface option and Edit Mode.",
 	default = true,
@@ -32,7 +32,7 @@ ns.Feature({
 	key = LABEL_KEY,
 	category = "Interface",
 	name = "Show band label",
-	tooltip = "The band's name in its colour above the strip.",
+	tooltip = "The band's name in its colour under the strip.",
 	default = true,
 	parent = KEY,
 })
@@ -54,9 +54,9 @@ local UNLIT_R, UNLIT_G, UNLIT_B = 0.5, 0.5, 0.5
 -- How far an unlit segment's icon tile is darkened: black over it at 0.6, leaving its colour at 40%.
 local UNLIT_DIM = 0.6
 
--- The strip's shape, from the game's swing timer bars: a 20-high band label above segments with a square icon tile
--- at their left (15 high with icons, 13 without), 3-wide gaps, and 6 between the strip and the timer below it.
-local LABEL_HEIGHT, SEGMENT_HEIGHT, ICON_SEGMENT_HEIGHT, SEGMENT_GAP, DOCK_GAP = 20, 13, 15, 3, 6
+-- The strip's shape, from the game's swing timer bars: segments with a square icon tile at their left (17 high with
+-- icons, 15 without), 3-wide gaps, a 20-high band label under them, and 6 between the timer and the strip below it.
+local LABEL_HEIGHT, SEGMENT_HEIGHT, ICON_SEGMENT_HEIGHT, SEGMENT_GAP, DOCK_GAP = 20, 15, 17, 3, 6
 -- The clear between a segment's icon tile and its bar.
 local ICON_GAP = 1
 local SEGMENT_INSET_X, SEGMENT_INSET_Y = 4, 3
@@ -103,6 +103,22 @@ local RANGED_REACH = {
 	WARRIOR = true,
 	ROGUE = true,
 }
+
+-- The melee spells each class checks its melee reach with: attack spells whose own range is the game's Combat Range,
+-- 5 yards. The druid's two are form spells, which answer nothing outside their form. The other classes name no melee
+-- attack of their own.
+---@type table<string, integer[]>
+local MELEE_SPELLS = {
+	WARRIOR = { 78 }, -- Heroic Strike
+	ROGUE = { 1752 }, -- Sinister Strike
+	HUNTER = { 2973, 2974, 1495 }, -- Raptor Strike, Wing Clip, Mongoose Bite
+	DRUID = { 1082, 6807 }, -- Claw, Maul
+}
+-- The game's own Attack, which every class also checks. It is no spellbook entry, so the client may not list it as
+-- known or answer it: a true from it is melee reach, and an answer of nothing decides nothing, as any nil does.
+local ATTACK_SPELL = 6603
+-- A class that names no melee spell of its own still checks Attack, so the loop never allocates.
+local NO_SPELLS = {}
 
 ---@class TFRangeReach
 ---@field key string
@@ -304,18 +320,41 @@ function Model.Reaches(class, known, rangedSpell, range)
 	return reaches
 end
 
--- Melee reach from the game's own swing check. Nil is no answer, never out of range.
----@param swingType Enum.PlayerSwingType
+-- Melee reach from the melee spells the player knows: true when any of them reaches, false when none does and at
+-- least one answered, and nil when none answered or none is known, which decides nothing, as before. A spell the
+-- player has not learned is skipped, and an answer of nil decides nothing either. The class's own spells are asked
+-- first, then the game's Attack.
+---@param class string
+---@param known fun(spell: integer): boolean
+---@param check fun(spell: integer): boolean?
 ---@return boolean?
-function Model.Reach(swingType)
-	if not (C_SwingTimer and C_SwingTimer.IsTargetWithinSwingRange) then
-		return nil
+function Model.Melee(class, known, check)
+	local answeredFalse = false
+	local function Reaches(spell)
+		if not known(spell) then
+			return false
+		end
+		local answer = check(spell)
+		if answer == true then
+			return true
+		end
+		if answer ~= nil then
+			answeredFalse = true
+		end
+		return false
 	end
-	local ok, inRange = pcall(C_SwingTimer.IsTargetWithinSwingRange, swingType)
-	if not ok then
-		return nil
+	for _, spell in ipairs(MELEE_SPELLS[class] or NO_SPELLS) do
+		if Reaches(spell) then
+			return true
+		end
 	end
-	return ns.Readable(inRange)
+	if Reaches(ATTACK_SPELL) then
+		return true
+	end
+	if answeredFalse then
+		return false
+	end
+	return nil
 end
 
 -- Whether the target is within 8 yards, the game's own interact distance. The minimum-range shots players meet
@@ -396,9 +435,6 @@ ns.Init(function()
 	if not class or not REACHES[class] then
 		return
 	end
-	if not (C_SwingTimer and Enum.PlayerSwingType) then
-		return
-	end
 	if not (C_Spell and C_Spell.IsSpellInRange and C_Spell.GetSpellName) then
 		return
 	end
@@ -422,13 +458,13 @@ ns.Init(function()
 	strip:Hide()
 
 	-- The game's own font objects, as its swing timers use: they carry the font this locale can render, and its
-	-- shadow, so no glyph comes out missing.
+	-- shadow, so no glyph comes out missing. The band label is a row under the segments, clear of the timers above.
 	local label = strip:CreateFontString(nil, "OVERLAY")
 	label:SetFontObject(GameFontNormal)
 	label:SetJustifyH("CENTER")
 	label:SetJustifyV("MIDDLE")
-	label:SetPoint("TOPLEFT", strip, "TOPLEFT", 0, 0)
-	label:SetPoint("TOPRIGHT", strip, "TOPRIGHT", 0, 0)
+	label:SetPoint("BOTTOMLEFT", strip, "BOTTOMLEFT", 0, 0)
+	label:SetPoint("BOTTOMRIGHT", strip, "BOTTOMRIGHT", 0, 0)
 	label:SetHeight(LABEL_HEIGHT)
 	label:Hide()
 
@@ -501,26 +537,26 @@ ns.Init(function()
 	-- The band lit now, so a layout can dim every other segment's icon.
 	local litBand
 
-	-- The strip's two rows: a 20-high band label only while it is on, above segments 15 high with icons and 13
-	-- without.
-	---@return number top
+	-- The strip's two rows: segments 17 high with icons and 15 without, and a 20-high band label under them only
+	-- while the label option is on.
 	---@return number segmentHeight
+	---@return number height
 	local function Geometry()
 		local segmentHeight = ns.Active(ICONS_KEY) and ICON_SEGMENT_HEIGHT or SEGMENT_HEIGHT
-		return ns.Active(LABEL_KEY) and LABEL_HEIGHT or 0, segmentHeight
+		return segmentHeight, segmentHeight + (ns.Active(LABEL_KEY) and LABEL_HEIGHT or 0)
 	end
 
-	-- Equal segments across the timer's width, each starting with its segment's icon tile while icons are on, with
-	-- its fill inset 4 x 3 and its name clipped to the bar's width: never wrapping, so a long name ends in an
-	-- ellipsis inside its own band.
+	-- Equal segments across the timer's width, along the strip's top, each starting with its segment's icon tile while
+	-- icons are on, with its fill inset 4 x 3 and its name given the bar's height and clipped to its width: never
+	-- wrapping, so a long name ends in an ellipsis inside its own band.
 	local function Layout()
 		local width = strip:GetWidth()
 		if not width or width <= 0 or #shown == 0 then
 			return
 		end
-		local top, segmentHeight = Geometry()
+		local segmentHeight, height = Geometry()
 		local icons = ns.Active(ICONS_KEY)
-		strip:SetHeight(top + segmentHeight)
+		strip:SetHeight(height)
 		local segmentWidth = (width - (#shown - 1) * SEGMENT_GAP) / #shown
 		for index, widget in ipairs(shown) do
 			local left = (index - 1) * (segmentWidth + SEGMENT_GAP)
@@ -530,20 +566,20 @@ ns.Init(function()
 			local barWidth = segmentWidth - (barLeft - left)
 			for _, texture in ipairs({ widget.background, widget.border }) do
 				texture:ClearAllPoints()
-				texture:SetPoint("TOPLEFT", strip, "TOPLEFT", barLeft, -top)
-				texture:SetPoint("BOTTOMRIGHT", strip, "BOTTOMLEFT", barLeft + barWidth, 0)
+				texture:SetPoint("TOPLEFT", strip, "TOPLEFT", barLeft, 0)
+				texture:SetPoint("BOTTOMRIGHT", strip, "BOTTOMLEFT", barLeft + barWidth, height - segmentHeight)
 			end
 			widget.fill:ClearAllPoints()
 			widget.fill:SetPoint("TOPLEFT", widget.background, "TOPLEFT", SEGMENT_INSET_X, -SEGMENT_INSET_Y)
 			widget.fill:SetPoint("BOTTOMRIGHT", widget.background, "BOTTOMRIGHT", -SEGMENT_INSET_X, SEGMENT_INSET_Y)
 			widget.text:ClearAllPoints()
-			widget.text:SetPoint("CENTER", widget.background, "CENTER", 0, 0)
-			widget.text:SetWidth(barWidth - 2 * SEGMENT_TEXT_INSET)
+			widget.text:SetPoint("TOPLEFT", widget.background, "TOPLEFT", SEGMENT_TEXT_INSET, 0)
+			widget.text:SetPoint("BOTTOMRIGHT", widget.background, "BOTTOMRIGHT", -SEGMENT_TEXT_INSET, 0)
 			if iconFile then
 				ns.Art.Icon(widget.icon, iconFile, tile)
 				for _, texture in ipairs({ widget.icon, widget.dim, widget.iconFrame }) do
 					texture:ClearAllPoints()
-					texture:SetPoint("TOPLEFT", strip, "TOPLEFT", left, -top)
+					texture:SetPoint("TOPLEFT", strip, "TOPLEFT", left, 0)
 				end
 				widget.dim:SetSize(tile, tile)
 				widget.iconFrame:SetSize(tile, tile)
@@ -586,7 +622,7 @@ ns.Init(function()
 		end
 	end
 
-	-- The band named above the strip, and its segment lit: white when lit, grey otherwise, and no segment at all
+	-- The band named under the strip, and its segment lit: white when lit, grey otherwise, and no segment at all
 	-- for Too far or when the game gave no answer. The label row only exists while the label option is on.
 	---@param band string?
 	---@param segments TFRangeSegment[]
@@ -624,17 +660,17 @@ ns.Init(function()
 		end
 	end
 
-	-- The shown timer higher on screen, which the strip sits on top of.
-	local function ShownTimer()
-		local highest
+	-- The shown timer lowest on screen, which the strip docks under.
+	local function LowestTimer()
+		local lowest
 		for _, timer in ipairs(timers) do
 			if timer:IsShown() then
-				if not highest or (timer:GetTop() or 0) > (highest:GetTop() or 0) then
-					highest = timer
+				if not lowest or (timer:GetBottom() or 0) < (lowest:GetBottom() or 0) then
+					lowest = timer
 				end
 			end
 		end
-		return highest
+		return lowest
 	end
 
 	local docked
@@ -707,7 +743,7 @@ ns.Init(function()
 		for _, segment in ipairs(spellSegments) do
 			segments[#segments + 1] = segment
 		end
-		local band = Model.Band(Model.Reach(Enum.PlayerSwingType.MainHand), reaches, Model.Interact)
+		local band = Model.Band(Model.Melee(class, Model.Known, Model.Check), reaches, Model.Interact)
 		return band, segments
 	end
 
@@ -738,7 +774,7 @@ ns.Init(function()
 			Hide()
 			return
 		end
-		local timer = ShownTimer()
+		local timer = LowestTimer()
 		if not timer then
 			Hide()
 			return
@@ -746,8 +782,8 @@ ns.Init(function()
 		if docked ~= timer then
 			docked = timer
 			strip:ClearAllPoints()
-			strip:SetPoint("BOTTOMLEFT", timer, "TOPLEFT", 0, DOCK_GAP)
-			strip:SetPoint("BOTTOMRIGHT", timer, "TOPRIGHT", 0, DOCK_GAP)
+			strip:SetPoint("TOPLEFT", timer, "BOTTOMLEFT", 0, -DOCK_GAP)
+			strip:SetPoint("TOPRIGHT", timer, "BOTTOMRIGHT", 0, -DOCK_GAP)
 		end
 		-- The timer's own scale, relative to the strip's parent.
 		local parentScale = UIParent:GetEffectiveScale()
@@ -766,13 +802,9 @@ ns.Init(function()
 			laidOut = signature
 			Layout()
 		end
-		-- No swing event fires while Melee cannot be named, and walking between two spell bands fires none either,
-		-- so the ticker follows every band except Melee.
-		if band ~= MELEE then
-			StartTicker()
-		else
-			StopTicker()
-		end
+		-- No event says when melee reach changes now, and walking between two spell bands fires none either, so the
+		-- ticker runs while the strip shows, whatever band it names.
+		StartTicker()
 	end
 
 	strip:SetScript("OnSizeChanged", Layout)
@@ -788,7 +820,6 @@ ns.Init(function()
 	ns.OnSettingChanged(KEY, Update)
 	ns.OnSettingChanged(ICONS_KEY, Update)
 	ns.OnSettingChanged(LABEL_KEY, Update)
-	ns.On("PLAYER_SWING_RANGE_UPDATE", Update)
 	ns.On("PLAYER_TARGET_CHANGED", Update)
 	-- A learned spell, a talent point, a level or the ranged slot moves a range or adds a reach. The segments are
 	-- rebuilt from the client's current ranges, and only a changed list lays the strip out again.
