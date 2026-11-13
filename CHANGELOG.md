@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- Tweaks no longer ships its own copy of the Auction House tab library, because Auctionator now brings a newer one itself. Nothing changes for players.
+
 ## [2.7.0] - 2026-11-13
 
 <!-- discord-image: docs/screenshots/chat.png -->
@@ -20,7 +22,6 @@ optional `### For addon authors` subsection after a version's player bullets.
 - **Your chat survives a reload.** The last 200 lines of each docked chat window come back above a Before your /reload line, saved for that character only and never for a line the game keeps secret. The Chat page also opens the game's own Chat Timestamps setting.
 - **Whisper tabs and a player card.** Each person who whispers you gets the game's own docked tab, with a count of whispers you have not read yet and a grey line saying when you last grouped with them. Hovering a player's name in chat shows what the game states exactly: level, race and class when it knows them, guild and zone from your own lists, your last group together and your whisper count. Nothing is sent to other players, and every switch is off until you turn it on.
 - **Link an item from your bags while you type.** Typing [ and a few letters in any chat box lists the items in your bags whose name contains those letters, up to eight, each with its icon and quality colour. Up and Down or Tab choose one, Enter puts in the item's real link and sends the line, a click puts it in so you can keep typing. The list is built when your bags change, not on every keystroke.
-- Tweaks no longer ships its own copy of the Auction House tab library, because Auctionator now brings a newer one itself. Nothing changes for players.
 
 ## [2.6.12] - 2026-11-12
 
