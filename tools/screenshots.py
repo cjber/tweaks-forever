@@ -14,7 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image, ImageChops  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
+from PIL import Image, ImageChops  # Pillow comes from the uv dev group
 
 FOREVER_CORE = Path(os.environ.get("FOREVER_CORE", Path(__file__).resolve().parents[2] / "forever-core")).expanduser()
 WOWMOCK = FOREVER_CORE / "tools" / "wowmock"
