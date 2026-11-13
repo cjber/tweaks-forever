@@ -4,6 +4,7 @@ exclude_files = { "forever-core/**", "tools/.cache/**", ".release/**", ".types/*
 ignore = { "212/_.*" } -- unused args prefixed with _
 globals = {
 	"BINDING_HEADER_TWEAKSFOREVER",
+	"ChatEdit_CustomTabPressed",
 	"ForeverMapMarkers",
 	"SLASH_TWEAKSFOREVER1",
 	"SLASH_TWEAKSFOREVER2",
@@ -25,7 +26,6 @@ read_globals = {
 	"AcceptGroup",
 	"AtlasMaps",
 	"AuctionHouseFrame",
-	"AuctionHouseFrameDisplayMode",
 	"BattlefieldMapFrame",
 	"BNET_CLIENT_WOW",
 	"BNGetNumFriends",
@@ -40,9 +40,6 @@ read_globals = {
 	"GetNormalizedRealmName",
 	"GetNumGuildMembers",
 	"IsGuildMember",
-	"PanelTemplates_SelectTab",
-	"PanelTemplates_DeselectTab",
-	"PanelTemplates_TabResize",
 	"WillAcceptInviteRemoveQueues",
 	"GetActiveLevel",
 	"GetAvailableLevel",
@@ -51,7 +48,6 @@ read_globals = {
 	"QuestFrameGreetingPanel",
 	"QuestInfoTitleHeader",
 	"WOW_PROJECT_ID",
-	"WOW_PROJECT_MAINLINE",
 	"GetQuestID",
 	"QuestScrollFrame",
 	"QuestMapFrame",
@@ -117,6 +113,29 @@ read_globals = {
 	"CHARACTER_FRAME_WIDTH",
 	"ChatFrameUtil",
 	"CheckInteractDistance",
+	"CHAT_FRAMES",
+	"AutoCompleteBox",
+	"FCFDock_GetChatFrames",
+	"FCFDock_GetSelectedWindow",
+	"FCF_SetTemporaryWindowType",
+	"FCF_Tab_OnClick",
+	"FriendsListUtil",
+	"GENERAL_CHAT_DOCK",
+	"GetGuildInfo",
+	"GetItemIcon",
+	"LASTONLINE_DAYS",
+	"LASTONLINE_HOURS",
+	"LASTONLINE_MINUTES",
+	"LASTONLINE_SECS",
+	"RAID_CLASS_COLORS",
+	"GetNumGroupMembers",
+	"IsInRaid",
+	"LinkProcessorResponse",
+	"LinkUtil",
+	"TIMESTAMPS_LABEL",
+	"time",
+	"Ambiguate",
+	"CreateAtlasMarkup",
 	"ClassTrainerFrame",
 	"ClassTrainerTrainButton",
 	"ClearOverrideBindings",
@@ -260,6 +279,9 @@ read_globals = {
 	"NineSliceUtil",
 	"NORMAL_FONT_COLOR",
 	"NUM_TOTAL_EQUIPPED_BAG_SLOTS",
+	"NUM_BAG_SLOTS",
+	"BACKPACK_CONTAINER",
+	"ITEM_QUALITY_COLORS",
 	"ObjectiveTrackerFrame",
 	"OpenMap",
 	"OpenMapDB",
@@ -367,9 +389,6 @@ read_globals = {
 -- A translation's lines are as long as its phrases.
 files["Locales/*.lua"] = { max_line_length = false }
 
-files["LibAHTab/LibStub/LibStub.lua"] =
-	{ read_globals = { "strmatch" }, max_line_length = 140 }
-files["LibAHTab/LibAHTab.lua"] = { ignore = { "212/self" } }
 files["tests/map_canvas_spec.lua"] = {
 	globals = {
 		"BattlefieldMapFrame",
@@ -388,20 +407,6 @@ files["tests/map_canvas_spec.lua"] = {
 		"hooksecurefunc",
 		"SoftCursor",
 		"WorldMapFrame",
-	},
-}
-files["tests/auctionator_spec.lua"] = {
-	globals = {
-		"strmatch",
-		"WOW_PROJECT_ID",
-		"WOW_PROJECT_MAINLINE",
-		"CreateFrame",
-		"PanelTemplates_DeselectTab",
-		"PanelTemplates_SelectTab",
-		"PanelTemplates_TabResize",
-		"hooksecurefunc",
-		"AuctionHouseFrameDisplayMode",
-		"AuctionHouseFrame",
 	},
 }
 -- UI/Settings.lua: the client's secure delegate for its settings rows.

@@ -8,8 +8,6 @@ refresh that moves the pin never leaves this file behind. The addon itself is GP
 
 | Input | Used for | Pin | Licence |
 |---|---|---|---|
-| [LibAHTab](https://github.com/TheMouseNest/LibAHTab), adapted | The `LibAHTab` child addon that keeps Auctionator's tabs working on Forever's auction house (`LibAHTab/README.md` lists the changes) | Upstream commit and library revision 4, named in `LibAHTab/README.md` | MIT (`LibAHTab/LICENSE`, plusmouse) |
-| [LibStub](https://www.wowace.com/projects/libstub) | Loads LibAHTab (`LibAHTab/LibStub/LibStub.lua`) | Its revision 103 header, minor version 2 | Public domain |
 | WoW: Forever client tables, via [wago.tools](https://wago.tools) | Camp benefits, dungeon entrances, Forever's new quests, map overlays, zone levels and class spell ranks in `Data/*.lua` | `BUILD` in each `tools/gen_*.py` | Blizzard Entertainment's game data |
 | Classic Era client tables, via wago.tools | Which quests Forever added (`Data/ForeverQuests.lua`), and which spell each trainer's teaching spell gives (`Data/ClassSpells.lua`) | `ERA_BUILD` in `tools/gen_foreverquests.py`; `TEACH_BUILD` in `tools/gen_classspells.py` | Blizzard Entertainment's game data |
 | [CMaNGOS classic-db](https://github.com/cmangos/classic-db) | Class trainer lists in `Data/ClassSpells.lua` | `CLASSICDB_COMMIT` in `tools/gen_classspells.py` | GPL-3.0 |
@@ -22,7 +20,6 @@ refresh that moves the pin never leaves this file behind. The addon itself is GP
 | Input | Used for | Licence |
 |---|---|---|
 | Questie and QuestieDB, if installed | Quest givers, objectives and quest progress | QuestieDB carries no licence; nothing is copied |
-| Auctionator, if installed | The auction house tabs LibAHTab keeps working | Its own; nothing is copied |
 | Shortest Path Forever, if installed | Travel to a clicked map point or dungeon entrance, through its public API | GPL-3.0-or-later |
 | [Polestar](https://github.com/fitzforge/polestar), [OpenMap](https://github.com/jiforever/wowforever-openmap), Leatrix Plus, Leatrix Maps, Mapster and the other addons named in `docs/features.md#works-alongside`, if installed | Whether one of them already does a feature's job, read from its loaded state or settings (`Polestar.Get`, OpenMap's and Leatrix's saved options), so the feature steps aside | Their own (Polestar GPL-3.0, OpenMap MIT); nothing is copied |
 

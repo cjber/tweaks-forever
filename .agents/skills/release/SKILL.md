@@ -107,8 +107,6 @@ authorization. A preparation-only request ends before tags or uploads.
   procedure in `tools/README.md`, as well as the screenshots.
 - User checks: settings toggles, companion conflicts, map and tracker updates,
   tooltips, range icons and combat behaviour without Lua errors or blocked actions.
-- Verify `.pkgmeta` moves LibAHTab into its own top-level `LibAHTab/` folder in
-  the release zip, alongside TweaksForever.
 
 ## Command discovery
 
