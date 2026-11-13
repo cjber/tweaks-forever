@@ -12,6 +12,12 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.7.2] - 2026-11-13
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
 ## [2.7.1] - 2026-11-13
 
 - Tweaks no longer ships its own copy of the Auction House tab library, because Auctionator now brings a newer one itself. Nothing changes for players.
