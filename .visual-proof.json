@@ -1,26 +1,23 @@
 {
-  "input_digest": "0ed88594123679ca01aa92300aad08c66fd2789eb3b1c1ac942696936ec5adb0",
-  "runtime_sha256": "0ed88594123679ca01aa92300aad08c66fd2789eb3b1c1ac942696936ec5adb0",
-  "candidate": "faa69e4c8569802723ff702f0a65a72464edf890c60500b3d44d4049ac4dfb53",
-  "tested_artifact": "source-tree",
+  "input_digest": "1836526c47b1ee8bceffb815592c0b32007aabdda51dd7d863baf3945f73296c",
+  "runtime_sha256": "1836526c47b1ee8bceffb815592c0b32007aabdda51dd7d863baf3945f73296c",
+  "candidate": "f25c783859458407a955b9663e79505dd119ef6873c098765586f0c70d4ba8a2",
   "client_build": "1.60.1.70938 (Interface 16001)",
-  "source_commit": "523ec062cdf778a241ce7a7d3fbce711ec142b3d",
-  "notes": "Recorded in the client from a git archive of this commit linked as the TweaksForever folder (client reported v2.7.1-dev+523ec06). The swing timers, their managed container and a frame anchored under them all report IsProtected false, so the strip can show, hide and anchor in combat. The strip itself needs an attackable target, which this session does not take; its look is the rangestrip mock scenes. No Lua errors this session.",
+  "tested_artifact": "source-tree",
+  "source_commit": "99ab82aabce3e728387b4c03dca54836b6a2ca28",
   "flows": [
     {
-      "name": "Range strip option in Tweaks settings",
+      "name": "Westfall map without entrance pins",
       "steps": [
-        "Open the game's Options",
-        "Search for Range strip",
-        "The Tweaks Forever Interface result shows Range strip, on by default"
+        "/home/cjber/.cache/agent-scratch/proof-e6a4/flows/westfall-map.lua"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/c90a8346c79f3f71e2902a0ea76b8c2a/raw/05790ef2fa3542392043e365e919e5c5556c0057/531-range-strip-option.png",
-      "sha256": "7b11515c5219b082513a43e815c892bd443134fc8dd97705492d6f863d51f7b3"
+      "url": "https://gist.githubusercontent.com/cjber/45689932ca800df25858f04c43aabfac/raw/2c3ceb3df0148acf93832b23862353b6ae5cf525/1-westfall-map-without-entrance-pins.png",
+      "sha256": "dd519f86095d9c4a0806dfac7004f1c9f886e7af5e8e38a2d6a54e263e47168b"
     }
   ]
 }
