@@ -1,0 +1,23 @@
+{
+  "input_digest": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
+  "runtime_sha256": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
+  "candidate": "50bf684a1d4396f90c417358ac556a90f38dd9054aa4f19ca0846d5ab23f584f",
+  "client_build": "1.60.1.70938 (Interface 16001)",
+  "tested_artifact": "source-tree",
+  "source_commit": "8a3b28a576d04eb49ba2f1421a623cbf11f47e14",
+  "flows": [
+    {
+      "name": "tweaks",
+      "steps": [
+        "/tweaks"
+      ],
+      "result": "pass"
+    }
+  ],
+  "images": [
+    {
+      "url": "https://gist.githubusercontent.com/cjber/149d24477184995464e2d40881e00cad/raw/cf28af02f1f238a270c7c909d7e01f92611c79a2/1-tweaks.png",
+      "sha256": "fae2dea5efccf769239a443bba367ca3d0087b7bbd58057da336aa237fdfa6fb"
+    }
+  ]
+}

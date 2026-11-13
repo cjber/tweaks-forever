@@ -6,7 +6,7 @@
 ## Category: Quality of Life
 ## IconTexture: Interface\AddOns\TweaksForever\media\Icon
 ## X-Forever-Icon: Interface\Icons\Trade_Engineering
-## OptionalDeps: ShortestPathForever, QuestieDB, Questie
+## OptionalDeps: ShortestPathForever, QuestieDB, Questie, Titan, Mapster
 ## AddonCompartmentFunc: TweaksForever_OnAddonCompartmentClick
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
@@ -14,7 +14,7 @@
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
 ## Dependencies: ForeverCore
-## X-Forever-Core: v1.7.4
+## X-Forever-Core: v1.11.0
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
@@ -89,6 +89,21 @@ UI\BeastTraining.lua
 Features\Fishing.lua
 UI\Reload.lua
 UI\WhatsNew.lua
+Chat\Shared.lua
+Chat\ShortNames.lua
+Chat\ClassLevels.lua
+Chat\Timestamps.lua
+Chat\FoldRepeats.lua
+Chat\ItemIcons.lua
+Chat\Mentions.lua
+Chat\WebLinks.lua
+Chat\History.lua
+Chat\PlayerRecord.lua
+Chat\WhisperTabs.lua
+Chat\UnreadCount.lua
+Chat\LastGrouped.lua
+Chat\PlayerCard.lua
+Chat\BagLinks.lua
 Core\Report.lua
 UI\Settings.lua
 Core\API.lua

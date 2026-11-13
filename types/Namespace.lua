@@ -219,9 +219,11 @@
 ---@field cameraZoomSaved? string
 ---@field screenGlowSaved? string
 ---@field lootSparklesSaved? table<string, string>
+---@field chatClassColorSaved? string the chatClassColorOverride CVar before this addon forced it on
+---@field chatWhisperModeSaved? string the whisperMode CVar before this addon forced popout
 ---@field lastVersion? string the addon version last logged in with
 ---@field windowLayouts? table<string, table<string, TFPosition>>
----@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>|ForeverCaughtError[]|ForeverDebugLogStore
+---@field [string] boolean|number|string|TFMarks|table<string, string>|table<string, table<string, TFPosition>>|table<string, TFChatPlayer>|ForeverCaughtError[]|ForeverDebugLogStore
 
 ---@class TFCharacterDatabase
 ---@field groups TFGroups
@@ -229,6 +231,8 @@
 ---@field beforeFishing? table<integer, integer>
 ---@field trainer? table<integer, TFTrainerSpell>
 ---@field petTrainer? table<integer, TFTrainerSpell>
+---@field chatHistory? table<string, TFChatHistoryLine[]>
+---@field chatPlayers? table<string, TFChatPlayer> the players this character has grouped or whispered with
 
 ---@type TFDatabase
 TweaksForeverDB = nil
@@ -259,12 +263,45 @@ TweaksForeverCharDB = nil
 ---@field slider? { min: number, max: number, step?: number }
 ---@field parent? string
 ---@field button? fun()
+---@field buttonOnly? boolean a row that is only this button, with no setting of its own
+---@field buttonText? string the button's label, "Open" when absent
 ---@field needs? TFNeed
 
 -- Another addon a feature can't work without: `check` finds it, and `title` names it while it's missing.
 ---@class TFNeed
 ---@field title string
 ---@field check fun(): any
+
+-- A saved chat line: the rendered text, its colour and when it arrived (Chat/History.lua).
+---@class TFChatHistoryLine
+---@field text string
+---@field r number
+---@field g number
+---@field b number
+---@field time number
+
+-- One player this character has grouped or whispered with (Chat/PlayerRecord.lua), keyed by the case-folded short
+-- name. Nothing here is sent to other players.
+---@class TFChatPlayer
+---@field time? number when this character last grouped with the player
+---@field zone? string where that group was, when the client gave it
+---@field whispers? integer whispers between this character and the player, sent and received
+---@field seen? number when the record was last written, which decides which record the cap drops
+
+-- One item in the bags, as Chat/BagLinks.lua reads it from the container: one row per distinct item ID.
+---@class TFChatBagItem
+---@field id integer
+---@field name string
+---@field lower string the name lower-cased, for the typed substring
+---@field link string the item's own hyperlink
+---@field icon integer? the client's FileDataID for its icon
+---@field quality integer? the item's quality, which colours its name
+
+---@class TFChatBagRow : Button
+---@field icon Texture
+---@field text FontString
+---@field highlight Texture the client's own bag list selection highlight
+---@field item TFChatBagItem?
 
 ---@class TFClickMode
 ---@field feature string
@@ -290,6 +327,20 @@ TweaksForeverCharDB = nil
 ---@field Frames TFFrames
 ---@field Tooltips TFTooltips
 ---@field WhisperInvite TFWhisperInvite
+---@field Chat TFChat
+---@field ChatShortNames TFChatShortNames
+---@field ChatClassLevels TFChatClassLevels
+---@field ChatFoldRepeats TFChatFoldRepeats
+---@field ChatItemIcons TFChatItemIcons
+---@field ChatMentions TFChatMentions
+---@field ChatWebLinks TFChatWebLinks
+---@field ChatHistory TFChatHistory
+---@field ChatPlayerRecord TFChatPlayerRecord
+---@field ChatWhisperTabs TFChatWhisperTabs
+---@field ChatWhisperUnread TFChatWhisperUnread
+---@field ChatLastGrouped TFChatLastGrouped
+---@field ChatPlayerCard TFChatPlayerCard
+---@field ChatBagLinks TFChatBagLinks
 ---@field Exploration TFExploration
 ---@field RareAlerts TFRareAlerts
 ---@field CombinedBag TFCombinedBag

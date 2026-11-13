@@ -17,16 +17,9 @@ except ModuleNotFoundError:
     from forever_tools import package
 
 ROOT = Path(__file__).resolve().parent.parent
-# Every spec but those that read the checkout rather than the addon: auctionator_spec loads LibAHTab from the
-# repository layout (the package ships it as its own folder, which the TOC check above covers).
-REPO_ONLY = {"tests/auctionator_spec.lua"}
 POLICY = package.Policy(
-    addons=("TweaksForever", "LibAHTab", "ForeverCore"),
-    specs=tuple(
-        spec
-        for spec in sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("tests/*_spec.lua"))
-        if spec not in REPO_ONLY
-    ),
+    addons=("TweaksForever", "ForeverCore"),
+    specs=tuple(sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("tests/*_spec.lua"))),
 )
 
 if __name__ == "__main__":
