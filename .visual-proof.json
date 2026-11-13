@@ -1,23 +1,23 @@
 {
-  "input_digest": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
-  "runtime_sha256": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
-  "candidate": "50bf684a1d4396f90c417358ac556a90f38dd9054aa4f19ca0846d5ab23f584f",
+  "input_digest": "483f94c86e82d3520e16e6fa40a26e6f7ee28f06f74b897c55c21878e9f0dc4f",
+  "runtime_sha256": "483f94c86e82d3520e16e6fa40a26e6f7ee28f06f74b897c55c21878e9f0dc4f",
+  "candidate": "cf37793729652afa605e0b2c264cf7eaac86fd9ace4988ffd6e2ae2c1b926299",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "8a3b28a576d04eb49ba2f1421a623cbf11f47e14",
+  "source_commit": "48705900905242e8c13b42536bc0d875359df223",
   "flows": [
     {
-      "name": "tweaks",
+      "name": "Westfall map without entrance pins",
       "steps": [
-        "/tweaks"
+        "/home/cjber/.cache/agent-scratch/proof-e6a4/flows/westfall-map.lua"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/149d24477184995464e2d40881e00cad/raw/cf28af02f1f238a270c7c909d7e01f92611c79a2/1-tweaks.png",
-      "sha256": "fae2dea5efccf769239a443bba367ca3d0087b7bbd58057da336aa237fdfa6fb"
+      "url": "https://gist.githubusercontent.com/cjber/78d844a597c1fdfe7d785ea5394138f3/raw/8a9174f30d8ca04e76b0d0fe4fa36e5bc536fd17/1-westfall-map-without-entrance-pins.png",
+      "sha256": "35bdfcd25ab9c13dd0780fc9e9cbcf378ba0ff6ffb64a0a2de4cce349907c82b"
     }
   ]
 }
