@@ -82,6 +82,7 @@ UI\CameraZoom.lua
 UI\ScreenGlow.lua
 UI\XPRate.lua
 UI\QuestXPBar.lua
+UI\RangeStrip.lua
 UI\LootSparkles.lua
 UI\TrainAll.lua
 UI\MacroNames.lua

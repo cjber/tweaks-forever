@@ -159,6 +159,24 @@ Enum.TrainerType = { General = 0, TalentsObsolete = 1, Tradeskills = 2, Pet = 3 
 ---@return Enum.TrainerType
 function C_Trainer.GetTrainerType() end
 
+-- The swing timer API and frames, absent from the pinned Retail annotations. A nil range answer means no check
+-- could be made, never out of range.
+---@enum Enum.PlayerSwingType
+Enum.PlayerSwingType = { MainHand = 0, OffHand = 1, Ranged = 2 }
+
+C_SwingTimer = {}
+---@param swingType Enum.PlayerSwingType
+---@return boolean? inRange
+function C_SwingTimer.IsTargetWithinSwingRange(swingType) end
+---@param swingType Enum.PlayerSwingType
+---@param enable boolean
+function C_SwingTimer.EnableRangeCheck(swingType, enable) end
+
+---@type Frame
+SwingTimerMainHandFrame = nil
+---@type Frame
+SwingTimerRangedFrame = nil
+
 -- Forever keeps the original talent point count, absent from the pinned Retail API.
 ---@return integer
 function GetNumUnspentTalents() end

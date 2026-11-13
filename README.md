@@ -45,6 +45,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Dungeon maps.** Inside a dungeon or raid, or when you click its entrance, the world map shows the client's own painted map, with its area names and boss rooms, a button for the floor and a Back to map button. The maps come with WoW: Forever; no extra addon is needed.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout (not with the gamepad UI).
 - **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
+- **Range strip.** A strip on top of the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
 - **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
 - **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Turn on **Quest XP on the experience bar** (off by default) to shade the bar with the XP your quest log is worth, the ready hand-ins first, and the tooltip then adds the level they reach. Rare alerts (off by default) name nearby rares in chat; click the name, or press a bound key, to set a waypoint to it. In a group, a pull warning says in chat when your threat passes the tank's. A soft glow on the talents button reminds you while talent or pet training points are unspent.
@@ -81,6 +82,18 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 </p>
 
 <p align="center">Move and scale Blizzard windows from a tab in Edit Mode.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip.png" width="100%" alt="The range strip in each band, docked on the swing timers">
+</p>
+
+<p align="center">The range strip under the swing timers: melee, dead zone, auto shot and too far.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip-classes.png" width="100%" alt="The range strip for each class, docked on its Main Hand swing timer">
+</p>
+
+<p align="center">Every class gets its own strip, from melee out to its longest reach.</p>
 
 ## Install
 

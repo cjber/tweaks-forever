@@ -388,6 +388,7 @@ TweaksForeverCharDB = nil
 ---@field RefreshConflicts fun()
 ---@field XPRate TFXPRate
 ---@field QuestXPBar TFQuestXPBar
+---@field RangeStrip TFRangeStrip
 ---@field QuestButtons TFQuestButtons
 ---@field Coordinates TFCoordinates
 ---@field BestReward TFBestReward
