@@ -1,30 +1,26 @@
 {
-  "input_digest": "68504027cd6e81c362752ec65751a0d331850b81d01f33b0c8cfb6e1707d99aa",
-  "runtime_sha256": "68504027cd6e81c362752ec65751a0d331850b81d01f33b0c8cfb6e1707d99aa",
-  "candidate": "72a9b020cf18a6effbd1feef2657cb3d7f9e8e948d8a662fe14a7fbfa3f80b6c",
+  "input_digest": "e2bd46c367eed3798fbea7fbc7bed854436bd52f981eaae0403f310ba919b5df",
+  "runtime_sha256": "e2bd46c367eed3798fbea7fbc7bed854436bd52f981eaae0403f310ba919b5df",
+  "candidate": "72fda99cd00ea040e7922123684293f3d9b57f00f6da1f8607e8893aa879b1b4",
   "tested_artifact": "source-tree",
   "client_build": "1.60.1.70938 (Interface 16001)",
-  "source_commit": "e66f7a6f20ea0890754fcb975af7648a525fce58",
-  "notes": "Recorded on Hel Io in the headless client from a source-tree build of this commit (forever_client.py build-dev) linked into AddOns, with the store ForeverCore v1.10.0 and the other four 1.10.0 sync builds (Tweaks, Legacy, Commissions, Macro Assist, Field Guide) loaded in the same session. BugGrabber recorded no errors this session; the errors listed in the report window are earlier sessions' history.",
+  "source_commit": "8d423a2b61da8ee6257e7ccb04513628e23009a4",
+  "notes": "Checked in the headless client: the Titan Panel and Mapster declarations change no behaviour, and the item icon now comes from C_Item.GetItemIconByID.",
   "flows": [
     {
-      "name": "Tweaks Forever on ForeverCore 1.10.0",
+      "name": "Chat item icons on C_Item.GetItemIconByID",
       "steps": [
-        "Link the candidate build with the store ForeverCore v1.10.0 and /reload",
-        "Print every Forever addon's loaded version: ForeverCore v1.10.0 and each sync build loaded, 0 BugGrabber errors this session",
-        "Run /tweaks report: the addon's report window opens on this build, with ForeverCore 1.10.0's performance section"
+        "Link the candidate build with the store ForeverCore and /reload",
+        "Turn on chat item icons and pass a say line with a [Hearthstone] link through ChatFrame1's own chat event handler: the Hearthstone icon shows before the link",
+        "Print the loaded TweaksForever version: the candidate build, 0 Lua errors this session"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/61e1d759a57ff98eb48b76f8121cf66a/raw/9ce32ab1c30b24a4b41552cd2ad58f5346a1240c/sync110-tweaks-report.png",
-      "sha256": "5b1f39b48f975a0a43ca08f77479a50b0c6dac1fbd110d2c6f12834bee48bdf2"
-    },
-    {
-      "url": "https://gist.githubusercontent.com/cjber/61e1d759a57ff98eb48b76f8121cf66a/raw/9ce32ab1c30b24a4b41552cd2ad58f5346a1240c/sync110-versions.png",
-      "sha256": "66d10d46b3140bbd2797f47ca2fe716284b6b74d2dc5ba0ed7393970eac409b0"
+      "url": "https://gist.githubusercontent.com/cjber/0990754c8ffba2fe40866d6188344f42/raw/23b71071ea17084eb9b4091fc7722a43446bc02c/lint-calls.png",
+      "sha256": "ca73ba50d3622561be970b113f388127d14383bcb7efd9c11685263a532a2743"
     }
   ]
 }
