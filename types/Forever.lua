@@ -89,6 +89,34 @@ ERR_NOT_IN_COMBAT = ""
 TRAINING_POINTS_ABBREV = ""
 ---@type string
 ITEM_SPELL_KNOWN = ""
+-- The label of the game's own Chat Timestamps setting (Settings > Social).
+---@type string
+TIMESTAMPS_LABEL = ""
+-- The chat dock the game's own frames sit in (Blizzard_ChatFrameBase).
+---@type Frame
+GENERAL_CHAT_DOCK = nil
+-- A chat frame's own fields, set in Lua by FloatingChatFrame.lua, which the generated class omits.
+---@class ScrollingMessageFrame
+---@field name? string the window's display name, set by FCF_SetWindowName
+---@field isTemporary? boolean a temporary window the client opened for one partner
+---@field chatType? string what the window receives, such as WHISPER
+---@field chatTarget? string the partner or channel it is dedicated to
+---@field editBox? EditBox the box the client made for this window (FloatingChatFrame.xml)
+
+-- The relative time strings the friends list's own formatter uses (Blizzard_SharedXML/TimeUtil.lua).
+---@type string
+LASTONLINE_SECS = ""
+---@type string
+LASTONLINE_MINUTES = ""
+---@type string
+LASTONLINE_HOURS = ""
+---@type string
+LASTONLINE_DAYS = ""
+-- The friends list's formatter, loaded with Blizzard_FriendsFrame, which the card uses when it is there.
+---@class TFFriendsListUtil
+---@field GetRelativeTimeText? fun(timestamp: number): string
+---@type TFFriendsListUtil
+FriendsListUtil = nil
 
 -- UIErrorsFrame's hidden message types (Blizzard_UIErrorsFrame), written by its SetMessageTypeEnabled.
 ---@type table<integer, boolean>
@@ -111,6 +139,10 @@ FACTION_HORDE = ""
 -- A bag's children include both item buttons and ordinary window controls.
 ---@class TFBagChild : Frame
 ---@field GetSlotAndBagID? fun(self: TFBagChild): integer, integer
+
+-- The client's autocomplete popup (Blizzard_AutoComplete), which owns the same keys while it shows.
+---@class AutoCompleteBox : Frame
+---@field parent? EditBox the edit box it is attached to, set by AutoComplete_Update
 
 -- Forever's trainer frame, whose inset holds the skill list under its title.
 ---@class ClassTrainerFrame

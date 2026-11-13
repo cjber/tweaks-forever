@@ -75,6 +75,24 @@ All off until you turn them on, except faster auto loot.
 - Tooltip at the cursor (off by default). The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them.
 - Larger, clearer nameplates. A taller health bar in the retail game's own frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined in white and your focus in gold, and the other plates' bars are slightly darker. Casts show in a slim bar with the spell's icon and name inside, grey with a shield when they can't be interrupted. Health numbers inside the bar follow the game's own Nameplates options. Friendly plates in dungeons are the game's own and can't be restyled. On by default; turning it off takes effect after a reload.
 
+## Chat
+
+All off until you turn them on, each with its own switch; the timestamps row is a link to the game's own setting, not a switch of ours.
+
+- Short channel names. A numbered channel shows just its name, so **[2. Trade - City]** reads **[Trade]**, **[1. General - Elwynn Forest]** reads **[General]** and **[4. LookingForGroup]** reads **[LFG]**. Guild, officer, party, raid, instance and raid warning lines use **[G]**, **[O]**, **[P]**, **[PL]**, **[R]**, **[RL]**, **[RW]**, **[I]** and **[IL]**. Clicking a channel name still works.
+- Class colours and levels. Player names take their class colour, and the level follows the name in grey when the game knows it exactly: your group, guild, friends, /who, your target or the player under your mouse. Turning it off puts your previous class colour choices back.
+- Item icons in chat. The item's own icon appears before each item link, so a trade or a loot link is recognised at a glance. Quest, spell and other links are left alone.
+- Fold repeated messages. When the same player posts the same text in the same chat within two minutes, the earlier line is removed and the new line ends with a grey count, such as **x3**. Only an exact match of the sender and the whole text, never a fuzzy guess.
+- Mention marker. A line from another player that names your character as a whole word gets a small chat icon at its start and your name in the game's normal colour. No sound plays and no line is added.
+- Clickable web links. **http://** and **https://** addresses become light blue links. Clicking one opens a small box with the address selected, ready to copy, because the game cannot open a browser itself.
+- Chat history after a reload. The last 200 lines of each docked chat window come back after a reload or logging out, above a **Before your /reload** line. Kept for this character only, and a line the game keeps secret is left out.
+- Chat timestamps. The Chat page has a row that opens the game's own **Chat Timestamps** setting, under Social, where you pick the format or turn it off. Tweaks Forever does not change timestamps itself.
+- Whisper tabs. Every person who whispers you gets their own tab in the chat window, using the game's own **New Whispers** setting. Turning this off puts your previous setting back, and a mode that already opens whisper tabs is left alone.
+- Unread whispers on tabs. A whisper tab you are not reading shows how many whispers have arrived since you last opened it, after the player's name, such as **Thrall (3)**. The game's own glow marks a new whisper as before.
+- Last grouped with. A whisper window starts with a grey line saying when you last grouped with that player and where, from what this character has seen, such as **Grouped with you 3 days ago in Deadmines**. Nothing is added when you have never grouped with them.
+- Player card on hover. Hovering a player's name in chat shows their level, race and class when the game knows them, their guild and zone when your guild roster, friends list or last /who gives them, when you last grouped with them, and how many whispers you have exchanged. Only fields the game or your own history states are shown, and nothing is sent to anyone.
+- Link items from your bags. Type **[** and a few letters in any chat box to list the items in your bags whose name contains those letters, up to eight, sorted by name, each with its own icon and quality colour. **Up** and **Down** or **Tab** and **Shift-Tab** choose one, **Enter** puts in the item's real link and sends the line, and a click puts it in so you can keep typing. **Escape** closes the list without changing your text. The list is built when your bags change, not on each keystroke, and only the game's own item data is used.
+
 ## Fishing
 
 - Double right-click the world with a fishing pole equipped to cast Fishing. Not in combat or while mounted.

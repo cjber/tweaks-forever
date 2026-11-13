@@ -14,7 +14,7 @@
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
 ## Dependencies: ForeverCore
-## X-Forever-Core: v1.8.2
+## X-Forever-Core: v1.9.0
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
@@ -92,6 +92,21 @@ Features\Fishing.lua
 UI\Reload.lua
 UI\WhatsNew.lua
 Integrations\Companions.lua
+Chat\Shared.lua
+Chat\ShortNames.lua
+Chat\ClassLevels.lua
+Chat\Timestamps.lua
+Chat\FoldRepeats.lua
+Chat\ItemIcons.lua
+Chat\Mentions.lua
+Chat\WebLinks.lua
+Chat\History.lua
+Chat\PlayerRecord.lua
+Chat\WhisperTabs.lua
+Chat\UnreadCount.lua
+Chat\LastGrouped.lua
+Chat\PlayerCard.lua
+Chat\BagLinks.lua
 Core\Report.lua
 UI\Settings.lua
 Core\API.lua
