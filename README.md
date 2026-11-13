@@ -142,7 +142,7 @@ The addon is free and stays GPL-3.0. If it saves you time, you can [sponsor me o
 
 ## Credits
 
-LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab) (MIT). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts, and the rare waypoint by [RareScanner](https://www.curseforge.com/wow/addons/rarescanner); no code was copied. Fitz is welcome to use our code.
+Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts, and the rare waypoint by [RareScanner](https://www.curseforge.com/wow/addons/rarescanner); no code was copied. Fitz is welcome to use our code.
 
 <!-- forever-credits:start -->
 
@@ -152,7 +152,7 @@ Thanks to Sojiro84, Mouchoir, SirGooie and everyone who reported a bug or asked 
 
 ## Licence
 
-GPL-3.0-or-later. The bundled LibStub is public domain. Every input and its licence: [THIRD_PARTY.md](THIRD_PARTY.md).
+GPL-3.0-or-later. Every input and its licence: [THIRD_PARTY.md](THIRD_PARTY.md).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
 

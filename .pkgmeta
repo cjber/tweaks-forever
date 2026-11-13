@@ -2,7 +2,6 @@ package-as: TweaksForever
 
 move-folders:
   TweaksForever/ForeverCore: ForeverCore
-  TweaksForever/LibAHTab: LibAHTab
 
 manual-changelog:
   filename: .release-notes.md
