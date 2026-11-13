@@ -208,12 +208,14 @@ for event, handler in pairs(EVENTS) do
 	ns.On(event, handler)
 end
 
--- An addon that loads after login can become a conflict, and Blizzard can reset its chat settings on a world change.
-ns.On("ADDON_LOADED", Model.Sync)
 ns.OnSettingChanged(KEY, Model.Sync)
 
 ns.Init(function()
 	Chat.NameFilter(NameFilter)
 	Model.Refresh()
+	-- Registered here, not at file load: ADDON_LOADED fires for every addon before login, when the saved settings
+	-- are not read yet (#548). An addon that loads after login can become a conflict, and Blizzard can reset its chat
+	-- settings on a world change.
+	ns.On("ADDON_LOADED", Model.Sync)
 	Model.Sync()
 end)

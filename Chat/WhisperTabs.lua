@@ -64,7 +64,11 @@ function Model.Sync()
 	end
 end
 
-ns.On("ADDON_LOADED", Model.Sync)
 ns.OnSettingChanged(KEY, Model.Sync)
 
-ns.Init(Model.Sync)
+ns.Init(function()
+	-- Registered here, not at file load: ADDON_LOADED fires for every addon before login, when the saved settings
+	-- are not read yet (#548).
+	ns.On("ADDON_LOADED", Model.Sync)
+	Model.Sync()
+end)

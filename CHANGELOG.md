@@ -13,6 +13,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 
 - Tweaks no longer ships its own copy of the Auction House tab library, because Auctionator now brings a newer one itself. Nothing changes for players.
+- **Chat options no longer raise an error at login.** Class colours and levels and Whisper tabs read your saved settings whenever an addon finished loading, which happens before Tweaks has read them, so the client logged an error each time and on a full install warned about too many errors. Both now wait until your settings are loaded, so login stays quiet.
 
 ## [2.7.0] - 2026-11-13
 
