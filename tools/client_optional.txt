@@ -1,0 +1,4 @@
+# Titan Panel's settings: Bags/Junk.lua and Bags/Vendor.lua ask TitanRepair, UI/XPRate.lua asks TitanXP.
+TitanGetVar  Titan
+# Mapster's coords and fog modules: Map/Coordinates.lua and Map/Exploration.lua find them through Ace3.
+LibStub  Mapster

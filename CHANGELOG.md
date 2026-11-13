@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Tweaks Forever loads after Titan Panel and Mapster when they are installed**, so its checks of their settings always see them.
+
 ## [2.7.2] - 2026-11-13
 
 <!-- forever-core-sync -->

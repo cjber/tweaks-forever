@@ -120,7 +120,6 @@ read_globals = {
 	"FriendsListUtil",
 	"GENERAL_CHAT_DOCK",
 	"GetGuildInfo",
-	"GetItemIcon",
 	"LASTONLINE_DAYS",
 	"LASTONLINE_HOURS",
 	"LASTONLINE_MINUTES",

@@ -30,12 +30,7 @@ local ICON = "|T%s:0:0:0:0:64:64:5:59:5:59|t " -- art-ok: the registry's square 
 ---@param itemID number
 ---@return string|integer?
 local function Icon(itemID)
-	if C_Item and C_Item.GetItemIconByID then
-		return C_Item.GetItemIconByID(itemID)
-	end
-	if GetItemIcon then
-		return GetItemIcon(itemID)
-	end
+	return C_Item.GetItemIconByID(itemID)
 end
 
 -- Put the icon before every item hyperlink's target. Only `|Hitem:` is matched: a spell, quest, achievement or

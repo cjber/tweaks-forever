@@ -6,7 +6,7 @@
 ## Category: Quality of Life
 ## IconTexture: Interface\AddOns\TweaksForever\media\Icon
 ## X-Forever-Icon: Interface\Icons\Trade_Engineering
-## OptionalDeps: ShortestPathForever, QuestieDB, Questie
+## OptionalDeps: ShortestPathForever, QuestieDB, Questie, Titan, Mapster
 ## AddonCompartmentFunc: TweaksForever_OnAddonCompartmentClick
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
