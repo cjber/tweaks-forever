@@ -13,7 +13,18 @@ optional `### For addon authors` subsection after a version's player bullets.
 ## [Unreleased]
 
 - **Every class gets a range strip on its swing timers.** A strip under the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap, so you know when to close in and when to back off. Each segment leads with its attack's own icon, and the band's name sits under the strip in its colour; Show icons and Show band label turn either off (#413).
+- **Tweaks Forever loads after Titan Panel and Mapster when they are installed**, so its checks of their settings always see them.
+
+## [2.7.2] - 2026-11-13
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
+## [2.7.1] - 2026-11-13
+
 - Tweaks no longer ships its own copy of the Auction House tab library, because Auctionator now brings a newer one itself. Nothing changes for players.
+- Chat options no longer raise errors at login. Class colours and Whisper tabs checked your saved settings each time another addon finished loading, which starts before Tweaks has read them, so every login and /reload logged dozens of errors, enough for the client's "too many errors" warning. Both now start watching once your settings are read. Thanks to Mouchoir for the report and fix.
 
 ## [2.7.0] - 2026-11-13
 

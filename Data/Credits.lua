@@ -9,6 +9,7 @@ ns.Credits = {
 		{ name = "Sojiro84", what = "Abandon Quests button hides with quest details" },
 		{ name = "Mouchoir", what = "Fixed the login Lua error (code)" },
 		{ name = "Mouchoir", what = "Questie icon sizes follow its sliders (code)" },
+		{ name = "Mouchoir", what = "Fixed the chat options' login errors (code)" },
 	},
 	inspired = {
 		{ name = "Polestar by Fitz", what = "Ideas for many features" },

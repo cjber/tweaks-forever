@@ -48,6 +48,7 @@ Credit for the reports and requests behind the addon.
 | Sojiro84 | Abandon Quests button hides with quest details | GitHub; #109 |
 | [Mouchoir](https://github.com/Mouchoir) | Fixed the login Lua error (code) | GitHub; #202 |
 | [Mouchoir](https://github.com/Mouchoir) | Questie icon sizes follow its sliders (code) | GitHub; #217, PR #216 |
+| [Mouchoir](https://github.com/Mouchoir) | Fixed the chat options' login errors (code) | GitHub; #551, PR #552 |
 
 ## Inspired by
 

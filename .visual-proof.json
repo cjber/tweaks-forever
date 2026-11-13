@@ -1,31 +1,26 @@
 {
-  "input_digest": "727bcf83af95dd742d6c3e6121f0b938833279411cf6b08851cb6a41b02336dc",
-  "runtime_sha256": "727bcf83af95dd742d6c3e6121f0b938833279411cf6b08851cb6a41b02336dc",
-  "candidate": "81e9374afcaa2b4dfd3de42066eb443dcecee9e047151005485132cfe5592045",
-  "tested_artifact": "release-package",
-  "client_build": "1.60.1.70888 (Interface 16001)",
-  "source_commit": "9a470b77afabcb3c262aa8094895c92c1efb57fe",
-  "notes": "Recorded on Hel Io in the player's live client from the packager's release build of this commit (TweaksForever and LibAHTab from a local BigWigs packager -d -z run; --compare-package equivalent). Every other Forever addon's 1.9.0 sync build was loaded in the same session. The only BugGrabber entries this session were the recorder's own over-long /run lines.",
+  "input_digest": "e2bd46c367eed3798fbea7fbc7bed854436bd52f981eaae0403f310ba919b5df",
+  "runtime_sha256": "e2bd46c367eed3798fbea7fbc7bed854436bd52f981eaae0403f310ba919b5df",
+  "candidate": "72fda99cd00ea040e7922123684293f3d9b57f00f6da1f8607e8893aa879b1b4",
+  "tested_artifact": "source-tree",
+  "client_build": "1.60.1.70938 (Interface 16001)",
+  "source_commit": "8d423a2b61da8ee6257e7ccb04513628e23009a4",
+  "notes": "Checked in the headless client: the Titan Panel and Mapster declarations change no behaviour, and the item icon now comes from C_Item.GetItemIconByID.",
   "flows": [
     {
-      "name": "Tweaks' settings open on ForeverCore 1.9.0",
+      "name": "Chat item icons on C_Item.GetItemIconByID",
       "steps": [
-        "Install the candidate with the store ForeverCore v1.9.0 and /reload",
-        "Print every Forever addon's loaded version into a chat tab with no channels: store ForeverCore v1.9.0 plus each 1.9.0 sync build, all loaded, and BugGrabber shows no addon errors this session",
-        "Type /tweaks",
-        "The game's Options open on the Tweaks Forever page with its group buttons and no action-blocked message"
+        "Link the candidate build with the store ForeverCore and /reload",
+        "Turn on chat item icons and pass a say line with a [Hearthstone] link through ChatFrame1's own chat event handler: the Hearthstone icon shows before the link",
+        "Print the loaded TweaksForever version: the candidate build, 0 Lua errors this session"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/627a1b4cf36d973bb26ba262c81eb601/raw/67bd0b623f26040eed9f66dd363a477dbb684579/sync190-tweaks-settings.png",
-      "sha256": "43f0e687f947733819e6c8cee69ea12798e6886be0d7897ffd5df5ea1e921b7e"
-    },
-    {
-      "url": "https://gist.githubusercontent.com/cjber/627a1b4cf36d973bb26ba262c81eb601/raw/67bd0b623f26040eed9f66dd363a477dbb684579/sync190-versions.png",
-      "sha256": "9731b84977a7daf94152f9129b9ea996b4c467006f822f7acc430332fa8f08ec"
+      "url": "https://gist.githubusercontent.com/cjber/0990754c8ffba2fe40866d6188344f42/raw/23b71071ea17084eb9b4091fc7722a43446bc02c/lint-calls.png",
+      "sha256": "ca73ba50d3622561be970b113f388127d14383bcb7efd9c11685263a532a2743"
     }
   ]
 }

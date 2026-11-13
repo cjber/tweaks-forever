@@ -64,7 +64,11 @@ function Model.Sync()
 	end
 end
 
-ns.On("ADDON_LOADED", Model.Sync)
 ns.OnSettingChanged(KEY, Model.Sync)
 
-ns.Init(Model.Sync)
+-- ADDON_LOADED is watched from login on: before PLAYER_LOGIN it fires for every addon that loads after this one,
+-- while ns.db is still nil, and Restore would index it.
+ns.Init(function()
+	ns.On("ADDON_LOADED", Model.Sync)
+	Model.Sync()
+end)

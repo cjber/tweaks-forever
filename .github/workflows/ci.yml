@@ -42,20 +42,11 @@ jobs:
           ref: ${{ steps.forever-core.outputs.ref }}
           path: forever-core
           persist-credentials: false
-      # Ubuntu 24.04's release-pocket builds, which the archive never replaces.
-      - name: Install LuaJIT and luacheck
-        env:
-          LUAJIT: 2.1.0+git20231223.c525bcb+dfsg-1
-          LUACHECK: 1.1.2-1
-        run: |
-          # Fall back to a mirror of Ubuntu's signed archives when the runner's Azure mirror cannot resolve.
-          mirror_list=/etc/apt/apt-mirrors.txt
-          if [ -f "$mirror_list" ] && ! getent ahosts azure.archive.ubuntu.com >/dev/null; then
-            printf '%s\n' https://mirrors.mit.edu/ubuntu | sudo tee "$mirror_list" >/dev/null
-          fi
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends --allow-downgrades \
-            "luajit=$LUAJIT" "libluajit-5.1-2=$LUAJIT" "libluajit-5.1-common=$LUAJIT" "lua-check=$LUACHECK"
+      # Every Lua tool version lives in this checkout's tools/toolchain.json, which the action reads, then installs
+      # and verifies each pin from: LuaJIT, luac5.1, luacheck and StyLua here.
+      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+        with:
+          tools: lua stylua
       - run: luacheck .
       - run: python3 -m tools.forever_tools.assets
       - run: python3 -m tools.forever_tools.specs
@@ -71,11 +62,7 @@ jobs:
       - run: luajit tools/forever_sim/run.lua
       # A screenshot older than the code it is drawn from (docs/screenshots/scenes.sha256).
       - run: python3 tools/check_screenshots.py
-      - uses: JohnnyMorganz/stylua-action@76fd70c03e6340ceaf673366712db9b20560b402 # v5.0.0
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          version: 2.5.2
-          args: --check .
+      - run: stylua --check .
 
   generated:
     runs-on: ubuntu-24.04
@@ -112,27 +99,11 @@ jobs:
           ref: ${{ steps.forever-core.outputs.ref }}
           path: forever-core
           persist-credentials: false
-      # tools/check_locales.py parses each translation with LuaJIT.
-      # Ubuntu 24.04's release-pocket builds, which the archive never replaces.
-      - name: Install LuaJIT
-        env:
-          LUAJIT: 2.1.0+git20231223.c525bcb+dfsg-1
-        run: |
-          # Fall back to a mirror of Ubuntu's signed archives when the runner's Azure mirror cannot resolve.
-          mirror_list=/etc/apt/apt-mirrors.txt
-          if [ -f "$mirror_list" ] && ! getent ahosts azure.archive.ubuntu.com >/dev/null; then
-            printf '%s\n' https://mirrors.mit.edu/ubuntu | sudo tee "$mirror_list" >/dev/null
-          fi
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends --allow-downgrades \
-            "luajit=$LUAJIT" "libluajit-5.1-2=$LUAJIT" "libluajit-5.1-common=$LUAJIT"
-      - name: Install LuaLS 3.19.1
-        run: |
-          mkdir -p "$RUNNER_TEMP/luals"
-          curl --retry 8 --retry-delay 5 --retry-all-errors --connect-timeout 20 --max-time 300 -sSfL -o "$RUNNER_TEMP/luals.tar.gz" https://github.com/LuaLS/lua-language-server/releases/download/3.19.1/lua-language-server-3.19.1-linux-x64.tar.gz
-          echo "e9235d2d72ef55bc41cf8c99cda2ed64777682024b4bb81f5dea425060c5cbb8  $RUNNER_TEMP/luals.tar.gz" | sha256sum -c -
-          tar -xzf "$RUNNER_TEMP/luals.tar.gz" -C "$RUNNER_TEMP/luals"
-          echo "$RUNNER_TEMP/luals/bin" >> "$GITHUB_PATH"
+      # tools/check_locales.py parses each translation with LuaJIT; LuaLS checks every TOC-loaded file. Both are pins
+      # in this checkout's tools/toolchain.json.
+      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+        with:
+          tools: lua luals
       - run: tools/typecheck.sh
 
   python:
@@ -143,10 +114,12 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-      - run: uvx ruff@0.16.8 check tools
-      - run: uvx ruff@0.16.8 format --check tools
+      # The Python tools are tools/pyproject.toml's dev group, resolved in tools/uv.lock; uv keeps the environment
+      # at tools/.venv, which every linter ignores.
+      - run: uv run --project tools --frozen --group dev ruff check tools
+      - run: uv run --project tools --frozen --group dev ruff format --check tools
       - run: python3 tools/check_api_docs.py
-      - run: uvx ty@0.0.83 check tools --extra-search-path . --extra-search-path tools
+      - run: uv run --project tools --frozen --group dev ty check tools --extra-search-path . --extra-search-path tools
 
   project-rules:
     runs-on: ubuntu-24.04
@@ -168,8 +141,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
-      - run: uvx --from actionlint-py==1.7.12.25 actionlint
-      - run: uvx zizmor@1.30.1 --offline .github
+      - run: uv run --project tools --frozen --group dev actionlint
+      - run: uv run --project tools --frozen --group dev zizmor --offline .github
 
   secrets:
     runs-on: ubuntu-24.04
@@ -179,12 +152,11 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - name: Install gitleaks 8.30.1
-        run: |
-          curl --retry 8 --retry-delay 5 --retry-all-errors --connect-timeout 20 --max-time 300 -sSfL -o gitleaks.tar.gz https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz
-          echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  gitleaks.tar.gz" | sha256sum -c -
-          tar -xzf gitleaks.tar.gz gitleaks
-      - run: ./gitleaks git --redact --no-banner .
+      # gitleaks is pinned in tools/toolchain.json.
+      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+        with:
+          tools: gitleaks
+      - run: gitleaks git --redact --no-banner .
 
   # What a tag would ship, checked before it ships: the release workflow's packager without uploading or zipping,
   # then tools/check_package.py on .release/ (every loaded file present, no development folders, specs pass on it).
@@ -209,19 +181,10 @@ jobs:
           ref: ${{ steps.forever-core.outputs.ref }}
           path: forever-core
           persist-credentials: false
-      # Ubuntu 24.04's release-pocket builds, which the archive never replaces.
-      - name: Install LuaJIT
-        env:
-          LUAJIT: 2.1.0+git20231223.c525bcb+dfsg-1
-        run: |
-          # Fall back to a mirror of Ubuntu's signed archives when the runner's Azure mirror cannot resolve.
-          mirror_list=/etc/apt/apt-mirrors.txt
-          if [ -f "$mirror_list" ] && ! getent ahosts azure.archive.ubuntu.com >/dev/null; then
-            printf '%s\n' https://mirrors.mit.edu/ubuntu | sudo tee "$mirror_list" >/dev/null
-          fi
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends --allow-downgrades \
-            "luajit=$LUAJIT" "libluajit-5.1-2=$LUAJIT" "libluajit-5.1-common=$LUAJIT" "lua5.1=5.1.5-9build2"
+      # The package gate parses and runs Lua, so it needs the pinned LuaJIT and luac5.1 from tools/toolchain.json.
+      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+        with:
+          tools: lua
       # .pkgmeta's manual changelog, which the release fills with the version's entry.
       - run: printf 'Package check\n' > .release-notes.md
       # The packager skips a push build when HEAD carries a tag ("Found future tag, not packaging"), so a tag that

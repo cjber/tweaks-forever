@@ -12,14 +12,15 @@ on-screen line when an installed ForeverCore is older than API 1.
 ## Commands
 
 ```sh
-python3 tools/doctor.py   # first on a new machine: every tool pin below, with a fix for each problem
+python3 tools/doctor.py   # first on a new machine: every pin in tools/toolchain.json and tools/pyproject.toml, with a fix for each problem
 stylua --check .
 luacheck .
 FOREVER_CORE=../forever-core tools/typecheck.sh
 for spec in tests/*_spec.lua; do FOREVER_CORE=../forever-core luajit "$spec" || exit 1; done
 FOREVER_CORE=../forever-core python3 tools/forever_sim/fetch.py && FOREVER_CORE=../forever-core luajit tools/forever_sim/run.lua   # tests/sim scenarios on the real Blizzard UI
-ruff check tools && ruff format --check tools
-uvx ty@0.0.83 check tools --extra-search-path . --extra-search-path tools
+uv run --project tools --frozen --group dev ruff check tools
+uv run --project tools --frozen --group dev ruff format --check tools
+uv run --project tools --frozen --group dev ty check tools --extra-search-path . --extra-search-path tools
 python3 tools/check_generated.py --offline # omit --offline to fetch missing pinned inputs
 python3 tools/forever_tools/credits.py --check # Data/Credits.lua and both thanks blocks are current (WFA-31)
 python3 tools/changelog.py --check
@@ -35,6 +36,9 @@ THIRD_PARTY.md ship with README's `## Credits` and THIRD_PARTY's `## Players` (W
 specs pass on the packaged files.
 
 The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and history.
+CI installs the Lua tools and LuaLS from `tools/toolchain.json` through `cjber/forever-core/.github/actions/toolchain`,
+which verifies each pin, and runs the Python tools from `tools/pyproject.toml`'s dev group, resolved in `tools/uv.lock`,
+with `uv run --project tools --frozen --group dev`: those two files hold every version CI uses.
 `.github/workflows/speedpatrol.yml` times the spec suite on every pull request against its base branch and fails on a
 regression (`.speedpatrol/instructions.md`).
 `.github/workflows/refresh-data.yml` runs daily: when wago.tools lists a newer Forever build it opens a
@@ -71,7 +75,7 @@ adopts the dependency and becomes `v1.0.0` at release.
   that order, each receiving `local addonName, ns = ...`; a new file goes in the TOC or never runs.
 - The specs are a headless harness with stubbed client APIs. Anything they cannot reach (frames,
   menus, tooltips, the tracker) is checked in game: check them in the headless client (forever-core's `wow-forever-addon/in-game.md`) and list in the PR what was checked; what waits on the player's own session goes in the PR as `/reload` tests for the user.
-- LuaLS 3.19.1 checks every TOC-loaded file against pinned Ketho API/FrameXML annotations.
+- LuaLS (pinned in `tools/toolchain.json`) checks every TOC-loaded file against pinned Ketho API/FrameXML annotations.
   `tools/typecheck.sh` fetches them into an ignored types cache and also checks accidental `select()` expansion.
 - New host globals go in `.luacheckrc`; if upstream lacks their types, declare real types in
   `types/Forever.lua`. Addon contracts live in `types/`. Never add a LuaLS globals allowlist.
