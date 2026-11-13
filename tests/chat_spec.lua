@@ -742,4 +742,47 @@ ns.ChatHistory.Replay()
 assert(#offFrame.messages == 0, "history off replays nothing")
 assert(env.TweaksForeverCharDB.chatHistory == nil, "history off clears the saved lines")
 
+-- Before PLAYER_LOGIN the client fires ADDON_LOADED for every addon that loads after this one, while ns.db is still
+-- nil and ns.Init holds its startup functions (Core/Core.lua). Class colours read no saved setting then; login
+-- applies the option, and an addon loading after login syncs it again.
+do
+	local early, startup, earlyHandlers = {}, {}, {}
+	for key, value in pairs(ns) do
+		early[key] = value
+	end
+	early.db = nil
+	early.Init = function(fn)
+		startup[#startup + 1] = fn
+	end
+	early.On = function(event, fn)
+		earlyHandlers[event] = earlyHandlers[event] or {}
+		earlyHandlers[event][#earlyHandlers[event] + 1] = fn
+	end
+	early.Active = function(key)
+		return early.db ~= nil and early.db[key] == true
+	end
+	local function AddonLoaded(name)
+		for _, fn in ipairs(earlyHandlers.ADDON_LOADED or {}) do
+			fn(name)
+		end
+	end
+	cvars.chatClassColorOverride = "1"
+	cvarWrites = {}
+	setfenv(assert(loadfile("Chat/ClassLevels.lua")), env)("TweaksForever", early)
+	AddonLoaded("Questie")
+	AddonLoaded("WeakAuras")
+	assert(#cvarWrites == 0, "an addon loading before login changes no class colour")
+
+	db.chatClassLevels, db.chatClassColorSaved = true, nil
+	early.db = db
+	for _, fn in ipairs(startup) do
+		fn()
+	end
+	assert(cvars.chatClassColorOverride == "0", "login applies class colours")
+	assert(db.chatClassColorSaved == "1", "login keeps the player's own value")
+	cvars.chatClassColorOverride = "1"
+	AddonLoaded("Blizzard_TrainerUI")
+	assert(cvars.chatClassColorOverride == "0", "an addon loading after login syncs class colours again")
+end
+
 print("chat: ok")

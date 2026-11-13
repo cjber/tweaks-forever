@@ -589,4 +589,47 @@ db.chatPlayerCard = false
 Emit("CHAT_MSG_WHISPER", "hello", "Thrall")
 assert(ns.ChatPlayerRecord.Get("Thrall").whispers == before + 2, "the card off stops counting")
 
+-- Before PLAYER_LOGIN the client fires ADDON_LOADED for every addon that loads after this one, while ns.db is still
+-- nil and ns.Init holds its startup functions (Core/Core.lua). Whisper tabs read no saved setting then; login
+-- applies the option, and an addon loading after login syncs it again.
+do
+	local early, startup, earlyHandlers = {}, {}, {}
+	for key, value in pairs(ns) do
+		early[key] = value
+	end
+	early.db = nil
+	early.Init = function(fn)
+		startup[#startup + 1] = fn
+	end
+	early.On = function(event, fn)
+		earlyHandlers[event] = earlyHandlers[event] or {}
+		earlyHandlers[event][#earlyHandlers[event] + 1] = fn
+	end
+	early.Active = function(key)
+		return early.db ~= nil and early.db[key] == true
+	end
+	local function AddonLoaded(name)
+		for _, fn in ipairs(earlyHandlers.ADDON_LOADED or {}) do
+			fn(name)
+		end
+	end
+	cvars.whisperMode = "inline"
+	cvarWrites = {}
+	setfenv(assert(loadfile("Chat/WhisperTabs.lua")), env)("TweaksForever", early)
+	AddonLoaded("Questie")
+	AddonLoaded("WeakAuras")
+	assert(#cvarWrites == 0, "an addon loading before login changes no whisper mode")
+
+	db.chatWhisperTabs, db.chatWhisperModeSaved = true, nil
+	early.db = db
+	for _, fn in ipairs(startup) do
+		fn()
+	end
+	assert(cvars.whisperMode == "popout", "login applies whisper tabs")
+	assert(db.chatWhisperModeSaved == "inline", "login keeps the player's own mode")
+	cvars.whisperMode = "inline"
+	AddonLoaded("Blizzard_TrainerUI")
+	assert(cvars.whisperMode == "popout", "an addon loading after login syncs whisper tabs again")
+end
+
 print("chat whispers: ok")
