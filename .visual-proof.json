@@ -1,23 +1,26 @@
 {
-  "input_digest": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
-  "runtime_sha256": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
-  "candidate": "50bf684a1d4396f90c417358ac556a90f38dd9054aa4f19ca0846d5ab23f584f",
-  "client_build": "1.60.1.70938 (Interface 16001)",
+  "input_digest": "0ed88594123679ca01aa92300aad08c66fd2789eb3b1c1ac942696936ec5adb0",
+  "runtime_sha256": "0ed88594123679ca01aa92300aad08c66fd2789eb3b1c1ac942696936ec5adb0",
+  "candidate": "faa69e4c8569802723ff702f0a65a72464edf890c60500b3d44d4049ac4dfb53",
   "tested_artifact": "source-tree",
-  "source_commit": "8a3b28a576d04eb49ba2f1421a623cbf11f47e14",
+  "client_build": "1.60.1.70938 (Interface 16001)",
+  "source_commit": "523ec062cdf778a241ce7a7d3fbce711ec142b3d",
+  "notes": "Recorded in the client from a git archive of this commit linked as the TweaksForever folder (client reported v2.7.1-dev+523ec06). The swing timers, their managed container and a frame anchored under them all report IsProtected false, so the strip can show, hide and anchor in combat. The strip itself needs an attackable target, which this session does not take; its look is the rangestrip mock scenes. No Lua errors this session.",
   "flows": [
     {
-      "name": "tweaks",
+      "name": "Range strip option in Tweaks settings",
       "steps": [
-        "/tweaks"
+        "Open the game's Options",
+        "Search for Range strip",
+        "The Tweaks Forever Interface result shows Range strip, on by default"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/149d24477184995464e2d40881e00cad/raw/cf28af02f1f238a270c7c909d7e01f92611c79a2/1-tweaks.png",
-      "sha256": "fae2dea5efccf769239a443bba367ca3d0087b7bbd58057da336aa237fdfa6fb"
+      "url": "https://gist.githubusercontent.com/cjber/c90a8346c79f3f71e2902a0ea76b8c2a/raw/05790ef2fa3542392043e365e919e5c5556c0057/531-range-strip-option.png",
+      "sha256": "7b11515c5219b082513a43e815c892bd443134fc8dd97705492d6f863d51f7b3"
     }
   ]
 }
