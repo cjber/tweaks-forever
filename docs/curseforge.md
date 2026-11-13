@@ -74,7 +74,7 @@ With Shortest Path Forever, Shift-clicking a dungeon or raid entrance plans the 
 
 <!-- forever-credits:start -->
 
-Thanks to Sojiro84, Mouchoir, SirGooie and everyone who reported a bug or asked for a feature.
+Thanks to Mouchoir, Sojiro84, SirGooie and everyone who reported a bug or asked for a feature.
 
 <!-- forever-credits:end -->
 
