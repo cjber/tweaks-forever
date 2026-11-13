@@ -1,26 +1,23 @@
 {
-  "input_digest": "e2bd46c367eed3798fbea7fbc7bed854436bd52f981eaae0403f310ba919b5df",
-  "runtime_sha256": "e2bd46c367eed3798fbea7fbc7bed854436bd52f981eaae0403f310ba919b5df",
-  "candidate": "72fda99cd00ea040e7922123684293f3d9b57f00f6da1f8607e8893aa879b1b4",
-  "tested_artifact": "source-tree",
+  "input_digest": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
+  "runtime_sha256": "169681e05a14618da93ee046f296d3966cdbb26a8570227e2130b43b62f032b3",
+  "candidate": "50bf684a1d4396f90c417358ac556a90f38dd9054aa4f19ca0846d5ab23f584f",
   "client_build": "1.60.1.70938 (Interface 16001)",
-  "source_commit": "8d423a2b61da8ee6257e7ccb04513628e23009a4",
-  "notes": "Checked in the headless client: the Titan Panel and Mapster declarations change no behaviour, and the item icon now comes from C_Item.GetItemIconByID.",
+  "tested_artifact": "source-tree",
+  "source_commit": "8a3b28a576d04eb49ba2f1421a623cbf11f47e14",
   "flows": [
     {
-      "name": "Chat item icons on C_Item.GetItemIconByID",
+      "name": "tweaks",
       "steps": [
-        "Link the candidate build with the store ForeverCore and /reload",
-        "Turn on chat item icons and pass a say line with a [Hearthstone] link through ChatFrame1's own chat event handler: the Hearthstone icon shows before the link",
-        "Print the loaded TweaksForever version: the candidate build, 0 Lua errors this session"
+        "/tweaks"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/0990754c8ffba2fe40866d6188344f42/raw/23b71071ea17084eb9b4091fc7722a43446bc02c/lint-calls.png",
-      "sha256": "ca73ba50d3622561be970b113f388127d14383bcb7efd9c11685263a532a2743"
+      "url": "https://gist.githubusercontent.com/cjber/149d24477184995464e2d40881e00cad/raw/cf28af02f1f238a270c7c909d7e01f92611c79a2/1-tweaks.png",
+      "sha256": "fae2dea5efccf769239a443bba367ca3d0087b7bbd58057da336aa237fdfa6fb"
     }
   ]
 }
