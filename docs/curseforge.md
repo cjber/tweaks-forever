@@ -18,6 +18,10 @@ Inside a dungeon or raid the map opens on its painted parchment sheet. Click an 
 
 Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.
 
+![A chat window with short headers, class colours and levels, an item icon, a folded repeat, a mention and a web link](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/chat.png)
+
+Chat options on: short headers, class colours with the level beside a name, an item's icon before its link, a folded repeat, a mention marker and clickable web links. The lines that survived a reload sit above their own divider.
+
 ![Three enemy nameplates with a Fireball cast](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
 
 Nameplates in retail's own frame, with your target outlined.

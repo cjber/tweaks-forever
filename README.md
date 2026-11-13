@@ -58,6 +58,12 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Small things.** Quiet repeated macro errors, hints for my other Forever addons (with a Forever addons settings page) and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
 
 <p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/chat.png" width="768" alt="A chat window with short headers, class colours and levels, an item icon, a folded repeat, a mention and a web link">
+</p>
+
+<p align="center">Chat options on: short headers, class colours and levels, an item icon, a folded repeat, a mention, a web link and the lines that survived a reload.</p>
+
+<p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined with a Fireball cast">
 </p>
 

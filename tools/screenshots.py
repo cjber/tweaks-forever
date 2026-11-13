@@ -14,7 +14,7 @@ import re
 import sys
 from pathlib import Path
 
-from PIL import Image  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
+from PIL import Image, ImageChops  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
 
 FOREVER_CORE = Path(os.environ.get("FOREVER_CORE", Path(__file__).resolve().parents[2] / "forever-core")).expanduser()
 WOWMOCK = FOREVER_CORE / "tools" / "wowmock"
@@ -858,12 +858,203 @@ def quest_abandon(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).image.save(OUT / "quests.png")
 
 
+# Chat: a docked ChatFrame1 with the Chat page's options on. The frame's own chrome is the stock ChatFrame art,
+# which the client draws by FileDataID: it is the host's art, not the addon's, and no atlas covers that frame.
+CHAT = Font(ARIALN, 14, (1, 1, 1), (1, -1))  # ChatFontNormal, inheriting NumberFont_Shadow_Med
+CHAT_TAB = FONTS["GameFontNormalSmall"]  # ChatTabTemplate's ButtonText
+CHAT_WIDTH, CHAT_LINE, CHAT_TEXT = 430, 14, 4
+# Host chrome for the stock frame in UI_ART_BUILD, named so a stale pin reads: the client's own ChatFrame art.
+CHAT_ART = {
+    "background": 130937,  # Interface\ChatFrame\ChatFrameBackground
+    "corner": 374189,  # Interface\ChatFrame\UI-ChatFrame-BorderCorner
+    "left": 374190,  # Interface\ChatFrame\UI-ChatFrame-BorderLeft
+    "top": 374191,  # Interface\ChatFrame\UI-ChatFrame-BorderTop
+    "tab-bg-left": 374162,  # Interface\ChatFrame\ChatFrameTab-BGLeft
+    "tab-bg-mid": 374164,  # Interface\ChatFrame\ChatFrameTab-BGMid
+    "tab-bg-right": 374166,  # Interface\ChatFrame\ChatFrameTab-BGRight
+    "tab-selected-left": 374174,  # Interface\ChatFrame\ChatFrameTab-SelectedLeft
+    "tab-selected-mid": 374176,  # Interface\ChatFrame\ChatFrameTab-SelectedMid
+    "tab-selected-right": 374178,  # Interface\ChatFrame\ChatFrameTab-SelectedRight
+}
+# The frame fades to DEFAULT_CHATFRAME_ALPHA (0.25) when the cursor is away; over the plain backdrop it is raised so
+# the lines read, as a dark scene stands in for the game world here.
+CHAT_ALPHA = 0.6
+CHAT_TIMESTAMP = (0.5, 0.5, 0.5)  # GRAY_FONT_COLOR, the client's own secondary chat colour
+CHAT_TYPE = {
+    "channel": (1.0, 0.7529, 0.7529),  # ChatTypeInfo CHANNEL
+    "guild": (0.25, 1.0, 0.25),  # GUILD
+    "party": (2 / 3, 2 / 3, 1.0),  # PARTY
+    "system": (1.0, 1.0, 0.0),  # SYSTEM
+}
+# RAID_CLASS_COLORS.
+CHAT_CLASS = {
+    "warrior": (0.78, 0.61, 0.43),
+    "paladin": (0.96, 0.55, 0.73),
+    "rogue": (1.0, 0.96, 0.41),
+    "priest": (1.0, 1.0, 1.0),
+}
+# The tooltip quality colours, as the client wraps an item link's display text.
+CHAT_ITEM_QUALITY = {0: "9d9d9d", 1: "ffffff", 2: "1eff00", 3: "0070dd", 4: "a335ee", 5: "ff8000"}
+
+
+def chat_grey(text):
+    """GRAY_FONT_COLOR: the level after a name, a fold's count, the divider's label and a timestamp."""
+    return colored(text, CHAT_TIMESTAMP)
+
+
+def chat_name(name, cls, level):
+    """The client's bracketed sender, class-coloured by Chat/ClassLevels.lua with the level in grey inside it."""
+    return f"[{colored(name, CHAT_CLASS[cls])} {chat_grey(str(level))}]"
+
+
+def chat_item(ui, item_id):
+    """An item link with Chat/ItemIcons.lua's icon: the 64-texel square crop's 5 to 59 box, at the line's height.
+    The link's display text is what the player sees; the client's hyperlink payload is not part of a render."""
+    item = ui.item(item_id)
+    icon = f"|T{item.icon}:0:0:0:0:64:64:5:59:5:59|t"
+    return f"|cff{CHAT_ITEM_QUALITY[item.quality]}{icon} [{item.name}]|r"
+
+
+def chat_web(url):
+    """Chat/WebLinks.lua's link: the address itself in its light blue, as the player reads it."""
+    return colored(f"[{url}]", (0x66 / 255, 0xBB / 255, 1.0))
+
+
+def chat_host(ui, key):
+    """The stock ChatFrame's own art, by the FileDataID the client draws it with: host chrome, not the addon's.
+    Read through _image because the public texture() refuses the client's pre-Legion chrome."""
+    return ui._image(CHAT_ART[key])
+
+
+def chat_additive(image):
+    """An ADD-layer texture as straight alpha, so it lights the tab under it instead of painting its black."""
+    r, g, b, a = image.split()
+    light = ImageChops.multiply(ImageChops.lighter(ImageChops.lighter(r, g), b), a)
+    out = image.copy()
+    out.putalpha(light)
+    return out
+
+
+def chat_tabs(ui, canvas, x, y, names, selected=0):
+    """ChatTabTemplate: Background left/mid/right 16x32, the selected tab's ADD layer in NORMAL_FONT_COLOR, and
+    PanelTemplates_TabResize's width (the text + 20) with tabs one unit apart."""
+    parts = {
+        (kind, side): chat_host(ui, f"tab-{kind}-{side}")
+        for kind in ("bg", "selected")
+        for side in ("left", "mid", "right")
+    }
+    active = {side: chat_additive(parts["selected", side]) for side in ("left", "mid", "right")}
+    for index, label in enumerate(names):
+        width = max(32, canvas.text_width(label, CHAT_TAB) + 20)
+        alpha = 1.0 if index == selected else 0.6
+        canvas.draw(parts["bg", "left"], x - 2, y, 16, 32, (1, 1, 1, alpha))
+        canvas.draw(parts["bg", "mid"], x + 14, y, width - 28, 32, (1, 1, 1, alpha))
+        canvas.draw(parts["bg", "right"], x + width - 14, y, 16, 32, (1, 1, 1, alpha))
+        if index == selected:
+            canvas.draw(active["left"], x - 2, y, 16, 32, (*NORMAL, alpha))
+            canvas.draw(active["mid"], x + 14, y, width - 28, 32, (*NORMAL, alpha))
+            canvas.draw(active["right"], x + width - 14, y, 16, 32, (*NORMAL, alpha))
+        canvas.text(x, y + 16, label, CHAT_TAB, justify="CENTER", width=width)
+        x += width + 1
+
+
+def chat_frame(ui, rows, tabs, selected=0):
+    """A docked ChatFrame1: tabs over FloatingBorderedFrame's background and border, lines bottom-aligned.
+    `rows` are (kind, text, colour), a "divider" row drawn in its own grey."""
+    probe = ui.canvas(1, 1)
+    laid = []
+    for kind, text, colour in rows:
+        lines = [text] if kind == "divider" else wrap_text(probe, text, CHAT, CHAT_WIDTH - 2 * CHAT_TEXT - 8)
+        laid.append((lines, colour))
+    total = CHAT_LINE * sum(len(lines) for lines, _ in laid)
+    height = max(120, total + 12)
+    canvas = ui.canvas(CHAT_WIDTH + 26, height + 48)
+    left, top = 6, 36
+    bg_x, bg_y, bg_w, bg_h = left - 2, top + 3, CHAT_WIDTH + 17, height - 9
+    canvas.draw(
+        chat_host(ui, "background"),
+        bg_x,
+        bg_y,
+        bg_w,
+        bg_h,
+        (0, 0, 0, CHAT_ALPHA),
+    )
+    # FloatingBorderedFrame's border: 8-square corners 4 outside the background, 16-wide edges that tile along it
+    # (the art is uniform on that axis, so drawing the edge at the length is the same pixels).
+    corner = chat_host(ui, "corner")
+    edge_left = chat_host(ui, "left")
+    edge_top = chat_host(ui, "top")
+    shade = (1, 1, 1, CHAT_ALPHA)
+    canvas.draw(corner, bg_x - 4, bg_y - 4, 8, 8, shade)
+    canvas.draw(corner, bg_x + bg_w - 4, bg_y - 4, 8, 8, shade, flip_h=True)
+    canvas.draw(corner, bg_x - 4, bg_y + bg_h - 4, 8, 8, shade, flip_v=True)
+    canvas.draw(corner, bg_x + bg_w - 4, bg_y + bg_h - 4, 8, 8, shade, flip_h=True, flip_v=True)
+    canvas.draw(edge_left, bg_x - 4, bg_y + 4, 16, bg_h - 8, shade)
+    canvas.draw(edge_left, bg_x + bg_w - 12, bg_y + 4, 16, bg_h - 8, shade, flip_h=True)
+    canvas.draw(edge_top, bg_x + 4, bg_y - 4, bg_w - 8, 16, shade)
+    canvas.draw(edge_top, bg_x + 4, bg_y + bg_h - 12, bg_w - 8, 16, shade, flip_v=True)
+    chat_tabs(ui, canvas, left, bg_y - 32, tabs, selected)
+    y = bg_y + bg_h - 6 - total
+    for lines, colour in laid:
+        for line in lines:
+            canvas.text(bg_x + 2 + CHAT_TEXT, y, line, CHAT, colour)
+            y += CHAT_LINE
+    return canvas
+
+
+def chat(ui):
+    """The chat window with the Chat options on: short headers, class colours with levels, an item icon, a folded
+    repeat, a mention marker, a web link, and the divider above the lines that survived a /reload."""
+    members = {
+        "ironquill": chat_name("Ironquill", "rogue", 37),
+        "tamsin": chat_name("Tamsin", "paladin", 38),
+        "oakhelm": chat_name("Oakhelm", "warrior", 42),
+        "mirabelle": chat_name("Mirabelle", "priest", 41),
+    }
+    ring = chat_item(ui, 281927)  # Boulderheart Band, a level 22 rare from the Forever build
+    url = "https://www.wowhead.com/classic/item=281927"
+    rows = [
+        (
+            "line",
+            chat_grey("13:58") + f" [G] {members['oakhelm']}: anyone up for a Deadmines run tonight?",
+            CHAT_TYPE["guild"],
+        ),
+        (
+            "line",
+            chat_grey("14:01") + f" [Trade] {members['ironquill']}: WTS {ring} 45s, pst {chat_grey('x3')}",
+            CHAT_TYPE["channel"],
+        ),
+        (
+            "line",
+            chat_grey("14:02") + f" [General] {members['tamsin']}: anyone know where the Defias traitor is?",
+            CHAT_TYPE["channel"],
+        ),
+        (
+            "line",
+            chat_grey("14:03") + f" [G] {members['oakhelm']}: price list here {chat_web(url)}",
+            CHAT_TYPE["guild"],
+        ),
+        ("line", chat_grey("14:04") + " Aldric has come online.", CHAT_TYPE["system"]),
+        ("divider", atlas_markup("communities-chat-date-line", 165, 8) + " Before your /reload", CHAT_TIMESTAMP),
+        (
+            "line",
+            chat_grey("14:09")
+            + f" [P] {members['mirabelle']}: "
+            + atlas_markup("communities-icon-chat", 12, 12)
+            + f" {colored('Barry', NORMAL)} can you pull the next pack? I'm out of mana",
+            CHAT_TYPE["party"],
+        ),
+    ]
+    scene(ui, [(chat_frame(ui, rows, ("General", "Combat Log")), 0, 0)], MARGIN).save(OUT / "chat.png")
+
+
 UI_ART_BUILD = "1.60.1.70124"
 
 
 def main():
     ui = Ui(build=UI_ART_BUILD, scale=2)
     quest_abandon(ui)
+    chat(ui)
     gear(ui)
     menu(ui)
     exploration(ui)
