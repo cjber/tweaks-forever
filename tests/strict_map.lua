@@ -203,13 +203,6 @@ function Kit.Region()
 	})
 end
 
--- The pieces the addon's XML templates give a frame.
-local TEMPLATES = {
-	TweaksForeverDungeonEntrancePinTemplate = function(frame)
-		frame.Texture, frame.HighlightTexture = Kit.Region(), Kit.Region()
-	end,
-}
-
 ---@return table
 function Kit.CreateFrame(frameType, name, parent, template)
 	local frame = setmetatable({
@@ -222,9 +215,6 @@ function Kit.CreateFrame(frameType, name, parent, template)
 		events = {},
 	}, Frame)
 	frame.shown = true
-	if template then
-		assert(TEMPLATES[template], "no stub for template " .. template)(frame)
-	end
 	Kit.frames[#Kit.frames + 1] = frame
 	return frame
 end

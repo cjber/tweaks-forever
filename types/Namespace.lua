@@ -364,9 +364,8 @@ TweaksForeverCharDB = nil
 ---@field ZoneRanges table<integer, [number, number]>
 ---@field ZoneLevels TFZoneLevels
 ---@field DungeonEntrances table<integer, TFEntrance[]>
----@field InstanceEntrances table<integer, TFDungeonEntrance> by instance Map.ID, before pin clustering
+---@field InstanceEntrances table<integer, TFDungeonEntrance> by instance Map.ID, before entry clustering
 ---@field RaidInstances table<integer, boolean>
----@field Entrances TFEntrances
 ---@field MapDraw TFMapCanvasModule our own views on the maps (Map/MapDraw.lua)
 ---@field DungeonMaps TFDungeonMaps
 ---@field DungeonMapArt table<integer, TFInteriorMap[]>
@@ -379,8 +378,6 @@ TweaksForeverCharDB = nil
 ---@field FitButton fun(button: Button, width: number)
 ---@field EscapeCloses fun(frame: Frame)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
----@field NavigateHint fun(shift: boolean?): string
----@field EntranceHint fun(shift: boolean?): string? the grey line about Shortest Path Forever on a dungeon entrance (Integrations/Companions.lua)
 ---@field WHATS_NEW string the headline of the release WHATS_NEW_VERSION names
 ---@field WHATS_NEW_VERSION string the newest release in CHANGELOG.md with a bold headline
 ---@field WhatsNew TFWhatsNew

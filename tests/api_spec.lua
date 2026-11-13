@@ -412,10 +412,13 @@ assert(#API.Trainers() == 0, "and a class the client doesn't know")
 class = deathknight
 
 local cluster = ns.DungeonEntrances[1427][1]
-assert(#cluster.instances == 3 and cluster.x ~= entrance.x and cluster.y ~= entrance.y, "not the merged pin centre")
+assert(#cluster.instances == 3 and cluster.x ~= entrance.x and cluster.y ~= entrance.y, "not the merged entry centre")
 cluster.x, cluster.y = 0.1, 0.2
 entrance = API.DungeonEntrance(230)
-assert(entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725, "pin changes cannot move the destination")
+assert(
+	entrance.map == 1427 and entrance.x == 0.271 and entrance.y == 0.725,
+	"merged entry changes cannot move the destination"
+)
 local unknown, unknownReason = API.DungeonEntrance(999999)
 assert(unknown == nil and unknownReason == "none", "unknown instance has nothing to answer")
 local naxx, naxxReason = API.DungeonEntrance(533)

@@ -92,7 +92,7 @@ jobs:
 
             ${{ steps.report.outputs.markdown }}
 
-            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up and the entrance pins sit on their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers, `Data/ClassSpells.lua` for spells that dropped out, and `Data/ForeverQuests.lua` for quest IDs that dropped out.
+            Before merging, open a few zone maps with *Reveal unexplored areas* on and check the tinted areas line up, confirm the entrances still match their dungeons, and read the diffs of `Data/CampBenefits.lua` and `Data/ZoneLevels.lua` for changed numbers, `Data/ClassSpells.lua` for spells that dropped out, and `Data/ForeverQuests.lua` for quest IDs that dropped out.
 
             The workflow that opened this PR also approved its CI, so the required checks run without a maintainer's approval.
 

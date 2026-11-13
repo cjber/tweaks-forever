@@ -1,3 +1,9 @@
+local toc = assert(io.open("TweaksForever.toc", "r"))
+local loadedFiles = toc:read("*a")
+toc:close()
+assert(not loadedFiles:find("Map\\DungeonEntrances.lua", 1, true), "the entrance pins must not load")
+assert(not loadedFiles:find("Map\\DungeonEntrances.xml", 1, true), "the entrance pin art must not load")
+
 local features, initializers, events, handlers = {}, {}, {}, {}
 local active = true
 local ns = {
@@ -480,11 +486,11 @@ instance = 90
 events.ZONE_CHANGED_NEW_AREA()
 assert(host.shown and heading.text == "Gnomeregan")
 
--- Clicking an entrance outdoors draws every floor behind it over the map it was clicked on.
+-- A dungeon's floors draw over the map they are shown on.
 instanceType, instance = "none", 0
 events.ZONE_CHANGED_NEW_AREA()
 assert(not host.shown)
-assert(Model.Open(map:GetMapID(), { 36, 90, 409 }), "an entrance with art opens")
+assert(Model.Open(map:GetMapID(), { 36, 90, 409 }), "a dungeon with art opens")
 assert(host.shown and not reopen.shown and heading.text == "The Deadmines 1")
 assert(#Model.FloorsOf(art, { 36, 90, 409 }) == 3 and #Model.FloorsOf(art, { 409 }) == 0)
 events.ZONE_CHANGED_NEW_AREA()
@@ -494,21 +500,21 @@ assert(host.shown, "a zone event closed the map the player asked for")
 back.scripts.OnClick()
 assert(not host.shown and not reopen.shown)
 
--- The map turning, or closing, drops the entrance's map.
+-- The map turning, or closing, drops the sheet.
 assert(Model.Open(map:GetMapID(), { 36 }))
 local turned = map.GetMapID
 map.GetMapID = function()
 	return -1
 end
 Turned()
-assert(not host.shown, "another map stayed under an entrance's sheet")
+assert(not host.shown, "another map stayed under the sheet")
 map.GetMapID = turned
 assert(Model.Open(map:GetMapID(), { 36 }))
 Close()
 Open()
-assert(not host.shown, "an entrance's sheet came back with the map")
+assert(not host.shown, "the sheet came back with the map")
 
--- No art, combat or the setting off leaves the click to travel.
+-- No art, combat or the setting off leaves no sheet to show.
 assert(not Model.Open(map:GetMapID(), { 409 }))
 combat = true
 assert(not Model.Open(map:GetMapID(), { 36 }))

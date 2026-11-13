@@ -6,17 +6,13 @@ Free, with nothing locked behind it. If it saves you time, you can [sponsor me o
 
 [![Join me on Discord](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/discord-button.png)](https://discord.gg/FpHugGxRJY) [![Sponsor me on GitHub](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/github-sponsors-button.png)](https://github.com/sponsors/cjber) [![Support me on Ko-fi](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/kofi-button.png)](https://ko-fi.com/cjber)
 
-![Dungeon entrances, nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
+![Nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
-The junk coin marks what sells with your greys at a merchant. Also dungeon entrances and nameplates.
+The junk coin marks what sells with your greys at a merchant. Also nameplates.
 
 ![The world map inside Blackfathom Deeps with its floor and legend](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png)
 
-Inside a dungeon or raid the map opens on its painted parchment sheet. Click an entrance to see one from outside.
-
-![The Eastern Kingdoms with a dungeon icon at every entrance](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeons.png)
-
-Every dungeon and raid entrance, with retail's icons. Blackrock Mountain lists all four.
+Inside a dungeon or raid the map opens on its painted parchment sheet, with a button for each floor.
 
 ![A chat window with short headers, class colours and levels, an item icon, a folded repeat, a mention and a web link](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/chat.png)
 
@@ -37,7 +33,7 @@ These images are generated previews of the Tweaks UI.
 - **Automation.** Accept and turn in quests (hold Shift to talk normally), skip single-option gossip, open the flight map, accept summons and group resurrections, release in battlegrounds, decline duels (friends and guild can be let through), and accept party invites from friends or decline strangers'. All off by default.
 - **Vendors and gear groups.** Repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback; Alt+Right-click marks anything as junk when turned on, and holding Shift as a merchant opens skips both. Ctrl+Right-click a bag item to put it in a coloured group, then equip the group in one click.
 - **Chat, rares and levelling.** Optional chat fixes, all off until you turn them on: short channel names, class colours with levels when the game knows them, item icons in links, repeated lines folded into a grey count, a marker when someone mentions you, clickable web links that open a copy box, whisper tabs with an unread count and a line saying when you last grouped with the player, a card on hover with what the game knows about them, a bag item picker when you type [ and a few letters (Enter puts the link in and sends the line; a click puts it in so you can keep typing), and the last 200 lines after a reload. Nothing is sent to other players beyond the line you send. The Chat page also opens the game's own Chat Timestamps setting. Rare alerts in chat, XP per hour and time to level on the experience bar, and the XP your quest log is worth shaded onto the bar. For every class, a strip on the swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap.
-- **Maps.** Every dungeon and raid entrance gets retail's icon. Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside or click their entrance.
+- **Maps.** Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside.
 - **Nameplates, tooltips and windows.** A taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
 - **Quests and camps.** Quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so. Quest item sparkles use the game's own effect, as in Forever Loot Sparkles: off by default, they turn outlines off, and removing them needs a restart.
 - **Spellbook, trainers and fishing.** Unlearned spells in the spellbook, the Pet tab's future abilities, a pet trainer note naming what your pet has not learned with a button to Beast Training, known ranks marked in Beast Training, Train all for what you can afford, and the reagent bag in the combined bag. Double right-click to cast or apply a lure, with a warning when you have none.
@@ -74,7 +70,7 @@ For help, ideas and each day's release notes, join [cjber's Workshop on Discord]
 
 <!-- forever-family:end -->
 
-With Shortest Path Forever, Shift-clicking a dungeon or raid entrance plans the way there. Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint and entrance icons step aside for Legacy Forever.
+Adventure Guide Forever uses Tweaks' class trainer locations for its spell reminders. Tweaks' unexplored tint steps aside for Legacy Forever.
 
 <!-- forever-credits:start -->
 

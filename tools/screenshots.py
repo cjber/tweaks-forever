@@ -293,71 +293,6 @@ def zone_levels(ui):
     scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "zonelevels.png")
 
 
-EASTERN_KINGDOMS = 1415
-BLACKROCK_MOUNTAIN = 25  # AreaTable ID
-ENTRANCE_ICON = 32  # the Dungeon and Raid atlases' size; SetScalingLimits(1, 1.0, 1.2) keeps it on screen at min zoom
-
-
-def entrances(ui_map):
-    """Data/DungeonEntrances.lua for one map: [(x, y, instances, area)]."""
-    source = (ROOT / "Data" / "DungeonEntrances.lua").read_text()
-    block = re.search(rf"\[{ui_map}\] = \{{(.*?)\n\t\}},", source, re.S)
-    if not block:
-        raise KeyError(f"no entrances for {ui_map}")
-    pattern = r"x = ([\d.]+), y = ([\d.]+), instances = \{ ([\d, ]+) \}(?:, area = (\d+))?"
-    return [
-        (float(x), float(y), [int(i) for i in ids.split(", ")], int(area) if area else None)
-        for x, y, ids, area in re.findall(pattern, block.group(1))
-    ]
-
-
-def raid_instances():
-    source = (ROOT / "Data" / "DungeonEntrances.lua").read_text()
-    return {int(i) for i in re.findall(r"\[(\d+)\] = true", source.split("ns.RaidInstances", 1)[1])}
-
-
-def dungeon_entrances(ui):
-    """The Eastern Kingdoms with every entrance pinned, pointing at Blackrock Mountain: the POI area label and
-    the pin's tooltip (ANCHOR_RIGHT), titled by the complex with its instances in NORMAL_FONT_COLOR."""
-    dungeon_layers(ui)[0].save(OUT / "dungeons.png")
-
-
-def dungeon_layers(ui):
-    """The dungeons scene, and the same framing before the pointer reaches Blackrock Mountain."""
-    art = map_art(ui, EASTERN_KINGDOMS)
-    nav = ("World", "Eastern Kingdoms")
-    frame, rects = world_map_frame(ui, art, nav, arrows=nav[1:])
-    mx, my, mw, mh = rects["map"]
-    raids, maps = raid_instances(), ui.table("Map")
-    hovered = None
-    for x, y, instances, area in entrances(EASTERN_KINGDOMS):
-        atlas = "Raid" if all(i in raids for i in instances) else "Dungeon"
-        px, py = mx + x * mw - ENTRANCE_ICON / 2, my + y * mh - ENTRANCE_ICON / 2
-        frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON)
-        if area == BLACKROCK_MOUNTAIN:
-            hovered = (px, py, instances)
-    if hovered is None:
-        raise KeyError("no Blackrock Mountain pin on the Eastern Kingdoms")
-    px, py, instances = hovered
-    title = ui.table("AreaTable")[str(BLACKROCK_MOUNTAIN)]["AreaName_lang"]
-    here = on_map(ui, EASTERN_KINGDOMS, *LAKESHIRE)
-    idle = ui.canvas(frame.width, frame.height)
-    idle.paste(frame, 0, 0)
-    # Before the pointer reaches the map, only the player's position; then the cursor's on the pin too.
-    draw_coords(idle, rects, here)
-    centre = ((px + ENTRANCE_ICON / 2 - mx) / mw, (py + ENTRANCE_ICON / 2 - my) / mh)
-    draw_coords(frame, rects, here, centre)
-    atlas = "Raid" if all(i in raids for i in instances) else "Dungeon"
-    # The HIGHLIGHT layer: the same atlas drawn ADD at alpha 0.4.
-    frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON, color=(1, 1, 1, 0.4), blend="ADD")
-    frame.text(mx, my + AREA_LABEL_TOP, title, AREA_LABEL_FONT, justify="CENTER", width=mw)
-    icons = {i: atlas_markup("Raid" if i in raids else "Dungeon", 16, 16) for i in instances}
-    names = [f"{icons[i]} {maps[str(i)]['MapName_lang']}" for i in instances]
-    lines = [TooltipLine(title)] + [TooltipLine(name, NORMAL) for name in names]
-    tip = tooltip(ui, lines)
-    return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
-
-
 def dungeon_map(ui):
     """The world map opened inside Blackfathom Deeps with the client's native four by three tile sheet."""
     title = "Blackfathom Deeps 1"
@@ -914,13 +849,13 @@ def nameplates_scene(ui):
     return scene(ui, layers, MARGIN)
 
 
-# The demo: a short tour of dungeon pins, nameplates and junk coins, at 10 frames a second.
+# The demo: a short tour of nameplates and junk coins, at 10 frames a second.
 DEMO_SIZE = (760, 520)
 DEMO_LIMIT = 3_000_000
 # (scene, tenths of a second held); a cut to a new scene crossfades over DEMO_FADE tenths.
-DEMO_SHOTS = [("dungeons idle", 10), ("dungeons", 20), ("nameplates", 20), ("junk idle", 6), ("junk", 19)]
+DEMO_SHOTS = [("nameplates", 20), ("junk idle", 6), ("junk", 19)]
 DEMO_FADE = 5
-DEMO_HOVERS = {("dungeons idle", "dungeons"), ("junk idle", "junk")}
+DEMO_HOVERS = {("junk idle", "junk")}
 
 
 def fitted(canvas):
@@ -936,11 +871,8 @@ def fitted(canvas):
 
 
 def demo(ui):
-    dungeons, dungeons_idle = dungeon_layers(ui)
     junk_shown, junk_idle = junk_layers(ui)
     shots = {
-        "dungeons idle": fitted(dungeons_idle),
-        "dungeons": fitted(dungeons),
         "nameplates": fitted(nameplates_scene(ui)),
         "junk idle": fitted(junk_idle),
         "junk": fitted(junk_shown),
@@ -955,7 +887,7 @@ def demo(ui):
         previous = name
     # One palette for every frame, from each scene, so colours hold still and two runs encode the same bytes.
     sample = Image.new("RGB", (DEMO_SIZE[0], DEMO_SIZE[1] * 3))
-    for index, name in enumerate(("dungeons", "nameplates", "junk")):
+    for index, name in enumerate(("nameplates", "junk idle", "junk")):
         sample.paste(shots[name], (0, DEMO_SIZE[1] * index))
     palette = sample.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
     indexed = [frame.quantize(palette=palette, dither=Image.Dither.NONE) for frame in frames]
@@ -1289,7 +1221,6 @@ def main():
     menu(ui)
     exploration(ui)
     zone_levels(ui)
-    dungeon_entrances(ui)
     dungeonmap(ui)
     junk(ui)
     campsite(ui)

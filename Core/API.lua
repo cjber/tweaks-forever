@@ -93,8 +93,8 @@ function API.Trainers()
 	return trainers
 end
 
--- An instance's own door, never a merged pin's centre: Blackrock Mountain draws one pin for four doors, and a caller
--- routing to Blackwing Lair wants its own. Baked, so it answers with pins off or suppressed, before login and in
+-- An instance's own door, never a merged entry's centre: Data/DungeonEntrances.lua groups Blackrock Mountain's four
+-- doors as one entry, and a caller routing to Blackwing Lair wants its own. Baked, so it answers before login and in
 -- combat; an instance with no entrance in the client has nothing to answer.
 ---@param instanceID integer
 ---@return TFDungeonEntrance?

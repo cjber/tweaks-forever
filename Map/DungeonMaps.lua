@@ -9,8 +9,8 @@ ns.Feature({
 	key = "dungeonMaps",
 	category = "Maps",
 	name = "Dungeon interior maps",
-	tooltip = "Inside a dungeon or raid, or after clicking its entrance, the world map shows its painted map, with a "
-		.. "floor picker and a Back to map button.",
+	tooltip = "Inside a dungeon or raid, the world map shows its painted map, with a floor picker and a "
+		.. "Back to map button.",
 	default = true,
 })
 
@@ -277,7 +277,7 @@ ns.Init(function()
 		Draw()
 	end
 
-	-- An entrance's dungeon, over the map it was clicked on. False leaves the click to travel instead.
+	-- A dungeon's floors over the map it is shown on. False leaves no sheet to show.
 	---@param uiMapID integer
 	---@param instances integer[]
 	---@return boolean

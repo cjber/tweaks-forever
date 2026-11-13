@@ -73,8 +73,6 @@ Map\Exploration.lua
 Map\ZoneLevels.lua
 Map\Coordinates.lua
 Integrations\Navigate.lua
-Map\DungeonEntrances.lua
-Map\DungeonEntrances.xml
 Map\DungeonMaps.lua
 UI\Frames.lua
 UI\Errors.lua
@@ -92,7 +90,6 @@ UI\BeastTraining.lua
 Features\Fishing.lua
 UI\Reload.lua
 UI\WhatsNew.lua
-Integrations\Companions.lua
 Chat\Shared.lua
 Chat\ShortNames.lua
 Chat\ClassLevels.lua
