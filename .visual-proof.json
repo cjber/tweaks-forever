@@ -1,16 +1,16 @@
 {
-  "input_digest": "6d4e530f2c5eed23cf1131920b5aa115f0eec199d850469beb5bfc1cf6c74baf",
-  "runtime_sha256": "6d4e530f2c5eed23cf1131920b5aa115f0eec199d850469beb5bfc1cf6c74baf",
-  "candidate": "dab365403eb9101c0758123ba742abf3ca6e1ae612c4e365ee98ef95c0657947",
+  "input_digest": "dd9631ae5b7c5642971d1d44c1d1cddb290195c591302ab5e25b66e91eacdab1",
+  "runtime_sha256": "dd9631ae5b7c5642971d1d44c1d1cddb290195c591302ab5e25b66e91eacdab1",
+  "candidate": "64a3c1c16c465fd7ac47581cae215f1a5ea2b3b2bbde15a4c620757e5ee6c163",
   "tested_artifact": "source-tree",
   "client_build": "1.60.1.70938 (Interface 16001)",
-  "source_commit": "52fd7536bcaaa8295d634179d6000c4c8d252a5a",
-  "notes": "Recorded in the client from a git archive of this commit linked as the TweaksForever folder, with its TOC version set to 2.8.0 (visual_proof --compare: equivalent). No Lua errors this session.",
+  "source_commit": "8fad82b0854bbbc4f677bff417a99a1b7e5588f1",
+  "notes": "Recorded in the client from a git archive of this commit linked as the TweaksForever folder, with its TOC version set to 2.8.0 (visual_proof --compare: equivalent), beside the store ForeverCore v1.12.0. No Lua errors this session.",
   "flows": [
     {
       "name": "After an update to 2.8.0 the chat says once what changed",
       "steps": [
-        "Link the release candidate with its TOC version at 2.8.0 over the saved 2.7 version",
+        "Link the release candidate with its TOC version at 2.8.0 over the saved v2.7.1",
         "Log in",
         "Read the chat: one Tweaks Forever line names 2.8.0 and the range strip headline"
       ],
@@ -19,8 +19,8 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/c90a8346c79f3f71e2902a0ea76b8c2a/raw/0bbb487d428e6007c44c3b3aea32bf99daed7366/567-update-notice.png",
-      "sha256": "101d3d3273f4320d6b01d4ae1891cd80abbbf88538480a3ab7b8d0da2f386a1f"
+      "url": "https://gist.githubusercontent.com/cjber/c90a8346c79f3f71e2902a0ea76b8c2a/raw/8b00fac0c8ef11e9798d7c9aa43845dd327fc0ee/567-update-notice-v2.png",
+      "sha256": "e6f480cd0f9d87171ad574a84690544e68b5e6e12517db311828b389c611a6ee"
     }
   ]
 }
