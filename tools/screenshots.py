@@ -12,9 +12,10 @@ import math
 import os
 import re
 import sys
+from dataclasses import replace
 from pathlib import Path
 
-from PIL import Image  # ty: ignore[unresolved-import]  # Pillow is local only, like wowmock
+from PIL import Image, ImageChops  # Pillow comes from the uv dev group
 
 FOREVER_CORE = Path(os.environ.get("FOREVER_CORE", Path(__file__).resolve().parents[2] / "forever-core")).expanduser()
 WOWMOCK = FOREVER_CORE / "tools" / "wowmock"
@@ -23,7 +24,7 @@ if not (WOWMOCK / "wowmock.py").is_file():
 sys.path.insert(0, str(WOWMOCK))
 
 # wowmock resolves from $FOREVER_CORE/tools/wowmock at runtime (sys.path above), so ty cannot see it.
-from wowmock import (  # ty: ignore[unresolved-import]
+from wowmock import (  # ty: ignore[import-not-found]
     ARIALN,
     FONTS,
     FRIZQT,
@@ -292,71 +293,6 @@ def zone_levels(ui):
     scene(ui, [(frame, 0, 0)], MARGIN).save(OUT / "zonelevels.png")
 
 
-EASTERN_KINGDOMS = 1415
-BLACKROCK_MOUNTAIN = 25  # AreaTable ID
-ENTRANCE_ICON = 32  # the Dungeon and Raid atlases' size; SetScalingLimits(1, 1.0, 1.2) keeps it on screen at min zoom
-
-
-def entrances(ui_map):
-    """Data/DungeonEntrances.lua for one map: [(x, y, instances, area)]."""
-    source = (ROOT / "Data" / "DungeonEntrances.lua").read_text()
-    block = re.search(rf"\[{ui_map}\] = \{{(.*?)\n\t\}},", source, re.S)
-    if not block:
-        raise KeyError(f"no entrances for {ui_map}")
-    pattern = r"x = ([\d.]+), y = ([\d.]+), instances = \{ ([\d, ]+) \}(?:, area = (\d+))?"
-    return [
-        (float(x), float(y), [int(i) for i in ids.split(", ")], int(area) if area else None)
-        for x, y, ids, area in re.findall(pattern, block.group(1))
-    ]
-
-
-def raid_instances():
-    source = (ROOT / "Data" / "DungeonEntrances.lua").read_text()
-    return {int(i) for i in re.findall(r"\[(\d+)\] = true", source.split("ns.RaidInstances", 1)[1])}
-
-
-def dungeon_entrances(ui):
-    """The Eastern Kingdoms with every entrance pinned, pointing at Blackrock Mountain: the POI area label and
-    the pin's tooltip (ANCHOR_RIGHT), titled by the complex with its instances in NORMAL_FONT_COLOR."""
-    dungeon_layers(ui)[0].save(OUT / "dungeons.png")
-
-
-def dungeon_layers(ui):
-    """The dungeons scene, and the same framing before the pointer reaches Blackrock Mountain."""
-    art = map_art(ui, EASTERN_KINGDOMS)
-    nav = ("World", "Eastern Kingdoms")
-    frame, rects = world_map_frame(ui, art, nav, arrows=nav[1:])
-    mx, my, mw, mh = rects["map"]
-    raids, maps = raid_instances(), ui.table("Map")
-    hovered = None
-    for x, y, instances, area in entrances(EASTERN_KINGDOMS):
-        atlas = "Raid" if all(i in raids for i in instances) else "Dungeon"
-        px, py = mx + x * mw - ENTRANCE_ICON / 2, my + y * mh - ENTRANCE_ICON / 2
-        frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON)
-        if area == BLACKROCK_MOUNTAIN:
-            hovered = (px, py, instances)
-    if hovered is None:
-        raise KeyError("no Blackrock Mountain pin on the Eastern Kingdoms")
-    px, py, instances = hovered
-    title = ui.table("AreaTable")[str(BLACKROCK_MOUNTAIN)]["AreaName_lang"]
-    here = on_map(ui, EASTERN_KINGDOMS, *LAKESHIRE)
-    idle = ui.canvas(frame.width, frame.height)
-    idle.paste(frame, 0, 0)
-    # Before the pointer reaches the map, only the player's position; then the cursor's on the pin too.
-    draw_coords(idle, rects, here)
-    centre = ((px + ENTRANCE_ICON / 2 - mx) / mw, (py + ENTRANCE_ICON / 2 - my) / mh)
-    draw_coords(frame, rects, here, centre)
-    atlas = "Raid" if all(i in raids for i in instances) else "Dungeon"
-    # The HIGHLIGHT layer: the same atlas drawn ADD at alpha 0.4.
-    frame.draw(ui.atlas(atlas), px, py, ENTRANCE_ICON, ENTRANCE_ICON, color=(1, 1, 1, 0.4), blend="ADD")
-    frame.text(mx, my + AREA_LABEL_TOP, title, AREA_LABEL_FONT, justify="CENTER", width=mw)
-    icons = {i: atlas_markup("Raid" if i in raids else "Dungeon", 16, 16) for i in instances}
-    names = [f"{icons[i]} {maps[str(i)]['MapName_lang']}" for i in instances]
-    lines = [TooltipLine(title)] + [TooltipLine(name, NORMAL) for name in names]
-    tip = tooltip(ui, lines)
-    return framed(ui, [(frame, 0, 0), (tip, px + ENTRANCE_ICON, py - tip.height)], [(idle, 0, 0)])
-
-
 def dungeon_map(ui):
     """The world map opened inside Blackfathom Deeps with the client's native four by three tile sheet."""
     title = "Blackfathom Deeps 1"
@@ -569,6 +505,235 @@ def editmode(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).save(OUT / "editmode.png")
 
 
+# UI/RangeStrip.lua: segments 17 high over Blizzard's own swing timer bars, at their width, each segment leading with
+# its attack's icon as a square tile of the segment's height and 1 clear before its bar, with the 20-high band label
+# row under them.
+RANGE_BAR_W, RANGE_BAR_H, RANGE_BAR_GAP = 240, 15, 6
+RANGE_LABEL_H = 20
+RANGE_SEGMENT_H, RANGE_SEGMENT_GAP = 17, 3
+RANGE_ICON_GAP = 1
+# UI/RangeStrip.lua's SEGMENT_TEXT_INSET: 3 clear on either side of a segment name.
+RANGE_TEXT_INSET = 3
+RANGE_COL_W = 260
+RANGE_CLASS_W = 110
+RANGE_ROW_GAP = 10
+RANGE_GOLD, RANGE_GREEN, RANGE_RED, RANGE_GREY = (1, 0.82, 0), (0.25, 0.75, 0.25), (1, 0.13, 0.13), (0.55, 0.55, 0.55)
+# The strip's own font objects: GameFontNormal for the band label, GameFontHighlightSmall for the segment names,
+# both in enUS's Friz Quadrata, coloured per band.
+RANGE_LABEL_FONT, RANGE_NAME_FONT = FONTS["GameFontNormal"], FONTS["GameFontHighlightSmall"]
+# The client's own spell icon for each segment, from SpellMisc's SpellIconFileDataID in the pinned build. Melee heads
+# with the main-hand weapon's own icon, the file the game's Attack button draws: INV_Sword_04 stands in for the weapon
+# a player has equipped. Dead zone names no attack, so it has no tile.
+RANGE_WEAPON = "Interface/Icons/INV_Sword_04.blp"
+RANGE_ICONS = {
+    "Charge": 132337,
+    "Shoot Gun": 132222,
+    "Shoot Bow": 132222,
+    "Auto Shot": 132369,
+    "Feral Charge": 132183,
+    "Wrath": 136006,
+    "Judgement": 135959,
+    "Fire Blast": 135807,
+    "Frostbolt": 135846,
+    "Fireball": 135812,
+    "Smite": 135924,
+    "Fear": 136183,
+    "Shadow Bolt": 136197,
+    "Earth Shock": 136026,
+    "Lightning Bolt": 136048,
+}
+# The hunter's four bands: (band label, colour, lit segment index or None), with the strip's segment names.
+RANGE_HUNTER = ("Melee", "Dead zone", "Auto Shot")
+RANGE_STATES = [
+    ("Melee", RANGE_GOLD, 0),
+    ("Dead zone", RANGE_RED, 1),
+    ("Auto Shot", RANGE_GREEN, 2),
+    ("Too far", RANGE_GREY, None),
+]
+# RAID_CLASS_COLORS, for the class names down the left of rangestrip-classes.png.
+RAID_CLASS_COLORS = {
+    "WARRIOR": (0.78, 0.61, 0.43),
+    "PALADIN": (0.96, 0.55, 0.73),
+    "HUNTER": (0.67, 0.83, 0.45),
+    "ROGUE": (1.0, 0.96, 0.41),
+    "PRIEST": (1.0, 1.0, 1.0),
+    "SHAMAN": (0.0, 0.44, 0.87),
+    "MAGE": (0.41, 0.8, 0.94),
+    "WARLOCK": (0.58, 0.51, 0.79),
+    "DRUID": (1.0, 0.49, 0.04),
+}
+# One row per class: the segments the class shows, and the band lit. The warrior carries a gun, the rogue and the
+# hunter a bow, and the druid knows Feral Charge, so the rows show the same shapes the addon draws.
+RANGE_CLASSES = [
+    ("WARRIOR", ("Melee", "Dead zone", "Charge", "Shoot Gun"), 2),
+    ("ROGUE", ("Melee", "Dead zone", "Shoot Bow"), 1),
+    ("HUNTER", ("Melee", "Dead zone", "Auto Shot"), 2),
+    ("DRUID", ("Melee", "Dead zone", "Feral Charge", "Wrath"), 3),
+    ("PALADIN", ("Melee", "Judgement"), 1),
+    ("MAGE", ("Melee", "Fire Blast", "Frostbolt", "Fireball"), 1),
+    ("PRIEST", ("Melee", "Smite"), 1),
+    ("WARLOCK", ("Melee", "Fear", "Shadow Bolt"), 1),
+    ("SHAMAN", ("Melee", "Earth Shock", "Lightning Bolt"), 2),
+]
+
+
+def swing_bar(ui, canvas, x, y, label, fill, progress, time, out_of_range):
+    """One SwingTimerFrameTemplate bar, with its own out of range look: 40% alpha and red labels."""
+    bar = ui.canvas(RANGE_BAR_W, RANGE_BAR_H)
+    bar.draw(ui.atlas("ui-swingtimerbar-background"), 0, 0, RANGE_BAR_W, RANGE_BAR_H)
+    bar.draw(ui.atlas("ui-swingtimerbar-frame"), 0, 0, RANGE_BAR_W, RANGE_BAR_H)
+    inner_w, inner_h = RANGE_BAR_W - 10, RANGE_BAR_H - 8
+    if progress:
+        bar.draw(ui.atlas(fill), 5, 4, inner_w * progress, inner_h)
+        bar.draw(ui.atlas("ui-swingtimerbar-pip"), 5 + inner_w * progress - 2, 2, 4, inner_h + 4)
+    colour = RANGE_RED if out_of_range else (1, 1, 1)
+    bar.text(15, 0, label, Font(FRIZQT, 10, colour, (1, -1)), box_height=RANGE_BAR_H)
+    bar.text(5, 0, time, Font(FRIZQT, 10, colour, (1, -1)), box_height=RANGE_BAR_H, justify="RIGHT", width=inner_w - 10)
+    if out_of_range:
+        bar.image.putalpha(bar.image.getchannel("A").point(lambda a: round(a * 0.4)))
+    canvas.paste(bar, x, y)
+
+
+def swing_timers(ui, canvas, y, lit):
+    """Blizzard's Main Hand and Ranged bars, each faded while that swing cannot reach."""
+    swing_bar(ui, canvas, 0, y, "Main Hand", "ui-swingtimerbar-filling-mainhand", 0, "0.0", lit != 0)
+    swing_bar(
+        ui,
+        canvas,
+        0,
+        y + RANGE_BAR_H + RANGE_BAR_GAP,
+        "Ranged",
+        "ui-swingtimerbar-filling-ranged",
+        0.45,
+        "1.2",
+        lit != 2,
+    )
+
+
+def fit_range_name(canvas, name, font, width):
+    """A segment name as its FontString shows it: one line, cut with an ellipsis where it no longer fits."""
+    if canvas.text_width(name, font) <= width:
+        return name
+    ellipsis = "..."
+    if canvas.text_width(ellipsis, font) > width:
+        return ""
+    low, high = 0, len(name)
+    while low < high:
+        middle = (low + high + 1) // 2
+        if canvas.text_width(name[:middle] + ellipsis, font) <= width:
+            low = middle
+        else:
+            high = middle - 1
+    return name[:low] + ellipsis
+
+
+def range_segments(names):
+    """A strip's segments as (name, icon): each names a spell, and Melee the equipped main-hand weapon."""
+    return [(name, RANGE_WEAPON if name == "Melee" else RANGE_ICONS.get(name)) for name in names]
+
+
+def rangestrip_widget(ui, names, lit, label, colour):
+    """The strip in one band: equal segments along its top, each leading with its attack's icon, the lit one filled
+    in the band's colour, and the band's name in its colour in the row under them."""
+    segments = range_segments(names)
+    segment_w = (RANGE_BAR_W - (len(segments) - 1) * RANGE_SEGMENT_GAP) / len(segments)
+    c = ui.canvas(RANGE_BAR_W, RANGE_SEGMENT_H + RANGE_LABEL_H)
+    y = 0
+    for index, (name, icon) in enumerate(segments):
+        sx = index * (segment_w + RANGE_SEGMENT_GAP)
+        # The icon tile is the segment's height square, 1 clear of the bar, and only a segment with an attack has one.
+        tile = RANGE_SEGMENT_H if icon else 0
+        bx = sx + tile + (RANGE_ICON_GAP if tile else 0)
+        bw = segment_w - tile - (RANGE_ICON_GAP if tile else 0)
+        if tile:
+            spell_icon(ui, c, icon, sx, y, tile)
+            if index != lit:
+                c.fill(sx, y, tile, tile, (0, 0, 0, 0.6))
+            c.draw(ui.atlas("ui-swingtimerbar-frame"), sx, y, tile, tile)
+        c.draw(ui.atlas("ui-swingtimerbar-background"), bx, y, bw, RANGE_SEGMENT_H)
+        if index == lit:
+            c.draw(
+                ui.atlas("UI-HUD-CoolDownManager-Bar"),
+                bx + 4,
+                y + 3,
+                bw - 8,
+                RANGE_SEGMENT_H - 6,
+                color=(*colour, 1),
+            )
+        c.draw(ui.atlas("ui-swingtimerbar-frame"), bx, y, bw, RANGE_SEGMENT_H)
+        text_colour = (1, 1, 1) if index == lit else (0.5, 0.5, 0.5)
+        font = replace(RANGE_NAME_FONT, color=text_colour)
+        name_w = bw - 2 * RANGE_TEXT_INSET
+        c.text(
+            bx + RANGE_TEXT_INSET,
+            y,
+            fit_range_name(c, name, font, name_w),
+            font,
+            box_height=RANGE_SEGMENT_H,
+            justify="CENTER",
+            width=name_w,
+        )
+    c.text(
+        0,
+        RANGE_SEGMENT_H,
+        label,
+        replace(RANGE_LABEL_FONT, color=colour),
+        box_height=RANGE_LABEL_H,
+        justify="CENTER",
+        width=RANGE_BAR_W,
+    )
+    return c
+
+
+def rangestrip_state(ui, state):
+    """The strip in one band, 6 below the lowest shown swing timer as UI/RangeStrip.lua docks it."""
+    label, colour, lit = state
+    widget = rangestrip_widget(ui, RANGE_HUNTER, lit, label, colour)
+    timers = 2 * RANGE_BAR_H + RANGE_BAR_GAP
+    c = ui.canvas(RANGE_BAR_W, timers + 6 + widget.height)
+    swing_timers(ui, c, 0, lit)
+    c.paste(widget, 0, timers + 6)
+    return c
+
+
+def rangestrip(ui):
+    layers = []
+    for index, state in enumerate(RANGE_STATES):
+        widget = rangestrip_state(ui, state)
+        layers.append((widget, index * RANGE_COL_W + (RANGE_COL_W - widget.width) / 2, 0))
+    scene(ui, layers, MARGIN).save(OUT / "rangestrip.png")
+
+
+def rangestrip_class_row(ui, class_name, names, lit):
+    """One class's strip 6 below its Main Hand bar, its name in the class colour down the left."""
+    label = names[lit]
+    colour = RANGE_RED if label == "Dead zone" else RANGE_GREEN
+    widget = rangestrip_widget(ui, names, lit, label, colour)
+    c = ui.canvas(RANGE_CLASS_W + RANGE_BAR_W, RANGE_BAR_H + 6 + widget.height)
+    swing_bar(ui, c, RANGE_CLASS_W, 0, "Main Hand", "ui-swingtimerbar-filling-mainhand", 0, "0.0", True)
+    c.paste(widget, RANGE_CLASS_W, RANGE_BAR_H + 6)
+    c.text(
+        0,
+        RANGE_BAR_H + 6,
+        class_name.title(),
+        Font(FRIZQT, 14, RAID_CLASS_COLORS[class_name], (1, -1)),
+        box_height=widget.height,
+        width=RANGE_CLASS_W - 12,
+    )
+    return c
+
+
+def rangestrip_classes(ui):
+    rows = [rangestrip_class_row(ui, *row) for row in RANGE_CLASSES]
+    height = sum(row.height for row in rows) + RANGE_ROW_GAP * (len(rows) - 1)
+    c = ui.canvas(max(row.width for row in rows), height)
+    y = 0
+    for row in rows:
+        c.paste(row, 0, y)
+        y += row.height + RANGE_ROW_GAP
+    scene(ui, [(c, 0, 0)], MARGIN).save(OUT / "rangestrip-classes.png")
+
+
 # UI/Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
 # and a 12 cast bar, name and level 4 above the bar, the target outlined and every other plate's bar darkened by
 # Blizzard's own deselected overlay.
@@ -684,13 +849,13 @@ def nameplates_scene(ui):
     return scene(ui, layers, MARGIN)
 
 
-# The demo: a short tour of dungeon pins, nameplates and junk coins, at 10 frames a second.
+# The demo: a short tour of nameplates and junk coins, at 10 frames a second.
 DEMO_SIZE = (760, 520)
 DEMO_LIMIT = 3_000_000
 # (scene, tenths of a second held); a cut to a new scene crossfades over DEMO_FADE tenths.
-DEMO_SHOTS = [("dungeons idle", 10), ("dungeons", 20), ("nameplates", 20), ("junk idle", 6), ("junk", 19)]
+DEMO_SHOTS = [("nameplates", 20), ("junk idle", 6), ("junk", 19)]
 DEMO_FADE = 5
-DEMO_HOVERS = {("dungeons idle", "dungeons"), ("junk idle", "junk")}
+DEMO_HOVERS = {("junk idle", "junk")}
 
 
 def fitted(canvas):
@@ -706,11 +871,8 @@ def fitted(canvas):
 
 
 def demo(ui):
-    dungeons, dungeons_idle = dungeon_layers(ui)
     junk_shown, junk_idle = junk_layers(ui)
     shots = {
-        "dungeons idle": fitted(dungeons_idle),
-        "dungeons": fitted(dungeons),
         "nameplates": fitted(nameplates_scene(ui)),
         "junk idle": fitted(junk_idle),
         "junk": fitted(junk_shown),
@@ -725,7 +887,7 @@ def demo(ui):
         previous = name
     # One palette for every frame, from each scene, so colours hold still and two runs encode the same bytes.
     sample = Image.new("RGB", (DEMO_SIZE[0], DEMO_SIZE[1] * 3))
-    for index, name in enumerate(("dungeons", "nameplates", "junk")):
+    for index, name in enumerate(("nameplates", "junk idle", "junk")):
         sample.paste(shots[name], (0, DEMO_SIZE[1] * index))
     palette = sample.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
     indexed = [frame.quantize(palette=palette, dither=Image.Dither.NONE) for frame in frames]
@@ -858,22 +1020,214 @@ def quest_abandon(ui):
     scene(ui, [(canvas, 0, 0)], MARGIN).image.save(OUT / "quests.png")
 
 
+# Chat: a docked ChatFrame1 with the Chat page's options on. The frame's own chrome is the stock ChatFrame art,
+# which the client draws by FileDataID: it is the host's art, not the addon's, and no atlas covers that frame.
+CHAT = Font(ARIALN, 14, (1, 1, 1), (1, -1))  # ChatFontNormal, inheriting NumberFont_Shadow_Med
+CHAT_TAB = FONTS["GameFontNormalSmall"]  # ChatTabTemplate's ButtonText
+CHAT_WIDTH, CHAT_LINE, CHAT_TEXT = 430, 14, 4
+# Host chrome for the stock frame in UI_ART_BUILD, named so a stale pin reads: the client's own ChatFrame art.
+CHAT_ART = {
+    "background": 130937,  # Interface\ChatFrame\ChatFrameBackground
+    "corner": 374189,  # Interface\ChatFrame\UI-ChatFrame-BorderCorner
+    "left": 374190,  # Interface\ChatFrame\UI-ChatFrame-BorderLeft
+    "top": 374191,  # Interface\ChatFrame\UI-ChatFrame-BorderTop
+    "tab-bg-left": 374162,  # Interface\ChatFrame\ChatFrameTab-BGLeft
+    "tab-bg-mid": 374164,  # Interface\ChatFrame\ChatFrameTab-BGMid
+    "tab-bg-right": 374166,  # Interface\ChatFrame\ChatFrameTab-BGRight
+    "tab-selected-left": 374174,  # Interface\ChatFrame\ChatFrameTab-SelectedLeft
+    "tab-selected-mid": 374176,  # Interface\ChatFrame\ChatFrameTab-SelectedMid
+    "tab-selected-right": 374178,  # Interface\ChatFrame\ChatFrameTab-SelectedRight
+}
+# The frame fades to DEFAULT_CHATFRAME_ALPHA (0.25) when the cursor is away; over the plain backdrop it is raised so
+# the lines read, as a dark scene stands in for the game world here.
+CHAT_ALPHA = 0.6
+CHAT_TIMESTAMP = (0.5, 0.5, 0.5)  # GRAY_FONT_COLOR, the client's own secondary chat colour
+CHAT_TYPE = {
+    "channel": (1.0, 0.7529, 0.7529),  # ChatTypeInfo CHANNEL
+    "guild": (0.25, 1.0, 0.25),  # GUILD
+    "party": (2 / 3, 2 / 3, 1.0),  # PARTY
+    "system": (1.0, 1.0, 0.0),  # SYSTEM
+}
+# RAID_CLASS_COLORS.
+CHAT_CLASS = {
+    "warrior": (0.78, 0.61, 0.43),
+    "paladin": (0.96, 0.55, 0.73),
+    "rogue": (1.0, 0.96, 0.41),
+    "priest": (1.0, 1.0, 1.0),
+}
+# The tooltip quality colours, as the client wraps an item link's display text.
+CHAT_ITEM_QUALITY = {0: "9d9d9d", 1: "ffffff", 2: "1eff00", 3: "0070dd", 4: "a335ee", 5: "ff8000"}
+
+
+def chat_grey(text):
+    """GRAY_FONT_COLOR: the level after a name, a fold's count, the divider's label and a timestamp."""
+    return colored(text, CHAT_TIMESTAMP)
+
+
+def chat_name(name, cls, level):
+    """The client's bracketed sender, class-coloured by Chat/ClassLevels.lua with the level in grey inside it."""
+    return f"[{colored(name, CHAT_CLASS[cls])} {chat_grey(str(level))}]"
+
+
+def chat_item(ui, item_id):
+    """An item link with Chat/ItemIcons.lua's icon: the 64-texel square crop's 5 to 59 box, at the line's height.
+    The link's display text is what the player sees; the client's hyperlink payload is not part of a render."""
+    item = ui.item(item_id)
+    icon = f"|T{item.icon}:0:0:0:0:64:64:5:59:5:59|t"
+    return f"|cff{CHAT_ITEM_QUALITY[item.quality]}{icon} [{item.name}]|r"
+
+
+def chat_web(url):
+    """Chat/WebLinks.lua's link: the address itself in its light blue, as the player reads it."""
+    return colored(f"[{url}]", (0x66 / 255, 0xBB / 255, 1.0))
+
+
+def chat_host(ui, key):
+    """The stock ChatFrame's own art, by the FileDataID the client draws it with: host chrome, not the addon's.
+    Read through _image because the public texture() refuses the client's pre-Legion chrome."""
+    return ui._image(CHAT_ART[key])
+
+
+def chat_additive(image):
+    """An ADD-layer texture as straight alpha, so it lights the tab under it instead of painting its black."""
+    r, g, b, a = image.split()
+    light = ImageChops.multiply(ImageChops.lighter(ImageChops.lighter(r, g), b), a)
+    out = image.copy()
+    out.putalpha(light)
+    return out
+
+
+def chat_tabs(ui, canvas, x, y, names, selected=0):
+    """ChatTabTemplate: Background left/mid/right 16x32, the selected tab's ADD layer in NORMAL_FONT_COLOR, and
+    PanelTemplates_TabResize's width (the text + 20) with tabs one unit apart."""
+    parts = {
+        (kind, side): chat_host(ui, f"tab-{kind}-{side}")
+        for kind in ("bg", "selected")
+        for side in ("left", "mid", "right")
+    }
+    active = {side: chat_additive(parts["selected", side]) for side in ("left", "mid", "right")}
+    for index, label in enumerate(names):
+        width = max(32, canvas.text_width(label, CHAT_TAB) + 20)
+        alpha = 1.0 if index == selected else 0.6
+        canvas.draw(parts["bg", "left"], x - 2, y, 16, 32, (1, 1, 1, alpha))
+        canvas.draw(parts["bg", "mid"], x + 14, y, width - 28, 32, (1, 1, 1, alpha))
+        canvas.draw(parts["bg", "right"], x + width - 14, y, 16, 32, (1, 1, 1, alpha))
+        if index == selected:
+            canvas.draw(active["left"], x - 2, y, 16, 32, (*NORMAL, alpha))
+            canvas.draw(active["mid"], x + 14, y, width - 28, 32, (*NORMAL, alpha))
+            canvas.draw(active["right"], x + width - 14, y, 16, 32, (*NORMAL, alpha))
+        canvas.text(x, y + 16, label, CHAT_TAB, justify="CENTER", width=width)
+        x += width + 1
+
+
+def chat_frame(ui, rows, tabs, selected=0):
+    """A docked ChatFrame1: tabs over FloatingBorderedFrame's background and border, lines bottom-aligned.
+    `rows` are (kind, text, colour), a "divider" row drawn in its own grey."""
+    probe = ui.canvas(1, 1)
+    laid = []
+    for kind, text, colour in rows:
+        lines = [text] if kind == "divider" else wrap_text(probe, text, CHAT, CHAT_WIDTH - 2 * CHAT_TEXT - 8)
+        laid.append((lines, colour))
+    total = CHAT_LINE * sum(len(lines) for lines, _ in laid)
+    height = max(120, total + 12)
+    canvas = ui.canvas(CHAT_WIDTH + 26, height + 48)
+    left, top = 6, 36
+    bg_x, bg_y, bg_w, bg_h = left - 2, top + 3, CHAT_WIDTH + 17, height - 9
+    canvas.draw(
+        chat_host(ui, "background"),
+        bg_x,
+        bg_y,
+        bg_w,
+        bg_h,
+        (0, 0, 0, CHAT_ALPHA),
+    )
+    # FloatingBorderedFrame's border: 8-square corners 4 outside the background, 16-wide edges that tile along it
+    # (the art is uniform on that axis, so drawing the edge at the length is the same pixels).
+    corner = chat_host(ui, "corner")
+    edge_left = chat_host(ui, "left")
+    edge_top = chat_host(ui, "top")
+    shade = (1, 1, 1, CHAT_ALPHA)
+    canvas.draw(corner, bg_x - 4, bg_y - 4, 8, 8, shade)
+    canvas.draw(corner, bg_x + bg_w - 4, bg_y - 4, 8, 8, shade, flip_h=True)
+    canvas.draw(corner, bg_x - 4, bg_y + bg_h - 4, 8, 8, shade, flip_v=True)
+    canvas.draw(corner, bg_x + bg_w - 4, bg_y + bg_h - 4, 8, 8, shade, flip_h=True, flip_v=True)
+    canvas.draw(edge_left, bg_x - 4, bg_y + 4, 16, bg_h - 8, shade)
+    canvas.draw(edge_left, bg_x + bg_w - 12, bg_y + 4, 16, bg_h - 8, shade, flip_h=True)
+    canvas.draw(edge_top, bg_x + 4, bg_y - 4, bg_w - 8, 16, shade)
+    canvas.draw(edge_top, bg_x + 4, bg_y + bg_h - 12, bg_w - 8, 16, shade, flip_v=True)
+    chat_tabs(ui, canvas, left, bg_y - 32, tabs, selected)
+    y = bg_y + bg_h - 6 - total
+    for lines, colour in laid:
+        for line in lines:
+            canvas.text(bg_x + 2 + CHAT_TEXT, y, line, CHAT, colour)
+            y += CHAT_LINE
+    return canvas
+
+
+def chat(ui):
+    """The chat window with the Chat options on: short headers, class colours with levels, an item icon, a folded
+    repeat, a mention marker, a web link, and the divider above the lines that survived a /reload."""
+    members = {
+        "ironquill": chat_name("Ironquill", "rogue", 37),
+        "tamsin": chat_name("Tamsin", "paladin", 38),
+        "oakhelm": chat_name("Oakhelm", "warrior", 42),
+        "mirabelle": chat_name("Mirabelle", "priest", 41),
+    }
+    ring = chat_item(ui, 281927)  # Boulderheart Band, a level 22 rare from the Forever build
+    url = "https://www.wowhead.com/classic/item=281927"
+    rows = [
+        (
+            "line",
+            chat_grey("13:58") + f" [G] {members['oakhelm']}: anyone up for a Deadmines run tonight?",
+            CHAT_TYPE["guild"],
+        ),
+        (
+            "line",
+            chat_grey("14:01") + f" [Trade] {members['ironquill']}: WTS {ring} 45s, pst {chat_grey('x3')}",
+            CHAT_TYPE["channel"],
+        ),
+        (
+            "line",
+            chat_grey("14:02") + f" [General] {members['tamsin']}: anyone know where the Defias traitor is?",
+            CHAT_TYPE["channel"],
+        ),
+        (
+            "line",
+            chat_grey("14:03") + f" [G] {members['oakhelm']}: price list here {chat_web(url)}",
+            CHAT_TYPE["guild"],
+        ),
+        ("line", chat_grey("14:04") + " Aldric has come online.", CHAT_TYPE["system"]),
+        ("divider", atlas_markup("communities-chat-date-line", 165, 8) + " Before your /reload", CHAT_TIMESTAMP),
+        (
+            "line",
+            chat_grey("14:09")
+            + f" [P] {members['mirabelle']}: "
+            + atlas_markup("communities-icon-chat", 12, 12)
+            + f" {colored('Barry', NORMAL)} can you pull the next pack? I'm out of mana",
+            CHAT_TYPE["party"],
+        ),
+    ]
+    scene(ui, [(chat_frame(ui, rows, ("General", "Combat Log")), 0, 0)], MARGIN).save(OUT / "chat.png")
+
+
 UI_ART_BUILD = "1.60.1.70124"
 
 
 def main():
     ui = Ui(build=UI_ART_BUILD, scale=2)
     quest_abandon(ui)
+    chat(ui)
     gear(ui)
     menu(ui)
     exploration(ui)
     zone_levels(ui)
-    dungeon_entrances(ui)
     dungeonmap(ui)
     junk(ui)
     campsite(ui)
     campfire_buff(ui)
     editmode(ui)
+    rangestrip(ui)
+    rangestrip_classes(ui)
     nameplates(ui)
     tooltips(ui)
     frames, size = demo(ui)

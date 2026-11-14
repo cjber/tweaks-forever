@@ -32,6 +32,7 @@ python3 tools/typecheck_coverage.py
 python3 tools/lint_multivalue.py
 python3 tools/lint_art.py
 python3 tools/lint_secret.py
+python3 tools/lint_client_calls.py
 python3 tools/check_editorconfig.py
 # --release, not the plain check: a translation gap fails the PR, not the release. Every shipped
 # locale is at 100%, so adding an English string means translating it in the same change.

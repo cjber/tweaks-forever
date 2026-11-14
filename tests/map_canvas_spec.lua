@@ -1,5 +1,7 @@
 -- Run from the repository root: luajit tests/map_canvas_spec.lua
--- MapDraw and Exploration draw on owned frames while strict maps reject state writes and native pin APIs.
+-- Map/MapDraw.lua and Map/Exploration.lua on a world map and a zone map that fail on any write
+-- (tests/strict_map.lua): Tweaks draws its unexplored tint on frames of its own, adds no data provider,
+-- acquires no pin and writes nothing of the maps' (#168).
 local checks = 0
 local function check(condition, label)
 	checks = checks + 1
@@ -9,45 +11,13 @@ end
 local Kit = dofile("tests/strict_map.lua")
 Kit.Install(_G)
 
--- Westfall (1436) has the Deadmines entrance and art 1194's overlays; Stormwind's flight master sits beside it.
-local world = { mapID = 1436, pins = { FlightPointPinTemplate = {} } }
+-- Westfall (1436) has art 1194's overlays.
+local world = { mapID = 1436 }
 WorldMapFrame = Kit.NewMap(world)
 local zone = { mapID = 1436, visible = false }
 
-local tooltip = { lines = {} }
-local Tooltip = {
-	SetOwner = function(_, owner)
-		tooltip.owner, tooltip.lines = owner, {}
-	end,
-	GetOwner = function()
-		return tooltip.owner
-	end,
-	Show = function() end,
-	Hide = function()
-		tooltip.owner = nil
-	end,
-}
-GetAppropriateTooltip = function()
-	return Tooltip
-end
-local function Line(_, text)
-	tooltip.lines[#tooltip.lines + 1] = text
-end
-GameTooltip_SetTitle, GameTooltip_AddNormalLine, GameTooltip_AddInstructionLine = Line, Line, Line
-GameTooltip_AddDisabledLine = Line
-GetRealZoneText = function()
-	return "The Deadmines"
-end
-local cvar = true
-GetCVarBool = function(name)
-	assert(name == "showDungeonEntrancesOnMap")
-	return cvar
-end
 Enum = { UIMapType = { Zone = 3 } }
 C_Map = {
-	GetAreaInfo = function()
-		return "Area"
-	end,
 	GetMapInfo = function()
 		return { mapType = 3 }
 	end,
@@ -77,8 +47,8 @@ hooksecurefunc = function(target, name, fn)
 	end
 end
 
-local initializers, events, settings, travelled = {}, {}, {}, {}
-local active = { dungeonEntrances = true, exploration = true }
+local initializers, events, settings = {}, {}, {}
+local active = { exploration = true }
 local ns = {
 	-- Core/API.lua's change signal, which this spec does not load.
 	APIChanged = function() end,
@@ -96,20 +66,6 @@ local ns = {
 		settings[key] = fn
 	end,
 	RefreshConflicts = function() end,
-	Art = {
-		Markup = function()
-			return ""
-		end,
-	},
-	Navigate = function(uiMapID, x, y, title)
-		travelled[#travelled + 1] = { uiMapID, x, y, title }
-	end,
-	NavigateHint = function()
-		return "Click to travel there."
-	end,
-	EntranceHint = function()
-		return nil
-	end,
 	core = {
 		SafeCall = function(_, fn, ...)
 			return true, fn(...)
@@ -117,19 +73,6 @@ local ns = {
 	},
 }
 assert(loadfile("Map/MapDraw.lua"))("TweaksForever", ns)
--- No painted sheet here, so a click travels: tests/dungeonmaps_spec.lua runs the sheets.
-ns.DungeonMaps = {
-	FloorsOf = function()
-		return {}
-	end,
-	Open = function()
-		return false
-	end,
-}
-rawset(_G, "IsShiftKeyDown", function()
-	return false
-end)
-assert(loadfile("Data/DungeonEntrances.lua"))("TweaksForever", ns)
 assert(loadfile("Data/Overlays.lua"))("TweaksForever", ns)
 assert(loadfile("Map/Exploration.lua"))("TweaksForever", ns)
 for _, init in ipairs(initializers) do
@@ -148,6 +91,7 @@ end
 
 -- Opening the map draws on the next frame of its view, on frames of ours.
 Kit.Tick()
+
 -- The unexplored tint: textures of ours, masked as the map is, on a frame on the canvas at the exploration level.
 local tint = Tint(world)
 check(tint and tint.mouse == false, "the tint is a frame of ours that never takes the mouse")
@@ -181,8 +125,7 @@ zone.visible = true
 Kit.Tick()
 check(Tint(zone) ~= nil, "the zone map gets its own tint")
 
--- Nothing of ours is made inside an open window, each canvas holds one frame of ours, and no pin has a click script
--- or a field the map reads off its mouse focus.
+-- Nothing of ours is made inside an open window, and each canvas holds one frame of ours.
 for _, state in ipairs({ world, zone }) do
 	local onCanvas = 0
 	for _, frame in ipairs(Kit.frames) do
@@ -192,12 +135,6 @@ for _, state in ipairs({ world, zone }) do
 end
 for _, frame in ipairs(Kit.frames) do
 	check(frame.madeUnder == nil, "every frame of ours is made with no parent")
-	if frame.template then
-		for _, script in ipairs({ "OnClick", "OnMouseDown", "OnMouseUp", "OnDoubleClick" }) do
-			check(frame.scripts[script] == nil, "a pin has no " .. script .. " script")
-		end
-		check(frame.owningMap == nil and frame.pinTemplate == nil, "a pin carries no field the map reads")
-	end
 end
 
 print(("map_canvas: %d checks passed"):format(checks))

@@ -6,12 +6,19 @@
 Small quality-of-life tweaks for WoW: Forever that look like they came with the game.<br>
 <a href="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml"><img src="https://github.com/cjber/tweaks-forever/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
 <a href="https://github.com/cjber/tweaks-forever/releases/latest"><img src="https://img.shields.io/github/v/release/cjber/tweaks-forever" alt="Latest release"></a>
+<a href="https://www.curseforge.com/wow/addons/tweaks-forever"><img src="https://img.shields.io/curseforge/dt/1708506?label=CurseForge%20downloads" alt="CurseForge downloads"></a>
 <br><br><a href="https://github.com/sponsors/cjber"><img src="docs/github-sponsors-button.png" alt="Sponsor me on GitHub"></a> <a href="https://ko-fi.com/cjber"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi"></a>
 </p>
 
 Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Nameplates and a junk coin">
+</p>
+
+<p align="center">The junk coin marks what sells with your greys at a merchant. Also nameplates.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png" width="768" alt="The world map inside Blackfathom Deeps, showing the client's painted dungeon floor">
@@ -28,10 +35,11 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Faster auto loot.** Takes everything at once instead of waiting for the loot window.
 - **Repairs and junk.** Repairs at any merchant, from guild funds when allowed, and sells grey junk through the game's own Sell All Junk, plus up to 12 marked stacks per visit. Everything stays in buyback. **Alt+Right-click** marks an item with the game's junk coin when *Mark items as junk* is on. Hold Shift as a merchant opens to skip both for that visit.
 - **Gear groups.** **Ctrl+Right-click** a bag item to put it in a named, coloured group, then equip the whole group in one click. Items show a coloured strip, border or dots. A fishing pole keeps the weapons it replaced as a **Before fishing** group.
-- **Map extras.** Unexplored areas in a blue tint on the world and zone maps (off until you turn it on), each zone's level range coloured like quest levels, your and the cursor's coordinates, and every dungeon and raid entrance marked with retail's icons.
-- **Dungeon maps.** Inside a dungeon or raid, or when you click its entrance, the world map shows the client's own painted map, with its area names and boss rooms, a button for the floor and a Back to map button. The maps come with WoW: Forever; no extra addon is needed.
+- **Map extras.** Unexplored areas in a blue tint on the world and zone maps (off until you turn it on), each zone's level range coloured like quest levels, and your and the cursor's coordinates.
+- **Dungeon maps.** Inside a dungeon or raid the world map shows the client's own painted map, with its area names and boss rooms, a button for the floor and a Back to map button. The maps come with WoW: Forever; no extra addon is needed.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout (not with the gamepad UI).
 - **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
+- **Range strip.** A strip on top of the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
 - **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
 - **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Turn on **Quest XP on the experience bar** (off by default) to shade the bar with the XP your quest log is worth, the ready hand-ins first, and the tooltip then adds the level they reach. Rare alerts (off by default) name nearby rares in chat; click the name, or press a bound key, to set a waypoint to it. In a group, a pull warning says in chat when your threat passes the tank's. A soft glow on the talents button reminds you while talent or pet training points are unspent.
@@ -41,8 +49,15 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Pet trainer hint.** At a pet trainer, names the abilities you know that your pet hasn't learned, with a button that opens Beast Training. It says when the trainer's filter hides the ranks you already know.
 - **Known ranks in Beast Training.** Ranks your pet already knows, or has replaced with a higher rank, are dimmed and marked as known instead of looking learnable.
 - **Fishing.** Double right-click to cast, apply the best lure you have, and a warning when you have none.
+- **Chat.** Optional chat fixes, all off until you turn them on: short channel names, class colours with levels when the game knows them, item icons in links, repeated lines folded into a grey count, a marker when someone mentions you, clickable web links that open a copy box, whisper tabs with an unread count and a line saying when you last grouped with the player, a card on hover with what the game knows about them, a bag item picker when you type [ and a few letters (Enter puts the link in and sends the line; a click puts it in so you can keep typing), and the last 200 lines after a reload. Nothing is sent to other players beyond the line you send. The Chat page also opens the game's own Chat Timestamps setting.
 - **Quest item sparkles.** The game's own sparkles on lootable quest objects, as in [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles). Off by default. Outlines are off while it's on and come back after; removing sparkles needs a game restart.
-- **Small things.** Quiet repeated macro errors, hints for my other Forever addons (with a Forever addons settings page) and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
+- **Small things.** Quiet repeated macro errors, a page for my other Forever addons and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/chat.png" width="768" alt="A chat window with short headers, class colours and levels, an item icon, a folded repeat, a mention and a web link">
+</p>
+
+<p align="center">Chat options on: short headers, class colours and levels, an item icon, a folded repeat, a mention, a web link and the lines that survived a reload.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined with a Fireball cast">
@@ -61,6 +76,18 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 </p>
 
 <p align="center">Move and scale Blizzard windows from a tab in Edit Mode.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip.png" width="100%" alt="The range strip in each band, docked on the swing timers">
+</p>
+
+<p align="center">The range strip under the swing timers: melee, dead zone, auto shot and too far.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip-classes.png" width="100%" alt="The range strip for each class, docked on its Main Hand swing timer">
+</p>
+
+<p align="center">Every class gets its own strip, from melee out to its longest reach.</p>
 
 ## Install
 
@@ -83,7 +110,7 @@ Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian a
 
 ## Works alongside
 
-A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) for journeys and waypoints. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
 
 <!-- forever-family:start -->
 
@@ -128,17 +155,17 @@ The addon is free and stays GPL-3.0. If it saves you time, you can [sponsor me o
 
 ## Credits
 
-LibAHTab is adapted from [plusmouse's](https://github.com/TheMouseNest/LibAHTab) (MIT). Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts, and the rare waypoint by [RareScanner](https://www.curseforge.com/wow/addons/rarescanner); no code was copied. Fitz is welcome to use our code.
+Game data comes from [wago.tools](https://wago.tools), [CMaNGOS classic-db](https://github.com/cmangos/classic-db) (GPL-3.0) and [Warcraft Wiki](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)). Quest sparkles use the same settings as [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles) by Ashtar Senior. Some features were inspired by [Polestar](https://github.com/fitzforge/polestar) by Fitz, such as rare alerts, and the rare waypoint by [RareScanner](https://www.curseforge.com/wow/addons/rarescanner); no code was copied. Fitz is welcome to use our code.
 
 <!-- forever-credits:start -->
 
-Thanks to Sojiro84, Mouchoir, SirGooie, NightIsolation and everyone who reported a bug or asked for a feature.
+Thanks to Mouchoir, Sojiro84, SirGooie, NightIsolation and everyone who reported a bug or asked for a feature.
 
 <!-- forever-credits:end -->
 
 ## Licence
 
-GPL-3.0-or-later. The bundled LibStub is public domain. Every input and its licence: [THIRD_PARTY.md](THIRD_PARTY.md).
+GPL-3.0-or-later. Every input and its licence: [THIRD_PARTY.md](THIRD_PARTY.md).
 
 Made by Cillian Berragan · [cillian.dev](https://cillian.dev) · [GitHub](https://github.com/cjber) · [Twitter](https://twitter.com/cjberragan)
 

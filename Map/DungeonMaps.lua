@@ -279,7 +279,7 @@ ns.Init(function()
 		Draw()
 	end
 
-	-- An entrance's dungeon, over the map it was clicked on. False leaves the click to travel instead.
+	-- A dungeon's floors over the map it is shown on. False leaves no sheet to show.
 	---@param uiMapID integer
 	---@param instances integer[]
 	---@return boolean

@@ -12,10 +12,54 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Dungeon maps fill the map window.** Padded tile edges no longer leave unused strips, and progress badges and quest counts stay behind the dungeon heading. (#524)
+
+## [2.8.0] - 2026-11-14
+
+<!-- discord-image: docs/screenshots/rangestrip.png -->
+
+- **Every class gets a range strip on its swing timers.** A strip under the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap, so you know when to close in and when to back off. Each segment leads with its attack's own icon, and the band's name sits under the strip in its colour; Show icons and Show band label turn either off (#413).
+- **No more Lua errors when you hover players in a battleground.** Tooltip class colours and the tooltip health bar read another player's class and race, which the game hides inside a battleground, so one match could log over a thousand errors. Tweaks now leaves such a player's tooltip as the game wrote it, with the health bar in its plain colour. Thanks to Mouchoir for the report and fix. (#568)
+- **Dungeon and raid entrance icons are gone from the world map.** The castle icons no longer cover zone and continent labels; the painted dungeon maps and the Dungeon map button stay. (#525)
+- **Tweaks Forever loads after Titan Panel and Mapster when they are installed**, so its checks of their settings always see them.
+
+## [2.7.2] - 2026-11-13
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
+## [2.7.1] - 2026-11-13
+
+- Tweaks no longer ships its own copy of the Auction House tab library, because Auctionator now brings a newer one itself. Nothing changes for players.
+- Chat options no longer raise errors at login. Class colours and Whisper tabs checked your saved settings each time another addon finished loading, which starts before Tweaks has read them, so every login and /reload logged dozens of errors, enough for the client's "too many errors" warning. Both now start watching once your settings are read. Thanks to Mouchoir for the report and fix.
+
+## [2.7.0] - 2026-11-13
+
+<!-- discord-image: docs/screenshots/chat.png -->
+
+- **Chat options, all off until you turn them on.** Short channel names ([2. Trade - City] reads [Trade], [Guild] reads [G]), class colours with the level beside the name when the game knows it, item icons before item links, identical repeats folded into a grey x2 or x3, a chat icon and your name in gold when someone mentions you, and clickable web links that open a copy box. Each is its own switch under Chat, so you can take one without the others.
+- **Your chat survives a reload.** The last 200 lines of each docked chat window come back above a Before your /reload line, saved for that character only and never for a line the game keeps secret. The Chat page also opens the game's own Chat Timestamps setting.
+- **Whisper tabs and a player card.** Each person who whispers you gets the game's own docked tab, with a count of whispers you have not read yet and a grey line saying when you last grouped with them. Hovering a player's name in chat shows what the game states exactly: level, race and class when it knows them, guild and zone from your own lists, your last group together and your whisper count. Nothing is sent to other players, and every switch is off until you turn it on.
+- **Link an item from your bags while you type.** Typing [ and a few letters in any chat box lists the items in your bags whose name contains those letters, up to eight, each with its icon and quality colour. Up and Down or Tab choose one, Enter puts in the item's real link and sends the line, a click puts it in so you can keep typing. The list is built when your bags change, not on every keystroke.
+
+## [2.6.12] - 2026-11-12
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
+## [2.6.11] - 2026-11-12
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
 ## [2.6.10] - 2026-11-12
 
-- **Dungeon entrance icons no longer cover the world map.** Dungeon maps remain available inside instances. (#525)
-- **Dungeon maps fill the map window.** Padded tile edges no longer leave unused strips, and progress badges and quest counts stay behind the dungeon heading. (#524)
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
 
 ## [2.6.9] - 2026-11-12
 

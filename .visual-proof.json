@@ -1,0 +1,26 @@
+{
+  "input_digest": "1bde5a1f47fefc64039773979f61dccdc88b8718d09bcf1d99c76a4b9ad576b7",
+  "runtime_sha256": "1bde5a1f47fefc64039773979f61dccdc88b8718d09bcf1d99c76a4b9ad576b7",
+  "candidate": "92f1eccf6a0d57c0282dbf9c36bc8119b9e8ce4c01b21c16839c3f87262ecb5e",
+  "tested_artifact": "source-tree",
+  "client_build": "1.60.1.70938 (Interface 16001)",
+  "source_commit": "feb5bf88d391bf40c0aa9c65e2bc5cc3220f7642",
+  "notes": "Recorded in the client from a git archive of this commit linked as the TweaksForever folder, with its TOC version set to 2.8.0 (visual_proof --compare: equivalent), beside the store ForeverCore v1.12.0. No Lua errors this session. The battleground tooltip fix (#569) is covered by tests/tooltips_spec.lua: hovering another player needs one in reach, which this session does not seek out.",
+  "flows": [
+    {
+      "name": "After an update to 2.8.0 the chat says once what changed",
+      "steps": [
+        "Link the release candidate with its TOC version at 2.8.0 over the saved v2.7.1",
+        "Log in",
+        "Read the chat: one Tweaks Forever line names 2.8.0 and the range strip headline"
+      ],
+      "result": "pass"
+    }
+  ],
+  "images": [
+    {
+      "url": "https://gist.githubusercontent.com/cjber/c90a8346c79f3f71e2902a0ea76b8c2a/raw/912a2fc2d2cde62b958ecc9cfa341fb9c6b87d0f/567-update-notice-v3.png",
+      "sha256": "524fc1091b5b1fec0dd2bfd5aa0666bba0a7d5f2bb75aabe5724a97522fc98c8"
+    }
+  ]
+}

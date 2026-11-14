@@ -50,13 +50,13 @@ repo runs before a pull request.
   the remappable-click guard, used by Bags/Junk.lua and Bags/Gear.lua. The specs never run `ns.Init`, so a change here
   needs a stubbed load of Core + the feature file (hook-registration trace) to show behaviour is unchanged.
 - `ns.Gear`, `ns.Fishing`, `ns.Frames`, `ns.Exploration`, `ns.Sections`, `ns.Reagents`, `ns.Camp`,
-  `ns.ZoneLevels`, `ns.Entrances`, `ns.FutureSpells`: pure `Model` tables exported for the specs, each named
+  `ns.ZoneLevels`, `ns.FutureSpells`: pure `Model` tables exported for the specs, each named
   once in production. Some are also cross-file APIs: `ns.Fishing.IsPole` (Gear), `ns.Gear.MarksOf`/`ColourOf`
   (Sections) and `OnRefresh`/`Settling` (CombinedBag). `ns.CombinedBag` (Bags/CombinedBag.lua) owns the combined bag's
   layout pass, its grid constants and `Relayout`; it calls `ns.Reagents.Reserve`, `ns.Sections.Active`/`Arrange`, then
   `ns.Reagents.Placed`, in that order.
-- `ns.ClickMode` (Core/Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core/Core.lua), `ns.Suggestion`
-  (Integrations/Companions.lua), `ns.Navigate`/`ns.NavigateHint` (Integrations/Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
+- `ns.ClickMode` (Core/Modes.lua), `ns.ForEachBagButton`, `ns.ConflictOf`, `ns.Print` (Core/Core.lua),
+  `ns.Navigate` (Integrations/Navigate.lua), and Spellbook's `ns.KnownSpell`, `ns.TrainerSpells`,
   `ns.LineName`, `ns.GeneralName` (also read by Core/API.lua): shared helpers.
 - `ns.QuestGivers`, `ns.QuestProgress`, `ns.QuestLog`, `ns.WhatsNew`: more `Model` tables exported for the specs.
 - `ns.QuestieDB`, `ns.QuestieSource` (Integrations/QuestieSource.lua): the installed QuestieDB and what is read from it
@@ -66,7 +66,6 @@ repo runs before a pull request.
 - `ns.L` (`Locales/enUS.lua`) and each translation's `Locales/<locale>.lua`, which only sets `ns.L` entries;
   `Locales/phrases.txt` is `tools/phrases.py`'s template for translators.
 - `ns.DungeonMaps` (Map/DungeonMaps.lua): `Model` table exported for the specs; the feature reads Atlas's `AtlasMaps` global and the TOC's `OptionalDeps` `Atlas`, `Atlas_ClassicWoW` at runtime.
-- `TweaksForeverDungeonEntrancePinMixin`: global named by `Map/DungeonEntrances.xml`'s pin template.
 - `TweaksForeverCharDB.trainer` (Spellbook): persisted trainer scan.
 - Conflict entries name other addons' folders and read their saved variables (`LeaPlusDB.X == "On"`,
   `LegacyForeverDB`, `LeaMapsDB`, Questie, Mapster via LibStub): external contracts.
@@ -85,8 +84,9 @@ Shapes that look like defects here but are not. Read this before raising a findi
 - stringly-typed on the `gearMark` values (`Bags/Gear.lua`): the three-member set already fails loudly on an
   unknown value (`error("unknown gear mark …")`).
 - Model fields named once in production (`ns.Gear`, `ns.Camp`, …) and `types/` classes referenced once
-  (`NamePlateFrame`, `SpellBookFrameTemplate_PagedSpellsFrame`, `SpellBookSingleSkillLineCategoryMixin`,
-  `TFEntrancePin`): spec exports and annotations of external or XML-made objects, not dead code.
+  (`NamePlateFrame`, `SpellBookFrameTemplate_PagedSpellsFrame`,
+  `SpellBookSingleSkillLineCategoryMixin`): spec exports and annotations of external or XML-made objects, not dead
+  code.
 - `Bags/Sections.lua` `Arrange`/`Bags/Reagents.lua` `Reserve`: they share only the fits-at-`MIN_SCALE` check and two resize calls,
   and `MIN_SCALE` is already one constant; each owns its own state.
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.

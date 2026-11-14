@@ -45,7 +45,7 @@ end
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 setfenv(assert(loadfile("Integrations/Navigate.lua")), env)("TweaksForever", ns)
 
--- Shortest Path present and accepting: it alone guides, with the entrance's own map, place and name.
+-- Shortest Path present and accepting: it alone guides, with the place's own map, position and name.
 Install(1)
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 local journey = journeys[1]
@@ -59,7 +59,7 @@ ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 assert(#journeys == 2 and #waypoints == 1 and superTracked[1] == true)
 assert(waypoints[1].uiMapID == 1427 and waypoints[1].x == 0.35 and waypoints[1].y == 0.84)
 
--- Shortest Path absent, or a major version this addon does not know: the waypoint, and a hint that says so.
+-- Shortest Path absent, or a major version this addon does not know: the waypoint instead.
 env.ShortestPathForever = nil
 ns.Navigate(1427, 0.35, 0.84, "Blackrock Mountain")
 assert(#journeys == 2 and #waypoints == 2)

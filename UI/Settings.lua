@@ -100,6 +100,20 @@ end
 ---@param category SettingsCategoryMixin
 ---@param feature TFFeature
 local function AddSetting(category, feature)
+	-- A row that is just a button: a link to one of the game's own settings pages, with no switch of ours.
+	if feature.buttonOnly then
+		Settings.RegisterInitializer(
+			category,
+			Secure(CreateSettingsButtonInitializer)(
+				L[feature.name],
+				L[feature.buttonText or "Open"],
+				feature.button,
+				Tooltip(feature),
+				false
+			)
+		)
+		return
+	end
 	local options, slider = feature.options, feature.slider
 	local gamepadOptions = options and InputUtil.IsGamepadUIEnabled()
 	-- ns.db keeps the option's string; only the row and its setting speak in indexes, so every reader and
