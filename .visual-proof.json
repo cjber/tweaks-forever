@@ -1,67 +1,23 @@
 {
-  "input_digest": "bb8dbf9570dbd2d279357aef023f0dedc251ff5c9b7a21ebfc02250c6561e2a3",
-  "runtime_sha256": "bb8dbf9570dbd2d279357aef023f0dedc251ff5c9b7a21ebfc02250c6561e2a3",
-  "candidate": "1709f7319f3e82ec6c40f86eb603c69429fb4dd32d7fb990a3af3faeb63e882b",
+  "input_digest": "6e593f01872e9cf44d8f836f728dd4cba05d7d6e1c3ce09a14b14eb91fb4d5d1",
+  "runtime_sha256": "6e593f01872e9cf44d8f836f728dd4cba05d7d6e1c3ce09a14b14eb91fb4d5d1",
+  "candidate": "573374f4f8e185dfde9e8af4c818d938d8fe83f18225c15facbf86fd2c0ac03e",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "1ed5050473f7ad86bb59b5e89350a115963dffe0",
+  "source_commit": "3269e463576d2c981c4276c3185827c39c417d9b",
   "flows": [
     {
-      "name": "dungeon sheet in the full size map",
+      "name": "settings",
       "steps": [
-        "/home/cjber/.cache/agent-scratch/sweep/wow/tf523/1-large.lua"
-      ],
-      "result": "pass"
-    },
-    {
-      "name": "second floor from the floor picker",
-      "steps": [
-        "/home/cjber/.cache/agent-scratch/sweep/wow/tf523/2-floor.lua"
-      ],
-      "result": "pass"
-    },
-    {
-      "name": "Back to map leaves a Dungeon map button",
-      "steps": [
-        "/home/cjber/.cache/agent-scratch/sweep/wow/tf523/3-back.lua"
-      ],
-      "result": "pass"
-    },
-    {
-      "name": "Dungeon map button reopens the sheet",
-      "steps": [
-        "/home/cjber/.cache/agent-scratch/sweep/wow/tf523/4-reopen.lua"
-      ],
-      "result": "pass"
-    },
-    {
-      "name": "dungeon sheet in the compact map",
-      "steps": [
-        "/home/cjber/.cache/agent-scratch/sweep/wow/tf523/5-compact.lua"
+        "/tweaks"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/1f2b4dcf5530174439eafeea4c31dafb/raw/ae29d7594ab5e4f4db32306e0443c2d57426f083/1-dungeon-sheet-in-the-full-size-map.png",
-      "sha256": "701f8affb6af8819bc8f10e8f8b3ef406084377712fd29e0b93dc883c8602f50"
-    },
-    {
-      "url": "https://gist.githubusercontent.com/cjber/1f2b4dcf5530174439eafeea4c31dafb/raw/ae29d7594ab5e4f4db32306e0443c2d57426f083/2-second-floor-from-the-floor-picker.png",
-      "sha256": "6cfd2fc50690579c425747bcf2eab7c37695c3735922cf173b978677909da444"
-    },
-    {
-      "url": "https://gist.githubusercontent.com/cjber/1f2b4dcf5530174439eafeea4c31dafb/raw/ae29d7594ab5e4f4db32306e0443c2d57426f083/3-back-to-map-leaves-a-dungeon-map-button.png",
-      "sha256": "00cc5e6ca6b15cd3b834b2c53bfbe8d8c03728148b0651a5e69a8bf386af2944"
-    },
-    {
-      "url": "https://gist.githubusercontent.com/cjber/1f2b4dcf5530174439eafeea4c31dafb/raw/ae29d7594ab5e4f4db32306e0443c2d57426f083/4-dungeon-map-button-reopens-the-sheet.png",
-      "sha256": "e61aec2714fd7bdb84aeb207f79803daf06b5e3ffe0a8105388ed76f05a74bec"
-    },
-    {
-      "url": "https://gist.githubusercontent.com/cjber/1f2b4dcf5530174439eafeea4c31dafb/raw/ae29d7594ab5e4f4db32306e0443c2d57426f083/5-dungeon-sheet-in-the-compact-map.png",
-      "sha256": "58e4acd98d70bda8da5b67b8e23e039248a37fd4bf330ed1f2c74dab2206aaf7"
+      "url": "https://gist.githubusercontent.com/cjber/7142905cf6f04a8fc3c462f75985c246/raw/12eac24325696f6256523e4d406bc58787a956ec/1-settings.png",
+      "sha256": "8159c7c7d6a4051d9c9793795207e18060317dbd30bc628dab1912aa431cfd8a"
     }
   ]
 }
