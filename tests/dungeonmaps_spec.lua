@@ -98,20 +98,32 @@ local function Frame(kind)
 		SetText = function(self, text)
 			self.text = text
 		end,
+		SetPoint = function(self, ...)
+			self.point = { ... }
+		end,
+		SetWordWrap = function(self, enabled)
+			self.wordWrap = enabled
+		end,
+		SetTexCoord = function(self, ...)
+			self.texCoord = { ... }
+		end,
 		SetTexture = function(self, texture)
 			self.texture = texture
 		end,
-		GetWidth = function()
-			return 1000
+		GetWidth = function(self)
+			return rawget(self, "width") or 1000
 		end,
-		GetHeight = function()
-			return 600
+		GetHeight = function(self)
+			return rawget(self, "height") or 600
 		end,
 		GetStringHeight = function()
 			return 50
 		end,
 		GetFrameLevel = function()
 			return 1
+		end,
+		SetFrameStrata = function(self, strata)
+			self.strata = strata
 		end,
 		CreateTexture = function()
 			local texture = Frame("Texture")
@@ -322,12 +334,26 @@ for _, frame in ipairs(frames) do
 end
 host = frames[1] -- the first frame built is the one over the map canvas
 assert(host and host.shown and back and reopen and picker and popup)
+assert(host.strata == "DIALOG", "the dungeon sheet is above map and addon controls")
 assert(reopen.text == "Dungeon map" and not reopen.shown)
 assert(back.fitted == 112 and reopen.fitted == 112, "both buttons widen to a longer translated label")
 local heading = fontStrings[1]
 assert(heading.text == "The Deadmines 1")
+assert(heading.point[1] == "TOPRIGHT" and heading.point[2] == picker, "heading stops before the floor picker")
+assert(heading.wordWrap == false, "long dungeon titles stay within the header row")
 assert(textures[2].texture == "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1_1")
 assert(textures[13].texture == "Interface\\WorldMap\\TheDeadmines\\TheDeadmines1_12")
+local function CheckMapBounds(width, height)
+	host.width, host.height = width, height
+	host.scripts.OnSizeChanged()
+	local first, last = textures[2], textures[13]
+	assert(first.point[4] == 0 and first.point[5] == 0, "the first map tile starts at the canvas edge")
+	assert(math.abs(last.point[4] + last.size[1] - width) < 0.001, "painted map reaches the right edge")
+	assert(math.abs(-last.point[5] + last.size[2] - height) < 0.001, "painted map reaches the bottom edge")
+	assert(last.texCoord[2] == 234 / 256 and last.texCoord[4] == 156 / 256, "padded edge tiles are cropped")
+end
+CheckMapBounds(1002, 668)
+CheckMapBounds(1503, 1002)
 assert(picker.shown, "multiple floors need a picker")
 assert(not popup.shown and not popup.registered.GLOBAL_MOUSE_DOWN)
 local built = #frames

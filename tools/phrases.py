@@ -7,7 +7,7 @@ prints a translation template:
 a Locales/<locale>.lua
 with an `L["x"] = "x"` line per phrase. `--write` saves it to Locales/phrases.txt, and `--check` fails when that file
 is stale, when shipped code hands a literal with words in it straight to a UI call, when a translation is missing
-from the TOC, or when a tracked file carries the packager's CurseForge localization keyword.
+from the TOC, or when a packaged text file carries the packager's CurseForge localization keyword.
 """
 
 import re
@@ -16,6 +16,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+from tools.forever_tools import pkgmeta
 from tools.forever_tools.lua import LuaSyntaxError, Token, tokenize
 
 PHRASES = Path("Locales/phrases.txt")
@@ -248,15 +249,23 @@ def render(phrases: list[str]) -> str:
     return TEMPLATE + "".join(f"L[{encode(phrase)}] = {encode(phrase)}\n" for phrase in phrases)
 
 
-def layout(paths: list[Path], tracked: list[str]) -> list[Finding]:
+def layout(paths: list[Path], tracked: list[str], root: Path = Path(".")) -> list[Finding]:
     """A translation the TOC doesn't load never runs, and the packager keyword fails the release."""
     findings = []
     listed = set(paths)
+    manifest = pkgmeta.read(root)
+    project_tocs = set(pkgmeta.localization_toc_files(root))
     for name in tracked:
         path = Path(name)
         if path.parent == Path("Locales") and path.suffix == ".lua" and path not in listed:
             findings.append(Finding(path, 1, "not in TweaksForever.toc, so the game never loads it"))
-        if path.is_file() and PACKAGER_KEYWORD in path.read_text(errors="ignore"):
+        source = root / path
+        if (
+            (path.suffix == ".lua" or source.resolve() in project_tocs)
+            and (manifest is None or (manifest.keeps(name) and not manifest.kept_bytes(name)))
+            and source.is_file()
+            and PACKAGER_KEYWORD in source.read_text(errors="ignore")
+        ):
             findings.append(Finding(path, 1, "CurseForge localization is gone; this keyword fails the release"))
     return findings
 

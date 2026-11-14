@@ -26,6 +26,10 @@ Nameplates in retail's own frame, with your target outlined.
 
 The range strip under the swing timers: melee, dead zone, auto shot and too far.
 
+![Enemy and player tooltips with health bars](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png)
+
+Health bars in creature and player tooltips.
+
 These images are generated previews of the Tweaks UI.
 
 ## Features
@@ -74,7 +78,7 @@ Adventure Guide Forever uses Tweaks' class trainer locations for its spell remin
 
 <!-- forever-credits:start -->
 
-Thanks to Mouchoir, Sojiro84, SirGooie and everyone who reported a bug or asked for a feature.
+Thanks to Mouchoir, Sojiro84, SirGooie, NightIsolation and everyone who reported a bug or asked for a feature.
 
 <!-- forever-credits:end -->
 

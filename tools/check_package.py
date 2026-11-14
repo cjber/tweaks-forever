@@ -19,7 +19,9 @@ except ModuleNotFoundError:
 ROOT = Path(__file__).resolve().parent.parent
 POLICY = package.Policy(
     addons=("TweaksForever", "ForeverCore"),
-    specs=tuple(sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("tests/*_spec.lua"))),
+    specs=tuple(sorted(p.relative_to(ROOT).as_posix() for p in ROOT.glob("tests/*_spec.lua")))
+    + ("tests/sim/exercise_scenario.lua",),
+    support=("tests", "tools/forever_sim"),
 )
 
 if __name__ == "__main__":

@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Dungeon maps fill the map window.** Padded tile edges no longer leave unused strips, and progress badges and quest counts stay behind the dungeon heading. (#524)
+
 ## [2.8.0] - 2026-11-14
 
 <!-- discord-image: docs/screenshots/rangestrip.png -->

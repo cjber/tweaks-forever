@@ -5,6 +5,7 @@ local _, ns = ...
 ns.Credits = {
 	players = {
 		{ name = "SirGooie", what = "Fixed the gamepad crash leaving the addon settings" },
+		{ name = "NightIsolation", what = "Reported the dungeon map presentation problem" },
 		{ name = "Sojiro84", what = "Tooltips anchored to the cursor" },
 		{ name = "Sojiro84", what = "Abandon Quests button hides with quest details" },
 		{ name = "Mouchoir", what = "Fixed the login Lua error (code)" },

@@ -44,6 +44,7 @@ Credit for the reports and requests behind the addon.
 | Who | What | Notes |
 |---|---|---|
 | SirGooie | Fixed the gamepad crash leaving the addon settings | CurseForge; #168 |
+| NightIsolation | Reported the dungeon map presentation problem | CurseForge; #524 |
 | Sojiro84 | Tooltips anchored to the cursor | GitHub; #108 |
 | Sojiro84 | Abandon Quests button hides with quest details | GitHub; #109 |
 | [Mouchoir](https://github.com/Mouchoir) | Fixed the login Lua error (code) | GitHub; #202 |
