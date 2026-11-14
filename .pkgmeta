@@ -37,3 +37,6 @@ optional-dependencies:
 # carry no dependencies at all.
 externals:
   ForeverCore: https://github.com/cjber/forever-core/releases/download/v1.12.1/ForeverCore-v1.12.1-forever.zip
+
+required-dependencies:
+  - forevercore
