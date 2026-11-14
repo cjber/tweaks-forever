@@ -12,7 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-## [2.8.0] - 2026-11-13
+## [2.8.0] - 2026-11-14
 
 <!-- discord-image: docs/screenshots/rangestrip.png -->
 
