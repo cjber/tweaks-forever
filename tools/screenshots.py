@@ -24,7 +24,7 @@ if not (WOWMOCK / "wowmock.py").is_file():
 sys.path.insert(0, str(WOWMOCK))
 
 # wowmock resolves from $FOREVER_CORE/tools/wowmock at runtime (sys.path above), so ty cannot see it.
-from wowmock import (  # ty: ignore[unresolved-import]
+from wowmock import (  # ty: ignore[import-not-found]
     ARIALN,
     FONTS,
     FRIZQT,
