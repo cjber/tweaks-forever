@@ -49,6 +49,7 @@ Credit for the reports and requests behind the addon.
 | [Mouchoir](https://github.com/Mouchoir) | Fixed the login Lua error (code) | GitHub; #202 |
 | [Mouchoir](https://github.com/Mouchoir) | Questie icon sizes follow its sliders (code) | GitHub; #217, PR #216 |
 | [Mouchoir](https://github.com/Mouchoir) | Fixed the chat options' login errors (code) | GitHub; #551, PR #552 |
+| [Mouchoir](https://github.com/Mouchoir) | Fixed the battleground tooltip errors (code) | GitHub; #568, PR #569 |
 
 ## Inspired by
 

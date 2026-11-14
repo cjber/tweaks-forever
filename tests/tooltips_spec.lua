@@ -1,6 +1,6 @@
 -- A player's tooltip lines: the level line is found by the race and the unit's own level, so a guild named after a
--- race is bracketed as a guild and never takes the class. The tooltip's frames are stubbed loosely: anything not
--- under test answers with another stub.
+-- race is bracketed as a guild and never takes the class. The health bar takes the unit's colour unless the client
+-- keeps it secret. The tooltip's frames are stubbed loosely: anything not under test answers with another stub.
 local function Stub()
 	return setmetatable({}, {
 		__index = function(self, key)
@@ -14,7 +14,7 @@ local function Stub()
 	})
 end
 
-local features, initializers, handlers = {}, {}, {}
+local features, initializers, handlers, onUnit = {}, {}, {}, nil
 local active = true
 local ns = {
 	db = { tooltipStyle = "modern" },
@@ -27,7 +27,9 @@ local ns = {
 	Active = function()
 		return active
 	end,
-	OnTooltip = function() end,
+	OnTooltip = function(_, _, fn)
+		onUnit = fn
+	end,
 	OnSettingChanged = function(key, fn)
 		handlers[key] = fn
 	end,
@@ -95,6 +97,11 @@ end
 function GameTooltip.SetPadding(_, right, bottom, left, top)
 	padding = { right, bottom, left, top }
 end
+-- The health bar's own colour, as last set.
+local barColor
+function bar.SetStatusBarColor(_, r, g, b)
+	barColor = { r, g, b }
+end
 GameTooltip.NineSlice = Stub()
 function GameTooltip.GetProcessingTooltipInfo()
 	return processing
@@ -110,8 +117,23 @@ function GameTooltip.GetPadding()
 	return 0, 0, 0, 0
 end
 
+-- A secret string as the client hands it to tainted code: type() calls it a string and it may be passed along, but
+-- indexing it (text:find) or concatenating it raises.
+local secrets = setmetatable({}, { __mode = "k" })
+local function SecretString()
+	local function Raise()
+		error("attempt to use a secret string value", 2)
+	end
+	local value = setmetatable({}, { __index = Raise, __concat = Raise, __len = Raise, __call = Raise })
+	secrets[value] = true
+	return value
+end
+
 local pre, linePre, post = {}, {}, {}
 local levels = { mouseover = 60, target = -1 }
+local playerInfo = { "Warrior", "WARRIOR", "Night Elf", "NightElf", 2, "Sellene", "" }
+local isPlayer, classColor = true, { r = 0.78, g = 0.61, b = 0.43 }
+local reactionColors = { [2] = { r = 1, g = 0, b = 0 } }
 local env = setmetatable({
 	GameTooltip = GameTooltip,
 	ItemRefTooltip = Tooltip(),
@@ -134,7 +156,10 @@ local env = setmetatable({
 	},
 	hooksecurefunc = function() end,
 	GetPlayerInfoByGUID = function()
-		return "Warrior", "WARRIOR", "Night Elf", "NightElf", 2, "Sellene", ""
+		return unpack(playerInfo)
+	end,
+	type = function(value)
+		return secrets[value] and "string" or type(value)
 	end,
 	UnitExists = function(unit)
 		return levels[unit] ~= nil
@@ -142,14 +167,35 @@ local env = setmetatable({
 	UnitLevel = function(unit)
 		return levels[unit]
 	end,
-	canaccessvalue = function()
-		return true
+	canaccessvalue = function(value)
+		return value ~= "secret" and not secrets[value]
 	end,
 	C_ClassColor = {
 		GetClassColor = function()
-			return { r = 0.78, g = 0.61, b = 0.43 }
+			return classColor
 		end,
 	},
+	UnitIsPlayer = function()
+		return isPlayer
+	end,
+	UnitClass = function()
+		return "Warrior", "WARRIOR", 1
+	end,
+	UnitReaction = function()
+		return 2
+	end,
+	FACTION_BAR_COLORS = reactionColors,
+	UnitHealth = function()
+		return 1200
+	end,
+	UnitHealthMax = function()
+		return 1500
+	end,
+	UnitHealthPercent = function()
+		return 80
+	end,
+	BreakUpLargeNumbers = tostring,
+	CurveConstants = { ScaleTo100 = 1 },
 	FACTION_ALLIANCE = "Alliance",
 	FACTION_HORDE = "Horde",
 	PLAYER_FACTION_COLORS = { [0] = { r = 1, g = 0, b = 0 }, [1] = { r = 0, g = 0, b = 1 } },
@@ -247,6 +293,22 @@ built = Build("GetHyperlink", { "unit:Player-1", n = 1 }, {
 assert(built[2].text == "Level 42 Night Elf Warrior (Player)", built[2].text)
 print("tooltips: the level line is found by race and level, never in a guild name: ok")
 
+-- A player whose identity is restricted: GetPlayerInfoByGUID hands back a secret class and race, and the lines are
+-- secret too. The tooltip is left exactly as Blizzard wrote it, and none of it is read.
+local secretLevel = SecretString()
+playerInfo = { SecretString(), SecretString(), SecretString(), SecretString(), 2, SecretString(), "" }
+built = Build("GetWorldCursor", nil, { "Sellene", secretLevel, "Warrior", "Alliance" })
+assert(#built == 4 and built[2].text == secretLevel and built[3].text == "Warrior", "a secret player keeps every line")
+assert(not built[1].color, "a secret player's name keeps Blizzard's colour")
+
+-- A readable player with a secret line: that line is neither the level line nor the class line, and the post-call
+-- reads nothing past it.
+playerInfo = { "Warrior", "WARRIOR", "Night Elf", "NightElf", 2, "Sellene", "" }
+built = Build("GetWorldCursor", nil, { "Sellene", SecretString(), "Warrior", "Alliance" })
+assert(#built == 4 and built[3].text == "Warrior", "a secret line never lets the class line go")
+assert(not built[4].color, "nothing past a secret line is read")
+print("tooltips: a secret player or line is left as Blizzard wrote it: ok")
+
 -- A short name like "Deer" never squeezes the health bar: the tooltip keeps Blizzard's status bar width while the
 -- bar shows, and lets it go once the bar hides.
 barShown = true
@@ -259,3 +321,26 @@ minWidth = nil
 barHooks.OnHide()
 assert(minWidth == nil, "a width this file did not set is left alone")
 print("tooltips: the health bar keeps a minimum width: ok")
+
+-- The health bar of the unit under the cursor: its colour on the bar, and the track a shade of it.
+local function BarColor(r, g, b)
+	onUnit(GameTooltip, "GetWorldCursor")
+	return barColor[1] == r
+		and barColor[2] == g
+		and barColor[3] == b
+		and track.color[1] == r * 0.3
+		and track.color[2] == g * 0.3
+		and track.color[3] == b * 0.3
+end
+assert(BarColor(0.78, 0.61, 0.43), "a player's bar takes the class colour")
+isPlayer = false
+assert(BarColor(1, 0, 0), "another unit's bar takes its reaction's colour")
+
+-- A colour the client keeps secret, whole or in part, leaves the bar the object's colour: its shade would be arithmetic
+-- on a secret, and the bar is Blizzard's, so it must never be handed one. UnitClass is secret for a player whose
+-- identity is restricted, and GetClassColor takes that secret from addon code, so its colour comes back secret.
+reactionColors[2] = { r = 1, g = 0, b = "secret" }
+assert(BarColor(0, 0.6, 0.1), "a reaction colour with a secret channel is not used")
+isPlayer, classColor = true, { r = "secret", g = "secret", b = "secret" }
+assert(BarColor(0, 0.6, 0.1), "a secret class colour is not used")
+print("tooltips: a secret bar colour is never used: ok")
