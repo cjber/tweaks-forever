@@ -1,11 +1,11 @@
 {
-  "input_digest": "dd9631ae5b7c5642971d1d44c1d1cddb290195c591302ab5e25b66e91eacdab1",
-  "runtime_sha256": "dd9631ae5b7c5642971d1d44c1d1cddb290195c591302ab5e25b66e91eacdab1",
-  "candidate": "64a3c1c16c465fd7ac47581cae215f1a5ea2b3b2bbde15a4c620757e5ee6c163",
+  "input_digest": "1bde5a1f47fefc64039773979f61dccdc88b8718d09bcf1d99c76a4b9ad576b7",
+  "runtime_sha256": "1bde5a1f47fefc64039773979f61dccdc88b8718d09bcf1d99c76a4b9ad576b7",
+  "candidate": "92f1eccf6a0d57c0282dbf9c36bc8119b9e8ce4c01b21c16839c3f87262ecb5e",
   "tested_artifact": "source-tree",
   "client_build": "1.60.1.70938 (Interface 16001)",
-  "source_commit": "8fad82b0854bbbc4f677bff417a99a1b7e5588f1",
-  "notes": "Recorded in the client from a git archive of this commit linked as the TweaksForever folder, with its TOC version set to 2.8.0 (visual_proof --compare: equivalent), beside the store ForeverCore v1.12.0. No Lua errors this session.",
+  "source_commit": "feb5bf88d391bf40c0aa9c65e2bc5cc3220f7642",
+  "notes": "Recorded in the client from a git archive of this commit linked as the TweaksForever folder, with its TOC version set to 2.8.0 (visual_proof --compare: equivalent), beside the store ForeverCore v1.12.0. No Lua errors this session. The battleground tooltip fix (#569) is covered by tests/tooltips_spec.lua: hovering another player needs one in reach, which this session does not seek out.",
   "flows": [
     {
       "name": "After an update to 2.8.0 the chat says once what changed",
@@ -19,8 +19,8 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/c90a8346c79f3f71e2902a0ea76b8c2a/raw/8b00fac0c8ef11e9798d7c9aa43845dd327fc0ee/567-update-notice-v2.png",
-      "sha256": "e6f480cd0f9d87171ad574a84690544e68b5e6e12517db311828b389c611a6ee"
+      "url": "https://gist.githubusercontent.com/cjber/c90a8346c79f3f71e2902a0ea76b8c2a/raw/912a2fc2d2cde62b958ecc9cfa341fb9c6b87d0f/567-update-notice-v3.png",
+      "sha256": "524fc1091b5b1fec0dd2bfd5aa0666bba0a7d5f2bb75aabe5724a97522fc98c8"
     }
   ]
 }
