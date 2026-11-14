@@ -12,8 +12,13 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-- **Dungeon and raid entrance icons are gone from the world map.** The castle icons no longer cover zone and continent labels; the painted dungeon maps and the Dungeon map button stay. (#525)
+## [2.8.0] - 2026-11-14
+
+<!-- discord-image: docs/screenshots/rangestrip.png -->
+
 - **Every class gets a range strip on its swing timers.** A strip under the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap, so you know when to close in and when to back off. Each segment leads with its attack's own icon, and the band's name sits under the strip in its colour; Show icons and Show band label turn either off (#413).
+- **No more Lua errors when you hover players in a battleground.** Tooltip class colours and the tooltip health bar read another player's class and race, which the game hides inside a battleground, so one match could log over a thousand errors. Tweaks now leaves such a player's tooltip as the game wrote it, with the health bar in its plain colour. Thanks to Mouchoir for the report and fix. (#568)
+- **Dungeon and raid entrance icons are gone from the world map.** The castle icons no longer cover zone and continent labels; the painted dungeon maps and the Dungeon map button stay. (#525)
 - **Tweaks Forever loads after Titan Panel and Mapster when they are installed**, so its checks of their settings always see them.
 
 ## [2.7.2] - 2026-11-13
