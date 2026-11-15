@@ -12,6 +12,12 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.8.2] - 2026-11-15
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
 ## [2.8.1] - 2026-11-14
 
 - **Dungeon maps fill the map window.** Padded tile edges no longer leave unused strips, and progress badges and quest counts stay behind the dungeon heading. Thanks to NightIsolation for the report. (#524)
