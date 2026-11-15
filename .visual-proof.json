@@ -4,10 +4,10 @@
   "candidate": "17c8442814504a2bce9d8de205a780a86908acc36281c7ee70857a29d4dd52bb",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "f0c8684aa1422619495c9b5c5d96d315bf4a35f0",
+  "source_commit": "c7ccb81801bbc42128e2a90d5a0e23a3e0c7fd45",
   "flows": [
     {
-      "name": "client",
+      "name": "settings categories",
       "steps": [
         "/tweaks"
       ],
@@ -16,8 +16,8 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/97e296590c105baa4daccf1b5431c0d5/raw/8c6411e535ae512d1a2bf6d61023f30acc66336f/1-client.png",
-      "sha256": "f9cd9a3cddaf860ca44a5aae681bb6e407ccb918e31a6073dc1324b5664522d7"
+      "url": "https://gist.githubusercontent.com/cjber/0e175dd2faf33c6432efdd0e4bbb4bed/raw/76445491825f453df7ca615a0fdf4382c891374a/client.png",
+      "sha256": "04c0d7a204e43ae3a22d40641dc3ead0da3bba0c32b7c9dcbbc14d1e04478850"
     }
   ]
 }

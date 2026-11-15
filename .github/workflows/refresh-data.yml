@@ -54,7 +54,7 @@ jobs:
         with:
           tools: lua stylua
       - if: steps.build.outputs.new == 'true'
-        name: Read the Forever Core ref
+        name: Read the ForeverCore ref
         id: forever-core
         run: echo "ref=$(cat tools/forever-core.txt)" >> "$GITHUB_OUTPUT"
       - if: steps.build.outputs.new == 'true'
@@ -87,6 +87,7 @@ jobs:
           branch: data/forever-${{ steps.build.outputs.version }}
           title: "data: game data for Forever ${{ steps.build.outputs.version }}"
           commit-message: "data: game data for Forever ${{ steps.build.outputs.version }}"
+          sign-commits: true
           body: |
             Regenerated `Data/Overlays.lua` (world map overlays), `Data/CampBenefits.lua` (camp benefit texts), `Data/ZoneLevels.lua` (zone level ranges), `Data/DungeonEntrances.lua` (dungeon and raid entrances), `Data/ClassSpells.lua` (class trainer spells) and `Data/ForeverQuests.lua` (quests added in Forever) for Forever build ${{ steps.build.outputs.version }}; `tools/README.md` names each file's sources.
 
