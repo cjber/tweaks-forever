@@ -12,7 +12,7 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
-## [2.8.2] - 2026-11-14
+## [2.8.2] - 2026-11-15
 
 <!-- forever-core-sync -->
 
