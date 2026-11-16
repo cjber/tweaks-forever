@@ -300,18 +300,24 @@ def dungeon_map(ui):
     frame, rects = world_map_frame(ui, map_art(ui, ASHENVALE), nav, arrows=nav[1:])
     cx, cy, cw, ch = rects["container"]
     frame.fill(cx, cy, cw, ch, (0, 0, 0, 1))
-    pad, header, columns, rows = 12, 46, 4, 3
-    side = min(cw - 2 * pad, (ch - header - pad) * columns / rows)
-    tile_w = tile_h = side / columns
+    # Map/DungeonMaps.lua's Layout: a 1002x668 art canvas in padded 256px tiles, the art filling the whole container.
+    # Each tile is cropped to its top-left slice of the art, as its texcoords do.
+    art_w, art_h, texel, columns, rows = 1002, 668, 256, 4, 3
     for index in range(1, columns * rows + 1):
+        left = (index - 1) % columns * texel
+        top = (index - 1) // columns * texel
+        tile_w, tile_h = min(texel, art_w - left), min(texel, art_h - top)
         tile = ui.texture(f"Interface\\WorldMap\\BlackfathomDeeps\\BlackfathomDeeps1_{index}.blp")
+        width, height = tile.size
         frame.draw(
-            tile,
-            cx + pad + (index - 1) % columns * tile_w,
-            cy + header + (index - 1) // columns * tile_h,
-            tile_w,
-            tile_h,
+            tile.crop((0, 0, round(width * tile_w / texel), round(height * tile_h / texel))),
+            cx + cw * left / art_w,
+            cy + ch * top / art_h,
+            cw * tile_w / art_w,
+            ch * tile_h / art_h,
         )
+    # The heading and the two buttons sit on the art afterwards, at their own inset.
+    pad = 12
     back_x = cx + cw - pad - 112
     ui_panel_button(frame, back_x, cy + pad, 112, 22, "Back to map")
     ui_panel_button(frame, back_x - 8 - 200, cy + pad, 200, 24, title)

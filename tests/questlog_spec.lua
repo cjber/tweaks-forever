@@ -195,10 +195,17 @@ local function Click(button)
 	assert(button.enabled ~= false and button.shown, "button must be usable")
 	button.scripts.OnClick(button)
 end
-env.CreateFrame = function(_, _, parent)
-	return Frame(parent)
+env.CreateFrame = function(_, _, parent, template)
+	local frame = Frame(parent)
+	if template == "BasicFrameTemplateWithInset" then
+		frame.CloseButton = Frame(frame)
+	end
+	return frame
 end
 env.UIParent = Frame()
+env.HideUIPanel = function()
+	error("a close button hides its own frame: HideUIPanel's broadcast would run under this addon's taint")
+end
 env.QuestMapFrame = { QuestsFrame = quests, DetailsFrame = { ScrollFrame = {} } }
 env.QuestScrollFrame = scroll
 scroll.BorderFrame = Frame(scroll)
@@ -238,6 +245,11 @@ local clear = Button("Clear selection")
 assert(clear.fitted == 130 and clear.point[2] == selectAll and clear.point[3] == "RIGHT", "anchored to Select all")
 local panel = selectAll.parent
 assert(panel.shown, "click opens the checklist")
+-- The template's own close button hides the checklist directly, never through HideUIPanel.
+assert(panel.CloseButton, "the checklist owns the template's close button")
+panel.CloseButton.scripts.OnClick(panel.CloseButton)
+assert(not panel.shown, "the close button hides the checklist")
+Click(open)
 Click(selectAll)
 Click(Button("Abandon selected (2)"))
 assert(Button("Confirm abandon (2)") and #abandoned == 2, "first click only requests confirmation")

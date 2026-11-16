@@ -50,7 +50,7 @@ local function frame(kind, name, _, template)
 	f.CreateFontString = region
 	if template == "BasicFrameTemplateWithInset" then
 		f.TitleText = region()
-		f.CloseButton = { shown = true }
+		f.CloseButton = frame("Button")
 	end
 	if kind == "CheckButton" then
 		f.Text = region()
@@ -129,6 +129,9 @@ local env = setmetatable({
 		return false
 	end,
 	C_Timer = { After = noop },
+	HideUIPanel = function()
+		error("a close button hides its own frame: HideUIPanel's broadcast would run under this addon's taint")
+	end,
 	IsControlKeyDown = function()
 		return true
 	end,
@@ -197,6 +200,11 @@ end
 open()
 local panel = assert(named.TweaksForeverGearPanel)
 assert(panel.shown)
+-- The template's own close button hides the panel directly, never through HideUIPanel.
+panel.CloseButton.scripts.OnClick(panel.CloseButton)
+assert(not panel.shown, "the close button hides the gear panel")
+open()
+assert(panel.shown, "the panel reopens after its close button")
 assert(row("Healing").checked and not row("Other").checked, "saved membership drives checks")
 press("Healing")
 assert(saved.groups.Healing == nil and panel.shown, "real checkbox removes final member and refreshes")

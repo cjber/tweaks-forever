@@ -1,23 +1,34 @@
 {
-  "input_digest": "5ad62eb472b43d814c53909f76638329e4612e8a860f4dfd634a2f17550d790f",
-  "runtime_sha256": "5ad62eb472b43d814c53909f76638329e4612e8a860f4dfd634a2f17550d790f",
-  "candidate": "0270cbdda0916315ba88c77725d0646d998eb6fea74d14d96babfadeea2faccb",
+  "input_digest": "2b362666a87e244ec144d5538f015ba75de25e3077946f98883b50b62751b684",
+  "runtime_sha256": "2b362666a87e244ec144d5538f015ba75de25e3077946f98883b50b62751b684",
+  "candidate": "d610c5565fb1fd342d6f1f0c880c289a2f810301b0244782f84ee1363c5e67bf",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "aace0ee6a7c0f4469aac8ad6fbd3a1e7df10d114",
+  "source_commit": "ad81e9ab70fe88b8f3ffdd384243378ad6698286",
   "flows": [
     {
-      "name": "settings",
+      "name": "windows open",
       "steps": [
-        "/tweaks"
+        "tweaks582-open.lua sha256:313a45c7f9ec7f0885d736115c8547701fbf7dc48c87bf8ada3cad72e28989ea"
+      ],
+      "result": "pass"
+    },
+    {
+      "name": "closed with x",
+      "steps": [
+        "tweaks582-close.lua sha256:adaf0d095a2697bd4ccf5e6b0bc30261d2d7739704110350e71694a2fb79969d"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/bc803f5598e8192a81f6af1b8bc32f5b/raw/489cb47eb5e39297c6512be27789d778421554a7/1-settings.png",
-      "sha256": "6471de88eac7bb5e6f3a6936037b417353baa58d02548fb4ec572b87f0022eca"
+      "url": "https://gist.githubusercontent.com/cjber/b47de33fdbaacd2939172dc6fcaa2893/raw/07a44fb118c8e11ccee2c71689eb350cde56eaa3/1-windows-open.png",
+      "sha256": "af28ecc4aed61049e0cd683075c9cb92d2a2b2726ce2a795340ab952a824b6a5"
+    },
+    {
+      "url": "https://gist.githubusercontent.com/cjber/b47de33fdbaacd2939172dc6fcaa2893/raw/07a44fb118c8e11ccee2c71689eb350cde56eaa3/2-closed-with-x.png",
+      "sha256": "111e583872af7feb832dd611ff0ea54328e77be4153663ec860695bf8f62dba0"
     }
   ]
 }
