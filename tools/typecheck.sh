@@ -2,7 +2,11 @@
 set -eu
 
 cd "$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
-revision=d0b5b51fac4c52c493371b9b18e66ce604ea4326
+# The annotation checkout and the LuaLS version come from tools/toolchain.json, synced from ForeverCore: the one
+# place either is pinned, and the file CI installs LuaLS from.
+pins=$(python3 -c 'import json; t = json.load(open("tools/toolchain.json"))["tools"]; print(t["annotations"]["commit"], t["luals"]["version"])')
+revision=${pins% *}
+luals=${pins#* }
 library=.types/vscode-wow-api
 if [ ! -d "$library/.git" ]; then
     mkdir -p .types
@@ -21,8 +25,8 @@ if [ -n "$(git -C "$library" status --porcelain --untracked-files=all)" ]; then
     echo "$library: annotations must match the pinned checkout" >&2
     exit 1
 fi
-if [ "$(lua-language-server --version)" != '3.19.1' ]; then
-    echo 'typecheck requires lua-language-server 3.19.1 on PATH' >&2
+if [ "$(lua-language-server --version)" != "$luals" ]; then
+    echo "typecheck requires lua-language-server $luals on PATH (tools/toolchain.json)" >&2
     exit 1
 fi
 
