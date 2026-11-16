@@ -411,9 +411,9 @@ function Model.Band(melee, reaches, interact)
 	if gap then
 		local within = interact()
 		if within == true then
-			-- A spell with no minimum could still reach inside 8 yards, so its nil answer decides against the gap.
+			-- An unanswered spell could still reach; the interaction answer alone cannot rule it out.
 			for _, reach in ipairs(reaches) do
-				if reach.check == nil and reach.min < 8 then
+				if reach.check == nil then
 					return nil
 				end
 			end

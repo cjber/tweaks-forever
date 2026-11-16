@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **The range strip leaves uncertain bands blank.** The band label stays blank when an unanswered attack-range check could change the result. (#574)
+
 ## [2.8.2] - 2026-11-15
 
 <!-- forever-core-sync -->

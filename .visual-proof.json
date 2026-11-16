@@ -1,13 +1,13 @@
 {
-  "input_digest": "2d0aa82553ea7d403cdf28ef1458e92a74b35e19418af3e99449293ec288db96",
-  "runtime_sha256": "2d0aa82553ea7d403cdf28ef1458e92a74b35e19418af3e99449293ec288db96",
-  "candidate": "17c8442814504a2bce9d8de205a780a86908acc36281c7ee70857a29d4dd52bb",
+  "input_digest": "c87a2603e83048535d7edfa434558933f22fcc0607baffdd18039e4cc08b4459",
+  "runtime_sha256": "c87a2603e83048535d7edfa434558933f22fcc0607baffdd18039e4cc08b4459",
+  "candidate": "aa0a29fb740311fb6fb5b5d0bb6789a7ebbe63da9ce9ce73d2b9291c338c0155",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "c7ccb81801bbc42128e2a90d5a0e23a3e0c7fd45",
+  "source_commit": "5c91d4586f469fe5183a83f4d5a6524ed6fa7a1c",
   "flows": [
     {
-      "name": "settings categories",
+      "name": "settings",
       "steps": [
         "/tweaks"
       ],
@@ -16,8 +16,8 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/0e175dd2faf33c6432efdd0e4bbb4bed/raw/76445491825f453df7ca615a0fdf4382c891374a/client.png",
-      "sha256": "04c0d7a204e43ae3a22d40641dc3ead0da3bba0c32b7c9dcbbc14d1e04478850"
+      "url": "https://gist.githubusercontent.com/cjber/8c72ee8e19e24ecde49e6aef33499845/raw/63dc5622c068abf46824c280b0b3b75e8cf34cb0/1-settings.png",
+      "sha256": "27ffcdef38f93298b3580b7957bd2811f958fe5efa56e49f2395ff50ff8036e5"
     }
   ]
 }
