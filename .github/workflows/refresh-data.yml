@@ -50,7 +50,7 @@ jobs:
       # Every Lua tool version lives in this checkout's tools/toolchain.json; the action installs and verifies the pins.
       - name: Install LuaJIT, luacheck and StyLua
         if: steps.build.outputs.new == 'true'
-        uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+        uses: cjber/forever-core/.github/actions/toolchain@5af33e8122201201634ef3efc80977a407e1e7a2 # main
         with:
           tools: lua stylua
       - if: steps.build.outputs.new == 'true'
