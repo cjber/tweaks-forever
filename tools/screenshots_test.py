@@ -5,8 +5,6 @@ import unittest
 from pathlib import Path
 from unittest.mock import Mock
 
-from PIL import Image
-
 # Map/DungeonMaps.lua: the art's canvas, and the padded tile each of the four by three textures holds.
 ART_WIDTH, ART_HEIGHT, TEXEL = 1002, 668, 256
 # The decoded size of a tile texture, whatever the art's canvas is: texcoords are fractions of it.
@@ -17,13 +15,23 @@ CONTAINER, MAXIMIZED = (697, 465), (1394, 930)
 SIZES = (CONTAINER, MAXIMIZED)
 
 
+class FakeTexture:
+    """A decoded tile texture without the art: TEXTURE square, and cropped to the size of whatever box it is given."""
+
+    def __init__(self, size=(TEXTURE, TEXTURE)):
+        self.size = size
+
+    def crop(self, box):
+        return FakeTexture((box[2] - box[0], box[3] - box[1]))
+
+
 def dungeon_map(width, height):
-    """`dungeon_map` from tools/screenshots.py, with the art replaced by a real image and the map stubbed."""
+    """`dungeon_map` from tools/screenshots.py, with the art a fake texture and the map stubbed."""
     source = Path(__file__).with_name("screenshots.py").read_text()
     tree = ast.parse(source)
     function = next(node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "dungeon_map")
     frame, ui = Mock(), Mock()
-    ui.texture.return_value = Image.new("RGBA", (TEXTURE, TEXTURE))
+    ui.texture.return_value = FakeTexture()
     scope = {
         "ASHENVALE": 43,
         "FONTS": {"GameFontNormalLarge": object()},
