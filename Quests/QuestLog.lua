@@ -121,6 +121,12 @@ ns.Init(function()
 	ns.OnSettingChanged("foreverQuests", RefreshTint)
 
 	local panel = CreateFrame("Frame", nil, UIParent, "BasicFrameTemplateWithInset")
+	-- The template's CloseButton runs UIPanelCloseButton_OnClick, which closes it through HideUIPanel: that
+	-- broadcast writes the gamepad frame bookkeeping under this addon's taint and blocks the client's next secure
+	-- gamepad call. This panel is our own, so its button hides it directly, running the OnHide reset below like Cancel.
+	panel.CloseButton:SetScript("OnClick", function()
+		panel:Hide()
+	end)
 	panel:SetSize(380, 460)
 	panel:SetPoint("CENTER")
 	panel:SetFrameStrata("DIALOG")

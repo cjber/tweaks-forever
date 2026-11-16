@@ -96,6 +96,12 @@ local function Box()
 		return box
 	end
 	box = CreateFrame("Frame", "TweaksForeverChatURLCopy", UIParent, "BasicFrameTemplateWithInset")
+	-- The template's CloseButton runs UIPanelCloseButton_OnClick, which closes it through HideUIPanel: that
+	-- broadcast writes the gamepad frame bookkeeping under this addon's taint and blocks the client's next secure
+	-- gamepad call. This box is our own, so its button hides it directly.
+	box.CloseButton:SetScript("OnClick", function()
+		box:Hide()
+	end)
 	box:SetSize(440, 116)
 	box:SetFrameStrata("DIALOG")
 	box:SetClampedToScreen(true)

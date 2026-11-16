@@ -587,6 +587,12 @@ end
 local function OpenMenu(button, itemID)
 	if not gearPanel then
 		gearPanel = CreateFrame("Frame", "TweaksForeverGearPanel", UIParent, "BasicFrameTemplateWithInset")
+		-- The template's CloseButton runs UIPanelCloseButton_OnClick, which closes it through HideUIPanel: that
+		-- broadcast writes the gamepad frame bookkeeping under this addon's taint and blocks the client's next secure
+		-- gamepad call. This panel is our own, so its button hides it directly.
+		gearPanel.CloseButton:SetScript("OnClick", function()
+			gearPanel:Hide()
+		end)
 		gearPanel:SetSize(380, 520)
 		gearPanel:SetFrameStrata("DIALOG")
 		gearPanel:SetClampedToScreen(true)

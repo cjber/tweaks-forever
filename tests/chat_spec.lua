@@ -28,10 +28,14 @@ local function Widget(kind, name, parent, template)
 		parent = parent,
 		template = template,
 		shown = false,
+		scripts = {},
 		text = nil,
 	}
 	function widget:GetName()
 		return self.name
+	end
+	function widget:SetScript(event, callback)
+		self.scripts[event] = callback
 	end
 	function widget.SetSize() end
 	function widget.SetFrameStrata() end
@@ -227,6 +231,9 @@ local env = setmetatable({
 	CreateAtlasMarkup = function(atlas, width, height)
 		return ("|A:%s:%d:%d|a"):format(atlas, width, height)
 	end,
+	HideUIPanel = function()
+		error("a close button hides its own frame: HideUIPanel's broadcast would run under this addon's taint")
+	end,
 	GRAY_FONT_COLOR = {
 		WrapTextInColorCode = function(_, text)
 			return "|cff808080" .. text .. "|r"
@@ -240,6 +247,9 @@ local env = setmetatable({
 	CreateFrame = function(kind, name, parent, template)
 		local widget = Widget(kind, name, parent, template)
 		widget.TitleText = Widget("FontString", nil, widget, nil)
+		if template == "BasicFrameTemplateWithInset" then
+			widget.CloseButton = Widget("Button", nil, widget, nil)
+		end
 		widget.CreateFontString = function()
 			return Widget("FontString", nil, widget, nil)
 		end
@@ -667,6 +677,10 @@ end
 assert(editBox and editBox.text == "https://example.com", "the copy box shows the address")
 assert(editBox.highlighted and editBox.focused, "the address is selected and focused")
 assert(box and box.shown and env.escaped == box, "the box is shown and Escape closes it")
+-- The template's own close button hides the box directly, never through HideUIPanel.
+assert(box.CloseButton, "the copy box owns the template's close button")
+box.CloseButton.scripts.OnClick(box.CloseButton)
+assert(not box.shown, "the close button hides the copy box")
 
 -- History: 200 lines kept, saved lines skipped when secret, replayed oldest first above the divider.
 local history = ns.ChatHistory
