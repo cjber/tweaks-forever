@@ -92,7 +92,6 @@ L["Dressing room"] = "Гардеробная"
 L["Duels from your friends, Battle.net friends and guild still ask you."] = "Дуэли от друзей, друзей по Battle.net и гильдии по-прежнему требуют вашего ответа."
 L["Dungeon interior maps"] = "Внутренние карты подземелий"
 L["Dungeon map"] = "Карта подземелья"
-L["Closing Tweaks' windows no longer blocks the gamepad interface."] = "Закрытие окон Tweaks больше не блокирует интерфейс для контроллера." -- mt
 L["Each segment starts with its attack's icon: your weapon for Melee, the spell for the rest."] = "Каждый сегмент начинается со значка своей атаки: оружие для ближнего боя, заклинание для остальных."
 L["Equip %s"] = "Надеть: %s"
 L["Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on."] = "При надевании удочки замененное ею оружие запоминается как группа «До рыбалки», отмеченная в сумках. Ctrl+правый щелчок по одному из предметов и пункт «Надеть: До рыбалки» вернут его на место."
@@ -347,3 +346,5 @@ L["A strip under the game's swing timers naming which of your attacks reach your
 L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt
+
+L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever сообщает, когда ForeverCore требует исправления." -- mt

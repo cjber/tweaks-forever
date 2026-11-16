@@ -92,7 +92,6 @@ L["Dressing room"] = "미리보기"
 L["Duels from your friends, Battle.net friends and guild still ask you."] = "친구, Battle.net 친구, 길드원의 결투 신청은 계속 묻습니다."
 L["Dungeon interior maps"] = "던전 내부 지도"
 L["Dungeon map"] = "던전 지도"
-L["Closing Tweaks' windows no longer blocks the gamepad interface."] = "Tweaks 창을 닫아도 더 이상 게임패드 인터페이스가 차단되지 않습니다." -- mt
 L["Each segment starts with its attack's icon: your weapon for Melee, the spell for the rest."] = "각 구간은 해당 공격의 아이콘으로 시작합니다. 근접은 무기, 나머지는 주문입니다."
 L["Equip %s"] = "%s 장착"
 L["Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on."] = "낚싯대를 장착하면 바뀐 무기를 낚시 전 묶음으로 기억해 가방에 표시합니다. 그중 하나를 Ctrl+오른쪽 클릭하고 낚시 전 장착을 고르면 다시 장착합니다."
@@ -347,3 +346,5 @@ L["A strip under the game's swing timers naming which of your attacks reach your
 L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt
+
+L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever가 ForeverCore를 수정해야 할 때 알려줍니다." -- mt
