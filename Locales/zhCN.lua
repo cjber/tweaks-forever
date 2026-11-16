@@ -335,6 +335,7 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 L["The choices, in order: %s."] = "选项依次为：%s。"
 
 
+L["%s: the installed ForeverCore is another addon (%s). Remove it and install ForeverCore from CurseForge."] = "%s：已安装的 ForeverCore 是另一个插件（%s）。请将其删除，并从 CurseForge 安装 ForeverCore。" -- mt
 L["%s: %s is out of date. Update it to fix this."] = "%s：%s 已过时。请更新它以解决此问题。" -- mt
 L["%s: %s are out of date. Update them to fix this."] = "%s：%s 已过时。请更新它们以解决此问题。" -- mt
 L["%s could not start. Reinstall %s to fix this."] = "%s 无法启动。请重新安装 %s 以解决此问题。" -- mt

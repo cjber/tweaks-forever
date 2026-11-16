@@ -25,6 +25,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s are out of date.
 L["%s: %s is out of date. Update it to fix this."] = "%s: %s is out of date. Update it to fix this."
 L["%s: rested"] = "%s: rested"
 L["%s: rested, again in %s"] = "%s: rested, again in %s"
+L["%s: the installed ForeverCore is another addon (%s). Remove it and install ForeverCore from CurseForge."] = "%s: the installed ForeverCore is another addon (%s). Remove it and install ForeverCore from CurseForge."
 L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"] = "/tw issue - report a bug or request a feature with a ready-made GitHub issue link"
 L["/tw report - show a report to copy into a bug report"] = "/tw report - show a report to copy into a bug report"
 L["A chat line and a sound when a rare creature's nameplate or map marker appears near you. Not in combat, and once per rare for ten minutes. Click the rare's name in chat, or press the key bound under Key Bindings > AddOns, to set a waypoint to it."] = "A chat line and a sound when a rare creature's nameplate or map marker appears near you. Not in combat, and once per rare for ten minutes. Click the rare's name in chat, or press the key bound under Key Bindings > AddOns, to set a waypoint to it."
