@@ -6,14 +6,13 @@
 ## Category: Quality of Life
 ## IconTexture: Interface\AddOns\TweaksForever\media\Icon
 ## X-Forever-Icon: Interface\Icons\Trade_Engineering
-## OptionalDeps: ShortestPathForever, QuestieDB, Questie, Titan, Mapster
+## OptionalDeps: ShortestPathForever, QuestieDB, Questie, Titan, Mapster, ForeverCore
 ## AddonCompartmentFunc: TweaksForever_OnAddonCompartmentClick
 ## X-License: GPL-3.0-or-later
 ## X-Website: https://github.com/cjber/tweaks-forever
 ## X-Donate: https://github.com/sponsors/cjber
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
-## Dependencies: ForeverCore
 ## X-Forever-Core: v1.13.0
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
