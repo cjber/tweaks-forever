@@ -12,6 +12,8 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+- **Closing Tweaks' windows no longer blocks the gamepad interface.** With the gamepad interface on, closing the gear panel, the link copy box or the quest abandon list with its X no longer leaves the game refusing its next gamepad action and blaming Tweaks.
+
 ## [2.8.2] - 2026-11-16
 
 - **The range strip leaves uncertain bands blank.** The band label stays blank when an unanswered attack-range check could change the result. (#574)
