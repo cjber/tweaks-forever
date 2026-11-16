@@ -1,10 +1,10 @@
 {
-  "input_digest": "744c32fa2dca62ea916edbe9ea0bb15d8807ae889f0f3e411fdeb1f781c1c7cb",
-  "runtime_sha256": "744c32fa2dca62ea916edbe9ea0bb15d8807ae889f0f3e411fdeb1f781c1c7cb",
-  "candidate": "e6d46e36c6eb877a36f41b023f5df2fa42dfb4a61a7541ac7de9f21d61ed4b97",
+  "input_digest": "a71e7109fc1a6a1e38ef0f5e276e56b3a2fe9942591879ed8c83960450c36603",
+  "runtime_sha256": "a71e7109fc1a6a1e38ef0f5e276e56b3a2fe9942591879ed8c83960450c36603",
+  "candidate": "c1f83808c33be88d40fc1929bf1cf36071276915058b67cf055808f6cc300834",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "02187a475affdd0f40411a664e3daf8ad1791173",
+  "source_commit": "88b33897080d9003f0b6766b55bef48cda7d037d",
   "flows": [
     {
       "name": "loaded with forevercore",
@@ -16,7 +16,7 @@
     {
       "name": "windows open",
       "steps": [
-        "tweaks582-open.lua sha256:313a45c7f9ec7f0885d736115c8547701fbf7dc48c87bf8ada3cad72e28989ea"
+        "tweaks582-open.lua sha256:613baffda4aee93619402da2a842eb0162d7b01b96ff2b083de4c93c9a02e1e3"
       ],
       "result": "pass"
     },
@@ -30,16 +30,16 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/25bcfbaeab1a335fc01b2fb22189167c/raw/152627a3bfbac0084a21db004f9a540339acb8b0/1-loaded-with-forevercore.png",
-      "sha256": "67a72f8b22be7e63547fecd8dfb13ff2a6a42fecb321f58617924397be46184a"
+      "url": "https://gist.githubusercontent.com/cjber/6e8b13fc98419c47061845b23e240c05/raw/4123c53b1de11b64ef87b6601c26e1c1e764077a/1-loaded-with-forevercore.png",
+      "sha256": "e010bbe6a780e24d74a23df4137597b955a4c4e40bf873b3cf484ba478aa5dac"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/25bcfbaeab1a335fc01b2fb22189167c/raw/152627a3bfbac0084a21db004f9a540339acb8b0/2-windows-open.png",
-      "sha256": "6ff838f1332532ec8604f0fd39976c5f0861360e28e1ec8b1602a3304c2db174"
+      "url": "https://gist.githubusercontent.com/cjber/6e8b13fc98419c47061845b23e240c05/raw/4123c53b1de11b64ef87b6601c26e1c1e764077a/2-windows-open.png",
+      "sha256": "d81de98a68cc557e0e69372adf3f0a027d745f2b409f753dfeaaa447a6527dd6"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/25bcfbaeab1a335fc01b2fb22189167c/raw/152627a3bfbac0084a21db004f9a540339acb8b0/3-closed-with-x.png",
-      "sha256": "0dbdc53c09841a41f7fb85156913a711d47ead88bb8e8ccde2ef395a937b57aa"
+      "url": "https://gist.githubusercontent.com/cjber/6e8b13fc98419c47061845b23e240c05/raw/4123c53b1de11b64ef87b6601c26e1c1e764077a/3-closed-with-x.png",
+      "sha256": "536f0e7ca8f6a033179b8d5f48f25e6e150a35f44602ea5de10b09098d9a1dac"
     }
   ]
 }
