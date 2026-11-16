@@ -92,7 +92,6 @@ L["Dressing room"] = "试衣间"
 L["Duels from your friends, Battle.net friends and guild still ask you."] = "好友、战网好友和公会成员的决斗仍会询问你。"
 L["Dungeon interior maps"] = "地下城内部地图"
 L["Dungeon map"] = "地下城地图"
-L["Closing Tweaks' windows no longer blocks the gamepad interface."] = "关闭 Tweaks 的窗口不再阻塞游戏手柄界面。" -- mt
 L["Each segment starts with its attack's icon: your weapon for Melee, the spell for the rest."] = "每一段都以该攻击的图标开头：近战显示你的武器，其余显示法术。"
 L["Equip %s"] = "装备%s"
 L["Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on."] = "装备鱼竿时，会把被替换的武器记为“钓鱼前”分组并在背包中标出。Ctrl+右键点击其中一件并选择“装备钓鱼前”即可换回。"
@@ -347,3 +346,5 @@ L["A strip under the game's swing timers naming which of your attacks reach your
 L["Melee"] = "近战" -- mt
 L["Dead zone"] = "死区" -- mt
 L["Too far"] = "过远" -- mt
+
+L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever 会在 ForeverCore 需要修复时提醒你。" -- mt

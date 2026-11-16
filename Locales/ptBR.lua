@@ -92,7 +92,6 @@ L["Dressing room"] = "Provador"
 L["Duels from your friends, Battle.net friends and guild still ask you."] = "Duelos de amigos, amigos do Battle.net e da sua guilda continuam perguntando."
 L["Dungeon interior maps"] = "Mapas internos de masmorras"
 L["Dungeon map"] = "Mapa da masmorra"
-L["Closing Tweaks' windows no longer blocks the gamepad interface."] = "Fechar as janelas do Tweaks não bloqueia mais a interface de controle." -- mt
 L["Each segment starts with its attack's icon: your weapon for Melee, the spell for the rest."] = "Cada segmento começa com o ícone do seu ataque: sua arma no corpo a corpo, o feitiço no restante."
 L["Equip %s"] = "Equipar %s"
 L["Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on."] = "Equipar uma vara de pescar guarda as armas que ela substituiu num grupo Antes de pescar, marcado nas suas bolsas. Ctrl+clique com o botão direito numa delas e escolha Equipar Antes de pescar para colocá-las de volta."
@@ -347,3 +346,5 @@ L["A strip under the game's swing timers naming which of your attacks reach your
 L["Melee"] = "Corpo a corpo" -- mt
 L["Dead zone"] = "Zona morta" -- mt
 L["Too far"] = "Longe demais" -- mt
+
+L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever avisa quando o ForeverCore precisa de reparos." -- mt
