@@ -2,7 +2,7 @@
 -- Tweaks Forever requires ForeverCore. Core/Require.lua checks the members this addon calls and hands the answer to
 -- Core/ForeverRequire.lua, the shared warning ForeverCore's own tests cover. This spec covers the addon's half: a core
 -- missing a member stops the addon's own files with one line in the error frame, and a complete one runs silently.
-local function Load(foreverCore)
+local function Load(foreverCore, installed, enabled)
 	local lines = {}
 	local env = {
 		ForeverCore = foreverCore,
@@ -23,14 +23,29 @@ local function Load(foreverCore)
 					if field == "X-Forever-Core" then
 						return "v1.5.0"
 					end
+				elseif addon == 1 or addon == "ForeverCore" then
+					if field == "Title" then
+						return "ForeverCore"
+					end
+					if field == "X-Curse-Project-ID" then
+						return "1796337"
+					end
 				end
 			end,
 			GetNumAddOns = function()
-				return 0
+				return installed == false and 0 or 1
 			end,
-			GetAddOnInfo = function() end,
-			IsAddOnLoaded = function() end,
-			GetAddOnEnableState = function() end,
+			GetAddOnInfo = function(index)
+				if index == 1 and installed ~= false then
+					return "ForeverCore"
+				end
+			end,
+			IsAddOnLoaded = function(index)
+				return index == 1 and installed ~= false and enabled ~= false
+			end,
+			GetAddOnEnableState = function(index)
+				return index == 1 and installed ~= false and enabled ~= false and 2 or 0
+			end,
 			-- The client returns a dependency list as varargs, never a table.
 			GetAddOnDependencies = function()
 				return unpack({})
@@ -63,5 +78,25 @@ assert(
 local ready, readyLines = Load({ APIKit = { Hub = function() end, NotReady = function() end } })
 assert(ready.broken == nil, "a ForeverCore with every member this addon calls runs it")
 assert(#readyLines == 0, "and says nothing")
+
+local absent, absentLines = Load(nil, false)
+assert(absent.broken == true, "a missing ForeverCore folder stops the addon")
+assert(#absentLines == 1, "a missing ForeverCore folder gives exactly one error line")
+assert(
+	absentLines[1].text
+		== (
+			"Tweaks Forever needs ForeverCore. Install it from CurseForge, "
+			.. "or choose Reinstall on ForeverCore in the CurseForge app."
+		),
+	absentLines[1].text
+)
+
+local disabled, disabledLines = Load(nil, true, false)
+assert(disabled.broken == true, "an installed but disabled ForeverCore stops the addon")
+assert(#disabledLines == 1, "a disabled ForeverCore gives exactly one error line")
+assert(
+	disabledLines[1].text == "Tweaks Forever: ForeverCore is turned off. Enable it in the AddOns list to fix this.",
+	disabledLines[1].text
+)
 
 print("core_dependency_spec: ok")

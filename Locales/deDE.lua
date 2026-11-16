@@ -335,6 +335,8 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 L["The choices, in order: %s."] = "Die Auswahlmöglichkeiten, der Reihe nach: %s."
 
 
+L["%s needs ForeverCore. Install it from CurseForge, or choose Reinstall on ForeverCore in the CurseForge app."] = "%s benötigt ForeverCore. Installiere es von CurseForge oder wähle in der CurseForge-App bei ForeverCore „Neu installieren“." -- mt
+L["%s: ForeverCore is turned off. Enable it in the AddOns list to fix this."] = "%s: ForeverCore ist ausgeschaltet. Aktiviere es in der Addons-Liste, um dies zu beheben." -- mt
 L["%s: the installed ForeverCore is another addon (%s). Remove it and install ForeverCore from CurseForge."] = "%s: Das installierte ForeverCore ist ein anderes Addon (%s). Entferne es und installiere ForeverCore von CurseForge." -- mt
 L["%s: %s is out of date. Update it to fix this."] = "%s: %s ist veraltet. Aktualisiere es, um dies zu beheben." -- mt
 L["%s: %s are out of date. Update them to fix this."] = "%s: %s sind veraltet. Aktualisiere sie, um dies zu beheben." -- mt
