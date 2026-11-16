@@ -561,14 +561,31 @@ assert(M.Band(false, warriorReaches, interact(false)) == "far", "every reach too
 assert(M.Band(false, { reach("judgement", 0, 10, false) }, noInteract) == "far", "no minimum range, so no dead zone")
 assert(M.Band(false, warriorReaches, interact(nil)) == nil, "the 8-yard check answered nothing")
 assert(M.Band(nil, { reach("charge", 8, 25, false) }, noInteract) == nil, "melee unknown leaves the gap unclaimed")
--- A spell with no minimum could still reach inside 8 yards, so its nil answer decides against the gap.
+-- Any unanswered spell could still reach, so the interaction answer alone cannot name the gap.
 assert(
 	M.Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == nil,
 	"a spell with no minimum and no answer could reach inside 8 yards"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == "dead",
-	"an 8-yard minimum cannot reach inside the gap"
+	M.Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == nil,
+	"a positive minimum does not make an unanswered spell false"
+)
+
+assert(
+	M.Band(false, { reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
+	"a single unanswered positive-minimum reach leaves the band unknown"
+)
+assert(
+	M.Band(false, { reach("charge", 8, 25, nil), reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
+	"multiple unanswered positive-minimum reaches leave the band unknown"
+)
+assert(
+	M.Band(false, { reach("charge", 8, 25, nil), reach("autoshot", 10, 35, nil) }, interact(true)) == nil,
+	"different positive minima do not resolve unanswered reaches"
+)
+assert(
+	M.Band(false, { reach("charge", 8, 25, false), reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
+	"a known false reach does not resolve another unanswered reach"
 )
 
 -- A hunter's strip: Melee, the Dead zone its Auto Shot minimum leaves, then Auto Shot.
