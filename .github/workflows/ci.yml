@@ -44,7 +44,7 @@ jobs:
           persist-credentials: false
       # Every Lua tool version lives in this checkout's tools/toolchain.json, which the action reads, then installs
       # and verifies each pin from: LuaJIT, luac5.1, luacheck and StyLua here.
-      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+      - uses: cjber/forever-core/.github/actions/toolchain@5af33e8122201201634ef3efc80977a407e1e7a2 # main
         with:
           tools: lua stylua
       - run: luacheck .
@@ -101,7 +101,7 @@ jobs:
           persist-credentials: false
       # tools/check_locales.py parses each translation with LuaJIT; LuaLS checks every TOC-loaded file. Both are pins
       # in this checkout's tools/toolchain.json.
-      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+      - uses: cjber/forever-core/.github/actions/toolchain@5af33e8122201201634ef3efc80977a407e1e7a2 # main
         with:
           tools: lua luals
       - run: tools/typecheck.sh
@@ -153,7 +153,7 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       # gitleaks is pinned in tools/toolchain.json.
-      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+      - uses: cjber/forever-core/.github/actions/toolchain@5af33e8122201201634ef3efc80977a407e1e7a2 # main
         with:
           tools: gitleaks
       - run: gitleaks git --redact --no-banner .
@@ -182,7 +182,7 @@ jobs:
           path: forever-core
           persist-credentials: false
       # The package gate parses and runs Lua, so it needs the pinned LuaJIT and luac5.1 from tools/toolchain.json.
-      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+      - uses: cjber/forever-core/.github/actions/toolchain@5af33e8122201201634ef3efc80977a407e1e7a2 # main
         with:
           tools: lua
       # .pkgmeta's manual changelog, which the release fills with the version's entry.

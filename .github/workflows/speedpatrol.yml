@@ -38,10 +38,10 @@ jobs:
           path: forever-core
           persist-credentials: false
       # Every Lua tool version lives in this checkout's tools/toolchain.json; the action installs and verifies the pin.
-      - uses: cjber/forever-core/.github/actions/toolchain@2596f68e68f9a727496a19f3f801c8a7039357d2 # main
+      - uses: cjber/forever-core/.github/actions/toolchain@5af33e8122201201634ef3efc80977a407e1e7a2 # main
         with:
           tools: lua
-      - uses: agent-labs-dev/speedpatrol@6f86e2ea61e004c78c18de41ad052c9f55ab5a19 # v0
+      - uses: agent-labs-dev/speedpatrol@f80460788957c55923f5c2798a04ecaed8670ddc # v0
         with:
           benchmarks: gate.specs
           fail-on-regression: true
