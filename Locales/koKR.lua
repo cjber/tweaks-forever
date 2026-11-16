@@ -335,6 +335,7 @@ L["In Beast Training, marks the ranks your pet already knows, or has replaced wi
 L["The choices, in order: %s."] = "선택 항목 순서: %s."
 
 
+L["%s: the installed ForeverCore is another addon (%s). Remove it and install ForeverCore from CurseForge."] = "%s: 설치된 ForeverCore는 다른 애드온(%s)입니다. 삭제한 뒤 CurseForge에서 ForeverCore를 설치하세요." -- mt
 L["%s: %s is out of date. Update it to fix this."] = "%s: %s 버전이 오래되었습니다. 문제를 해결하려면 업데이트하세요." -- mt
 L["%s: %s are out of date. Update them to fix this."] = "%s: %s 버전이 오래되었습니다. 문제를 해결하려면 모두 업데이트하세요." -- mt
 L["%s could not start. Reinstall %s to fix this."] = "%s을(를) 시작할 수 없습니다. 문제를 해결하려면 %s을(를) 다시 설치하세요." -- mt
