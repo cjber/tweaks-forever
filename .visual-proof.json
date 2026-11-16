@@ -1,11 +1,18 @@
 {
-  "input_digest": "2b362666a87e244ec144d5538f015ba75de25e3077946f98883b50b62751b684",
-  "runtime_sha256": "2b362666a87e244ec144d5538f015ba75de25e3077946f98883b50b62751b684",
-  "candidate": "d610c5565fb1fd342d6f1f0c880c289a2f810301b0244782f84ee1363c5e67bf",
+  "input_digest": "744c32fa2dca62ea916edbe9ea0bb15d8807ae889f0f3e411fdeb1f781c1c7cb",
+  "runtime_sha256": "744c32fa2dca62ea916edbe9ea0bb15d8807ae889f0f3e411fdeb1f781c1c7cb",
+  "candidate": "e6d46e36c6eb877a36f41b023f5df2fa42dfb4a61a7541ac7de9f21d61ed4b97",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "ad81e9ab70fe88b8f3ffdd384243378ad6698286",
+  "source_commit": "02187a475affdd0f40411a664e3daf8ad1791173",
   "flows": [
+    {
+      "name": "loaded with forevercore",
+      "steps": [
+        "tweaks-load-state.lua sha256:ec731275743e4021773d7c60304738f3fd9a6a86601dee7797f4dcaa9d70a974"
+      ],
+      "result": "pass"
+    },
     {
       "name": "windows open",
       "steps": [
@@ -23,12 +30,16 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/b47de33fdbaacd2939172dc6fcaa2893/raw/07a44fb118c8e11ccee2c71689eb350cde56eaa3/1-windows-open.png",
-      "sha256": "af28ecc4aed61049e0cd683075c9cb92d2a2b2726ce2a795340ab952a824b6a5"
+      "url": "https://gist.githubusercontent.com/cjber/25bcfbaeab1a335fc01b2fb22189167c/raw/152627a3bfbac0084a21db004f9a540339acb8b0/1-loaded-with-forevercore.png",
+      "sha256": "67a72f8b22be7e63547fecd8dfb13ff2a6a42fecb321f58617924397be46184a"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/b47de33fdbaacd2939172dc6fcaa2893/raw/07a44fb118c8e11ccee2c71689eb350cde56eaa3/2-closed-with-x.png",
-      "sha256": "111e583872af7feb832dd611ff0ea54328e77be4153663ec860695bf8f62dba0"
+      "url": "https://gist.githubusercontent.com/cjber/25bcfbaeab1a335fc01b2fb22189167c/raw/152627a3bfbac0084a21db004f9a540339acb8b0/2-windows-open.png",
+      "sha256": "6ff838f1332532ec8604f0fd39976c5f0861360e28e1ec8b1602a3304c2db174"
+    },
+    {
+      "url": "https://gist.githubusercontent.com/cjber/25bcfbaeab1a335fc01b2fb22189167c/raw/152627a3bfbac0084a21db004f9a540339acb8b0/3-closed-with-x.png",
+      "sha256": "0dbdc53c09841a41f7fb85156913a711d47ead88bb8e8ccde2ef395a937b57aa"
     }
   ]
 }
