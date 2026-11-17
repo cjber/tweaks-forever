@@ -45,7 +45,9 @@ regression (`.speedpatrol/instructions.md`).
 `data/forever-<version>` PR and approves that PR's CI and Speedpatrol runs, which GitHub holds for a PR opened by
 `GITHUB_TOKEN`.
 Every version needs a `CHANGELOG.md` entry (prose, bold-lead bullets) before its `v*` tag: the release
-publishes that entry as its notes.
+publishes that entry as its notes. A change's player-facing notes go in `changes/<issue>.md` as bold-lead bullets, with an optional `### For addon
+authors` section after them. The release commit gathers them with `python3 tools/changelog.py release X.Y.Z`; no
+other pull request edits `CHANGELOG.md`, and CI's `--check --base` fails one that does.
 
 `FOREVER_CORE` names the cjber/forever-core checkout the specs and the simulator load, defaulting to the sibling
 `../forever-core`. `tools/forever-core.txt` holds the git ref CI checks out for them; it is a branch while this addon
