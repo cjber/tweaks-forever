@@ -14,6 +14,15 @@ Tweaks Forever can accept and turn in quests, standing down while Polestar does.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
+## Known limitations
+
+- In combat and some instances the game hides names and buffs from addons, so a camp benefit gained mid-fight is named once the fight ends, and a rare whose name is hidden gets no alert.
+- In dungeons and raids your focus target gets no nameplate outline.
+- The pull warning stays quiet where the game hides threat from addons.
+- Camp benefit effects can show in English on a translated game, which the game does not give addons.
+- Questie extras need Questie or QuestieDB installed.
+- Window moving in Edit Mode is off with the gamepad UI.
+
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Nameplates and a junk coin">
 </p>
