@@ -625,7 +625,7 @@
     },
     {
       "source": "UI/Settings.lua",
-      "sha256": "b1bdd086a8cd8bcda916560e8a88c1b02e005ed72aaa2a76f4e1447beadd48c6",
+      "sha256": "fc57d511d50ea2336e1fba6fc752392b99a8fec4385c6ccee3cb8a0b86fc4589",
       "review": "Read AddSetting, Tooltip, Nest, registration and slash callers. Localized feature/category/button/option labels are handed to Blizzard secure settings initializers rather than an explicitly owned FontString. No font contract is inferred from those helper arguments. Tooltip descriptions, dropdown menus, minimap/family callbacks and chat output are excluded.",
       "bindings": []
     },

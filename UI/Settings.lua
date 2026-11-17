@@ -216,7 +216,6 @@ local LAYOUT = {
 	{ "Interface", { "Tooltips and nameplates", "Bars and alerts", "Spells and training", "Small things" } },
 	{ "Chat", { "Names and links", "Messages", "Whispers" } },
 }
-ns.SettingsLayout = LAYOUT
 
 ns.Init(function()
 	local category = Settings.RegisterVerticalLayoutCategory("Tweaks Forever")
