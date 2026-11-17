@@ -10,7 +10,7 @@ python3 tools/gen_foreverquests.py # Data/ForeverQuests.lua: pinned Forever IDs 
 python3 tools/check_generated.py  # freshness and repeatability in a disposable tree
 python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
-python3 tools/changelog.py --check # every v* tag has a CHANGELOG entry
+python3 tools/changelog.py --check # every v* tag has a CHANGELOG entry and changes/*.md is well formed
 python3 tools/screenshots.py       # docs/screenshots/*.png and demo.gif (Pillow)
 python3 tools/tooltip_border.py    # media/TooltipBorder{Modern,Retail}.tga (stdlib only)
 python3 -m tools.phrases --write     # Locales/phrases.txt, the template translators copy (stdlib only)
@@ -92,7 +92,9 @@ comments on it when it is already open.
 
 `changelog.py` prints the section of `CHANGELOG.md` for one version; the release
 workflow passes it to the packager as the release notes, and fails on a tag with
-no entry. `--check` (run in CI) fails when any `v*` tag has no entry.
+no entry. `--check` (run in CI) fails when any `v*` tag has no entry, and on a pull request
+`--check --base` fails any `CHANGELOG.md` edit but a whole new release section. Change notes go in
+`changes/<issue>.md`; `release X.Y.Z` gathers them into that version's section.
 
 `screenshots.py` renders `docs/screenshots/*.png` without the game: the client's
 own UI art, fonts and item icons from wago.tools, laid out as Blizzard's UI code and
