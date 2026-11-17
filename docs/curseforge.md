@@ -6,6 +6,15 @@ Free, with nothing locked behind it. If it saves you time, you can [sponsor me o
 
 [![Join me on Discord](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/discord-button.png)](https://discord.gg/FpHugGxRJY) [![Sponsor me on GitHub](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/github-sponsors-button.png)](https://github.com/sponsors/cjber) [![Support me on Ko-fi](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/kofi-button.png)](https://ko-fi.com/cjber)
 
+**Known limitations**
+
+- In combat and some instances the game hides names and buffs from addons, so a camp benefit gained mid-fight is named once the fight ends, and a rare whose name is hidden gets no alert.
+- In dungeons and raids your focus target gets no nameplate outline.
+- The pull warning stays quiet where the game hides threat from addons.
+- Camp benefit effects can show in English on a translated game, which the game does not give addons.
+- Questie extras need Questie or QuestieDB installed.
+- Window moving in Edit Mode is off with the gamepad UI.
+
 ![Nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
 The junk coin marks what sells with your greys at a merchant. Also nameplates.
