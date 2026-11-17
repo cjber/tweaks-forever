@@ -12,6 +12,12 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [Unreleased]
 
+## [2.8.5] - 2026-11-17
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
 ## [2.8.4] - 2026-11-16
 
 - **Tweaks Forever tells you when ForeverCore needs fixing.** Tweaks now loads without ForeverCore and puts one line on screen saying what to do when ForeverCore is missing, turned off or out of date, instead of failing silently.
