@@ -1,10 +1,10 @@
 {
-  "input_digest": "0f4efa54e0cce738f68d434460a610e600b90ba6904e6017b06c4bbd39b74b26",
-  "runtime_sha256": "0f4efa54e0cce738f68d434460a610e600b90ba6904e6017b06c4bbd39b74b26",
-  "candidate": "cb80c0ee0befd8122682fd72b8b2a267425fced9775244fa3057ef366f229103",
+  "input_digest": "234ea24dfba6bf193df041b35042c5374742c47d04c08722d2d590223a78ea50",
+  "runtime_sha256": "234ea24dfba6bf193df041b35042c5374742c47d04c08722d2d590223a78ea50",
+  "candidate": "c3486edab6891e55321c8dd474fedd6b474b656e4bd09cfd504ffe860f604d6b",
   "client_build": "1.60.1.70938 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "dd17dd57e8a25f36134f32ecc9acc0a2ba95787a",
+  "source_commit": "1dd5354bec4dcdd000ede1d0c970d244be901b79",
   "flows": [
     {
       "name": "loaded with forevercore",
@@ -23,12 +23,12 @@
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/1fd5d2753cc33f6871cac57011760292/raw/cfeb45015e8ef4b081b1a634d51aa80c03a917a8/1-loaded-with-forevercore.png",
-      "sha256": "5fb5783aa9d5431d6d4ae948e38d5ac90a17f75bf3fc7d7a2155aac032a3d3e6"
+      "url": "https://gist.githubusercontent.com/cjber/d810d3fe259e55d46e0f22ba2e898483/raw/3a4ce6ecca4814b740530ffbd0c90a9b2d4b524a/1-loaded-with-forevercore.png",
+      "sha256": "adcd4f114aa3aafdc47d5f0ceb93d5d5cc5dfba1d671c4aa9fbc463ab55b419a"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/1fd5d2753cc33f6871cac57011760292/raw/cfeb45015e8ef4b081b1a634d51aa80c03a917a8/2-settings.png",
-      "sha256": "cc20f56a6992f38e6debf4a25921a101c80f61e1ad364d07f500709283b06049"
+      "url": "https://gist.githubusercontent.com/cjber/d810d3fe259e55d46e0f22ba2e898483/raw/3a4ce6ecca4814b740530ffbd0c90a9b2d4b524a/2-settings.png",
+      "sha256": "52b907aaa4ed70a794d3a11564402ef3dfcf81f57095791c1ee7229c9c786e8c"
     }
   ]
 }
