@@ -11,6 +11,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Messages",
 	name = "Chat history after a reload",
 	tooltip = "The last 200 lines of each chat window come back after a reload or logging out, above a Before your "
 		.. "/reload line. Kept for this character only, and lines the game keeps secret are left out.",

@@ -11,7 +11,8 @@ local FISHING_ADDONS = { { addon = "FishingBuddy" }, { addon = "FishingAce" } }
 
 ns.Feature({
 	key = "easyCast",
-	category = "Fishing",
+	category = "Automation",
+	section = "Fishing",
 	name = "Double right-click to fish",
 	tooltip = "With a fishing pole equipped, double right-click anywhere in the world to cast Fishing. "
 		.. "Does nothing in combat or while mounted.",
@@ -21,7 +22,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "applyLure",
-	category = "Fishing",
+	category = "Automation",
+	section = "Fishing",
 	name = "Put on a lure first",
 	tooltip = "When your pole has no lure, the double-click puts on the best lure in your bags that your "
 		.. "fishing skill allows. Double right-click again to cast.",
@@ -32,7 +34,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "lureWarning",
-	category = "Fishing",
+	category = "Automation",
+	section = "Fishing",
 	name = "Warn about a missing lure",
 	tooltip = "A message when you log in or equip a fishing pole without a lure, and each time you cast without one.",
 	default = true,
@@ -41,7 +44,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "fishingSounds",
-	category = "Fishing",
+	category = "Automation",
+	section = "Fishing",
 	name = "Louder fishing splashes",
 	tooltip = "While a fishing pole is equipped, sound effects play at full volume and music and ambience "
 		.. "are silenced, so the bobber's splash is easy to hear. Your volumes come back when you unequip it.",

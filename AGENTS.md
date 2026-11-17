@@ -4,8 +4,8 @@ Tweaks Forever is a WoW: Forever addon (Interface 16001) that replaces single-pu
 options in the game's own settings. Players install the zip the BigWigs packager builds on a `v*` tag.
 
 It requires ForeverCore (`## Dependencies: ForeverCore`), the standalone addon that owns the shared tracker
-column, report window, error journal and debug log, the minimap button, the quest log side tabs, the settings-page
-chrome and the family page. CurseForge and Wago install ForeverCore with it through `.pkgmeta`'s
+column, report window, error journal and debug log, the minimap button, the quest log side tabs and the settings-page
+chrome. CurseForge and Wago install ForeverCore with it through `.pkgmeta`'s
 `required-dependencies`; no shared runtime file is vendored here. `Core/Require.lua` stops the addon with one
 on-screen line when an installed ForeverCore is older than API 1.
 
@@ -57,7 +57,7 @@ adopts the dependency and becomes `v1.0.0` at release.
 
 - `Core/Require.lua` is the API floor: an installed ForeverCore older than API 1 stops the addon's own files with
   one line in `UIErrorsFrame`. `Core/Core.lua` has `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers
-  through it, and TOC order sets the settings subpage order. `ns.core = ForeverCore.Register(...)` gives the
+  through it, naming its settings page and heading (`UI/Settings.lua` lists them in order). `ns.core = ForeverCore.Register(...)` gives the
   addon its own error journal, log and report.
 - `Bags/`, `Quests/`, `Map/`, `Features/` — feature modules grouped by the part of the game they change.
 - `UI/` — settings, tooltips, nameplates and window helpers; `Integrations/` — companion navigation, and

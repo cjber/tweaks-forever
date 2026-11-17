@@ -11,6 +11,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Messages",
 	name = "Fold repeated messages",
 	tooltip = "When the same player posts the same text in the same chat within two minutes, the earlier line is "
 		.. "removed and the new line ends with a grey count, such as x3. Only an exact match on the sender and the "

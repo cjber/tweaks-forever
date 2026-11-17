@@ -12,6 +12,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Names and links",
 	name = "Link items from your bags",
 	tooltip = "Typing [ and part of an item's name in a chat box lists the items in your bags whose name contains "
 		.. "what you typed. Up and Down or Tab and Shift-Tab move the selection, Enter puts the item's link in and "

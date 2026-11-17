@@ -13,6 +13,7 @@ local Record = ns.ChatPlayerRecord
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Names and links",
 	name = "Player card on hover",
 	tooltip = "Hovering a player's name in chat shows their level, race and class when the game knows them, their "
 		.. "guild and zone when your guild roster, friends list or last /who gives them, when you last grouped with "

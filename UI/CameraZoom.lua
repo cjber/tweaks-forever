@@ -13,6 +13,7 @@ local MAX = "2.6"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Small things",
 	name = "Maximum camera zoom",
 	tooltip = "The camera pulls back further than the game's own Max Camera Distance setting allows. The value you "
 		.. "had before is put back when you switch this off.",

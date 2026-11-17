@@ -7,7 +7,8 @@ end
 
 ns.Feature({
 	key = "dungeonMaps",
-	category = "Maps",
+	category = "Quests and maps",
+	section = "World map",
 	name = "Dungeon interior maps",
 	tooltip = "Inside a dungeon or raid, the world map shows its painted map, with a floor picker and a "
 		.. "Back to map button.",

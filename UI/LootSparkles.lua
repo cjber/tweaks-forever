@@ -21,7 +21,8 @@ end
 
 ns.Feature({
 	key = KEY,
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quest markers",
 	name = "Show quest item sparkles",
 	tooltip = "Shows the game's sparkles on lootable quest objects by turning outline mode off, including in raids. "
 		.. "Your previous graphics settings return when you switch this off. "

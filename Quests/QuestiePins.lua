@@ -8,7 +8,8 @@ end
 local KEY = "nativeQuestiePins"
 ns.Feature({
 	key = KEY,
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quest markers",
 	name = "Native quest map icons",
 	tooltip = "Uses the game's quest symbols at a readable size for Questie's map and minimap markers. "
 		.. "Keeps Questie's locations and tooltips. Turn off to restore Questie's appearance.",

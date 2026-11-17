@@ -45,8 +45,6 @@ local function Category(name)
 	}, Layout()
 end
 local opened
-local canvas
-local vertical
 -- Calls to the client's own restricted settings opener.
 local opens = 0
 -- [function] = how many secure delegates the settings built around it. Blizzard data the secure row build reads is
@@ -60,11 +58,6 @@ local env = setmetatable({
 			return Category(name)
 		end,
 		RegisterVerticalLayoutSubcategory = function(_, name)
-			return Category(name)
-		end,
-		-- The Forever addons page: the shared module's own frame on a canvas, or its rows under the gamepad UI.
-		RegisterCanvasLayoutSubcategory = function(parent, frame, name)
-			canvas = { parent = parent, frame = frame, name = name }
 			return Category(name)
 		end,
 		RegisterAddOnSetting = function(category, variable, key, _, varType, name)
@@ -168,15 +161,23 @@ ns = {
 		-- `needs` an addon, so its tooltip can carry a note and is read as it shows.
 		{
 			key = "repair",
-			category = "Merchants",
+			category = "Bags and vendors",
+			section = "Vendors",
 			name = "Repair",
 			tooltip = "Repairs.",
 			needs = { title = "QuestieDB", check = function() end },
 		},
-		{ key = "guildRepair", category = "Merchants", name = "Guild repair", parent = "repair" },
+		{
+			key = "guildRepair",
+			category = "Bags and vendors",
+			section = "Vendors",
+			name = "Guild repair",
+			parent = "repair",
+		},
 		{
 			key = "gearMark",
-			category = "Bags",
+			category = "Bags and vendors",
+			section = "Gear groups",
 			name = "Mark",
 			tooltip = "Marks.",
 			default = "border",
@@ -185,6 +186,7 @@ ns = {
 		{
 			key = "iconSize",
 			category = "Interface",
+			section = "Small things",
 			name = "Icon size",
 			default = 100,
 			slider = { min = 50, max = 200, step = 5 },
@@ -233,22 +235,10 @@ ns.core = {
 	},
 }
 env.ForeverCore = {
-	-- The shared page: a canvas with the mouse, the client's own rows under the gamepad UI (#382).
-	Family = {
-		CreatePanel = function(parent, db, current, safeCall)
-			return { kind = "family panel", parent = parent, db = db, current = current, safeCall = safeCall }
-		end,
-		Register = function(category, db, current, safeCall)
-			if env.InputUtil.IsGamepadUIEnabled() then
-				vertical = env.Settings.RegisterVerticalLayoutSubcategory(category, "Forever addons")
-				vertical.kind = "vertical"
-				return vertical
-			end
-			return env.Settings.RegisterCanvasLayoutSubcategory(
-				category,
-				env.ForeverCore.Family.CreatePanel(nil, db, current, safeCall),
-				"Forever addons"
-			)
+	-- ForeverCore's heading row, registered through the client's secure delegate like every row.
+	SettingsSections = {
+		Register = function(category, name)
+			env.Settings.RegisterInitializer(category, { kind = "heading", name = name })
 		end,
 	},
 	-- The real ForeverCore wraps this client function in its secure delegate (Core/OpenSettings.lua); here the same
@@ -260,31 +250,30 @@ env.ForeverCore = {
 env.ForeverCore.OpenSettingsPanel = env.CreateSecureDelegate(env.ForeverCore.OpenSettingsPanel)
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 -- A packaged German client: features declare English, and the settings show the translation where there is one.
-ns.L["Bags"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
+ns.L["Bags and vendors"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
 -- The settings page asks ForeverCore's opener, not Settings.OpenToCategory.
 setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 
--- Rows per page, in order: each subpage's settings, then the index's button to it.
+-- Rows per page, in order: each subpage's headings and settings, then the index's button to it. Pages and headings
+-- no feature uses are left out, and there is no Forever addons page.
 local kinds = {}
 for index, entry in ipairs(registered) do
 	kinds[index] = entry.initializer.kind .. "@" .. entry.category.name
 end
 assert(
 	table.concat(kinds, " ")
-		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever "
-			.. "slider@Interface button@Tweaks Forever button@Tweaks Forever",
+		== "heading@Taschen checkbox@Taschen checkbox@Taschen heading@Taschen dropdown@Taschen button@Tweaks Forever "
+			.. "heading@Interface slider@Interface button@Tweaks Forever",
 	table.concat(kinds, " ")
 )
-local repair, guildRepair = registered[1].initializer, registered[2].initializer
--- The Forever addons page, last: the shared panel on our saved variables, with this addon's row named.
-assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Tweaks Forever")
-assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
-assert(canvas.frame.safeCall == ns.core.SafeCall, "the page gets the addon's own SafeCall")
-assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
+local repair, guildRepair = registered[2].initializer, registered[3].initializer
+for _, entry in ipairs(registered) do
+	assert(entry.initializer.name ~= "Forever addons", "the Forever addons page is gone")
+end
 
--- The index's Open buttons, the Forever addons one included, open their page through the client's own function,
--- carried by one secure delegate. Settings.OpenToCategory is Blizzard's Lua around the restricted call, which the
--- client refuses from addon code (cjber/forever-core#333).
+-- The index's Open buttons open their page through the client's own function, carried by one secure delegate.
+-- Settings.OpenToCategory is Blizzard's Lua around the restricted call, which the client refuses from addon code
+-- (cjber/forever-core#333).
 do
 	local buttons = 0
 	for _, entry in ipairs(registered) do
@@ -297,30 +286,42 @@ do
 			assert(opened == initializer.name, initializer.name .. ": on its own page")
 		end
 	end
-	assert(buttons == 4, "the index has a button per subpage and the Forever addons page")
+	assert(buttons == 2, "the index has a button per page")
 	assert(opens == buttons, "every page opens through the shared opener")
 end
 
--- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
+-- Every feature the addon declares sits on a page and under a heading of the layout, and every heading is used.
 do
-	local before, family = #registered, env.ForeverCore.Family
-	local addOnCategories = 0
-	env.Settings.RegisterAddOnCategory = function()
-		addOnCategories = addOnCategories + 1
+	local used, names = {}, {}
+	for _, page in ipairs(ns.SettingsLayout) do
+		names[page[1]] = {}
+		for _, section in ipairs(page[2]) do
+			names[page[1]][section] = true
+		end
 	end
-	env.ForeverCore.Family = {
-		Register = function()
-			error("broken copy")
-		end,
-	}
-	env.SLASH_TWEAKSFOREVER1 = nil
-	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
-	assert(addOnCategories == 1, "the category still registers")
-	assert(env.SLASH_TWEAKSFOREVER1 == "/tweaks", "and /tweaks still works")
-	for index = before + 1, #registered do
-		assert(registered[index].initializer.name ~= "Forever addons", "no index button for a page that failed")
+	local toc = assert(io.open("TweaksForever.toc")):read("*a")
+	local declared = 0
+	for path in toc:gmatch("\n([%w_/\\]+%.lua)") do
+		local handle = io.open((path:gsub("\\", "/")))
+		local text = handle and handle:read("*a") or ""
+		for _, call in ipairs({ "ns.Feature" }) do
+			for body in text:gmatch(call .. "%(%{(.-)\n%}%)") do
+				local page, section = body:match('category = "([^"]+)"'), body:match('section = "([^"]+)"')
+				declared = declared + 1
+				assert(
+					page and section and names[page] and names[page][section],
+					path .. ": a feature has no listed heading"
+				)
+				used[page .. "/" .. section] = true
+			end
+		end
 	end
-	env.ForeverCore.Family = family
+	assert(declared > 60, "the feature files were read")
+	for _, page in ipairs(ns.SettingsLayout) do
+		for _, section in ipairs(page[2]) do
+			assert(used[page[1] .. "/" .. section], page[1] .. " > " .. section .. " has no feature")
+		end
+	end
 end
 assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
 assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")
@@ -346,11 +347,11 @@ missing.repair = "QuestieDB"
 assert(not Modifiable(repair), "a row missing an addon it needs is greyed out")
 assert(repair.tooltip():find("Needs QuestieDB, which isn't loaded", 1, true), "and says so")
 missing.repair = nil
-assert(registered[4].initializer.setting.variable == "TweaksForever_gearMark")
+assert(registered[5].initializer.setting.variable == "TweaksForever_gearMark")
 -- A row with no conflict and no needed addon carries its text, not a function of ours: under the gamepad interface a
 -- dropdown row's tooltip shows in the same call that pushes its footer bindings (#168).
-assert(registered[4].initializer.tooltip == "Marks.", "a row that can't carry a note gets its text")
-local size = registered[6].initializer
+assert(registered[5].initializer.tooltip == "Marks.", "a row that can't carry a note gets its text")
+local size = registered[8].initializer
 assert(
 	size.setting.variable == "TweaksForever_iconSize" and size.setting.varType == "number",
 	"a slider is a number setting"
@@ -412,10 +413,6 @@ do
 	gamepad = true
 	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 	gamepad = false
-	assert(
-		vertical and vertical.kind == "vertical" and vertical.name == "Forever addons",
-		"with the gamepad UI on the Forever addons page is the client's rows (#382)"
-	)
 	local choice = Choice(registered)
 	assert(choice and choice.kind == "slider", "with the gamepad UI on a choice is a slider")
 	local child

@@ -1,14 +1,14 @@
 ---@type string, TFNamespace
-local addonName, ns = ...
+local _, ns = ...
 
 if ns.broken then
 	return
 end
 local L = ns.L
 
--- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category so no page grows
--- tall. A feature another addon already handles, or one missing an addon it needs, is greyed out, its tooltip
--- naming that addon.
+-- Options → AddOns → Tweaks Forever: a short index page, then a stock subpage per category, each under a few
+-- headings so no page grows tall. A feature another addon already handles, or one missing an addon it needs, is
+-- greyed out, its tooltip naming that addon.
 -- Every row goes in through Settings.RegisterInitializer, which inserts it from Blizzard's secure delegate.
 -- Settings.CreateCheckbox/CreateDropdown and layout:AddInitializer insert from our code instead, and the
 -- settings search reads every layout, so that tainted it: a restricted button in the results (Social's
@@ -207,45 +207,50 @@ local function AddSetting(category, feature)
 	end
 end
 
+-- The pages and the headings on each, in the order players see them, most used first. A feature names its page
+-- (`category`) and heading (`section`) in English; a missing pair fails the settings spec.
+local LAYOUT = {
+	{ "Automation", { "Dialogue and loot", "Groups and duels", "Summons and deaths", "Fishing" } },
+	{ "Bags and vendors", { "Vendors", "Bags", "Gear groups" } },
+	{ "Quests and maps", { "Quests", "Quest markers", "World map" } },
+	{ "Interface", { "Tooltips and nameplates", "Bars and alerts", "Spells and training", "Small things" } },
+	{ "Chat", { "Names and links", "Messages", "Whispers" } },
+}
+ns.SettingsLayout = LAYOUT
+
 ns.Init(function()
 	local category = Settings.RegisterVerticalLayoutCategory("Tweaks Forever")
-	-- Subpages in the order their first feature loads; several files add to one.
-	local sections, bySection = {}, {}
+	local byPage = {}
 	for _, feature in ipairs(ns.features) do
-		if not bySection[feature.category] then
-			bySection[feature.category] = {}
-			sections[#sections + 1] = feature.category
-		end
-		table.insert(bySection[feature.category], feature)
+		byPage[feature.category] = byPage[feature.category] or {}
+		byPage[feature.category][feature.section] = byPage[feature.category][feature.section] or {}
+		table.insert(byPage[feature.category][feature.section], feature)
 	end
-	for _, section in ipairs(sections) do
-		local subcategory = Settings.RegisterVerticalLayoutSubcategory(category, L[section])
-		for _, feature in ipairs(bySection[section]) do
-			AddSetting(subcategory, feature)
+	for _, page in ipairs(LAYOUT) do
+		local sections = byPage[page[1]]
+		if sections then
+			local subcategory = Settings.RegisterVerticalLayoutSubcategory(category, L[page[1]])
+			for _, section in ipairs(page[2]) do
+				local features = sections[section]
+				if features then
+					-- A heading is ForeverCore's, registered through the same secure delegate as the rows.
+					ForeverCore.SettingsSections.Register(subcategory, L[section])
+					for _, feature in ipairs(features) do
+						AddSetting(subcategory, feature)
+					end
+				end
+			end
+			-- The index is buttons that open each subpage; search finds the settings themselves instead. Pages open
+			-- through the shared secure opener: Settings.OpenToCategory is Blizzard's own Lua around a restricted
+			-- client call, which the client refuses when addon code makes it (cjber/forever-core#333).
+			Settings.RegisterInitializer(
+				category,
+				Secure(CreateSettingsButtonInitializer)(L[page[1]], L["Open"], function()
+					ForeverCore.OpenSettingsPanel(subcategory:GetID())
+				end, nil, false)
+			)
 		end
-		-- The index is buttons that open each subpage; search finds the settings themselves instead. Pages open
-		-- through the shared secure opener: Settings.OpenToCategory is Blizzard's own Lua around a restricted
-		-- client call, which the client refuses when addon code makes it (cjber/forever-core#333).
-		Settings.RegisterInitializer(
-			category,
-			Secure(CreateSettingsButtonInitializer)(L[section], L["Open"], function()
-				ForeverCore.OpenSettingsPanel(subcategory:GetID())
-			end, nil, false)
-		)
 	end
-	-- The Forever addons page is ForeverCore's, with the hint setting on it. With the gamepad interface on it is the
-	-- client's own rows so the Options navigation can enter it (#382); otherwise its canvas frame, and nothing of
-	-- ours goes into the settings search. A failure there is caught and leaves the rest of the settings and /tweaks
-	-- working.
-	ns.core.SafeCall("Forever addons page", function()
-		local family = ForeverCore.Family.Register(category, ns.db, addonName, ns.core.SafeCall)
-		Settings.RegisterInitializer(
-			category,
-			Secure(CreateSettingsButtonInitializer)(L["Forever addons"], L["Open"], function()
-				ForeverCore.OpenSettingsPanel(family:GetID())
-			end, nil, false)
-		)
-	end)
 	Settings.RegisterAddOnCategory(category)
 	-- Another addon's settings may have changed since login. Not with the gamepad UI on (#168): its navigation
 	-- pushes and pops input bindings as this panel and its rows show and hide, and a blocked

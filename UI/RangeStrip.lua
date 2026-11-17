@@ -12,6 +12,7 @@ local ICONS_KEY, LABEL_KEY = "rangeStripIcons", "rangeStripLabel"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Range strip",
 	tooltip = "A strip under the game's swing timers naming which of your attacks reach your target, from "
 		.. "melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the "
@@ -22,6 +23,7 @@ ns.Feature({
 ns.Feature({
 	key = ICONS_KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Show icons",
 	tooltip = "Each segment starts with its attack's icon: your weapon for Melee, the spell for the rest.",
 	default = true,
@@ -31,6 +33,7 @@ ns.Feature({
 ns.Feature({
 	key = LABEL_KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Show band label",
 	tooltip = "The band's name in its colour under the strip.",
 	default = true,

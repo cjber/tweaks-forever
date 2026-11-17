@@ -7,7 +7,8 @@ end
 
 ns.Feature({
 	key = "questLevels",
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quests",
 	name = "Show quest levels",
 	tooltip = "Shows quest levels in the tracker, on map quest tooltips, and beside quest names added by Tweaks Forever.",
 	default = true,
@@ -15,7 +16,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "questLevelsDialogs",
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quests",
 	name = "In quest dialogs too",
 	tooltip = "The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail "
 		.. "and reward pages show its level, such as [12].",

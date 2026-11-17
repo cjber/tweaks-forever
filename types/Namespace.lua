@@ -209,8 +209,10 @@
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
----@class TFDatabase : ForeverFamilyDB
----@field companionHints? boolean the old hint setting, read once to carry a player's "off" over to suggestFamily
+---@class TFDatabase
+---@field companionHints? boolean retired: the old hint setting
+---@field suggestFamily? boolean retired: the Forever addons page's setting
+---@field familyDismissed? table retired: the Forever addons page's dismissed hints
 ---@field junk TFMarks
 ---@field errors ForeverCaughtError[] ForeverCore's shared error journal: earlier sessions' errors, for the report
 ---@field log ForeverDebugLogStore ForeverCore's shared log ring: recent lines, for the report
@@ -254,7 +256,8 @@ TweaksForeverCharDB = nil
 
 ---@class TFFeature
 ---@field key string
----@field category string
+---@field category string the settings page
+---@field section string the heading on that page
 ---@field name string
 ---@field tooltip? string
 ---@field default boolean|string|number

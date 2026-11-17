@@ -11,6 +11,7 @@ local KEYWORD = "whisperInviteKeyword"
 ns.Feature({
 	key = KEY,
 	category = "Automation",
+	section = "Groups and duels",
 	name = "Invite from whispers",
 	tooltip = "A whisper that is exactly the keyword you pick below invites its sender to your group. You must be "
 		.. "ungrouped, the group leader or a raid assistant. Nothing is sent until such a whisper arrives.",
@@ -28,6 +29,7 @@ ns.Feature({
 ns.Feature({
 	key = KEYWORD,
 	category = "Automation",
+	section = "Groups and duels",
 	name = "Invite keyword",
 	tooltip = "The whole whisper that invites its sender: the message must be this word alone.",
 	default = "inv",

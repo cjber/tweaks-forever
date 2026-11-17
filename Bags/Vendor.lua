@@ -8,7 +8,8 @@ local L = ns.L
 
 ns.Feature({
 	key = "repair",
-	category = "Vendors",
+	category = "Bags and vendors",
+	section = "Vendors",
 	name = "Repair automatically",
 	tooltip = "At any merchant who repairs, with the cost shown in chat. If you are short, it repairs once what "
 		.. "you sell there covers the cost. Hold Shift while a merchant opens to skip it there.",
@@ -40,7 +41,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "repairGuild",
-	category = "Vendors",
+	category = "Bags and vendors",
+	section = "Vendors",
 	name = "Repair with guild funds",
 	tooltip = "When your guild lets you repair from its bank and your withdrawal limit covers the cost. Otherwise "
 		.. "the repair comes out of your own money.",

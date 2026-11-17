@@ -8,7 +8,8 @@ local L = ns.L
 
 ns.Feature({
 	key = "campTooltips",
-	category = "Interface",
+	category = "Quests and maps",
+	section = "World map",
 	name = "Explain campsite benefits",
 	tooltip = "Hovering a camp feature, such as a Camp Tent or Mana Well, shows what sitting nearby gives "
 		.. "you and whether you have it. Hovering a campfire lists every benefit a camp can give. Your Campfire "
@@ -19,7 +20,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "campAlerts",
-	category = "Interface",
+	category = "Quests and maps",
+	section = "World map",
 	name = "Announce camp benefits",
 	tooltip = "When you gain a camp benefit, such as Fish Bowl, its name and what it gives show at the top of the "
 		.. "screen, once per benefit. Not for the ones you already had when you logged in.",

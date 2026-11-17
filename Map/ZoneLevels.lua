@@ -7,7 +7,8 @@ end
 
 ns.Feature({
 	key = "zoneLevels",
-	category = "Maps",
+	category = "Quests and maps",
+	section = "World map",
 	name = "Zone level ranges on the map",
 	tooltip = "Pointing at a zone on the world map adds its level range after the name. Coloured like quest "
 		.. "levels: red and orange are above you, yellow is your level, green and grey are below.",

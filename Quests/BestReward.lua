@@ -9,7 +9,8 @@ local KEY = "bestReward"
 
 ns.Feature({
 	key = KEY,
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quests",
 	name = "Mark the best-selling quest reward",
 	tooltip = "When a quest lets you choose a reward, a gold coin marks the one that sells to a merchant for the most."
 		.. " Nothing is chosen for you.",

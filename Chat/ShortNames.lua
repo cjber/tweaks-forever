@@ -11,6 +11,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Names and links",
 	name = "Short channel names",
 	tooltip = "Numbered channels show just their name: [2. Trade - City] reads [Trade], [1. General - Elwynn Forest] "
 		.. "reads [General] and [4. LookingForGroup] reads [LFG]. Guild, officer, party, raid, instance and raid "

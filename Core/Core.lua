@@ -25,7 +25,8 @@ if type(ForeverCore.Credits) == "table" then
 	ns.core.SafeCall("credits", ForeverCore.Credits.Register, "Tweaks Forever", ns.Credits)
 end
 
--- Features, in declaration order, and by key. Each is { key, category, name, tooltip, default, conflicts }, plus
+-- Features, in declaration order, and by key. Each is { key, category, section, name, tooltip, default, conflicts }:
+-- `category` is its settings page and `section` its heading there (UI/Settings.lua lists both). Plus
 -- `options` ({ { value, label } }) for a choice rather than an on/off switch, `parent` (a key) to indent it
 -- under that feature and grey it out while the parent is off, and `needs` ({ title, check }) for another addon it
 -- can't work without: off and greyed out while `check` finds it missing.
@@ -403,12 +404,11 @@ end)
 login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
-	-- Settings retired with a feature that no longer exists: the entrance pins' switch, and the old companion hint
-	-- switch, whose "off" carries over once to the shared Forever family setting.
-	if db.companionHints == false and db.suggestFamily == nil then
-		db.suggestFamily = false
-	end
+	-- Settings retired with a feature that no longer exists: the entrance pins' switch, and the companion hint
+	-- switch and Forever addons page's settings.
 	db.companionHints = nil
+	db.suggestFamily = nil
+	db.familyDismissed = nil
 	db.dungeonEntrances = nil
 	for _, feature in ipairs(ns.features) do
 		if db[feature.key] == nil then

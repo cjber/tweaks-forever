@@ -28,7 +28,8 @@ local bagConflicts = {
 
 ns.Feature({
 	key = "markJunk",
-	category = "Vendors",
+	category = "Bags and vendors",
+	section = "Bags",
 	name = "Mark items as junk",
 	tooltip = "Alt+Right-click a bag item, or pick Mark junk from a bag's portrait menu, to toggle its account-wide"
 		.. " junk mark."
@@ -39,7 +40,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "sellJunk",
-	category = "Vendors",
+	category = "Bags and vendors",
+	section = "Vendors",
 	name = "Sell junk automatically",
 	tooltip = L["Sell grey junk through the game when available, plus up to %d marked non-grey stacks per visit."]:format(
 		BATCH_SIZE
@@ -55,7 +57,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "greyCoins",
-	category = "Vendors",
+	category = "Bags and vendors",
+	section = "Bags",
 	name = "Junk coin on grey items",
 	tooltip = "Grey items show the game's gold junk coin in your bags all the time, not only while a merchant is open.",
 	default = true,

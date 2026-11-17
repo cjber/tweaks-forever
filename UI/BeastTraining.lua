@@ -12,6 +12,7 @@ local KNOWN_ALPHA = 0.5
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Spells and training",
 	name = "Known ranks in Beast Training",
 	tooltip = "In Beast Training, marks the ranks your pet already knows, or has replaced with a higher rank, as known, "
 		.. "so they no longer look like ranks still to learn.",
