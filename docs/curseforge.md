@@ -8,12 +8,10 @@ Free, with nothing locked behind it. If it saves you time, you can [sponsor me o
 
 **Known limitations**
 
-- In combat and some instances the game hides names and buffs from addons, so a camp benefit gained mid-fight is named once the fight ends, and a rare whose name is hidden gets no alert.
-- In dungeons and raids your focus target gets no nameplate outline.
-- The pull warning stays quiet where the game hides threat from addons.
-- Camp benefit effects can show in English on a translated game, which the game does not give addons.
-- Questie extras need Questie or QuestieDB installed.
-- Window moving in Edit Mode is off with the gamepad UI.
+- In combat and in some instances the game hides creature names and buffs from addons. A campsite buff you gain mid-fight is named after the fight, and a rare whose name is hidden gets no alert.
+- The warning that you are about to pull your target off the tank stays quiet where the game hides threat from addons.
+- Campsite buff effects show in English on a game language the addon has no text for yet, such as Italian.
+- Moving windows in Edit Mode is switched off while the gamepad UI is on.
 
 ![Nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
