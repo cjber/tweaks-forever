@@ -172,6 +172,9 @@ L["New group..."] = "Новая группа..."
 L["Next"] = "Далее"
 L["No rare has been found nearby yet."] = "Поблизости пока не найдено ни одного редкого существа." -- mt
 L["No red text or spoken error for the ones a spammed macro repeats: not ready yet, out of range, not enough mana, rage or energy, no target, and facing the wrong way. Full bags and other errors still show."] = "Без красного текста и озвученной ошибки для тех, что повторяет многократно нажатый макрос: еще не готово, слишком далеко, не хватает маны, ярости или энергии, нет цели и неверное направление. Полные сумки и другие ошибки по-прежнему показываются."
+L["Hide the crafting bar in the Professions window"] = "Скрыть полосу изготовления в окне профессий"
+L["Hides the cast bar the Professions window draws over the recipe while you craft. The game turns the player cast bar off while the window has its own, so crafts there show no bar."] =
+	"Скрывает полосу заклинания, которую окно профессий рисует над рецептом во время изготовления. Игра отключает полосу заклинаний игрока, пока у окна есть своя, поэтому изготовление там идёт без полосы."
 L["No screen glow"] = "Без свечения экрана"
 L["Not enough gold for all of them."] = "Не хватает золота на все."
 L["Not somewhere you can't teleport from, and in combat it waits for the fight to end. Hold Shift to answer it yourself."] = "Не там, откуда нельзя телепортироваться, а в бою ждет окончания боя. Удерживайте Shift, чтобы ответить самому."
