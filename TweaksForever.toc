@@ -13,7 +13,7 @@
 ## X-Donate: https://github.com/sponsors/cjber
 ## X-Curse-Project-ID: 1708506
 ## X-Wago-ID: ZKxOWd6k
-## X-Forever-Core: v1.14.4
+## X-Forever-Core: v1.14.5
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
