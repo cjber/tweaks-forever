@@ -104,22 +104,6 @@ local RANGED_REACH = {
 	ROGUE = true,
 }
 
--- The melee spells each class checks its melee reach with: attack spells whose own range is the game's Combat Range,
--- 5 yards. The druid's two are form spells, which answer nothing outside their form. The other classes name no melee
--- attack of their own.
----@type table<string, integer[]>
-local MELEE_SPELLS = {
-	WARRIOR = { 78 }, -- Heroic Strike
-	ROGUE = { 1752 }, -- Sinister Strike
-	HUNTER = { 2973, 2974, 1495 }, -- Raptor Strike, Wing Clip, Mongoose Bite
-	DRUID = { 1082, 6807 }, -- Claw, Maul
-}
--- The game's own Attack, which every class also checks. It is no spellbook entry, so the client may not list it as
--- known or answer it: a true from it is melee reach, and an answer of nothing decides nothing, as any nil does.
-local ATTACK_SPELL = 6603
--- A class that names no melee spell of its own still checks Attack, so the loop never allocates.
-local NO_SPELLS = {}
-
 ---@class TFRangeReach
 ---@field key string
 ---@field spell integer the spell that names and checks the segment
@@ -320,41 +304,19 @@ function Model.Reaches(class, known, rangedSpell, range)
 	return reaches
 end
 
--- Melee reach from the melee spells the player knows: true when any of them reaches, false when none does and at
--- least one answered, and nil when none answered or none is known, which decides nothing, as before. A spell the
--- player has not learned is skipped, and an answer of nil decides nothing either. The class's own spells are asked
--- first, then the game's Attack.
----@param class string
----@param known fun(spell: integer): boolean
----@param check fun(spell: integer): boolean?
+-- Whether the target is in melee reach: the game's own answer for the main-hand auto attack, the one its Main Hand
+-- swing timer dims by. Nil when the client made no check (no weapon, or the native range check is off), which decides
+-- nothing. The strip only shows while the native timers do, and the game checks their range while they show.
 ---@return boolean?
-function Model.Melee(class, known, check)
-	local answeredFalse = false
-	local function Reaches(spell)
-		if not known(spell) then
-			return false
-		end
-		local answer = check(spell)
-		if answer == true then
-			return true
-		end
-		if answer ~= nil then
-			answeredFalse = true
-		end
-		return false
+function Model.Melee()
+	if not (C_SwingTimer and C_SwingTimer.IsTargetWithinSwingRange and Enum and Enum.PlayerSwingType) then
+		return nil
 	end
-	for _, spell in ipairs(MELEE_SPELLS[class] or NO_SPELLS) do
-		if Reaches(spell) then
-			return true
-		end
+	local ok, within = pcall(C_SwingTimer.IsTargetWithinSwingRange, Enum.PlayerSwingType.MainHand)
+	if not ok then
+		return nil
 	end
-	if Reaches(ATTACK_SPELL) then
-		return true
-	end
-	if answeredFalse then
-		return false
-	end
-	return nil
+	return ns.Readable(within)
 end
 
 -- Whether the target is within 8 yards, the game's own interact distance. The minimum-range shots players meet
@@ -743,7 +705,7 @@ ns.Init(function()
 		for _, segment in ipairs(spellSegments) do
 			segments[#segments + 1] = segment
 		end
-		local band = Model.Band(Model.Melee(class, Model.Known, Model.Check), reaches, Model.Interact)
+		local band = Model.Band(Model.Melee(), reaches, Model.Interact)
 		return band, segments
 	end
 

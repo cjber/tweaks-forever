@@ -1,5 +1,5 @@
--- Range strip (UI/RangeStrip.lua): each class's reaches from the client's own spell ranges, melee from the client's
--- own spell range checks, the band rule from the nearest reach that answers true, the dead zone only when a shown
+-- Range strip (UI/RangeStrip.lua): each class's reaches from the client's own spell ranges, melee from the game's
+-- own main-hand swing range, the band rule from the nearest reach that answers true, the dead zone only when a shown
 -- reach has a minimum range, and a ticker while the strip shows. The file is compiled once, and a Load only gives it
 -- a fresh environment.
 local CHUNK = assert(loadfile("UI/RangeStrip.lua"))
@@ -148,7 +148,10 @@ local function Load(class, knownSpells)
 	local interact, target = true, true
 	local uiScale = 1
 	knownSpells = knownSpells or {}
-	local answers = {}
+	-- The client says its melee attacks reach at every distance (#574), so their answers are always true here and
+	-- the strip must take melee from the swing range instead.
+	local answers = { [78] = true, [1752] = true, [2973] = true, [2974] = true, [1495] = true, [6603] = true }
+	local swing = false
 	local ranges = {}
 	for spell, range in pairs(SPELL_RANGES) do
 		ranges[spell] = { range[1], range[2] }
@@ -220,6 +223,13 @@ local function Load(class, knownSpells)
 			return target
 		end,
 		CheckInteractDistance = interactCheck,
+		Enum = { PlayerSwingType = { MainHand = 0, OffHand = 1, Ranged = 2 } },
+		C_SwingTimer = {
+			IsTargetWithinSwingRange = function(swingType)
+				assert(swingType == 0, "melee reads the main-hand swing")
+				return swing
+			end,
+		},
 		C_Spell = {
 			IsSpellInRange = function(spell)
 				return answers[spell] == true
@@ -317,6 +327,9 @@ local function Load(class, knownSpells)
 			else
 				ranges[spell] = { minRange, maxRange }
 			end
+		end,
+		setSwing = function(value)
+			swing = value
 		end,
 		setAnswer = function(spell, value)
 			answers[spell] = value
@@ -458,40 +471,15 @@ hunter.setMainHand(nil)
 assert(M.MainHandTexture() == nil, "an empty main hand has no icon")
 hunter.setMainHand(SWORD)
 
--- Melee reach from the class's own melee spells and the game's Attack: true from any that reaches, false when a
--- known spell answered and none reaches, and nil when nothing answered. A spell the player has not learned is
--- skipped, and an answer of nil decides nothing.
-local function said(map)
-	return function(spell)
-		return map[spell]
-	end
-end
-
-local warrior = known({ [78] = true })
-assert(M.Melee("WARRIOR", warrior, said({ [78] = true })) == true, "a melee spell that reaches is melee")
-assert(M.Melee("WARRIOR", warrior, said({ [78] = false })) == false, "every known spell out of reach is not melee")
-assert(M.Melee("WARRIOR", warrior, said({})) == nil, "a known spell that answered nothing decides nothing")
-assert(M.Melee("WARRIOR", known({}), said({ [78] = true })) == nil, "a spell the player has not learned is skipped")
-assert(
-	M.Melee("HUNTER", known({ [2974] = true }), said({ [2973] = true, [2974] = false })) == false,
-	"Raptor Strike is not learned, so its answer is skipped"
-)
-assert(
-	M.Melee("HUNTER", known({ [2973] = true, [2974] = true }), said({ [2974] = false })) == false,
-	"a melee spell that answered nothing leaves the other's false standing"
-)
--- Attack is checked by every class, whether or not it has a melee spell of its own.
-assert(
-	M.Melee("WARRIOR", known({ [78] = true, [6603] = true }), said({ [78] = false, [6603] = true })) == true,
-	"Attack that reaches is melee"
-)
-assert(M.Melee("MAGE", known({}), said({ [6603] = true })) == nil, "Attack is skipped while it is not known")
-assert(M.Melee("MAGE", known({ [6603] = true }), said({ [6603] = true })) == true, "a class with only Attack")
-assert(M.Melee("MAGE", known({ [6603] = true }), said({ [6603] = false })) == false, "Attack out of reach")
-assert(
-	M.Melee("WARRIOR", known({ [78] = true, [6603] = true }), said({ [78] = false })) == false,
-	"Attack answering nothing leaves the melee spell's false standing"
-)
+-- Melee reach is the game's own main-hand swing range, as its Main Hand timer reads it: true, false, or nil when the
+-- client made no check. Raptor Strike and Attack answer true at every distance (#574) and decide nothing.
+hunter.setSwing(true)
+assert(M.Melee() == true, "in swing range is melee")
+hunter.setSwing(false)
+assert(M.Melee() == false, "out of swing range is not melee, whatever Raptor Strike says")
+hunter.setSwing(nil)
+assert(M.Melee() == nil, "no swing check decides nothing")
+hunter.setSwing(true)
 
 -- The client's own ranges decide order and merging: equal maxima are one segment named by the first spell in table
 -- order, and a talent that extends one splits them.
@@ -606,7 +594,7 @@ assert(hunter.ranged.scripts.OnShow and hunter.ranged.scripts.OnHide and hunter.
 
 hunter.db.rangeStrip = true
 hunter.db.rangeStripIcons, hunter.db.rangeStripLabel = true, true
-hunter.setAnswer(2973, true)
+hunter.setSwing(true)
 hunter.changed()
 assert(hunter.strip.shown, "on, the strip shows")
 -- The game stacks its timers, so the strip docks under the lowest one: the Ranged timer, whose bottom is lower.
@@ -673,13 +661,13 @@ hunter.changed()
 assert(hunter.strip.points[1][2] == hunter.mainHand, "the lower timer takes the strip")
 
 -- Auto Shot reaches: its band is named by the spell while the ticker keeps running.
-hunter.setAnswer(2973, false)
+hunter.setSwing(false)
 hunter.setAnswer(75, true)
 hunter.changed()
 assert(hunter.fontStrings[1].string == "Auto Shot", "the reach that answers names the band")
 assert(art(hunter, 3).fill.shown and not art(hunter, 1).fill.shown, "only the spell band is lit")
 assert(#hunter.tickers == 1 and not hunter.tickers[1].cancelled, "the ticker keeps running in a spell band")
-hunter.setAnswer(2973, true)
+hunter.setSwing(true)
 hunter.changed()
 assert(
 	hunter.fontStrings[1].string == "Melee" and not hunter.tickers[1].cancelled,
@@ -687,7 +675,7 @@ assert(
 )
 
 -- Out of reach but inside 8 yards: the Dead zone. Beyond it: Too far. With no 8-yard answer: no label at all.
-hunter.setAnswer(2973, false)
+hunter.setSwing(false)
 hunter.setAnswer(75, false)
 hunter.setInteract(true)
 hunter.changed()
@@ -715,7 +703,7 @@ assert(not hunter.strip.shown, "no strip without a shown timer")
 hunter.ranged.shown = true
 hunter.ranged.scale = 0.7
 hunter.setUIScale(0.5)
-hunter.setAnswer(2973, true)
+hunter.setSwing(true)
 hunter.changed()
 assert(hunter.strip.shown and math.abs(hunter.strip.scale - 1.4) < 1e-9, "the strip takes its timer's scale")
 assert(#hunter.tickers == 2 and not hunter.tickers[2].cancelled, "shown again, a new ticker starts")
