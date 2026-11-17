@@ -172,6 +172,9 @@ L["New group..."] = "Nuevo grupo..."
 L["Next"] = "Siguiente"
 L["No rare has been found nearby yet."] = "Todavía no se ha encontrado ningún raro cerca." -- mt
 L["No red text or spoken error for the ones a spammed macro repeats: not ready yet, out of range, not enough mana, rage or energy, no target, and facing the wrong way. Full bags and other errors still show."] = "Sin texto rojo ni error hablado para los que repite una macro presionada sin parar: aún no está listo, fuera de alcance, no hay suficiente maná, ira o energía, sin objetivo y mirando hacia el lado equivocado. Las bolsas llenas y otros errores se siguen mostrando."
+L["Hide the crafting bar in the Professions window"] = "Ocultar la barra de fabricación en la ventana de profesiones"
+L["Hides the cast bar the Professions window draws over the recipe while you craft. The game turns the player cast bar off while the window has its own, so crafts there show no bar."] =
+	"Oculta la barra de lanzamiento que la ventana de profesiones dibuja sobre la receta mientras fabricas. El juego desactiva la barra de lanzamiento del jugador mientras la ventana tiene la suya, así que al fabricar ahí no se muestra ninguna barra."
 L["No screen glow"] = "Sin brillo de pantalla"
 L["Not enough gold for all of them."] = "No hay oro suficiente para todos."
 L["Not somewhere you can't teleport from, and in combat it waits for the fight to end. Hold Shift to answer it yourself."] = "No en sitios desde los que no puedes teletransportarte, y en combate espera a que termine el combate. Mantén Mayús para responder tú."

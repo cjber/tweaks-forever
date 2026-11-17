@@ -172,6 +172,9 @@ L["New group..."] = "新建分組..."
 L["Next"] = "下一頁"
 L["No rare has been found nearby yet."] = "附近還沒有發現稀有生物。" -- mt
 L["No red text or spoken error for the ones a spammed macro repeats: not ready yet, out of range, not enough mana, rage or energy, no target, and facing the wrong way. Full bags and other errors still show."] = "對連按巨集重複觸發的錯誤不再顯示紅字和語音提示：尚未就緒、超出範圍、法力值、怒氣或能量不足、沒有目標以及朝向錯誤。背包已滿等其他錯誤仍會顯示。"
+L["Hide the crafting bar in the Professions window"] = "隱藏專業技能視窗中的製造條"
+L["Hides the cast bar the Professions window draws over the recipe while you craft. The game turns the player cast bar off while the window has its own, so crafts there show no bar."] =
+	"隱藏製造時專業技能視窗在配方上方顯示的施法條。視窗有自己的施法條時，遊戲會關閉玩家施法條，因此在那裡製造時不顯示任何施法條。"
 L["No screen glow"] = "關閉螢幕泛光"
 L["Not enough gold for all of them."] = "金幣不足以全部訓練。"
 L["Not somewhere you can't teleport from, and in combat it waits for the fight to end. Hold Shift to answer it yourself."] = "在無法傳送離開的地方不接受，戰鬥中會等戰鬥結束。按住Shift可自己回應。"

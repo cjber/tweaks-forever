@@ -136,6 +136,7 @@ read_globals = {
 	"CreateAtlasMarkup",
 	"ClassTrainerFrame",
 	"ClassTrainerTrainButton",
+	"ProfessionsFrame",
 	"ClearOverrideBindings",
 	"ColorPickerFrame",
 	"CompleteQuest",

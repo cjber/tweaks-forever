@@ -172,6 +172,9 @@ L["New group..."] = "새 묶음..."
 L["Next"] = "다음"
 L["No rare has been found nearby yet."] = "아직 근처에서 발견된 희귀 몬스터가 없습니다." -- mt
 L["No red text or spoken error for the ones a spammed macro repeats: not ready yet, out of range, not enough mana, rage or energy, no target, and facing the wrong way. Full bags and other errors still show."] = "매크로를 연타할 때 반복되는 오류(아직 준비되지 않음, 사거리 밖, 마나·분노·기력 부족, 대상 없음, 잘못된 방향)의 빨간 글씨와 음성을 없앱니다. 가방이 가득 참 같은 다른 오류는 그대로 표시됩니다."
+L["Hide the crafting bar in the Professions window"] = "전문 기술 창의 제작 바 숨기기"
+L["Hides the cast bar the Professions window draws over the recipe while you craft. The game turns the player cast bar off while the window has its own, so crafts there show no bar."] =
+	"제작하는 동안 전문 기술 창이 제조법 위에 표시하는 시전 바를 숨깁니다. 창에 자체 바가 있는 동안 게임이 플레이어 시전 바를 끄므로, 그곳에서 제작할 때는 바가 표시되지 않습니다."
 L["No screen glow"] = "화면 빛 효과 끄기"
 L["Not enough gold for all of them."] = "모두 배우기에는 골드가 부족합니다."
 L["Not somewhere you can't teleport from, and in combat it waits for the fight to end. Hold Shift to answer it yourself."] = "순간이동할 수 없는 곳에서는 수락하지 않으며, 전투 중에는 전투가 끝날 때까지 기다립니다. 직접 응답하려면 Shift를 누르고 있으세요."
