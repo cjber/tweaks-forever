@@ -7,6 +7,8 @@
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
+- `feature-heading-unlisted`: every `ns.Feature` names a `category` (settings page) and `section` (heading) that
+  UI/Settings.lua's LAYOUT lists, and every listed heading has a feature. A feature outside the layout gets no row.
 - `workflow-hashfiles-unmatched`: every pattern a workflow passes to `hashFiles()` matches a tracked file. A cache
   key built from a pattern that matches nothing never changes when the file it was meant to track does.
 """
@@ -84,7 +86,32 @@ def unmatched_hashfiles(files: dict[str, str]) -> list[str]:
     return hits
 
 
-RULES = (setting_callbacks, unused_luacheck_globals, unmatched_hashfiles)
+def feature_headings(files: dict[str, str]) -> list[str]:
+    settings = files.get("UI/Settings.lua", "")
+    layout = re.search(r"local LAYOUT = \{(.*?)\n\}\n", settings, re.S)
+    if not layout:
+        return ["UI/Settings.lua: feature-heading-unlisted: LAYOUT not found"]
+    listed = {
+        (page, section)
+        for page, sections in re.findall(r'\{ "([^"]+)", \{([^}]*)\} \}', layout.group(1))
+        for section in re.findall(r'"([^"]+)"', sections)
+    }
+    used, hits = set(), []
+    for path, text in files.items():
+        if not path.endswith(".lua") or path.startswith(("tests/", "types/", "tools/")):
+            continue
+        for body in re.findall(r"ns\.Feature\(\{(.*?)\n\}\)", text, re.S):
+            page = re.search(r'category = "([^"]+)"', body)
+            section = re.search(r'section = "([^"]+)"', body)
+            pair = (page and page.group(1), section and section.group(1))
+            used.add(pair)
+            if pair not in listed:
+                hits.append(f"{path}: feature-heading-unlisted: {pair[0]} > {pair[1]} is not in UI/Settings.lua LAYOUT")
+    hits += [f"UI/Settings.lua: feature-heading-unlisted: {p} > {s} has no feature" for p, s in sorted(listed - used)]
+    return hits
+
+
+RULES = (setting_callbacks, unused_luacheck_globals, unmatched_hashfiles, feature_headings)
 
 
 def findings(files: dict[str, str]) -> list[str]:

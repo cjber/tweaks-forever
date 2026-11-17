@@ -290,39 +290,6 @@ do
 	assert(opens == buttons, "every page opens through the shared opener")
 end
 
--- Every feature the addon declares sits on a page and under a heading of the layout, and every heading is used.
-do
-	local used, names = {}, {}
-	for _, page in ipairs(ns.SettingsLayout) do
-		names[page[1]] = {}
-		for _, section in ipairs(page[2]) do
-			names[page[1]][section] = true
-		end
-	end
-	local toc = assert(io.open("TweaksForever.toc")):read("*a")
-	local declared = 0
-	for path in toc:gmatch("\n([%w_/\\]+%.lua)") do
-		local handle = io.open((path:gsub("\\", "/")))
-		local text = handle and handle:read("*a") or ""
-		for _, call in ipairs({ "ns.Feature" }) do
-			for body in text:gmatch(call .. "%(%{(.-)\n%}%)") do
-				local page, section = body:match('category = "([^"]+)"'), body:match('section = "([^"]+)"')
-				declared = declared + 1
-				assert(
-					page and section and names[page] and names[page][section],
-					path .. ": a feature has no listed heading"
-				)
-				used[page .. "/" .. section] = true
-			end
-		end
-	end
-	assert(declared > 60, "the feature files were read")
-	for _, page in ipairs(ns.SettingsLayout) do
-		for _, section in ipairs(page[2]) do
-			assert(used[page[1] .. "/" .. section], page[1] .. " > " .. section .. " has no feature")
-		end
-	end
-end
 assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
 assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")
 local function Modifiable(initializer)
