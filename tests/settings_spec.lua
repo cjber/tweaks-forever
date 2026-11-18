@@ -45,8 +45,6 @@ local function Category(name)
 	}, Layout()
 end
 local opened
-local canvas
-local vertical
 -- Calls to the client's own restricted settings opener.
 local opens = 0
 -- [function] = how many secure delegates the settings built around it. Blizzard data the secure row build reads is
@@ -60,11 +58,6 @@ local env = setmetatable({
 			return Category(name)
 		end,
 		RegisterVerticalLayoutSubcategory = function(_, name)
-			return Category(name)
-		end,
-		-- The Forever addons page: the shared module's own frame on a canvas, or its rows under the gamepad UI.
-		RegisterCanvasLayoutSubcategory = function(parent, frame, name)
-			canvas = { parent = parent, frame = frame, name = name }
 			return Category(name)
 		end,
 		RegisterAddOnSetting = function(category, variable, key, _, varType, name)
@@ -233,24 +226,6 @@ ns.core = {
 	},
 }
 env.ForeverCore = {
-	-- The shared page: a canvas with the mouse, the client's own rows under the gamepad UI (#382).
-	Family = {
-		CreatePanel = function(parent, db, current, safeCall)
-			return { kind = "family panel", parent = parent, db = db, current = current, safeCall = safeCall }
-		end,
-		Register = function(category, db, current, safeCall)
-			if env.InputUtil.IsGamepadUIEnabled() then
-				vertical = env.Settings.RegisterVerticalLayoutSubcategory(category, "Forever addons")
-				vertical.kind = "vertical"
-				return vertical
-			end
-			return env.Settings.RegisterCanvasLayoutSubcategory(
-				category,
-				env.ForeverCore.Family.CreatePanel(nil, db, current, safeCall),
-				"Forever addons"
-			)
-		end,
-	},
 	-- The real ForeverCore wraps this client function in its secure delegate (Core/OpenSettings.lua); here the same
 	-- delegate is made in place, so the call path stays the one UI/Settings.lua asks for.
 	OpenSettingsPanel = function(categoryID, element)
@@ -272,17 +247,11 @@ end
 assert(
 	table.concat(kinds, " ")
 		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever "
-			.. "slider@Interface button@Tweaks Forever button@Tweaks Forever",
+			.. "slider@Interface button@Tweaks Forever",
 	table.concat(kinds, " ")
 )
 local repair, guildRepair = registered[1].initializer, registered[2].initializer
--- The Forever addons page, last: the shared panel on our saved variables, with this addon's row named.
-assert(canvas and canvas.name == "Forever addons" and canvas.parent.name == "Tweaks Forever")
-assert(canvas.frame.kind == "family panel" and canvas.frame.db == ns.db and canvas.frame.current == "TweaksForever")
-assert(canvas.frame.safeCall == ns.core.SafeCall, "the page gets the addon's own SafeCall")
-assert(registered[8].initializer.name == "Forever addons", "the index opens it like any other subpage")
-
--- The index's Open buttons, the Forever addons one included, open their page through the client's own function,
+-- The index's Open buttons open their page through the client's own function,
 -- carried by one secure delegate. Settings.OpenToCategory is Blizzard's Lua around the restricted call, which the
 -- client refuses from addon code (cjber/forever-core#333).
 do
@@ -297,31 +266,10 @@ do
 			assert(opened == initializer.name, initializer.name .. ": on its own page")
 		end
 	end
-	assert(buttons == 4, "the index has a button per subpage and the Forever addons page")
+	assert(buttons == 3, "the index has a button per subpage")
 	assert(opens == buttons, "every page opens through the shared opener")
 end
 
--- A failing shared panel (another addon's newer copy) leaves the rest of the settings and /tweaks working.
-do
-	local before, family = #registered, env.ForeverCore.Family
-	local addOnCategories = 0
-	env.Settings.RegisterAddOnCategory = function()
-		addOnCategories = addOnCategories + 1
-	end
-	env.ForeverCore.Family = {
-		Register = function()
-			error("broken copy")
-		end,
-	}
-	env.SLASH_TWEAKSFOREVER1 = nil
-	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
-	assert(addOnCategories == 1, "the category still registers")
-	assert(env.SLASH_TWEAKSFOREVER1 == "/tweaks", "and /tweaks still works")
-	for index = before + 1, #registered do
-		assert(registered[index].initializer.name ~= "Forever addons", "no index button for a page that failed")
-	end
-	env.ForeverCore.Family = family
-end
 assert(repair.setting.name == "Reparieren" and repair.tooltip() == "Repariert.", "names and tooltips are translated")
 assert(guildRepair.setting.name == "Guild repair", "a phrase with no translation stays English")
 local function Modifiable(initializer)
@@ -412,10 +360,6 @@ do
 	gamepad = true
 	setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 	gamepad = false
-	assert(
-		vertical and vertical.kind == "vertical" and vertical.name == "Forever addons",
-		"with the gamepad UI on the Forever addons page is the client's rows (#382)"
-	)
 	local choice = Choice(registered)
 	assert(choice and choice.kind == "slider", "with the gamepad UI on a choice is a slider")
 	local child
