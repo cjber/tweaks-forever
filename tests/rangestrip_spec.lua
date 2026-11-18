@@ -588,10 +588,10 @@ assert(
 )
 
 -- The band rule over every reach set, every distance and every pattern of unanswered checks. The target stands at a
--- distance; melee reaches 5 yards, the 8-yard check answers inside 8, and each reach answers inside its own range. Any
--- answer may be missing (melee is out of combat, a spell or the 8-yard check may say nothing). The rule must never
--- name a wrong band, and must name the band whenever the answers it was given leave only one band possible: a
--- missing answer hides only the bands it could change.
+-- distance; melee reaches 5 yards, the interact check answers inside the client's radius (8 or 9.9 here, the two ends
+-- the strip allows for), and each reach answers inside its own range. Any answer may be missing (melee is out of
+-- combat, a spell or the interact check may say nothing). The rule must never name a wrong band, and must name the
+-- band whenever the answers leave only one band possible: a missing answer hides only the bands it could change.
 local function TrueBand(distance, reaches)
 	if distance <= 5 then
 		return "melee"
@@ -609,14 +609,8 @@ local function TrueBand(distance, reaches)
 	return inside and "dead" or "far"
 end
 
--- The client's interact radius, run at each end of what the strip allows for it.
-local interactRadius
-local function Answers(distance, reaches)
-	local checks = {}
-	for i, r in ipairs(reaches) do
-		checks[i] = distance >= r.min and distance <= r.max
-	end
-	return distance <= 5, distance < interactRadius, checks
+local function Within(distance, r)
+	return distance >= r.min and distance <= r.max
 end
 
 -- Shapes the client gives a reach: no minimum, an 8-yard minimum, short and long maxima, and two sharing a minimum.
@@ -632,82 +626,88 @@ for a = 1, #SHAPES do
 	end
 end
 
-local distances = {}
-for tenth = 0, 600, 5 do
-	distances[#distances + 1] = tenth / 10
-end
-
-for _, radius in ipairs({ 8, 9.9 }) do
-	interactRadius = radius
-	for _, set in ipairs(reachSets) do
-		local reaches = {}
-		for i, shape in ipairs(set) do
-			reaches[i] = reach("r" .. shape, SHAPES[shape][1], SHAPES[shape][2], nil)
-		end
-		local n = #reaches
-		for _, distance in ipairs(distances) do
-			local melee, near, checks = Answers(distance, reaches)
-			-- Each of melee, the 8-yard check and every reach is answered or missing: bit i of mask drops answer i.
+for _, set in ipairs(reachSets) do
+	local reaches = {}
+	for i, shape in ipairs(set) do
+		reaches[i] = reach("r" .. shape, SHAPES[shape][1], SHAPES[shape][2], nil)
+	end
+	local n = #reaches
+	-- Every answer and band changes only at an edge, so each edge, a point between two edges and one past the last
+	-- stand for every distance.
+	local edges = { 0, 5, 8, 9.9, 10 }
+	for _, r in ipairs(reaches) do
+		edges[#edges + 1] = r.min
+		edges[#edges + 1] = r.max
+	end
+	table.sort(edges)
+	local samples = {}
+	for i, edge in ipairs(edges) do
+		samples[#samples + 1] = edge
+		samples[#samples + 1] = edges[i + 1] and (edge + edges[i + 1]) / 2 or edge + 1
+	end
+	-- Each distinct set of answers once, with every band a target giving those answers can stand in.
+	local cases, order = {}, {}
+	for _, radius in ipairs({ 8, 9.9 }) do
+		for _, distance in ipairs(samples) do
+			-- Bit 0 drops melee, bit 1 the interact check, bit i + 1 reach i.
 			for mask = 0, 2 ^ (n + 2) - 1 do
-				local function Drop(bit)
-					return math.floor(mask / 2 ^ bit) % 2 == 1
-				end
-				local seenMelee = melee
-				if Drop(0) then
-					seenMelee = nil
-				end
-				local seenNear = near
-				if Drop(1) then
-					seenNear = nil
-				end
-				local seen = {}
-				for i = 1, n do
-					seen[i] = checks[i]
-					if Drop(i + 1) then
-						seen[i] = nil
+				local function Kept(bit, value)
+					if math.floor(mask / 2 ^ bit) % 2 == 1 then
+						return nil
 					end
+					return value
 				end
-				-- Every band a distance agreeing with the answers given would show.
-				local possible, count, only = {}, 0, nil
-				for _, other in ipairs(distances) do
-					local m, _, c = Answers(other, reaches)
-					-- The strip knows the interact radius only to lie from 8 to 10 yards, so a distance agrees with the
-					-- interact answer when some radius there would give it.
-					local agrees = (seenMelee == nil or seenMelee == m)
-						and (seenNear == nil or (seenNear and other < 10) or (not seenNear and other >= 8))
-					for i = 1, n do
-						agrees = agrees and (seen[i] == nil or seen[i] == c[i])
-					end
-					if agrees then
-						local band = TrueBand(other, reaches)
-						if not possible[band] then
-							possible[band] = true
-							count = count + 1
-							only = band
-						end
-					end
+				local melee, near, checks = Kept(0, distance <= 5), Kept(1, distance < radius), {}
+				local key = tostring(melee) .. tostring(near)
+				for i, r in ipairs(reaches) do
+					checks[i] = Kept(i + 1, Within(distance, r))
+					key = key .. tostring(checks[i])
 				end
-				for i = 1, n do
-					reaches[i].check = seen[i]
+				local case = cases[key]
+				if not case then
+					case = { melee = melee, near = near, checks = checks, bands = {}, at = distance }
+					cases[key] = case
+					order[#order + 1] = key
 				end
-				local got = M.Band(seenMelee, reaches, function()
-					return seenNear
-				end)
-				local case = string.format(
-					"radius %.1f, reaches %s at %.1f yd, mask %d: got %s",
-					radius,
-					table.concat(set, ","),
-					distance,
-					mask,
-					tostring(got)
-				)
-				if got ~= nil then
-					assert(got == TrueBand(distance, reaches), case .. ", want " .. TrueBand(distance, reaches))
-				end
-				if count == 1 then
-					assert(got == only, case .. ", the answers leave only " .. only)
+				case.bands[TrueBand(distance, reaches)] = true
+			end
+		end
+	end
+	for _, key in ipairs(order) do
+		local case = cases[key]
+		for i = 1, n do
+			reaches[i].check = case.checks[i]
+		end
+		local got = M.Band(case.melee, reaches, function()
+			return case.near
+		end)
+		local failure =
+			string.format("reaches %s near %.1f yd (%s): got %s", table.concat(set, ","), case.at, key, tostring(got))
+		-- Never wrong: a named band is the band at every distance giving these answers.
+		if got ~= nil then
+			for band in pairs(case.bands) do
+				assert(band == got, failure .. ", but " .. band .. " gives the same answers")
+			end
+		end
+		-- Never hidden needlessly: the strip knows the interact radius only to lie from 8 to 10 yards, so the bands
+		-- possible are those at every distance some radius there would give these answers.
+		local only, count = nil, 0
+		local possible = {}
+		for _, distance in ipairs(samples) do
+			local agrees = (case.melee == nil or case.melee == (distance <= 5))
+				and (case.near == nil or (case.near and distance < 10) or (not case.near and distance >= 8))
+			for i, r in ipairs(reaches) do
+				agrees = agrees and (case.checks[i] == nil or case.checks[i] == Within(distance, r))
+			end
+			if agrees then
+				local band = TrueBand(distance, reaches)
+				if not possible[band] then
+					possible[band], count, only = true, count + 1, band
 				end
 			end
+		end
+		if count == 1 then
+			assert(got == only, failure .. ", the answers leave only " .. only)
 		end
 	end
 end

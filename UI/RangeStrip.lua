@@ -385,6 +385,7 @@ local function Solve(melee, interact, reaches)
 		samples[#samples + 1] = edge
 		samples[#samples + 1] = edges[i + 1] and (edge + edges[i + 1]) / 2 or edge + 1
 	end
+	---@type string|false
 	local band = false
 	for _, distance in ipairs(samples) do
 		local agrees = (melee == nil or melee == (distance <= MELEE_REACH))
