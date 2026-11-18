@@ -1,5 +1,6 @@
 -- Rare alerts (Features/RareAlerts.lua): a warning at the top of the screen and a sound when a rare's nameplate or
--- map marker appears, off by default, never in combat, once per rare for ten minutes, and never from a secret GUID or name.
+-- map marker appears, off by default, never in combat, once per rare for ten minutes, and never from a secret GUID
+-- or name.
 local features, handlers, db, printed, sounds, initializers = {}, {}, {}, {}, 0, {}
 local ns = {
 	-- Core/API.lua's change signal, which this spec does not load.
