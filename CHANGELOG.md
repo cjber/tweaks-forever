@@ -10,6 +10,26 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.0] - 2026-11-18
+
+<!-- discord-image: docs/screenshots/rangestrip.png -->
+
+### Added
+
+- **Hide the crafting bar in the Professions window.** A new option under Interface hides the cast bar the Professions window draws over the recipe while you craft. Off by default. Thanks to Tinter on CurseForge (#617).
+
+### Changed
+
+- **Updates are published on CurseForge and GitHub.** Wago publishing has ended, so install and update from CurseForge. (cjber/forever-core#649)
+
+### Fixed
+
+- **Range strip follows melee reach again.** The strip no longer says Melee at every distance: it takes melee reach from the game's own swing range, the check that dims the Main Hand timer, so walking away lights Dead zone, Auto Shot or Too far as you go.
+- **Range strip never shows a wrong band.** It lights a band only when the game's range answers leave no doubt, so a target at range is never shown as Melee. When the answers cannot tell two bands apart, it lights none rather than guess.
+- **No more stutter at merchants.** Junk selling checked your bags again every time the game loaded any item's details, which other addons trigger in bursts. It now waits only for the items in your bags it is missing, once per frame. The best reward coin on quest rewards works the same way.
+- **A turned-off ForeverCore is named as the problem.** With ForeverCore turned off, Tweaks Forever now says so at login, instead of naming every other Forever addon as out of date. (cjber/forever-core#816)
+- **The addon compartment entry says why Tweaks Forever stopped.** While Tweaks Forever cannot start, clicking its entry repeats the line naming the fix instead of raising a Lua error.
+
 ## [2.8.5] - 2026-11-17
 
 <!-- forever-core-sync -->

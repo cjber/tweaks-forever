@@ -12,7 +12,7 @@
 ## X-Website: https://github.com/cjber/tweaks-forever
 ## X-Donate: https://github.com/sponsors/cjber
 ## X-Curse-Project-ID: 1708506
-## X-Forever-Core: v1.15.0
+## X-Forever-Core: v1.15.2
 ## SavedVariables: TweaksForeverDB
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
