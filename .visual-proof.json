@@ -1,10 +1,10 @@
 {
-  "input_digest": "ca02e5e0818adf5819a3f8bf78aeed98bfa8798f560d15bcf8d1050c5fa93cef",
-  "runtime_sha256": "ca02e5e0818adf5819a3f8bf78aeed98bfa8798f560d15bcf8d1050c5fa93cef",
-  "candidate": "a19c30c07e07ff98c8033807f25429e0226055049313c08b84d7e877fc60da58",
-  "client_build": "1.60.1.70938 (Interface 16001)",
+  "input_digest": "c366b35ad291bae91592d9630cedc8fad5be8ae466e57aa1b915c3a417efd788",
+  "runtime_sha256": "c366b35ad291bae91592d9630cedc8fad5be8ae466e57aa1b915c3a417efd788",
+  "candidate": "0715620b4e553f6f45b649d4d76c51d19738c67ecd9501e1bf5644b849a31074",
+  "client_build": "1.60.1.70959 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "f6bb8b4095b65d8f5391fd78c9c6d79aeebace2e",
+  "source_commit": "6286cd30406e19b640693293be261de78641d29f",
   "flows": [
     {
       "name": "core-off",
@@ -16,19 +16,19 @@
     {
       "name": "compartment",
       "steps": [
-        "sha256:7e86e242bb1b50cfda50b1ec7132aa94fed1f54e6c4096182d3dcebfbacee2eb tweaks-forever.lua"
+        "sha256:fb5620e164c63eabd3836d0dc162f0f96272f9bdf8a8512f7939176e11f46613 tweaks-forever-wait.lua"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/6b6d0b6599f4c18d871462d66b4d450a/raw/7d8a7178b979603e92e59d21536a005e7fa3c891/1-core-off.png",
-      "sha256": "04b16b07d6f320a28d639346f2da72b3ed40cb5df328579279c456dce729ad30"
+      "url": "https://gist.githubusercontent.com/cjber/2312462fcc8f4b26fe46d670a94f1c6c/raw/8ffb9ea4fd1530e6829fa4d6c4422fbe10015b6b/1-core-off.png",
+      "sha256": "a51e7c48cb882a3f427a530895a0a6ea808ce7ed0136b2bef4686457fc61acd5"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/6b6d0b6599f4c18d871462d66b4d450a/raw/7d8a7178b979603e92e59d21536a005e7fa3c891/2-compartment.png",
-      "sha256": "36b3689b9eeffe442c89ca7a4579795d23155de0c9d3e45803a57d07377a8af4"
+      "url": "https://gist.githubusercontent.com/cjber/2312462fcc8f4b26fe46d670a94f1c6c/raw/8ffb9ea4fd1530e6829fa4d6c4422fbe10015b6b/2-compartment.png",
+      "sha256": "e6c44f57ef769d6bb1efa90b46d9c6f1197da6f73fd1934411bf478ce38c1f72"
     }
   ]
 }
