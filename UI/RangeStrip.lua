@@ -78,7 +78,11 @@ local RANGED_SPELLS = {
 	[16] = 2764, -- thrown: Throw
 }
 
--- Melee reach in yards: a spell whose own maximum is no further is not worth a segment beyond Melee.
+-- Melee reach in yards, measured as the spell ranges are, from the player's edge to the target's: a spell whose own
+-- maximum is no further is not worth a segment beyond Melee. The client measures spell ranges between the two
+-- creatures' edges and the swing between their centres against both combat reaches plus 4/3 (at least 5), so in edge
+-- terms the swing never reaches past 5 yards whatever the target's size; that is what lets a spell's answer rule
+-- melee out while the swing check is silent out of combat.
 local MELEE_REACH = 5
 
 -- What the game's interact check (Model.Interact) says about distance: true puts the target nearer than 10 yards
@@ -366,7 +370,7 @@ local function BandAt(distance, reaches)
 end
 
 -- The one band every distance agreeing with the answers puts the target in, or nil when they leave more than one.
--- False as well when no distance agrees: the answers break the yard model (a target's size moves every edge).
+-- False when no distance agrees: the answers break the yard model.
 -- The bands change only at the range edges, so each edge, a point between two edges and one past the last stand for
 -- every distance.
 ---@param melee boolean?
@@ -420,8 +424,7 @@ end
 ---@param interact fun(): boolean?
 ---@return string?
 function Model.Band(melee, reaches, interact)
-	-- The game's own swing answer wins outright: a large target's combat reach stretches the swing past MELEE_REACH,
-	-- where a spell with a minimum range can answer true too.
+	-- The game's own swing answer wins outright.
 	if melee == true then
 		return MELEE
 	end
@@ -429,17 +432,8 @@ function Model.Band(melee, reaches, interact)
 	if band == nil then
 		band = Solve(melee, interact(), reaches)
 	end
-	if band ~= false then
-		return band
-	end
-	-- No distance fits every answer, so the game's own true answers decide: the nearest reach that reaches.
-	local nearest
-	for _, reach in ipairs(reaches) do
-		if reach.check == true and (not nearest or reach.max < nearest.max) then
-			nearest = reach
-		end
-	end
-	return nearest and nearest.key
+	-- No distance fits every answer: something the yard model does not hold for, so no band can be named safely.
+	return band or nil
 end
 
 ns.Init(function()

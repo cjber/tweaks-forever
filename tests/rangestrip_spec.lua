@@ -587,6 +587,13 @@ assert(
 	"a false reach sharing the unanswered one's minimum puts the target inside both"
 )
 
+-- Answers no distance fits (Fire Blast in range, Frostbolt with the longer reach not) break the yard model, so the
+-- band is hidden rather than guessed.
+assert(
+	M.Band(false, { reach("fireblast", 0, 20, true), reach("frostbolt", 0, 30, false) }, interact(nil)) == nil,
+	"contradicting answers name no band"
+)
+
 -- The band rule over every reach set, every distance and every pattern of unanswered checks. The target stands at a
 -- distance; melee reaches 5 yards, the interact check answers inside the client's radius (8 or 9.9 here, the two ends
 -- the strip allows for), and each reach answers inside its own range. Any answer may be missing (melee is out of
@@ -899,7 +906,10 @@ local mage = Load("MAGE", { [2136] = true, [116] = true, [133] = true })
 mage.initializers[1]()
 mage.db.rangeStrip = true
 mage.db.rangeStripIcons, mage.db.rangeStripLabel = true, true
+-- Within 20 yards every reach answers true, as the client does.
 mage.setAnswer(2136, true)
+mage.setAnswer(116, true)
+mage.setAnswer(133, true)
 mage.changed()
 assert(joined(segments(mage)) == "Melee | Fire Blast | Frostbolt | Fireball", "the mage's reaches near to far")
 assert(mage.fontStrings[1].string == "Fire Blast", "the nearest reach names the band")
@@ -907,6 +917,8 @@ assert(mage.fontStrings[1].string == "Fire Blast", "the nearest reach names the 
 -- Improved Fire Blast (+15 yards) moves Fire Blast past Frostbolt, level with Fireball: the two are one segment,
 -- and CHARACTER_POINTS_CHANGED rebuilds the strip from the client's ranges and lays the narrower row out again.
 mage.setRange(2136, 0, 35)
+-- Between 30 and 35 yards: Frostbolt falls short, the talented Fire Blast and Fireball reach.
+mage.setAnswer(116, false)
 mage.handlers.CHARACTER_POINTS_CHANGED()
 assert(joined(segments(mage)) == "Melee | Frostbolt | Fire Blast", "a talent reorders and merges the mage strip")
 assert(mage.fontStrings[1].string == "Fire Blast", "the talented reach still names the band")
