@@ -674,7 +674,6 @@ ns.Init(function()
 	end
 
 	local docked
-	local laidOut
 	local ticker
 	local Update
 
@@ -700,73 +699,57 @@ ns.Init(function()
 		StopTicker()
 	end
 
-	-- The class's known reaches, rebuilt when a spell is learned, a talent moves it or the ranged weapon changes.
+	-- The class's known reaches and their segments, rebuilt when a spell is learned, a talent moves it or the
+	-- ranged weapon changes. Segment names and icons are read only then, not on every tick: the tick refreshes
+	-- each reach's range answer and re-derives the band from the cached segments.
 	---@type TFRangeReach[]
-	local knownReaches = {}
+	local cachedReaches = {}
+	---@type TFRangeSegment[]
+	local cachedSegments = {}
+	-- The segments and shape options last laid out, so a tick with none of them changed only re-lights the band.
+	---@type TFRangeSegment[]?
+	local shownSegments
+	local shownIcons, shownLabel
+	local SPELL_COLOUR = { SPELL_R, SPELL_G, SPELL_B }
 	local function Refresh()
-		knownReaches = Model.Reaches(class, Model.Known, Model.EquippedRanged())
-	end
-
-	-- The band and its segments, near to far: Melee, then Dead zone when a shown reach has a minimum range, then
-	-- the class's known reaches with their client-side names. Each segment's icon is read here, so a changed weapon
-	-- or spell icon lays the strip out again. A reach whose name cannot be read is not shown, and a strip with
-	-- nothing beyond Melee has nothing to say.
-	---@return string?, TFRangeSegment[]
-	local function Read()
-		local reaches = {}
-		local spellSegments = {}
-		for _, reach in ipairs(knownReaches) do
+		cachedReaches, cachedSegments = {}, {}
+		local gap = false
+		for _, reach in ipairs(Model.Reaches(class, Model.Known, Model.EquippedRanged())) do
 			local name = Model.SpellName(reach.spell)
 			if name then
-				reach.check = Model.Check(reach.spell)
-				reaches[#reaches + 1] = reach
-				spellSegments[#spellSegments + 1] = {
+				cachedReaches[#cachedReaches + 1] = reach
+				gap = gap or reach.min > 0
+				cachedSegments[#cachedSegments + 1] = {
 					key = reach.key,
 					name = name,
-					colour = { SPELL_R, SPELL_G, SPELL_B },
+					colour = SPELL_COLOUR,
 					icon = Model.SpellTexture(reach.spell),
 				}
 			end
 		end
-		local gap = false
-		for _, reach in ipairs(reaches) do
-			if reach.min > 0 then
-				gap = true
-			end
-		end
-		local segments = {
-			{ key = MELEE, name = NAMES[MELEE], colour = COLOURS[MELEE], icon = Model.MainHandTexture() },
-		}
+		-- Melee first, then Dead zone when a shown reach has a minimum range, then the reaches near to far.
+		table.insert(cachedSegments, 1, {
+			key = MELEE,
+			name = NAMES[MELEE],
+			colour = COLOURS[MELEE],
+			icon = Model.MainHandTexture(),
+		})
 		if gap then
-			segments[#segments + 1] = { key = DEAD_ZONE, name = NAMES[DEAD_ZONE], colour = COLOURS[DEAD_ZONE] }
+			table.insert(cachedSegments, 2, {
+				key = DEAD_ZONE,
+				name = NAMES[DEAD_ZONE],
+				colour = COLOURS[DEAD_ZONE],
+			})
 		end
-		for _, segment in ipairs(spellSegments) do
-			segments[#segments + 1] = segment
-		end
-		local band = Model.Band(Model.Melee(class, Model.Known, Model.Check), reaches, Model.Interact)
-		return band, segments
 	end
 
-	-- The band and its segment lit, with every shown segment named in its own width.
-	---@param band string?
-	---@param segments TFRangeSegment[]
-	local function Paint(band, segments)
-		ShowSegments(segments)
-		Apply(band, segments)
-	end
-
-	-- The segments' keys and icons, and the two shape options, in shown order. The strip lays out again only when
-	-- this changes, so a changed key list, icon or option lays it out at once and a tick with none of them does not.
-	---@param segments TFRangeSegment[]
-	---@return string
-	local function Signature(segments)
-		local keys = {}
-		for index, segment in ipairs(segments) do
-			keys[index] = segment.icon and (segment.key .. "=" .. segment.icon) or segment.key
+	-- The current band from the cached reaches: each reach's range answer is refreshed, then the band is derived.
+	---@return string?
+	local function Band()
+		for _, reach in ipairs(cachedReaches) do
+			reach.check = Model.Check(reach.spell)
 		end
-		keys[#keys + 1] = ns.Active(ICONS_KEY) and "icons" or "no icons"
-		keys[#keys + 1] = ns.Active(LABEL_KEY) and "label" or "no label"
-		return table.concat(keys, "|")
+		return Model.Band(Model.Melee(class, Model.Known, Model.Check), cachedReaches, Model.Interact)
 	end
 
 	function Update()
@@ -790,16 +773,19 @@ ns.Init(function()
 		if parentScale and parentScale > 0 then
 			strip:SetScale(timer:GetEffectiveScale() / parentScale)
 		end
-		local band, segments = Read()
-		if #segments <= 1 then
+		if #cachedSegments <= 1 then
 			Hide()
 			return
 		end
-		Paint(band, segments)
+		local icons, labelOn = ns.Active(ICONS_KEY), ns.Active(LABEL_KEY)
+		local changed = shownSegments ~= cachedSegments or shownIcons ~= icons or shownLabel ~= labelOn
+		if changed then
+			shownSegments, shownIcons, shownLabel = cachedSegments, icons, labelOn
+			ShowSegments(cachedSegments)
+		end
+		Apply(Band(), cachedSegments)
 		strip:Show()
-		local signature = Signature(segments)
-		if signature ~= laidOut then
-			laidOut = signature
+		if changed then
 			Layout()
 		end
 		-- No event says when melee reach changes now, and walking between two spell bands fires none either, so the

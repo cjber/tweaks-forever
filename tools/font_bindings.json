@@ -455,8 +455,8 @@
     },
     {
       "source": "UI/RangeStrip.lua",
-      "sha256": "a48e636d71492a7a62cf87ce104f85cfa30ed44e5169cccba936a98114d58385",
-      "review": "Read NAMES, Widget, ShowSegments, Apply, Read, Paint, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Read puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. Too far is displayed only in label, never a segment. Later updates change text, colour, geometry and visibility only. Client spell names/icons and settings phrases are excluded.",
+      "sha256": "f0ca6cea24a78ec991bee55d1cee9adfd56a815bd71f994a29e9ecdc11fa2477",
+      "review": "Read NAMES, Widget, ShowSegments, Apply, Refresh, Band, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Refresh puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. Too far is displayed only in label, never a segment. Later updates change text, colour, geometry and visibility only. Client spell names/icons and settings phrases are excluded.",
       "bindings": [
         {
           "font": "GameFontNormal",

@@ -25,6 +25,8 @@ local mapOf = setmetatable({}, { __mode = "k" })
 local places = {}
 ---@type integer[]
 local queue = {}
+-- Head and tail of `queue`: taking from the head is O(1), where table.remove(queue, 1) shifts the whole queue per NPC.
+local qHead, qTail = 1, 1
 ---@type table<integer, true>
 local queued = {}
 -- Reading waits for login, and for Questie to finish starting when it is installed; `running` while a frame is booked.
@@ -126,22 +128,27 @@ local function Step()
 	running = false
 	local db, MapOf = Source.Zones()
 	local started = debugprofilestop()
-	while db and MapOf and #queue > 0 do
-		local npc = table.remove(queue, 1) --[[@as integer]]
+	while db and MapOf and qHead < qTail do
+		local npc = queue[qHead] --[[@as integer]]
+		queue[qHead] = nil
+		qHead = qHead + 1
 		queued[npc] = nil
 		places[npc] = Read(db, MapOf, npc)
 		if debugprofilestop() - started >= SLICE_MS then
 			break
 		end
 	end
-	if db and #queue > 0 then
+	if qHead == qTail then
+		qHead, qTail = 1, 1
+	end
+	if db and qHead < qTail then
 		running = true
 		C_Timer.After(0, Step)
 	end
 end
 
 local function Pump()
-	if open and not running and #queue > 0 then
+	if open and not running and qHead < qTail then
 		running = true
 		C_Timer.After(0, Step)
 	end
@@ -167,7 +174,8 @@ function Source.Places(npcs)
 			state = "pending"
 			if not queued[npc] then
 				queued[npc] = true
-				queue[#queue + 1] = npc
+				queue[qTail] = npc
+				qTail = qTail + 1
 			end
 		end
 	end
