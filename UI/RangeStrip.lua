@@ -711,9 +711,9 @@ ns.Init(function()
 	local shownSegments
 	local shownIcons, shownLabel
 	local SPELL_COLOUR = { SPELL_R, SPELL_G, SPELL_B }
-	-- The client can answer a spell's name or icon (or the main hand's icon) late, before its data has loaded. A
-	-- build that missed one is read again on the next update, so the strip recovers without waiting for the next
-	-- spell or equipment event.
+	-- The client can answer a known spell's name late, before its data has loaded: a build that missed one is read
+	-- again on the next update, so the reach joins the strip without waiting for the next spell event. An icon may
+	-- be missing for good (Model.SpellTexture allows it), so a missing icon waits for the client's data-loaded events.
 	local incomplete = false
 	local function Refresh()
 		cachedReaches, cachedSegments = {}, {}
@@ -722,7 +722,7 @@ ns.Init(function()
 		for _, reach in ipairs(Model.Reaches(class, Model.Known, Model.EquippedRanged())) do
 			local name = Model.SpellName(reach.spell)
 			local icon = name and Model.SpellTexture(reach.spell)
-			incomplete = incomplete or not icon
+			incomplete = incomplete or not name
 			if name then
 				cachedReaches[#cachedReaches + 1] = reach
 				gap = gap or reach.min > 0
