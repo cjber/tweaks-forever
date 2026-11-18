@@ -98,7 +98,10 @@ local function Client(slots, db)
 		NUM_TOTAL_EQUIPPED_BAG_SLOTS = 5,
 		SELL_ALL_JUNK_ITEMS_POPUP = SELL_ALL,
 		Enum = { TooltipDataType = { Item = 0 } },
-		hooksecurefunc = function() end,
+		hooksecurefunc = function(name, fn)
+			c.hooks = c.hooks or {}
+			c.hooks[name] = fn
+		end,
 		IsControlKeyDown = No,
 		IsShiftKeyDown = function()
 			return c.shift
@@ -782,4 +785,51 @@ do -- Other addons' item requests never rescan the bags; the awaited items' arri
 	same(c.scans - before, 2, "both arrivals run one button update and one sale scan")
 	c.settle()
 	same(c.sold(), "3,4,5,6,7,8,9,10,11,12,1,2", "and the late items sell")
+end
+
+do -- An awaited price arriving on the Buyback tab sells once the vendor tab is back (#636).
+	local c = MarkedClient({ grey(1), grey(2) })
+	c.unpriced["item:1"] = true
+	c.visit()
+	same(c.sold(), "2", "the priced stack sells")
+	c.env.MerchantFrame.selectedTab = 2
+	c.unpriced["item:1"] = nil
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
+	c.settle()
+	same(c.sold(), "2", "nothing sells from the Buyback tab")
+	c.env.MerchantFrame.selectedTab = 1
+	c.hooks.MerchantFrame_Update()
+	c.settle()
+	same(c.sold(), "2,1", "the late stack sells on the vendor tab")
+	c.hooks.MerchantFrame_Update()
+	c.settle()
+	same(c.sold(), "2,1", "and only once")
+end
+
+do -- A wait from an earlier visit does not scan the bags in a later one (#636).
+	local c = MarkedClient({ grey(1), grey(2) })
+	c.unpriced["item:1"] = true
+	c.visit()
+	c.close()
+	c.slots[1] = nil
+	c.show()
+	c.settle()
+	local before = c.scans
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
+	same(c.settle(), 0, "the closed visit's wait is gone")
+	same(c.scans, before, "and scans nothing")
+end
+
+do -- A failed load keeps the wait for the arrival that succeeds (#636).
+	local c = MarkedClient({ grey(1), grey(2) })
+	c.unpriced["item:1"] = true
+	c.visit()
+	local before = c.scans
+	c.fire("GET_ITEM_INFO_RECEIVED", 1, false)
+	same(c.settle(), 0, "a failed load schedules nothing")
+	same(c.scans, before, "and scans nothing")
+	c.unpriced["item:1"] = nil
+	c.fire("GET_ITEM_INFO_RECEIVED", 1, true)
+	c.settle()
+	same(c.sold(), "2,1", "the successful arrival still sells it")
 end

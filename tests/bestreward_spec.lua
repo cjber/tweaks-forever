@@ -275,3 +275,14 @@ env.GetQuestItemInfoLootType = nil
 handlers.QUEST_FINISHED()
 assert(Marked() == nil, "closing the quest frame hides it")
 print("bestreward: ok")
+
+-- Closing the quest drops its waits: a price arriving later re-reads nothing (#636).
+Show({ { link = "item:1", price = 100 }, { link = "item:2", price = 300 } })
+cached["item:2"] = false
+hooks.QuestInfo_Display(REWARD)
+handlers.QUEST_FINISHED()
+local closed = reads
+cached["item:2"] = nil
+handlers.GET_ITEM_INFO_RECEIVED(2)
+assert(#frames == 0 and reads == closed, "a closed quest's wait is gone")
+print("bestreward: forget ok")

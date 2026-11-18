@@ -174,6 +174,7 @@ ns.Init(function()
 	ns.On("QUEST_ITEM_UPDATE", Retry)
 	ns.On("QUEST_FINISHED", function()
 		onReward = false
+		ns.ForgetItems(Retry)
 		Update()
 	end)
 	ns.OnSettingChanged(KEY, Update)

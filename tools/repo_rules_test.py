@@ -23,6 +23,8 @@ class LuacheckGlobalTest(unittest.TestCase):
         self.assertEqual(len(item_info_listeners({"Bags/Junk.lua": listen})), 1)
         self.assertEqual(len(item_info_listeners({"UI/X.lua": "f:RegisterEvent('ITEM_DATA_LOAD_RESULT')\n"})), 1)
         self.assertEqual(item_info_listeners({"Bags/Junk.lua": "ns.AwaitItem(info.itemID, OnItemInfo)\n"}), [])
+        xml = '<OnLoad>self:RegisterEvent("GET_ITEM_INFO_RECEIVED")</OnLoad>\n'
+        self.assertEqual(len(item_info_listeners({"UI/Frame.xml": xml})), 1, "an XML OnLoad listens too")
 
     def test_an_entry_nothing_names_fails(self):
         config = '\nread_globals = {\n\t"CreateFrame",\n\t"GetLocale",\n\t"tInvert",\n}\n'

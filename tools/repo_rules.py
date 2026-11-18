@@ -4,7 +4,8 @@
 - `setting-callback-outside-core`: `Settings.SetOnValueChangedCallback` is called only from Core/Core.lua's
   `ns.OnSettingChanged(key, fn)`. A feature file that restates the `"TweaksForever_" .. key` variable by hand
   registers a callback that never fires when the key is misspelt. Specs and annotations stub the API.
-- `item-info-outside-core`: only Core/ItemInfo.lua listens for `GET_ITEM_INFO_RECEIVED` or `ITEM_DATA_LOAD_RESULT`.
+- `item-info-outside-core`: only Core/ItemInfo.lua, of the Lua and XML files, listens for `GET_ITEM_INFO_RECEIVED`
+  or `ITEM_DATA_LOAD_RESULT`.
   Both fire for every item any addon asks about, in bursts, so a feature that reacts to the event itself reruns its
   work dozens of times a second; a feature names the items it waits for with `ns.AwaitItem(itemID, fn)` instead.
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
@@ -48,7 +49,7 @@ def item_info_listeners(files: dict[str, str]) -> list[str]:
     hits = []
     for path, text in files.items():
         # tools/ holds the vendored client simulator, which fires the events rather than listening for them.
-        if not path.endswith(".lua") or path == ITEM_INFO_OWNER or path.startswith((*SETTINGS_SKIP, "tools/")):
+        if not LUA_LIKE.search(path) or path == ITEM_INFO_OWNER or path.startswith((*SETTINGS_SKIP, "tools/")):
             continue
         for number, line in enumerate(text.splitlines(), 1):
             if ITEM_INFO_EVENT.search(line):

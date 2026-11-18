@@ -322,7 +322,7 @@ Step = function(run)
 		local pending
 		run.items, pending = Scan(run.manual and BATCH_SIZE or merchant.remaining)
 		if not run.manual then
-			merchant.pending = pending
+			merchant.pending, merchant.deferred = pending, nil
 		end
 	end
 	if run.waiting then
@@ -417,7 +417,13 @@ ns.Init(function()
 			tooltip:Show()
 		end
 	end)
-	hooksecurefunc("MerchantFrame_Update", UpdateMerchantButton)
+	hooksecurefunc("MerchantFrame_Update", function()
+		UpdateMerchantButton()
+		-- Item info that arrived while the merchant could not sell (the Buyback tab) runs once the vendor tab is back.
+		if merchant and merchant.deferred and not batch and MerchantFrame.selectedTab == 1 then
+			Start(false)
+		end
+	end)
 	MerchantSellAllJunkButton:HookScript("OnClick", function()
 		confirmationVisit = merchant
 	end)
@@ -461,6 +467,7 @@ ns.Init(function()
 	end)
 	ns.On("MERCHANT_CLOSED", function()
 		merchant, confirmationVisit = nil, nil
+		ns.ForgetItems(OnItemInfo)
 		if batch then
 			Finish(batch)
 		end
@@ -477,6 +484,9 @@ ns.Init(function()
 			if batch then
 				merchant.retry = true
 			else
+				-- Cleared once a run scans; left set when the merchant cannot sell now (the Buyback tab), so returning
+				-- to the vendor tab runs it.
+				merchant.deferred = true
 				Start(false)
 			end
 		end

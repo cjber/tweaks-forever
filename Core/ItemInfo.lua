@@ -1,5 +1,9 @@
 local _, ns = ...
 
+if ns.broken then
+	return
+end
+
 -- Waiting for the client's item data. GET_ITEM_INFO_RECEIVED fires for every item any addon asks about, in bursts, so
 -- a feature never reacts to the event itself: it names the item it is waiting for, and its callback runs once that
 -- item's data arrives, at most once per frame however many of its items land together (#636).
@@ -33,10 +37,25 @@ function ns.AwaitItem(itemID, callback)
 	callbacks[callback] = true
 end
 
+-- Stop waiting with `callback` for every item: the wait it was for is over (a merchant visit ended).
+---@param callback function
+function ns.ForgetItems(callback)
+	for itemID, callbacks in pairs(awaited) do
+		callbacks[callback] = nil
+		if next(callbacks) == nil then
+			awaited[itemID] = nil
+		end
+	end
+	if due then
+		due[callback] = nil
+	end
+end
+
 ns.Init(function()
-	ns.On("GET_ITEM_INFO_RECEIVED", function(itemID)
+	ns.On("GET_ITEM_INFO_RECEIVED", function(itemID, success)
 		local callbacks = awaited[itemID]
-		if not callbacks then
+		-- A failed load caches nothing: the wait stays for the arrival that does.
+		if not callbacks or success == false then
 			return
 		end
 		awaited[itemID] = nil
