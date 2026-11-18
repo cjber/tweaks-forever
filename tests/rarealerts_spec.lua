@@ -1,5 +1,5 @@
--- Rare alerts (Features/RareAlerts.lua): a warning at the top of the screen and a sound when a rare's nameplate or map marker appears,
--- off by default, never in combat, once per rare for ten minutes, and never from a secret GUID or name.
+-- Rare alerts (Features/RareAlerts.lua): a warning at the top of the screen and a sound when a rare's nameplate or
+-- map marker appears, off by default, never in combat, once per rare for ten minutes, and never from a secret GUID or name.
 local features, handlers, db, printed, sounds, initializers = {}, {}, {}, {}, 0, {}
 local ns = {
 	-- Core/API.lua's change signal, which this spec does not load.
@@ -169,7 +169,8 @@ combat = false
 handlers.PLAYER_REGEN_ENABLED()
 assert(printed[5] == "Rare nearby: Mother Fang, Gruff Swiftbite." and #printed == 5, "told once it ends, in one line")
 assert(sounds == 4, "two rares found together chime once")
--- Two rares' markers in one update: one line, so the four-message banner never drops one, and one chime; then a marker reaching the minimap chimes on its own.
+-- Two rares' markers in one update: one line, so the four-message banner never drops one, and one chime; then a
+-- marker reaching the minimap chimes on its own.
 now = now + 601
 vignettes.v2 = { atlasName = "VignetteKillElite", objectGUID = "Creature-0-1-0-1-104-HHH", name = "Second Rare" }
 handlers.VIGNETTES_UPDATED()
