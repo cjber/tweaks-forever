@@ -16,12 +16,10 @@ When another addon already does one of these jobs, that feature is greyed out an
 
 ## Known limitations
 
-- In combat and some instances the game hides names and buffs from addons, so a camp benefit gained mid-fight is named once the fight ends, and a rare whose name is hidden gets no alert.
-- In dungeons and raids your focus target gets no nameplate outline.
-- The pull warning stays quiet where the game hides threat from addons.
-- Camp benefit effects can show in English on a translated game, which the game does not give addons.
-- Questie extras need Questie or QuestieDB installed.
-- Window moving in Edit Mode is off with the gamepad UI.
+- In combat and in some instances the game hides creature names and buffs from addons. A campsite buff you gain mid-fight is named after the fight, and a rare whose name is hidden gets no alert.
+- The warning that you are about to pull your target off the tank stays quiet where the game hides threat from addons.
+- Campsite buff effects show in English on a game language the addon has no text for yet, such as Italian.
+- Moving windows in Edit Mode is switched off while the gamepad UI is on.
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Nameplates and a junk coin">
@@ -60,7 +58,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Fishing.** Double right-click to cast, apply the best lure you have, and a warning when you have none.
 - **Chat.** Optional chat fixes, all off until you turn them on: short channel names, class colours with levels when the game knows them, item icons in links, repeated lines folded into a grey count, a marker when someone mentions you, clickable web links that open a copy box, whisper tabs with an unread count and a line saying when you last grouped with the player, a card on hover with what the game knows about them, a bag item picker when you type [ and a few letters (Enter puts the link in and sends the line; a click puts it in so you can keep typing), and the last 200 lines after a reload. Nothing is sent to other players beyond the line you send. The Chat page also opens the game's own Chat Timestamps setting.
 - **Quest item sparkles.** The game's own sparkles on lootable quest objects, as in [Forever Loot Sparkles](https://github.com/svengabr/ForeverLootSparkles). Off by default. Outlines are off while it's on and come back after; removing sparkles needs a game restart.
-- **Small things.** Quiet repeated macro errors and one line in chat after an update are on. Hide macro names, maximum camera zoom and no screen glow are off until you turn them on.
+- **Small things.** Quiet repeated macro errors and one line in chat after an update are on. Hide macro names, maximum camera zoom, no screen glow and hiding the Professions window's crafting bar are off until you turn them on.
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/chat.png" width="768" alt="A chat window with short headers, class colours and levels, an item icon, a folded repeat, a mention and a web link">

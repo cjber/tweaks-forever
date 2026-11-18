@@ -5,7 +5,7 @@ options in the game's own settings. Players install the zip the BigWigs packager
 
 It requires ForeverCore (`## Dependencies: ForeverCore`), the standalone addon that owns the shared tracker
 column, report window, error journal and debug log, the minimap button, the quest log side tabs, the settings-page
-chrome and the family page. CurseForge and Wago install ForeverCore with it through `.pkgmeta`'s
+chrome and the family page. CurseForge installs ForeverCore with it through `.pkgmeta`'s
 `required-dependencies`; no shared runtime file is vendored here. `Core/Require.lua` stops the addon with one
 on-screen line when an installed ForeverCore is older than API 1.
 
@@ -66,7 +66,7 @@ adopts the dependency and becomes `v1.0.0` at release.
 - `Data/DungeonMapArt.lua` indexes the Forever client's dungeon interior tiles; `Map/DungeonMaps.lua` draws each native four-by-three floor over the world map.
 - `Data/` — lookup tables for what neither QuestieDB nor AtlasLoot holds (the WFA-28 waivers below); a generated one
   names the script that regenerates it and its sources in its header.
-- `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.
+- `docs/curseforge.md` — the store description, pasted into CurseForge by hand.
 - `Locales/` — `ns.L` (enUS.lua), keyed by the English text, and one `<locale>.lua` per translation, each in the
   TOC. After changing player-visible text, run `python3 -m tools.phrases --write` (translators copy `Locales/phrases.txt`).
   CurseForge's localization is gone and its packager keyword fails the release, so none may appear in the tree.
