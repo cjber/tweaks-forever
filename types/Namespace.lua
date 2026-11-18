@@ -401,6 +401,8 @@ TweaksForeverCharDB = nil
 ---@field OnSettingChanged fun(key: string, fn: function)
 ---@field On fun(event: WowEvent, fn: function)
 ---@field Init fun(fn: fun())
+---@field AwaitItem fun(itemID: integer?, callback: function)
+---@field ForgetItems fun(callback: function)
 ---@field BagSize fun(container: ContainerFrameTemplate|ContainerFrameCombinedBags): integer
 ---@field BagItems fun(container: ContainerFrameTemplate|ContainerFrameCombinedBags): (fun(): integer?, ContainerFrameItemButtonTemplate?)
 ---@field Readable fun(value: any): any
