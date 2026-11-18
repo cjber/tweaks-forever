@@ -17,7 +17,22 @@ local ns = {
 	OnSettingChanged = function(key, fn)
 		settingCallbacks[key] = fn
 	end,
+	core = {
+		SafeCall = function(_, fn, ...)
+			return fn(...)
+		end,
+	},
 }
+-- The next frame, run on demand: item info arriving schedules its callbacks here.
+local frames = {}
+local function NextFrame()
+	local due = frames
+	frames = {}
+	for _, fn in ipairs(due) do
+		fn()
+	end
+end
+local reads = 0
 
 local function Region()
 	local region = { shown = true, points = {} }
@@ -82,6 +97,7 @@ local env = setmetatable({
 		end
 	end,
 	GetNumQuestChoices = function()
+		reads = reads + 1
 		return #items
 	end,
 	GetQuestItemLink = function(_, index)
@@ -90,7 +106,16 @@ local env = setmetatable({
 	GetQuestItemInfo = function(_, index)
 		return "name", 0, items[index].count
 	end,
+	C_Timer = {
+		After = function(delay, fn)
+			assert(delay == 0, "item info waits one frame")
+			frames[#frames + 1] = fn
+		end,
+	},
 	C_Item = {
+		GetItemInfoInstant = function(link)
+			return tonumber(link:match("^item:(%d+)"))
+		end,
 		GetItemInfo = function(link)
 			if cached[link] == false then
 				return nil
@@ -103,11 +128,14 @@ local env = setmetatable({
 		end,
 	},
 }, { __index = _G })
+setfenv(assert(loadfile("Core/ItemInfo.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/BestReward.lua")), env)("TweaksForever", ns)
 local feature = features.bestReward
 assert(feature.default == true, "a marker, not an automation: on by default")
 assert(feature.conflicts[1].polestar == "qol.rewardHighlight", "Polestar's own reward highlight")
-initializers[1]()
+for _, init in ipairs(initializers) do
+	init()
+end
 
 -- Model.Best on its own.
 local Best = ns.BestReward.Best
@@ -192,9 +220,19 @@ assert(made == 1, "the marker frame is made once")
 cached["item:2"] = false
 Show({ { link = "item:1", price = 100 }, { link = "item:2", price = 300 } })
 assert(Marked() == nil, "an uncached price waits")
+-- Other addons' item requests arrive in bursts and never re-read the rewards (#636).
+local before = reads
+for id = 1000, 1199 do
+	handlers.GET_ITEM_INFO_RECEIVED(id)
+end
+assert(#frames == 0 and reads == before, "unrelated item info does nothing")
 cached["item:2"] = nil
-handlers.GET_ITEM_INFO_RECEIVED()
+handlers.GET_ITEM_INFO_RECEIVED(2)
+handlers.GET_ITEM_INFO_RECEIVED(2)
+assert(Marked() == nil and #frames == 1, "the awaited price waits for the next frame, once")
+NextFrame()
 assert(Marked() == 2, "and marks once it arrives")
+assert(reads == before + 1, "one re-read for the arrival")
 
 Show({ { link = "item:1", price = 100 } })
 assert(Marked() == nil, "a lone reward is no choice")
@@ -206,7 +244,8 @@ cached["item:2"] = false
 hooks.QuestInfo_Display(REWARD)
 hooks.QuestInfo_Display(LOG)
 cached["item:2"] = nil
-handlers.GET_ITEM_INFO_RECEIVED()
+handlers.GET_ITEM_INFO_RECEIVED(2)
+NextFrame()
 assert(Marked() == nil, "a price arriving while the log shows marks nothing")
 panel.shown = false
 hooks.QuestInfo_Display(REWARD)

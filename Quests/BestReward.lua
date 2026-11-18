@@ -52,6 +52,9 @@ function Model.Best(choices)
 	return best, false
 end
 
+-- Marks again once a waited-for choice's price arrives; set below.
+local Retry
+
 -- A choice's sell value, nil while unknown. A currency choice (loot type 1) sells for nothing.
 ---@param index integer
 ---@return number?
@@ -65,7 +68,11 @@ function Model.Value(index)
 	end
 	local _, _, count = GetQuestItemInfo("choice", index)
 	local price = select(11, C_Item.GetItemInfo(link))
-	return price and price * math.max(count or 1, 1) or nil
+	if not price then
+		ns.AwaitItem(C_Item.GetItemInfoInstant(link), Retry)
+		return nil
+	end
+	return price * math.max(count or 1, 1)
 end
 
 ---@type Frame?
@@ -154,7 +161,8 @@ local function Displayed(template)
 	Update()
 end
 
-local function Retry()
+-- A choice's price arriving (only the reward items asked for, once per frame) or its item re-laid.
+Retry = function()
 	if waiting then
 		Update()
 	end
@@ -162,7 +170,6 @@ end
 
 ns.Init(function()
 	hooksecurefunc("QuestInfo_Display", Displayed)
-	ns.On("GET_ITEM_INFO_RECEIVED", Retry)
 	-- A choice's item arriving re-lays the rewards without QuestInfo_Display.
 	ns.On("QUEST_ITEM_UPDATE", Retry)
 	ns.On("QUEST_FINISHED", function()

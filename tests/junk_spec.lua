@@ -48,6 +48,11 @@ local function Client(slots, db)
 		-- Core/API.lua's change signal, which this spec does not load.
 
 		APIChanged = function() end,
+		core = {
+			SafeCall = function(_, fn, ...)
+				return fn(...)
+			end,
+		},
 		db = c.db,
 		Feature = function(feature)
 			features[feature.key] = feature
@@ -113,6 +118,10 @@ local function Client(slots, db)
 		GameTooltip = { GetOwner = function() end },
 		C_Container = {
 			GetContainerNumSlots = function(bag)
+				-- One bag walk per scan reads the backpack first.
+				if bag == 0 then
+					c.scans = (c.scans or 0) + 1
+				end
 				return bag == 0 and 20 or 0
 			end,
 			GetContainerItemInfo = function(bag, slot)
@@ -146,7 +155,8 @@ local function Client(slots, db)
 		},
 		C_Timer = {
 			After = function(delay, fn)
-				assert(delay == 0.2)
+				-- The merchant's opening delay, or the next frame for item info that arrived.
+				assert(delay == 0.2 or delay == 0)
 				timers[#timers + 1] = fn
 			end,
 		},
@@ -215,13 +225,14 @@ local function Client(slots, db)
 	env._G = env
 	c.env = env
 	assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
+	setfenv(assert(loadfile("Core/ItemInfo.lua")), env)("TweaksForever", ns)
 	setfenv(assert(loadfile("Bags/Junk.lua")), env)("TweaksForever", ns)
 	for _, init in ipairs(initializers) do
 		init()
 	end
 
-	function c.fire(event)
-		handlers[event]()
+	function c.fire(event, ...)
+		handlers[event](...)
 	end
 	function c.show()
 		c.open = true
@@ -329,7 +340,7 @@ do -- Marked items wait for an asynchronous native sale, which is submitted only
 	c.tick()
 	same(c.nativeCalls, 1, "one bulk sale")
 	same(c.sold(), "", "marks wait while greys are in flight")
-	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.fire("GET_ITEM_INFO_RECEIVED", 3)
 	c.tick()
 	c.tick()
 	same(c.sold(), "", "marks still wait before the native acknowledgement")
@@ -348,7 +359,7 @@ do -- A native sale that makes no progress ends, and an item-info retry never re
 	c.visit()
 	same(c.sold(), "", "an uncached mark waits")
 	c.unpriced["item:2"] = nil
-	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.fire("GET_ITEM_INFO_RECEIVED", 2)
 	c.settle()
 	same(calls, 1, "an item-info retry never resubmits the stalled native sale")
 	same(c.sold(), "2", "marks remain usable after the bounded native wait")
@@ -481,7 +492,7 @@ do -- A sale the server never acknowledges ends the run after ten polls: no endl
 	same(c.visit(), 12, "the opening delay, the sale and ten polls")
 	same(c.sold(), "1", "the rejected stack is tried once and nothing follows it")
 	same(#c.printed, 0, "nothing sold, nothing printed")
-	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
 	c.fire("BAG_UPDATE_DELAYED")
 	same(c.settle(), 0, "and nothing restarts it")
 	same(c.sold(), "1", "still once")
@@ -502,7 +513,7 @@ do -- One visit sells twelve stacks, so all of them fit the buyback tab.
 	same(c.sold(), "2,3,4,5,6,7,8,9,10,11,12,13", "a batch")
 	same(c.printed[1], "Sold 12 junk stacks for 168c.", "the total")
 	c.unpriced["item:1"] = nil
-	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
 	c.settle()
 	same(#c.used, 12, "awaited item info arriving does not start a second batch")
 	c.close()
@@ -556,11 +567,12 @@ do -- An item whose price or quality is not cached yet is left, then sold when i
 	assert(c.requested["item:3"], "the unknown item is requested")
 	c.unpriced["item:1"], c.slots[3].quality = nil, 2
 	c.db.junk[3] = true
-	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
+	c.fire("GET_ITEM_INFO_RECEIVED", 3)
 	c.settle()
 	same(c.sold(), "2,1,3", "they sell once known")
 	c.slots[4] = grey(4)
-	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.fire("GET_ITEM_INFO_RECEIVED", 4)
 	c.settle()
 	same(c.sold(), "2,1,3", "with nothing left pending, later item info sells nothing")
 end
@@ -572,7 +584,7 @@ do -- Item info arriving during a run retries after it, within the same visit's 
 	c.tick()
 	same(c.sold(), "2", "the run is under way")
 	c.unpriced["item:1"] = nil
-	c.fire("GET_ITEM_INFO_RECEIVED")
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
 	c.settle()
 	same(c.sold(), "2,3,4,5,6,7,8,9,10,11,12,1", "the retry sells the late item")
 	same(c.printed[1], "Sold 11 junk stacks for 154c.", "the first run's total")
@@ -750,3 +762,24 @@ do -- The coin drawn over a bag button takes the game's junk coin's layer and su
 	assert(drawn and drawn.shown, "a marked item shows the coin")
 end
 print("junk_spec: ok")
+
+do -- Other addons' item requests never rescan the bags; the awaited items' arrivals rescan once per frame (#636).
+	local c = MarkedClient(fill(12, grey))
+	c.unpriced["item:1"], c.unpriced["item:2"] = true, true
+	c.visit()
+	local before = c.scans
+	for id = 1000, 1199 do
+		c.fire("GET_ITEM_INFO_RECEIVED", id)
+	end
+	same(c.settle(), 0, "unrelated item info schedules nothing")
+	same(c.scans, before, "and scans no bag")
+	c.unpriced["item:1"], c.unpriced["item:2"] = nil, nil
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
+	c.fire("GET_ITEM_INFO_RECEIVED", 2)
+	c.fire("GET_ITEM_INFO_RECEIVED", 1)
+	same(c.scans, before, "an arrival waits for the next frame")
+	c.tick()
+	same(c.scans - before, 2, "both arrivals run one button update and one sale scan")
+	c.settle()
+	same(c.sold(), "3,4,5,6,7,8,9,10,11,12,1,2", "and the late items sell")
+end

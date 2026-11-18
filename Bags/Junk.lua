@@ -211,6 +211,9 @@ local function Refundable(bag, slot)
 	return purchase and purchase.refundSeconds and purchase.refundSeconds > 0
 end
 
+-- Bag items whose data was still loading; set below, run once per frame when one of them arrives.
+local OnItemInfo
+
 ---@param limit integer
 local function Scan(limit)
 	local result, pending = {}, false
@@ -220,11 +223,15 @@ local function Scan(limit)
 			local info = C_Container.GetContainerItemInfo(bag, slot)
 			if info and info.quality == nil then
 				C_Item.GetItemInfo(info.hyperlink)
+				ns.AwaitItem(info.itemID, OnItemInfo)
 				pending = true
 			end
 			if info and IsJunk(info, marks) and not info.hasNoValue and not info.isLocked then
 				local price = select(11, C_Item.GetItemInfo(info.hyperlink))
-				pending = pending or price == nil
+				if price == nil then
+					ns.AwaitItem(info.itemID, OnItemInfo)
+					pending = true
+				end
 				local value = SaleValue(info, price, marks)
 				if value and not Refundable(bag, slot) then
 					result[#result + 1] = { bag = bag, slot = slot, info = info, value = value }
@@ -463,7 +470,8 @@ ns.Init(function()
 		RefreshBags()
 		UpdateMerchantButton()
 	end)
-	ns.On("GET_ITEM_INFO_RECEIVED", function()
+	-- Only a bag item this file is waiting on counts, once per frame: the event fires for every addon's item requests.
+	OnItemInfo = function()
 		UpdateMerchantButton()
 		if merchant and merchant.pending then
 			if batch then
@@ -472,6 +480,6 @@ ns.Init(function()
 				Start(false)
 			end
 		end
-	end)
+	end
 	RefreshBags()
 end)

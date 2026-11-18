@@ -4,6 +4,9 @@
 - `setting-callback-outside-core`: `Settings.SetOnValueChangedCallback` is called only from Core/Core.lua's
   `ns.OnSettingChanged(key, fn)`. A feature file that restates the `"TweaksForever_" .. key` variable by hand
   registers a callback that never fires when the key is misspelt. Specs and annotations stub the API.
+- `item-info-outside-core`: only Core/ItemInfo.lua listens for `GET_ITEM_INFO_RECEIVED` or `ITEM_DATA_LOAD_RESULT`.
+  Both fire for every item any addon asks about, in bursts, so a feature that reacts to the event itself reruns its
+  work dozens of times a second; a feature names the items it waits for with `ns.AwaitItem(itemID, fn)` instead.
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
@@ -20,6 +23,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SETTINGS_OWNER = "Core/Core.lua"
 SETTINGS_CALL = re.compile(r"SetOnValueChangedCallback\s*\(")
 SETTINGS_SKIP = ("tests/", "types/")
+ITEM_INFO_OWNER = "Core/ItemInfo.lua"
+ITEM_INFO_EVENT = re.compile(r"[\"'](GET_ITEM_INFO_RECEIVED|ITEM_DATA_LOAD_RESULT)[\"']")
 LUACHECK = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
 LUA_TEMPLATES = {"Locales/phrases.txt"}
@@ -36,6 +41,18 @@ def setting_callbacks(files: dict[str, str]) -> list[str]:
         for number, line in enumerate(text.splitlines(), 1):
             if SETTINGS_CALL.search(line):
                 hits.append(f"{path}:{number}: setting-callback-outside-core: use ns.OnSettingChanged(key, fn)")
+    return hits
+
+
+def item_info_listeners(files: dict[str, str]) -> list[str]:
+    hits = []
+    for path, text in files.items():
+        # tools/ holds the vendored client simulator, which fires the events rather than listening for them.
+        if not path.endswith(".lua") or path == ITEM_INFO_OWNER or path.startswith((*SETTINGS_SKIP, "tools/")):
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
+            if ITEM_INFO_EVENT.search(line):
+                hits.append(f"{path}:{number}: item-info-outside-core: wait for the item with ns.AwaitItem(itemID, fn)")
     return hits
 
 
@@ -84,7 +101,7 @@ def unmatched_hashfiles(files: dict[str, str]) -> list[str]:
     return hits
 
 
-RULES = (setting_callbacks, unused_luacheck_globals, unmatched_hashfiles)
+RULES = (setting_callbacks, item_info_listeners, unused_luacheck_globals, unmatched_hashfiles)
 
 
 def findings(files: dict[str, str]) -> list[str]:

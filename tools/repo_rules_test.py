@@ -2,7 +2,7 @@
 
 import unittest
 
-from tools.repo_rules import setting_callbacks, unmatched_hashfiles, unused_luacheck_globals
+from tools.repo_rules import item_info_listeners, setting_callbacks, unmatched_hashfiles, unused_luacheck_globals
 
 CALLBACK = 'Settings.SetOnValueChangedCallback("TweaksForever_x", print)\n'
 WORKFLOW = "      - with:\n          key: k-${{ hashFiles('tools/gen_*.py', %s) }}\n"
@@ -17,6 +17,13 @@ class SettingCallbackTest(unittest.TestCase):
 
 
 class LuacheckGlobalTest(unittest.TestCase):
+    def test_only_the_item_info_owner_listens_for_item_data(self):
+        listen = 'ns.On("GET_ITEM_INFO_RECEIVED", function() end)\n'
+        self.assertEqual(item_info_listeners({"Core/ItemInfo.lua": listen, "tests/junk_spec.lua": listen}), [])
+        self.assertEqual(len(item_info_listeners({"Bags/Junk.lua": listen})), 1)
+        self.assertEqual(len(item_info_listeners({"UI/X.lua": "f:RegisterEvent('ITEM_DATA_LOAD_RESULT')\n"})), 1)
+        self.assertEqual(item_info_listeners({"Bags/Junk.lua": "ns.AwaitItem(info.itemID, OnItemInfo)\n"}), [])
+
     def test_an_entry_nothing_names_fails(self):
         config = '\nread_globals = {\n\t"CreateFrame",\n\t"GetLocale",\n\t"tInvert",\n}\n'
         files = {".luacheckrc": config, "a.lua": 'CreateFrame("Frame")', "Locales/phrases.txt": "GetLocale()"}
