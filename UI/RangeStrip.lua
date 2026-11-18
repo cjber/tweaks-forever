@@ -715,6 +715,7 @@ ns.Init(function()
 	-- again on the next update, so the reach joins the strip without waiting for the next spell event. An icon may
 	-- be missing for good (Model.SpellTexture allows it), so a missing icon waits for the client's data-loaded events.
 	local incomplete, iconMissing = false, false
+	local OnDataLoaded ---@type fun()
 	local function Refresh()
 		cachedReaches, cachedSegments = {}, {}
 		incomplete, iconMissing = false, false
@@ -737,7 +738,16 @@ ns.Init(function()
 		end
 		-- Melee first, then Dead zone when a shown reach has a minimum range, then the reaches near to far.
 		local mainHand = Model.MainHandTexture()
-		iconMissing = iconMissing or mainHand == nil
+		-- A weapon whose icon has not loaded yet is awaited through the shared item wait.
+		if mainHand == nil and type(GetInventoryItemID) == "function" then
+			local weapon = GetInventoryItemID("player", INVSLOT_MAINHAND)
+			if weapon then
+				iconMissing = true
+				ns.AwaitItem(weapon, function()
+					OnDataLoaded()
+				end)
+			end
+		end
 		table.insert(cachedSegments, 1, {
 			key = MELEE,
 			name = NAMES[MELEE],
@@ -835,12 +845,12 @@ ns.Init(function()
 	-- raises, so try it and keep the rest when it does not exist.
 	pcall(ns.On, "PLAYER_TALENT_UPDATE", ReachesChanged)
 	-- A spell's or the weapon's data loading late brings its icon; neither event exists on every client either.
-	-- Item data arrives for every item the game loads, so only a build still missing an icon reads it again.
-	local function DataLoaded()
+	-- A spell's data loading late brings its icon; the event does not exist on every client either. Only a build still
+	-- missing an icon reads it again.
+	function OnDataLoaded()
 		if iconMissing then
 			ReachesChanged()
 		end
 	end
-	pcall(ns.On, "SPELL_DATA_LOAD_RESULT", DataLoaded)
-	pcall(ns.On, "GET_ITEM_INFO_RECEIVED", DataLoaded)
+	pcall(ns.On, "SPELL_DATA_LOAD_RESULT", OnDataLoaded)
 end)
