@@ -632,8 +632,10 @@ for _, set in ipairs(reachSets) do
 		reaches[i] = reach("r" .. shape, SHAPES[shape][1], SHAPES[shape][2], nil)
 	end
 	local n = #reaches
-	-- Every answer and band changes only at an edge, so each edge, a point between two edges and one past the last
-	-- stand for every distance.
+	-- This samples only each edge, the point between two edges and one past the last. That stands for every distance
+	-- because nothing here changes between edges: each answer and TrueBand compare the distance only against 5, the
+	-- interact radius and the reach edges, all of them in `edges`. A 0.01-yard walk from 0 to 60 yards gives the same
+	-- 769 distinct answer sets with the same bands (PR #613).
 	local edges = { 0, 5, 8, 9.9, 10 }
 	for _, r in ipairs(reaches) do
 		edges[#edges + 1] = r.min
