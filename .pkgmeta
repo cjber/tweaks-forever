@@ -37,5 +37,7 @@ optional-dependencies:
 externals:
   ForeverCore: https://github.com/cjber/forever-core/releases/download/v1.14.5/ForeverCore-v1.14.5-forever.zip
 
-required-dependencies:
+# ForeverCore is embedded under Libs/ForeverCore, so it is listed as an embedded library: the CurseForge app links
+# it on the project page but never installs it as a required dependency.
+embedded-libraries:
   - forevercore
