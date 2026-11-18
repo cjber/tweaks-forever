@@ -455,7 +455,7 @@
     },
     {
       "source": "UI/RangeStrip.lua",
-      "sha256": "55b8608796f9262f24ece726edaeda4c41105a08e25457b63f530b9bd26f675b",
+      "sha256": "321445b2057e2c862c482e1ad7e9b448b83b3d4a9386524e548269845fe8f889",
       "review": "Read NAMES, Widget, ShowSegments, Apply, Read, Paint, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Read puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. Too far is displayed only in label, never a segment. Later updates change text, colour, geometry and visibility only. Client spell names/icons and settings phrases are excluded.",
       "bindings": [
         {

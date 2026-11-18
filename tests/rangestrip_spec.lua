@@ -505,7 +505,8 @@ assert(
 )
 
 -- The band rule, by hand: melee wins, then the nearest reach that answers true, then the dead zone the 8-yard
--- check opens for a reach with a minimum, then Too far. A nil that could change the answer hides the band.
+-- check opens for a reach with a minimum, then Too far. A nil that could change the answer hides the band, and the
+-- 8-yard check runs only when the other answers leave more than one band.
 local function reach(key, min, max, check)
 	return { key = key, min = min, max = max, check = check }
 end
@@ -530,7 +531,7 @@ assert(
 	"the nearest reach that answers true"
 )
 assert(
-	M.Band(false, { reach("fireblast", 0, 20, nil), reach("frostbolt", 0, 30, true) }, noInteract) == nil,
+	M.Band(false, { reach("fireblast", 0, 20, nil), reach("frostbolt", 0, 30, true) }, interact(false)) == nil,
 	"a nearer reach with no answer hides the band"
 )
 assert(
@@ -556,17 +557,17 @@ assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(false)) == "far
 assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(nil)) == nil, "no 8-yard answer, melee undecided")
 assert(M.Band(nil, { reach("frostbolt", 0, 30, false) }, noInteract) == "far", "beyond a reach with no minimum")
 assert(
-	M.Band(nil, { reach("frostbolt", 0, 30, nil) }, noInteract) == nil,
+	M.Band(nil, { reach("frostbolt", 0, 30, nil) }, interact(true)) == nil,
 	"no reach answered false, so melee stays undecided"
 )
--- Any unanswered spell could still reach, so the interaction answer alone cannot name the gap.
+-- The interact check reaches past 8 yards, so it alone cannot say an unanswered 8-yard minimum is out of reach.
 assert(
-	M.Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == nil,
-	"a spell with no minimum and no answer could reach inside 8 yards"
+	M.Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == "wrath",
+	"inside the interact check and out of melee, a spell reaching from 0 to 30 yards reaches"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == nil,
-	"a positive minimum does not make an unanswered spell false"
+	M.Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == "dead",
+	"a false 8 to 30 reach inside the interact check puts the target inside 8 yards, inside Charge's minimum too"
 )
 
 assert(
@@ -582,9 +583,134 @@ assert(
 	"different positive minima do not resolve unanswered reaches"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, false), reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
-	"a known false reach does not resolve another unanswered reach"
+	M.Band(false, { reach("charge", 8, 25, false), reach("autoshot", 8, 35, nil) }, interact(true)) == "dead",
+	"a false reach sharing the unanswered one's minimum puts the target inside both"
 )
+
+-- The band rule over every reach set, every distance and every pattern of unanswered checks. The target stands at a
+-- distance; melee reaches 5 yards, the 8-yard check answers inside 8, and each reach answers inside its own range. Any
+-- answer may be missing (melee is out of combat, a spell or the 8-yard check may say nothing). The rule must never
+-- name a wrong band, and must name the band whenever the answers it was given leave only one band possible: a
+-- missing answer hides only the bands it could change.
+local function TrueBand(distance, reaches)
+	if distance <= 5 then
+		return "melee"
+	end
+	local nearest, inside
+	for _, r in ipairs(reaches) do
+		if distance >= r.min and distance <= r.max and (not nearest or r.max < nearest.max) then
+			nearest = r
+		end
+		inside = inside or distance < r.min
+	end
+	if nearest then
+		return nearest.key
+	end
+	return inside and "dead" or "far"
+end
+
+-- The client's interact radius, run at each end of what the strip allows for it.
+local interactRadius
+local function Answers(distance, reaches)
+	local checks = {}
+	for i, r in ipairs(reaches) do
+		checks[i] = distance >= r.min and distance <= r.max
+	end
+	return distance <= 5, distance < interactRadius, checks
+end
+
+-- Shapes the client gives a reach: no minimum, an 8-yard minimum, short and long maxima, and two sharing a minimum.
+local SHAPES = { { 0, 10 }, { 0, 20 }, { 0, 30 }, { 8, 25 }, { 8, 35 }, { 8, 41 }, { 10, 35 } }
+local reachSets = { {} }
+for a = 1, #SHAPES do
+	reachSets[#reachSets + 1] = { a }
+	for b = a + 1, #SHAPES do
+		reachSets[#reachSets + 1] = { a, b }
+		for c = b + 1, #SHAPES do
+			reachSets[#reachSets + 1] = { a, b, c }
+		end
+	end
+end
+
+local distances = {}
+for tenth = 0, 600, 5 do
+	distances[#distances + 1] = tenth / 10
+end
+
+for _, radius in ipairs({ 8, 9.9 }) do
+	interactRadius = radius
+	for _, set in ipairs(reachSets) do
+		local reaches = {}
+		for i, shape in ipairs(set) do
+			reaches[i] = reach("r" .. shape, SHAPES[shape][1], SHAPES[shape][2], nil)
+		end
+		local n = #reaches
+		for _, distance in ipairs(distances) do
+			local melee, near, checks = Answers(distance, reaches)
+			-- Each of melee, the 8-yard check and every reach is answered or missing: bit i of mask drops answer i.
+			for mask = 0, 2 ^ (n + 2) - 1 do
+				local function Drop(bit)
+					return math.floor(mask / 2 ^ bit) % 2 == 1
+				end
+				local seenMelee = melee
+				if Drop(0) then
+					seenMelee = nil
+				end
+				local seenNear = near
+				if Drop(1) then
+					seenNear = nil
+				end
+				local seen = {}
+				for i = 1, n do
+					seen[i] = checks[i]
+					if Drop(i + 1) then
+						seen[i] = nil
+					end
+				end
+				-- Every band a distance agreeing with the answers given would show.
+				local possible, count, only = {}, 0, nil
+				for _, other in ipairs(distances) do
+					local m, _, c = Answers(other, reaches)
+					-- The strip knows the interact radius only to lie from 8 to 10 yards, so a distance agrees with the
+					-- interact answer when some radius there would give it.
+					local agrees = (seenMelee == nil or seenMelee == m)
+						and (seenNear == nil or (seenNear and other < 10) or (not seenNear and other >= 8))
+					for i = 1, n do
+						agrees = agrees and (seen[i] == nil or seen[i] == c[i])
+					end
+					if agrees then
+						local band = TrueBand(other, reaches)
+						if not possible[band] then
+							possible[band] = true
+							count = count + 1
+							only = band
+						end
+					end
+				end
+				for i = 1, n do
+					reaches[i].check = seen[i]
+				end
+				local got = M.Band(seenMelee, reaches, function()
+					return seenNear
+				end)
+				local case = string.format(
+					"radius %.1f, reaches %s at %.1f yd, mask %d: got %s",
+					radius,
+					table.concat(set, ","),
+					distance,
+					mask,
+					tostring(got)
+				)
+				if got ~= nil then
+					assert(got == TrueBand(distance, reaches), case .. ", want " .. TrueBand(distance, reaches))
+				end
+				if count == 1 then
+					assert(got == only, case .. ", the answers leave only " .. only)
+				end
+			end
+		end
+	end
+end
 
 -- A hunter's strip: Melee, the Dead zone its Auto Shot minimum leaves, then Auto Shot.
 hunter.initializers[1]()
