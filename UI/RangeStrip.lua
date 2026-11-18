@@ -736,12 +736,6 @@ ns.Init(function()
 		end
 		-- Melee first, then Dead zone when a shown reach has a minimum range, then the reaches near to far.
 		local mainHand = Model.MainHandTexture()
-		incomplete = incomplete
-			or (
-				mainHand == nil
-				and type(GetInventoryItemID) == "function"
-				and GetInventoryItemID("player", INVSLOT_MAINHAND) ~= nil
-			)
 		table.insert(cachedSegments, 1, {
 			key = MELEE,
 			name = NAMES[MELEE],
@@ -838,4 +832,7 @@ ns.Init(function()
 	-- PLAYER_TALENT_UPDATE is not an event on every client this addon runs on: registering one the client lacks
 	-- raises, so try it and keep the rest when it does not exist.
 	pcall(ns.On, "PLAYER_TALENT_UPDATE", ReachesChanged)
+	-- A spell's or the weapon's data loading late brings its icon; neither event exists on every client either.
+	pcall(ns.On, "SPELL_DATA_LOAD_RESULT", ReachesChanged)
+	pcall(ns.On, "GET_ITEM_INFO_RECEIVED", ReachesChanged)
 end)
