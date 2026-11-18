@@ -1,163 +1,74 @@
 # AGENTS.md
 
-Tweaks Forever is a WoW: Forever addon (Interface 16001) that replaces single-purpose addons with
-options in the game's own settings. Players install the zip the BigWigs packager builds on a `v*` tag.
-
-It requires ForeverCore (`## Dependencies: ForeverCore`), the standalone addon that owns the shared tracker
-column, report window, error journal and debug log, the minimap button, the quest log side tabs, the settings-page
-chrome and the family page. CurseForge and Wago install ForeverCore with it through `.pkgmeta`'s
-`required-dependencies`; no shared runtime file is vendored here. `Core/Require.lua` stops the addon with one
-on-screen line when an installed ForeverCore is older than API 1.
+Tweaks Forever is a WoW: Forever addon (Interface 16001) that replaces single-purpose addons with options in the
+game's own settings. It needs ForeverCore (declared in `## OptionalDeps` so it can load and explain a missing core; the
+release pinned in `tools/forever-core.txt` ships in the zip). ForeverCore owns the shared tracker column, error journal,
+report window and settings chrome. `Core/Require.lua` stops the addon with one on-screen line when the loaded core lacks
+a member this addon calls (`APIKit.Hub`, `APIKit.NotReady`), never by version. Players install the zip the BigWigs
+packager builds on a `v*` tag.
 
 ## Commands
 
 ```sh
-python3 tools/doctor.py   # first on a new machine: every pin in tools/toolchain.json and tools/pyproject.toml, with a fix for each problem
-stylua --check .
-luacheck .
-FOREVER_CORE=../forever-core tools/typecheck.sh
-for spec in tests/*_spec.lua; do FOREVER_CORE=../forever-core luajit "$spec" || exit 1; done
-FOREVER_CORE=../forever-core python3 tools/forever_sim/fetch.py && FOREVER_CORE=../forever-core luajit tools/forever_sim/run.lua   # tests/sim scenarios on the real Blizzard UI
-uv run --project tools --frozen --group dev ruff check tools
-uv run --project tools --frozen --group dev ruff format --check tools
-uv run --project tools --frozen --group dev ty check tools --extra-search-path . --extra-search-path tools
-python3 tools/check_generated.py --offline # omit --offline to fetch missing pinned inputs
-python3 tools/forever_tools/credits.py --check # Data/Credits.lua and both thanks blocks are current (WFA-31)
-python3 tools/changelog.py --check
-python3 tools/check_screenshots.py   # an image older than its sources; --record after tools/screenshots.py
-python3 tools/check_menu_scroll.py # menus built from a list scroll (WFA-36); CI runs it in core-shared
-python3 tools/check_api_docs.py   # docs/api.md names every published API function and its minor
-python3 tools/repo_rules.py   # rules no linter covers; CI runs it in project-rules
+python3 tools/doctor.py             # first on a new machine: every tool pin, with a fix for each problem
+python3 tools/gate.py               # the fast local gate: format, lint, typecheck, specs, generated data, changelog, rules
+python3 tools/gate.py --changed     # only the steps the diff against origin/main reaches
 ```
 
-CI's `package` job builds the zip with the release's packager without uploading (`-d -z`) and runs
-`python3 tools/check_package.py` on its output: every loaded file ships, no development folder does, a licence file and
-THIRD_PARTY.md ship with README's `## Credits` and THIRD_PARTY's `## Players` (WFA-10, WFA-31), and the
-specs pass on the packaged files.
-
-The same gate CI runs, plus actionlint, zizmor and gitleaks on the workflows and history.
-CI installs the Lua tools and LuaLS from `tools/toolchain.json` through `cjber/forever-core/.github/actions/toolchain`,
-which verifies each pin, and runs the Python tools from `tools/pyproject.toml`'s dev group, resolved in `tools/uv.lock`,
-with `uv run --project tools --frozen --group dev`: those two files hold every version CI uses.
-`.github/workflows/speedpatrol.yml` times the spec suite on every pull request against its base branch and fails on a
-regression (`.speedpatrol/instructions.md`).
-`.github/workflows/refresh-data.yml` runs daily: when wago.tools lists a newer Forever build it opens a
-`data/forever-<version>` PR and approves that PR's CI and Speedpatrol runs, which GitHub holds for a PR opened by
-`GITHUB_TOKEN`.
-Every version needs a `CHANGELOG.md` entry (prose, bold-lead bullets) before its `v*` tag: the release
-publishes that entry as its notes. A change's player-facing notes go in `changes/<issue>.md` as bold-lead bullets, with an optional `### For addon
-authors` section after them. The release commit gathers them with `python3 tools/changelog.py release X.Y.Z`; no
-other pull request edits `CHANGELOG.md`, and CI's `--check --base` fails one that does.
-
-`FOREVER_CORE` names the cjber/forever-core checkout the specs and the simulator load, defaulting to the sibling
-`../forever-core`. `tools/forever-core.txt` holds the git ref CI checks out for them; it is a branch while this addon
-adopts the dependency and becomes `v1.0.0` at release.
+`gate.py` loads ForeverCore from `$FOREVER_CORE`, else `../forever-core`: set it in a worktree. CI runs the same checks
+plus the simulator (`tools/forever_sim`), the package build, actionlint, zizmor and gitleaks. After a data change,
+the matching `tools/gen_*.py` regenerates a `Data/*` file; after a text change, `python3 -m tools.phrases --write`.
+A change's player-facing notes go in `changes/<issue>.md`; only the release commit edits `CHANGELOG.md`
+(`python3 tools/changelog.py release X.Y.Z`). Release: `.agents/skills/release/SKILL.md`.
 
 ## Layout
 
-- `Core/Require.lua` is the API floor: an installed ForeverCore older than API 1 stops the addon's own files with
-  one line in `UIErrorsFrame`. `Core/Core.lua` has `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers
-  through it, and TOC order sets the settings subpage order. `ns.core = ForeverCore.Register(...)` gives the
-  addon its own error journal, log and report.
-- `Bags/`, `Quests/`, `Map/`, `Features/` — feature modules grouped by the part of the game they change.
-- `UI/` — settings, tooltips, nameplates and window helpers; `Integrations/` — companion navigation, and
-  `Integrations/QuestieSource.lua`, the one place QuestieDB is opened: quests, NPC names and spawns are read from the installed
-  addon in game, a little each frame, and never copied here.
-- `Data/DungeonMapArt.lua` indexes the Forever client's dungeon interior tiles; `Map/DungeonMaps.lua` draws each native four-by-three floor over the world map.
-- `Data/` — lookup tables for what neither QuestieDB nor AtlasLoot holds (the WFA-28 waivers below); a generated one
-  names the script that regenerates it and its sources in its header.
-- `docs/curseforge.md` — the store description, pasted into CurseForge and Wago by hand.
-- `Locales/` — `ns.L` (enUS.lua), keyed by the English text, and one `<locale>.lua` per translation, each in the
-  TOC. After changing player-visible text, run `python3 -m tools.phrases --write` (translators copy `Locales/phrases.txt`).
-  CurseForge's localization is gone and its packager keyword fails the release, so none may appear in the tree.
+- `Core/Core.lua` has `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, and TOC order sets the
+  settings subpage order. A new file goes in `TweaksForever.toc` or never runs (Lua 5.1, no `require`).
+- `Bags/`, `Quests/`, `Map/`, `Features/`, `Chat/`: feature modules by the part of the game they change. `UI/`:
+  settings, tooltips, nameplates, `UI/Art.lua`. `Integrations/QuestieSource.lua` is the one place QuestieDB is opened.
+- `Data/`: lookup tables for what neither QuestieDB nor AtlasLoot holds; a generated one names its generator and
+  sources in its header. `Locales/enUS.lua` is keyed by the English text.
+- Also ships `LibAHTab`. `tools/forever_tools/` and `tools/forever_sim/` are vendored: never edit them here.
 
 ## Rules
 
-- Lua 5.1 in the game's sandbox: no `require`. The client loads the files `TweaksForever.toc` lists, in
-  that order, each receiving `local addonName, ns = ...`; a new file goes in the TOC or never runs.
-- The specs are a headless harness with stubbed client APIs. Anything they cannot reach (frames,
-  menus, tooltips, the tracker) is checked in game: check them in the headless client (forever-core's `wow-forever-addon/in-game.md`) and list in the PR what was checked; what waits on the player's own session goes in the PR as `/reload` tests for the user.
-- LuaLS (pinned in `tools/toolchain.json`) checks every TOC-loaded file against pinned Ketho API/FrameXML annotations.
-  `tools/typecheck.sh` fetches them into an ignored types cache and also checks accidental `select()` expansion.
-- New host globals go in `.luacheckrc`; if upstream lacks their types, declare real types in
-  `types/Forever.lua`. Addon contracts live in `types/`. Never add a LuaLS globals allowlist.
-- A final `select(...)` or multi-return call (`GetDrawLayer`, `GetPoint`, `GetRGB`, … in
-  `tools/lint_multivalue.py`) as an argument, table element or return must be parenthesised, or carry a
-  trailing `-- multi-value: reason` when expansion is intentional.
-- Never touch Blizzard's Lua state (WFA-38). Forever runs its UI through secure delegates, so an addon hook, write or
-  first call there makes Blizzard's own code fail or be blocked, blamed on this addon. React through
-  `HookScript`, events, `EventRegistry` or an object's own `RegisterCallback`, `TooltipDataProcessor`
-  (`ns.OnTooltip`), or `hooksecurefunc("GlobalFunction", …)`; draw on our own textures and frames; lay Blizzard
-  frames out with engine calls (points, sizes, alpha) after Blizzard has. Never `hooksecurefunc(object, …)`, a
-  replaced method, a field written on a Blizzard table, or a call into Blizzard's layout or lazy caches.
-  To restyle a Blizzard element, draw our own frame or texture on top and set theirs to alpha 0.
-- On a map, draw only through `Map/MapDraw.lua`, the addon's own canvas helper: frames of our own on the canvas,
-  made with no parent and then set on it, refreshed by the view's reads. Never `AddDataProvider`, `AcquirePin`,
-  `AddOverlayFrame` or a `MapCanvasPinMixin`: the gamepad interface walks the map's providers and pins from secure
-  code (#168). `tests/map_canvas_spec.lua` runs the files that draw on a map against maps that fail on any write.
-- Player-visible text goes through `L["whole sentence"]` (a whole format string, never joined fragments), or a
-  Blizzard GlobalString that says exactly the same; `ns.Feature`/`ns.ClickMode` text stays plain English.
-- Commits are signed (`git commit -S`) with the personal email.
-- Release: load `.agents/skills/release/SKILL.md` when preparing or publishing a release.
-  A cloud session cannot push tags: once the version's PR is merged and `.github/workflows/ci.yml` passed on main, start the Release
-  workflow on main with `version` (and `commit` for an older main commit); it tags that commit and publishes.
-- Quality: read the live roots, settled shapes and anti-patterns in `.sloppatrol/instructions.md` before cleanup,
-  dead-code or refactoring work.
-- A feature another loaded addon already provides is greyed out with that addon named, never run
-  alongside it. Repairs, selling junk and faster auto loot start on;
-  every other automation that acts for the player is off by default.
-- Never stretch art: an icon, atlas or texture is drawn at its native aspect, through `UI/Art.lua` (`Art.Fit`,
-  `Art.Markup`); only nine-slice pieces, bars and fills stretch by design. `tools/lint_art.py` (in
-  `tools/typecheck.sh`) refuses a raw `SetAtlas`, `SetTexture`, button atlas or `|A`/`|T` markup anywhere else
-  unless its line says why its shape is right (`-- art-ok: reason`).
-- Store copy, README and posts pitch the addon as looking like it came with the game, in cjber's
-  own voice, never AI marketing: `wow-forever-addon` WFA-23/24, checked before every store paste.
+- On a map, draw only through `Map/MapDraw.lua`: frames of our own, made with no parent and then set on the canvas.
+  Never `AddDataProvider`, `AcquirePin`, `AddOverlayFrame` or a `MapCanvasPinMixin`: the gamepad interface walks the
+  map's providers from secure code (#168). `tests/map_canvas_spec.lua` enforces it.
+- Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame, so Blizzard
+  finishes its own initialization. This supersedes WFA-5's AddContainer hook guidance. Test event ordering and reuse.
+- Player-visible text goes through `L["whole sentence"]`, or a Blizzard GlobalString that says exactly the same;
+  `ns.Feature`/`ns.ClickMode` text stays plain English.
+- A feature another loaded addon already provides is greyed out with that addon named, never run alongside it. Repairs,
+  selling junk and faster auto loot start on; every other automation that acts for the player is off by default.
+- Never touch Blizzard's Lua state (WFA-38): no `hooksecurefunc(object, ...)`, replaced method or field written on a
+  Blizzard table; to restyle a Blizzard element, draw our own frame on top and set theirs to alpha 0.
+- Never stretch art: draw icons and atlases at native aspect through `UI/Art.lua` (`Art.Fit`, `Art.Markup`);
+  `tools/lint_art.py` refuses a raw `SetAtlas`/`SetTexture` elsewhere unless its line says `-- art-ok: reason`.
+- New host globals go in `.luacheckrc`, with real types in `types/Forever.lua` where upstream lacks them. Never add a
+  LuaLS globals allowlist.
+- Specs are a headless harness with stubbed client APIs. Frames, menus, tooltips and the tracker are checked in the
+  headless client (`wow-forever-addon` `in-game.md`); the PR lists what was checked.
 
 ## Waivers
 
 Owner-approved exceptions to `wow-forever-addon`:
 
-- WFA-2: Reveal unexplored areas is off by default: unexplored areas are a spoiler for players who like to explore.
-- WFA-2: Hide macro names is off by default: it changes action bars players set up themselves.
+- WFA-2: Reveal unexplored areas and Hide macro names are off by default (spoiler; changes players' own bars).
 - WFA-4: tooltips default to the charcoal Modern style, a headline feature pictured on the store page.
-- WFA-13: `Quests/QuestDistance.lua`'s 1 s ticker keeps running: it is the only catch for Questie tracker toggles and
-  tracker collapses, which set no dirty flag, and it is cheap.
-- WFA-28: class trainer spells with their level and fee (`Data/ClassSpells.lua` `spells`): CMaNGOS classic-db trainer
-  tables, with skill lines, ranks and races from the Forever client's DB2 on wago.tools. QuestieDB's NPC rows carry no
-  trainer offers and AtlasLoot lists profession recipes only. A trainer visit records the game's own list, level and
-  fee, which win over the bundled row.
-- WFA-28: which NPCs train each class (`Data/ClassSpells.lua` `trainers`, NPC IDs only): CMaNGOS classic-db
-  `creature_template.TrainerClass`. QuestieDB marks a trainer with a general flag and a translated subtitle, never
-  its class, and AtlasLoot has no trainers. Their names and places are read from QuestieDB.
-- WFA-28: pet family abilities with their pet level and training points (`Data/ClassSpells.lua` `PetFamilies`):
-  the Forever client's `CreatureFamily`, `SkillLine`, `SkillLineAbility` and `SpellLevels` on wago.tools.
-  QuestieDB has no pet ability rows and AtlasLoot has none.
-- WFA-28: dungeon and raid entrances (`Data/DungeonEntrances.lua`): the Forever client's `Map` corpse points on
-  wago.tools. QuestieDB keeps one zone point per dungeon, shared by every instance of a complex such as Blackrock
-  Mountain, not each instance's own door, and AtlasLoot has no map points.
-- WFA-28: world map overlays (`Data/Overlays.lua`): the Forever client's `WorldMapOverlay` art tables on wago.tools.
-  Neither database holds map art.
-- WFA-28: camp benefit texts (`Data/CampBenefits.lua`): the Forever client's `Spell` tables on wago.tools. Neither
-  database holds spell descriptions. The aura you have supplies its own values, which win.
-- WFA-28: zone level ranges (`Data/ZoneLevels.lua`): the published ranges on warcraft.wiki.gg for the original zones
-  and the Forever client's `AreaTable.ExplorationLevel` for new ones. QuestieDB has no zone ranges and AtlasLoot has
-  them for dungeons only. `C_Map.GetMapLevels` wins wherever the client fills it in.
-- WFA-28: quests added in Forever (`Data/ForeverQuests.lua`): the Forever client's `QuestV2` IDs less Classic Era's,
-  both on wago.tools. QuestieDB's quest rows have no field for the version a quest arrived in.
+- WFA-13: `Quests/QuestDistance.lua`'s 1 s ticker stays: the only catch for Questie tracker toggles, which set no flag.
+- WFA-28, data neither QuestieDB nor AtlasLoot holds, each sourced in its file: class trainer spells and trainer NPC
+  ids (`Data/ClassSpells.lua`, CMaNGOS classic-db plus the client's DB2; a trainer visit's own list wins), pet family
+  abilities, dungeon entrances, world map overlays, camp benefit texts and quests added in Forever (the client's
+  tables on wago.tools), and zone level ranges (warcraft.wiki.gg for the original zones, the client's
+  `AreaTable.ExplorationLevel` for new ones). `C_Map.GetMapLevels` and a live aura win over the bundled row.
+
+- Before cleanup, dead-code or refactoring work, read the live roots and settled shapes in `.sloppatrol/instructions.md`.
 
 ## Standards
 
-- `wow-forever-addon`: https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-forever-addon (UI look,
-  icon, README and store page, CI and release requirements shared by every WoW: Forever addon)
-- `wow-retail-ui-style`: https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-retail-ui-style (native host integration, compact layout rhythm, and asset blacklist)
-- `repo-standards`: the RS-* requirements every cjber repo meets (repo, Actions and security settings, rulesets, CI hardening, community files), a skill in cjber/skills whose `audit.py` checks this repo
-
-
-## Secure UI regression checks
-
-`tools/typecheck.sh` checks the TOC/XML load graph, LuaLS coverage, `tools/lint_secret.py` (secret values through `ns.Readable`, tooltip hooks behind `ns.Usable`), `tools/check_editorconfig.py` and `tools/check_family.py` (the shared family block between the `forever-family` markers in README.md and docs/curseforge.md).
-`tools/forever_tools/` is the shared tooling (cjber/forever-core, https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-forever-addon/tooling), vendored byte for byte: never edit it here.
-`python3 tools/forever_tools/sync.py check` verifies it offline; `sync.py update --source <checkout>` is the only way to refresh it.
-Register tracker sections after `PLAYER_ENTERING_WORLD` and `VARIABLES_LOADED`, deferred one frame
-so Blizzard finishes its own initialization. This supersedes WFA-5's AddContainer hook guidance.
-Test event ordering and reuse, not just method existence.
+- `wow-forever-addon`: https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-forever-addon (the WFA-*
+  requirements every WoW: Forever addon meets: UI look, assets, README and store page, CI and releases)
+- `wow-retail-ui-style`: https://github.com/cjber/forever-core/tree/main/.agents/skills/wow-retail-ui-style
+- `repo-standards`: the RS-* requirements every cjber and agent-labs-dev repo meets; its `audit.py` checks this repo.

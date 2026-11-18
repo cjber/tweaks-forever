@@ -415,6 +415,9 @@ function M.build(sim)
 			local _ = i
 		end
 		local w, h = Secret.unwrap(s.width), Secret.unwrap(s.height)
+		-- One point on an axis places the region only with an extent there: a size it was given, or a font string's
+		-- text. Without one the client resolves no rect, so the getters return nil and regions anchored to it get none.
+		local sizedX, sizedY = w ~= nil or s.kind == "FontString", h ~= nil or s.kind == "FontString"
 		if s.kind == "FontString" and (not w or w == 0 or not h or h == 0) then
 			local tw, th = textSize(s)
 			if not w or w == 0 then
@@ -435,12 +438,20 @@ function M.build(sim)
 			left, width = L, (CX - L) * 2
 		elseif R and CX then
 			left, width = CX - (R - CX), (R - CX) * 2
-		elseif L then
+		elseif sizedX and L then
 			left, width = L, w
-		elseif R then
+		elseif sizedX and R then
 			left, width = R - w, w
-		elseif CX then
+		elseif sizedX and CX then
 			left, width = CX - w / 2, w
+		end
+		-- Text with no height of its own wraps at the width its anchors stretched it to, as the client's does.
+		if s.kind == "FontString" and width and (Secret.unwrap(s.height) or 0) <= 0 and L and R then
+			local saved = s.width
+			s.width = width / es
+			local _, th = textSize(s)
+			s.width = saved
+			h = th * es
 		end
 		-- Side anchors position a sized region without stretching it on the other axis.
 		-- Intrinsic text is sized too; opposite edges still explicitly stretch either kind.
@@ -453,11 +464,11 @@ function M.build(sim)
 			bottom, height = B, (CY - B) * 2
 		elseif T and CY then
 			bottom, height = CY - (T - CY), (T - CY) * 2
-		elseif B then
+		elseif sizedY and B then
 			bottom, height = B, h
-		elseif T then
+		elseif sizedY and T then
 			bottom, height = T - h, h
-		elseif CY then
+		elseif sizedY and CY then
 			bottom, height = CY - h / 2, h
 		end
 		if left and bottom then
@@ -1011,6 +1022,10 @@ function M.build(sim)
 			return r[4] / effectiveScale(self)
 		end
 		if s.kind == "FontString" and (Secret.unwrap(s.height) or 0) <= 0 then
+			local placed = rect(self)
+			if placed then
+				return placed[4] / effectiveScale(self)
+			end
 			local _, h = textSize(s)
 			return h
 		end
@@ -2037,8 +2052,22 @@ function M.build(sim)
 		s.width = saved
 		return w
 	end
+	-- A string with no width of its own wraps at the width its anchors give it, as the client's does.
+	local function anchoredSize(self)
+		local s = st(self)
+		local w = Secret.unwrap(s.width)
+		if w and w > 0 then
+			return textSize(s)
+		end
+		local r = rect(self)
+		local saved = s.width
+		s.width = r and r[3] > 0 and r[3] / effectiveScale(self) or nil
+		local tw, th = textSize(s)
+		s.width = saved
+		return tw, th
+	end
 	impl.FontString.GetStringHeight = function(self)
-		local _, h = textSize(st(self))
+		local _, h = anchoredSize(self)
 		return h
 	end
 	impl.FontString.GetLineHeight = function(self)
@@ -2046,7 +2075,7 @@ function M.build(sim)
 	end
 	impl.FontString.GetNumLines = function(self)
 		local s = st(self)
-		local _, h = textSize(s)
+		local _, h = anchoredSize(self)
 		return math.max(1, math.floor(h / (s.fontHeight or 12) + 0.5))
 	end
 	impl.FontString.IsTruncated = function(self)
