@@ -1,34 +1,34 @@
 {
-  "input_digest": "c366b35ad291bae91592d9630cedc8fad5be8ae466e57aa1b915c3a417efd788",
-  "runtime_sha256": "c366b35ad291bae91592d9630cedc8fad5be8ae466e57aa1b915c3a417efd788",
-  "candidate": "0715620b4e553f6f45b649d4d76c51d19738c67ecd9501e1bf5644b849a31074",
+  "input_digest": "61fe55079bdc9359850433d8dbc7f9d7fa1d9b6cf601fc6ec0d4d6e7b204ebb3",
+  "runtime_sha256": "61fe55079bdc9359850433d8dbc7f9d7fa1d9b6cf601fc6ec0d4d6e7b204ebb3",
+  "candidate": "82bf66ff97a8bf11894a182e92046c1baf25e2c99d44fb442406da8c7470330c",
   "client_build": "1.60.1.70959 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "6286cd30406e19b640693293be261de78641d29f",
+  "source_commit": "004417e1100c186a2d25cc2d460f1ec5becaa286",
   "flows": [
     {
-      "name": "core-off",
+      "name": "bags-open",
       "steps": [
-        "sha256:7a97d2d7d8e316db43364800d15033bda3103efd7331b897032fcc5ec8f4c46b noop.lua"
+        "sha256:108be01690f41156ce354e9fca630d5d448b49115869a97418fd3dbfa303cd06 bags-open.lua"
       ],
       "result": "pass"
     },
     {
-      "name": "compartment",
+      "name": "bag-tooltip",
       "steps": [
-        "sha256:fb5620e164c63eabd3836d0dc162f0f96272f9bdf8a8512f7939176e11f46613 tweaks-forever-wait.lua"
+        "sha256:ba5fa28f74d8d1029686544224e6ae1d7f0c0d27dccc5ba3624f375ae3a4be63 bag-tooltip.lua"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/2312462fcc8f4b26fe46d670a94f1c6c/raw/8ffb9ea4fd1530e6829fa4d6c4422fbe10015b6b/1-core-off.png",
-      "sha256": "a51e7c48cb882a3f427a530895a0a6ea808ce7ed0136b2bef4686457fc61acd5"
+      "url": "https://gist.githubusercontent.com/cjber/bf944183ccf4d570171292c5916035e9/raw/d773cc8e8afb428a03f289186343cce91f706806/1-bags-open.png",
+      "sha256": "fe38af4343910302810f87cdca03e24f5c10d592c8b7e7117ffa7bd87011aa76"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/2312462fcc8f4b26fe46d670a94f1c6c/raw/8ffb9ea4fd1530e6829fa4d6c4422fbe10015b6b/2-compartment.png",
-      "sha256": "e6c44f57ef769d6bb1efa90b46d9c6f1197da6f73fd1934411bf478ce38c1f72"
+      "url": "https://gist.githubusercontent.com/cjber/bf944183ccf4d570171292c5916035e9/raw/d773cc8e8afb428a03f289186343cce91f706806/2-bag-tooltip.png",
+      "sha256": "5d88b6eb139c16570edaaa952b5a87ec32f0bb77ae671c682f81126e1fb14806"
     }
   ]
 }
