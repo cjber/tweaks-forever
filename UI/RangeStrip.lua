@@ -711,11 +711,18 @@ ns.Init(function()
 	local shownSegments
 	local shownIcons, shownLabel
 	local SPELL_COLOUR = { SPELL_R, SPELL_G, SPELL_B }
+	-- The client can answer a spell's name or icon (or the main hand's icon) late, before its data has loaded. A
+	-- build that missed one is read again on the next update, so the strip recovers without waiting for the next
+	-- spell or equipment event.
+	local incomplete = false
 	local function Refresh()
 		cachedReaches, cachedSegments = {}, {}
+		incomplete = false
 		local gap = false
 		for _, reach in ipairs(Model.Reaches(class, Model.Known, Model.EquippedRanged())) do
 			local name = Model.SpellName(reach.spell)
+			local icon = name and Model.SpellTexture(reach.spell)
+			incomplete = incomplete or not icon
 			if name then
 				cachedReaches[#cachedReaches + 1] = reach
 				gap = gap or reach.min > 0
@@ -723,16 +730,23 @@ ns.Init(function()
 					key = reach.key,
 					name = name,
 					colour = SPELL_COLOUR,
-					icon = Model.SpellTexture(reach.spell),
+					icon = icon,
 				}
 			end
 		end
 		-- Melee first, then Dead zone when a shown reach has a minimum range, then the reaches near to far.
+		local mainHand = Model.MainHandTexture()
+		incomplete = incomplete
+			or (
+				mainHand == nil
+				and type(GetInventoryItemID) == "function"
+				and GetInventoryItemID("player", INVSLOT_MAINHAND) ~= nil
+			)
 		table.insert(cachedSegments, 1, {
 			key = MELEE,
 			name = NAMES[MELEE],
 			colour = COLOURS[MELEE],
-			icon = Model.MainHandTexture(),
+			icon = mainHand,
 		})
 		if gap then
 			table.insert(cachedSegments, 2, {
@@ -753,6 +767,9 @@ ns.Init(function()
 	end
 
 	function Update()
+		if incomplete then
+			Refresh()
+		end
 		if not ns.Active(KEY) or not ns.Readable(UnitCanAttack("player", "target")) then
 			Hide()
 			return
