@@ -29,6 +29,8 @@ class Step:
     argv: tuple[str, ...]
     # fnmatch patterns over changed paths ("*" crosses folders); empty means the step runs for any change.
     reaches: tuple[str, ...] = ()
+    # The step loads ForeverCore from $FOREVER_CORE.
+    needs_core: bool = False
 
 
 STEPS = (
@@ -50,7 +52,7 @@ STEPS = (
             ".pkgmeta",
         ),
     ),
-    Step("specs", ("python3", "-m", "tools.forever_tools.specs"), LUA),
+    Step("specs", ("python3", "-m", "tools.forever_tools.specs"), LUA, needs_core=True),
     Step("deadcode", ("python3", "tools/deadcode.py", "--check"), LUA),
     Step("ruff check", (*UV, "ruff", "check", "tools"), ("*.py", "ruff.toml", "tools/pyproject.toml")),
     Step("ruff format", (*UV, "ruff", "format", "--check", "tools"), ("*.py", "ruff.toml", "tools/pyproject.toml")),
@@ -77,6 +79,9 @@ STEPS = (
     ),
     Step("phrases", ("python3", "-m", "tools.phrases", "--check"), ("Locales/*",) + LUA),
     Step("repo rules", ("python3", "tools/repo_rules.py")),
+    # The vendored copies match their MANIFEST.json, offline.
+    Step("vendored tools", ("python3", "tools/forever_tools/sync.py", "check"), ("tools/forever_tools/*",)),
+    Step("vendored sim", ("python3", "tools/forever_sim/sync.py", "check"), ("tools/forever_sim/*",)),
     Step(
         "ty",
         (*UV, "ty", "check", "tools", "--extra-search-path", ".", "--extra-search-path", "tools"),
@@ -101,26 +106,37 @@ def main() -> int:
     parser.add_argument("--changed", action="store_true", help="run only the steps the diff against --base reaches")
     parser.add_argument("--base", default="origin/main", help="the branch to diff against (default: origin/main)")
     args = parser.parse_args()
-    env = dict(os.environ)
-    core = Path(env.get("FOREVER_CORE") or ROOT.parent / "forever-core")
-    if not core.is_dir():
-        print(
-            f"ForeverCore checkout not found at {core}: set FOREVER_CORE to a cjber/forever-core checkout",
-            file=sys.stderr,
-        )
-        return 2
-    env["FOREVER_CORE"] = str(core)
     changed = changed_paths(args.base) if args.changed else set()
     # A change under tools/ can alter any check, so it reaches every step.
     everything = not args.changed or any(path.startswith("tools/") for path in changed)
+    selected = [
+        step
+        for step in STEPS
+        if everything or not step.reaches or any(fnmatch.fnmatch(p, g) for p in changed for g in step.reaches)
+    ]
+    env = dict(os.environ)
+    if any(step.needs_core for step in selected):
+        # Resolved from the caller's directory, so the steps (run from the repo root) see the same checkout.
+        core = Path(env.get("FOREVER_CORE") or ROOT.parent / "forever-core").resolve()
+        if not core.is_dir():
+            print(
+                f"ForeverCore checkout not found at {core}: set FOREVER_CORE to a cjber/forever-core checkout",
+                file=sys.stderr,
+            )
+            return 2
+        env["FOREVER_CORE"] = str(core)
     failed: list[str] = []
     for step in STEPS:
-        if not everything and step.reaches and not any(fnmatch.fnmatch(p, g) for p in changed for g in step.reaches):
+        if step not in selected:
             print(f"-- {step.name}: skipped, the diff does not reach it", flush=True)
             continue
         print(f"== {step.name}: {' '.join(step.argv)}", flush=True)
         started = time.monotonic()
-        code = subprocess.run(step.argv, cwd=ROOT, env=env, stdin=subprocess.DEVNULL).returncode
+        try:
+            code = subprocess.run(step.argv, cwd=ROOT, env=env, stdin=subprocess.DEVNULL).returncode
+        except OSError as exc:
+            print(f"== {step.name}: cannot start: {exc}", flush=True)
+            code = 127
         print(
             f"== {step.name}: {'ok' if code == 0 else f'FAILED (exit {code})'} in {time.monotonic() - started:.1f}s",
             flush=True,
