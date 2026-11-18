@@ -349,4 +349,4 @@ L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt
 
-L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever가 ForeverCore를 수정해야 할 때 알려줍니다." -- mt
+L["Hide the crafting bar in the Professions window."] = "전문 기술 창의 제작 바 숨기기." -- mt

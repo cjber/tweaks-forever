@@ -349,4 +349,4 @@ L["Melee"] = "近战" -- mt
 L["Dead zone"] = "死区" -- mt
 L["Too far"] = "过远" -- mt
 
-L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever 会在 ForeverCore 需要修复时提醒你。" -- mt
+L["Hide the crafting bar in the Professions window."] = "隐藏专业窗口中的制造条。" -- mt
