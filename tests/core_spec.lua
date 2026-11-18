@@ -401,4 +401,28 @@ do
 	assert(button.width == 126, "a long label widens the button with room either side")
 end
 
+-- An alert goes to the raid warning banner at the top of the screen, never to chat (#627).
+do
+	local ns, shown, chat = {}, {}, {}
+	local warning = { r = 1, g = 0.28, b = 0 }
+	local env = setmetatable({
+		CreateFrame = function()
+			return { RegisterEvent = function() end, SetScript = function() end }
+		end,
+		RaidWarningFrame = {},
+		ChatTypeInfo = { RAID_WARNING = warning },
+		RaidNotice_AddMessage = function(frame, text, color)
+			shown[#shown + 1] = { frame = frame, text = text, color = color }
+		end,
+		print = function(text)
+			chat[#chat + 1] = text
+		end,
+	}, { __index = _G })
+	Core(env)
+	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
+	ns.Alert("Rare nearby: Mother Fang.")
+	assert(#shown == 1 and shown[1].frame == env.RaidWarningFrame and shown[1].text == "Rare nearby: Mother Fang.")
+	assert(shown[1].color == warning and #chat == 0, "the game's raid warning colour, and no chat line")
+end
+
 print("core: ok")

@@ -34,7 +34,8 @@ ns.Feature({
 	key = "lureWarning",
 	category = "Fishing",
 	name = "Warn about a missing lure",
-	tooltip = "A message when you log in or equip a fishing pole without a lure, and each time you cast without one.",
+	tooltip = "A message at the top of the screen when you log in or equip a fishing pole without a lure, and each "
+		.. "time you cast without one.",
 	default = true,
 	conflicts = FISHING_ADDONS,
 })

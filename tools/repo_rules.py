@@ -8,6 +8,9 @@
   or `ITEM_DATA_LOAD_RESULT`.
   Both fire for every item any addon asks about, in bursts, so a feature that reacts to the event itself reruns its
   work dozens of times a second; a feature names the items it waits for with `ns.AwaitItem(itemID, fn)` instead.
+- `chat-alert`: only Core/Core.lua's `ns.Print` writes to chat, and only the files in CHAT_REPLIES call it: a reply
+  to the player's own command or a receipt of what was done for them. An alert the player should see now (a rare, a
+  pull) goes on screen with `ns.Alert`, since a chat line is lost among other addons' output (#627).
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
@@ -26,6 +29,17 @@ SETTINGS_CALL = re.compile(r"SetOnValueChangedCallback\s*\(")
 SETTINGS_SKIP = ("tests/", "types/")
 ITEM_INFO_OWNER = "Core/ItemInfo.lua"
 ITEM_INFO_EVENT = re.compile(r"[\"'](GET_ITEM_INFO_RECEIVED|ITEM_DATA_LOAD_RESULT)[\"']")
+CHAT_OWNER = "Core/Core.lua"
+CHAT_WRITE = re.compile(r"(?<![A-Za-z0-9_.:])print\s*\(|DEFAULT_CHAT_FRAME|ChatFrame\d+\s*:\s*AddMessage")
+CHAT_PRINT = re.compile(r"\bns\.Print\s*\(")
+# Each file allowed to print, with what its lines answer.
+CHAT_REPLIES = {
+    "Bags/Vendor.lua": "the repair receipt",
+    "Bags/Junk.lua": "the junk sale receipt",
+    "Integrations/Navigate.lua": "where a waypoint the player asked for is, when no navigation addon takes it",
+    "UI/Settings.lua": "the slash command's help",
+    "UI/WhatsNew.lua": "the one-line update note",
+}
 LUACHECK = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
 LUA_TEMPLATES = {"Locales/phrases.txt"}
@@ -54,6 +68,22 @@ def item_info_listeners(files: dict[str, str]) -> list[str]:
         for number, line in enumerate(text.splitlines(), 1):
             if ITEM_INFO_EVENT.search(line):
                 hits.append(f"{path}:{number}: item-info-outside-core: wait for the item with ns.AwaitItem(itemID, fn)")
+    return hits
+
+
+def chat_alerts(files: dict[str, str]) -> list[str]:
+    hits = []
+    for path, text in files.items():
+        if not LUA_LIKE.search(path) or path.startswith((*SETTINGS_SKIP, "tools/")):
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
+            code = line.split("--", 1)[0]
+            if path != CHAT_OWNER and CHAT_WRITE.search(code):
+                hits.append(f"{path}:{number}: chat-alert: chat output goes through ns.Print in {CHAT_OWNER}")
+            elif path not in (*CHAT_REPLIES, CHAT_OWNER) and CHAT_PRINT.search(code):
+                hits.append(
+                    f"{path}:{number}: chat-alert: show an alert with ns.Alert; chat is for replies and receipts"
+                )
     return hits
 
 
@@ -102,7 +132,7 @@ def unmatched_hashfiles(files: dict[str, str]) -> list[str]:
     return hits
 
 
-RULES = (setting_callbacks, item_info_listeners, unused_luacheck_globals, unmatched_hashfiles)
+RULES = (setting_callbacks, item_info_listeners, chat_alerts, unused_luacheck_globals, unmatched_hashfiles)
 
 
 def findings(files: dict[str, str]) -> list[str]:

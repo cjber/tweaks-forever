@@ -12,9 +12,9 @@ ns.Feature({
 	key = KEY,
 	category = "Interface",
 	name = "Pull warning",
-	tooltip = "In a group, a chat line when your threat on your target passes the tank's, just before it turns on you. "
-		.. "Once each time, until you drop back below the tank or change target. To colour nameplates by threat, use "
-		.. "the game's own Nameplates options.",
+	tooltip = "In a group, a warning at the top of the screen when your threat on your target passes the tank's, "
+		.. "just before it turns on you. Once each time, until you drop back below the tank or change target. To "
+		.. "colour nameplates by threat, use the game's own Nameplates options.",
 	default = true,
 	conflicts = {
 		{ addon = "Omen" },
@@ -50,9 +50,9 @@ local function Check()
 	warned = true
 	local name = ns.Readable(UnitName("target")) -- multi-value: Readable keeps the name
 	if type(name) == "string" and name ~= "" then
-		ns.Print(L["you are about to pull %s off the tank."]:format(name))
+		ns.Alert(L["You are about to pull %s off the tank."]:format(name))
 	else
-		ns.Print(L["you are about to pull your target off the tank."])
+		ns.Alert(L["You are about to pull your target off the tank."])
 	end
 end
 

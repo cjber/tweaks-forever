@@ -62,7 +62,7 @@ The change names:
 |---|---|
 | `trainable` | the answer `TrainableSpells()` gives changed, by its sorted spell IDs: a level up, or a spell learned |
 | `junk` | a junk mark was added or removed, by Alt+Right-click, the bag portrait menu or the click mode |
-| `rare` | a rare alert fired and printed its chat line |
+| `rare` | a rare alert fired and showed its warning |
 | `explored` | the player explored a new area, from the client's `MAP_EXPLORATION_UPDATED` |
 
 An event that changes nothing stays quiet. In particular `trainable` compares the sorted spell IDs, so a level up

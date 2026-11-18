@@ -17,7 +17,11 @@ local ns = {
 	Active = function(key)
 		return db[key]
 	end,
+	-- On screen only: a chat line is a failure (#627).
 	Print = function(message)
+		error("printed to chat: " .. message)
+	end,
+	Alert = function(message)
 		printed[#printed + 1] = message
 	end,
 }
@@ -53,7 +57,7 @@ end
 
 Threat(1)
 assert(
-	#printed == 1 and printed[1] == "you are about to pull Defias Pillager off the tank.",
+	#printed == 1 and printed[1] == "You are about to pull Defias Pillager off the tank.",
 	"warns once over the tank"
 )
 Threat(1)
@@ -80,7 +84,7 @@ assert(#printed == 3, "a secret threat answer changes nothing")
 handlers.PLAYER_REGEN_ENABLED()
 name = SECRET
 Threat(1)
-assert(printed[4] == "you are about to pull your target off the tank.", "a secret name is left out")
+assert(printed[4] == "You are about to pull your target off the tank.", "a secret name is left out")
 name = "Defias Pillager"
 
 Threat(0)

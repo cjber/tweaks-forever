@@ -21,7 +21,11 @@ local ns = {
 	Active = function(key)
 		return db[key]
 	end,
+	-- On screen only: a chat line is a failure (#627).
 	Print = function(message)
+		error("printed to chat: " .. message)
+	end,
+	Alert = function(message)
 		printed[#printed + 1] = message
 	end,
 	core = {
@@ -108,11 +112,6 @@ local env = setmetatable({
 			return { x = 0.1, y = 0.2 }
 		end,
 	},
-	NORMAL_FONT_COLOR = {
-		WrapTextInColorCode = function(_, text)
-			return "|cffffd200" .. text .. "|r"
-		end,
-	},
 	EventRegistry = {
 		RegisterCallback = function(_, event, fn, owner)
 			callbacks[event] = function(...)
@@ -144,7 +143,7 @@ handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#printed == 0, "nothing while off")
 db.rareAlerts = true
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(printed[1] == "rare nearby: Mother Fang." and sounds == 1, "a rare's nameplate")
+assert(printed[1] == "Rare nearby: Mother Fang." and sounds == 1, "a rare's nameplate")
 handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#printed == 1, "once per rare")
 handlers.NAME_PLATE_UNIT_ADDED("nameplate2")
@@ -157,7 +156,7 @@ handlers.NAME_PLATE_UNIT_ADDED("nameplate4")
 assert(#printed == 3 and sounds == 2, "a second rare within two seconds: its line, no stacked chime")
 now = now + 2
 handlers.VIGNETTES_UPDATED()
-assert(printed[4] == "rare nearby: Gruff Swiftbite." and #printed == 4, "a living, near rare's marker only")
+assert(printed[4] == "Rare nearby: Gruff Swiftbite." and #printed == 4, "a living, near rare's marker only")
 assert(sounds == 3, "a marker chimes too")
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
 assert(#printed == 4 and sounds == 3, "once")
@@ -168,7 +167,7 @@ handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#printed == 4 and sounds == 3, "never in combat")
 combat = false
 handlers.PLAYER_REGEN_ENABLED()
-assert(printed[5] == "rare nearby: Mother Fang." and printed[6] == "rare nearby: Gruff Swiftbite.", "told once it ends")
+assert(printed[5] == "Rare nearby: Mother Fang." and printed[6] == "Rare nearby: Gruff Swiftbite.", "told once it ends")
 assert(sounds == 4, "two rares found together chime once")
 -- Two rares' markers in one update: two lines, one chime; then a marker reaching the minimap chimes on its own.
 now = now + 601
@@ -177,13 +176,13 @@ handlers.VIGNETTES_UPDATED()
 assert(#printed == 8 and sounds == 5, "two markers in one update chime once")
 now = now + 601
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
-assert(printed[9] == "rare nearby: Gruff Swiftbite." and sounds == 6, "a marker reaching the minimap")
+assert(printed[9] == "Rare nearby: Gruff Swiftbite." and sounds == 6, "a marker reaching the minimap")
 -- A rare already near when the settings load (its nameplate came up during the loading screen) is told then.
 now = now + 601
 local before = #printed
 assert(#initializers == 1)
 initializers[1]()
-assert(printed[before + 1] == "rare nearby: Mother Fang.", "the nameplates up at login")
+assert(printed[before + 1] == "Rare nearby: Mother Fang.", "the nameplates up at login")
 db.rareAlerts = false
 now = now + 601
 before = #printed
@@ -196,31 +195,27 @@ local button = buttons.TweaksForeverRareWaypointButton
 before = #printed
 button.OnClick(button)
 assert(printed[before + 1] == "No rare has been found nearby yet." and #navigated == 0, "nothing to point at yet")
--- A rare with a map marker: its name is a link, and a click on it points at the marker.
+-- A rare with a map marker: the binding points at the marker.
 db.rareAlerts, playerMap = true, 1429
 now = now + 601
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
-local link = "addon:TweaksForever:rare:Creature-0-1-0-1-100-CCC"
-assert(printed[#printed] == "rare nearby: |cffffd200|H" .. link .. "|h[Gruff Swiftbite]|h|r.", printed[#printed])
-callbacks.SetItemRef(link, "[Gruff Swiftbite]", "LeftButton")
+assert(printed[#printed] == "Rare nearby: Gruff Swiftbite.", printed[#printed])
+button.OnClick(button)
 local went = navigated[1]
 assert(went.map == 1429 and went.x == 0.4 and went.y == 0.5 and went.title == "Gruff Swiftbite", "at its marker")
--- The marker moved: a later click follows it; once the marker is gone, the last place it was.
+-- The marker moved: a later press follows it; once the marker is gone, the last place it was.
 markerAt.v1 = { x = 0.45, y = 0.55 }
-callbacks.SetItemRef(link)
+button.OnClick(button)
 assert(navigated[2].x == 0.45 and navigated[2].y == 0.55, "the marker's current position")
 vignettes.v1.isDead = true
-callbacks.SetItemRef(link)
+button.OnClick(button)
 assert(navigated[3].x == 0.45, "where it was last seen")
 vignettes.v1.isDead = nil
--- Other addons' links and links to a rare we don't know are left alone.
-callbacks.SetItemRef("addon:OtherAddon:rare:x")
-callbacks.SetItemRef("item:6948")
-assert(#navigated == 3, "only our own links")
+assert(callbacks.SetItemRef == nil, "no chat link to click")
 -- A nameplate-only rare (no marker carries its GUID) is pinned where the player stood, close by plate range.
 now = now + 601
 handlers.NAME_PLATE_UNIT_ADDED("nameplate4")
-assert(printed[#printed]:find("|h%[Snort the Heckler%]|h"), "a nameplate rare's name is a link too")
+assert(printed[#printed] == "Rare nearby: Snort the Heckler.", "a nameplate rare")
 button.OnClick(button)
 went = navigated[4]
 assert(went.x == 0.1 and went.y == 0.2 and went.title == "Snort the Heckler", "the binding: the last rare, by you")

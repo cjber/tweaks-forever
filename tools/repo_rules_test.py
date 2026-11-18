@@ -2,7 +2,13 @@
 
 import unittest
 
-from tools.repo_rules import item_info_listeners, setting_callbacks, unmatched_hashfiles, unused_luacheck_globals
+from tools.repo_rules import (
+    chat_alerts,
+    item_info_listeners,
+    setting_callbacks,
+    unmatched_hashfiles,
+    unused_luacheck_globals,
+)
 
 CALLBACK = 'Settings.SetOnValueChangedCallback("TweaksForever_x", print)\n'
 WORKFLOW = "      - with:\n          key: k-${{ hashFiles('tools/gen_*.py', %s) }}\n"
@@ -25,6 +31,15 @@ class LuacheckGlobalTest(unittest.TestCase):
         self.assertEqual(item_info_listeners({"Bags/Junk.lua": "ns.AwaitItem(info.itemID, OnItemInfo)\n"}), [])
         xml = '<OnLoad>self:RegisterEvent("GET_ITEM_INFO_RECEIVED")</OnLoad>\n'
         self.assertEqual(len(item_info_listeners({"UI/Frame.xml": xml})), 1, "an XML OnLoad listens too")
+
+    def test_alerts_go_on_screen(self):
+        self.assertEqual(chat_alerts({"Core/Core.lua": 'print("x")\n', "tests/x_spec.lua": 'print("ok")\n'}), [])
+        self.assertEqual(chat_alerts({"Bags/Junk.lua": 'ns.Print(L["Sold"])\n'}), [], "a receipt")
+        self.assertEqual(len(chat_alerts({"Features/RareAlerts.lua": 'ns.Print(L["Rare"])\n'})), 1)
+        self.assertEqual(len(chat_alerts({"Bags/Junk.lua": 'print("x")\n'})), 1, "only ns.Print writes to chat")
+        self.assertEqual(len(chat_alerts({"UI/X.lua": "DEFAULT_CHAT_FRAME:AddMessage(x)\n"})), 1)
+        self.assertEqual(len(chat_alerts({"UI/X.xml": "<OnLoad>ChatFrame1:AddMessage(x)</OnLoad>\n"})), 1)
+        self.assertEqual(chat_alerts({"UI/X.lua": "ns.Alert(text) -- not ns.Print(text)\nf:Blueprint(x)\n"}), [])
 
     def test_an_entry_nothing_names_fails(self):
         config = '\nread_globals = {\n\t"CreateFrame",\n\t"GetLocale",\n\t"tInvert",\n}\n'

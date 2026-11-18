@@ -43,9 +43,17 @@ local missing = {}
 local watchedCVars = {}
 local pending, ready = {}, false
 
+-- Chat is for replies to the player's own commands and receipts of what was done for them (a repair, a sale).
 ---@param message string
 function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
+end
+
+-- Something the player should see now (a rare, a pull): the game's raid warning banner at the top of the screen,
+-- where it is seen during play, never a chat line lost among other addons' output (#627).
+---@param message string
+function ns.Alert(message)
+	RaidNotice_AddMessage(RaidWarningFrame, message, ChatTypeInfo.RAID_WARNING)
 end
 
 -- Widens a button to its label, never below `width`: a translated label can run past the width chosen for the
