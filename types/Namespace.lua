@@ -374,6 +374,7 @@ TweaksForeverCharDB = nil
 ---@field QuestieDB fun(): TFQuestieDB?
 ---@field QuestieSource TFQuestieSource
 ---@field Print fun(message: string)
+---@field Alert fun(message: string)
 ---@field FitButton fun(button: Button, width: number)
 ---@field EscapeCloses fun(frame: Frame)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)

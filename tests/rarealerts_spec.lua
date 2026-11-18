@@ -1,4 +1,4 @@
--- Rare alerts (Features/RareAlerts.lua): a chat line and a sound when a rare's nameplate or map marker appears,
+-- Rare alerts (Features/RareAlerts.lua): a warning at the top of the screen and a sound when a rare's nameplate or map marker appears,
 -- off by default, never in combat, once per rare for ten minutes, and never from a secret GUID or name.
 local features, handlers, db, printed, sounds, initializers = {}, {}, {}, {}, 0, {}
 local ns = {
@@ -167,22 +167,29 @@ handlers.NAME_PLATE_UNIT_ADDED("nameplate1")
 assert(#printed == 4 and sounds == 3, "never in combat")
 combat = false
 handlers.PLAYER_REGEN_ENABLED()
-assert(printed[5] == "Rare nearby: Mother Fang." and printed[6] == "Rare nearby: Gruff Swiftbite.", "told once it ends")
+assert(printed[5] == "Rare nearby: Mother Fang, Gruff Swiftbite." and #printed == 5, "told once it ends, in one line")
 assert(sounds == 4, "two rares found together chime once")
--- Two rares' markers in one update: two lines, one chime; then a marker reaching the minimap chimes on its own.
+-- Two rares' markers in one update: one line, so the four-message banner never drops one, and one chime; then a marker reaching the minimap chimes on its own.
 now = now + 601
 vignettes.v2 = { atlasName = "VignetteKillElite", objectGUID = "Creature-0-1-0-1-104-HHH", name = "Second Rare" }
 handlers.VIGNETTES_UPDATED()
-assert(#printed == 8 and sounds == 5, "two markers in one update chime once")
+assert(#printed == 6 and sounds == 5, "two markers in one update: one line, one chime")
+assert(
+	printed[6] == "Rare nearby: Gruff Swiftbite, Second Rare."
+		or printed[6] == "Rare nearby: Second Rare, Gruff Swiftbite."
+)
 now = now + 601
 handlers.VIGNETTE_MINIMAP_UPDATED("v1", true)
-assert(printed[9] == "Rare nearby: Gruff Swiftbite." and sounds == 6, "a marker reaching the minimap")
+assert(printed[7] == "Rare nearby: Gruff Swiftbite." and sounds == 6, "a marker reaching the minimap")
 -- A rare already near when the settings load (its nameplate came up during the loading screen) is told then.
 now = now + 601
 local before = #printed
 assert(#initializers == 1)
 initializers[1]()
-assert(printed[before + 1] == "Rare nearby: Mother Fang.", "the nameplates up at login")
+assert(
+	#printed == before + 1 and printed[before + 1]:find("^Rare nearby: Mother Fang, "),
+	"the rares up at login, one line"
+)
 db.rareAlerts = false
 now = now + 601
 before = #printed

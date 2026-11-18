@@ -95,7 +95,7 @@ local function Named(name)
 end
 
 -- Rares found within this many seconds of a chime (after a fight, in one marker update, or plates a frame apart)
--- each get their chat line but no chime of their own, so the sound never stacks.
+-- each get their alert but no chime of their own, so the sound never stacks.
 local CHIME_GAP = 2
 -- When the sound last played.
 ---@type number?
@@ -169,6 +169,34 @@ function Model.Last()
 	return { name = place.name, map = place.map, x = x, y = y }
 end
 
+-- The names a scan found, shown together once it ends; nil outside a scan, when each rare shows at once.
+---@type string[]?
+local found
+
+---@param names string[]
+local function Show(names)
+	ns.Alert(L["Rare nearby: %s."]:format(table.concat(names, ", ")))
+end
+
+-- Runs `scan`, then shows every rare it found in one line: the banner has room for four messages, so five rares
+-- after a fight shown one by one would push the first off before it was read.
+---@param scan fun()
+local function Batch(scan)
+	if found then
+		return scan()
+	end
+	found = {}
+	local ok, err = pcall(scan)
+	local names = found
+	found = nil
+	if #names > 0 then
+		Show(names)
+	end
+	if not ok then
+		error(err, 0)
+	end
+end
+
 ---@param guid string
 ---@param name string
 ---@param vignette string?
@@ -179,7 +207,11 @@ local function Alert(guid, name, vignette, now)
 	if map and position then
 		lastPlace = { map = map, x = position.x, y = position.y, name = name, vignette = vignette }
 	end
-	ns.Alert(L["Rare nearby: %s."]:format(name))
+	if found then
+		found[#found + 1] = name
+	else
+		Show({ name })
+	end
 	-- Tell API.Subscribe's `rare` channel, once per alert.
 	ns.APIChanged("rare")
 	if not chimed or now - chimed >= CHIME_GAP then
@@ -251,14 +283,20 @@ local function Valid(event)
 end
 
 ns.On("NAME_PLATE_UNIT_ADDED", CheckUnit)
-ns.On("PLAYER_REGEN_ENABLED", AfterCombat)
+ns.On("PLAYER_REGEN_ENABLED", function()
+	Batch(AfterCombat)
+end)
 -- Nameplates and markers that appeared while the world loaded, before the settings did (#202): a nameplate is
 -- announced only once, so look again as soon as the settings are read.
-ns.Init(AfterCombat)
+ns.Init(function()
+	Batch(AfterCombat)
+end)
 -- Only where the client has map markers; registering an event it doesn't know raises.
 if C_VignetteInfo then
 	if Valid("VIGNETTES_UPDATED") then
-		ns.On("VIGNETTES_UPDATED", CheckVignettes)
+		ns.On("VIGNETTES_UPDATED", function()
+			Batch(CheckVignettes)
+		end)
 	end
 	if Valid("VIGNETTE_MINIMAP_UPDATED") then
 		ns.On("VIGNETTE_MINIMAP_UPDATED", function(id, onMinimap)

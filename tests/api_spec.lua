@@ -289,6 +289,7 @@ ns.Readable = function(value)
 	return value
 end
 ns.Print = function() end
+ns.Alert = function() end
 ns.Navigate = function() end
 ns.core = {
 	SafeCall = function(_, fn, ...)

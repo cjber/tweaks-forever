@@ -50,10 +50,12 @@ function ns.Print(message)
 end
 
 -- Something the player should see now (a rare, a pull): the game's raid warning banner at the top of the screen,
--- where it is seen during play, never a chat line lost among other addons' output (#627).
+-- where it is seen during play, never a chat line lost among other addons' output (#627). RaidWarningUtil, not the
+-- RaidNotice_AddMessage shim, which the client defines only while the loadDeprecationFallbacks CVar is on. The banner
+-- holds four messages and drops the oldest for a fifth, so a caller with several at once joins them into one.
 ---@param message string
 function ns.Alert(message)
-	RaidNotice_AddMessage(RaidWarningFrame, message, ChatTypeInfo.RAID_WARNING)
+	RaidWarningUtil.AddMessage(message, ChatTypeInfo.RAID_WARNING)
 end
 
 -- Widens a button to its label, never below `width`: a translated label can run past the width chosen for the

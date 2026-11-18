@@ -1,4 +1,4 @@
--- Pull warning (Features/PullWarning.lua): in a group, one chat line when your threat on your target passes the
+-- Pull warning (Features/PullWarning.lua): in a group, one on-screen warning when your threat on your target passes the
 -- tank's (UnitThreatSituation 1), re-armed only by dropping back below the tank, a new target or leaving combat, and
 -- silent while the threat or the name is secret.
 local features, handlers, db, printed = {}, {}, {}, {}

@@ -8,9 +8,10 @@
   or `ITEM_DATA_LOAD_RESULT`.
   Both fire for every item any addon asks about, in bursts, so a feature that reacts to the event itself reruns its
   work dozens of times a second; a feature names the items it waits for with `ns.AwaitItem(itemID, fn)` instead.
-- `chat-alert`: only Core/Core.lua's `ns.Print` writes to chat, and only the files in CHAT_REPLIES call it: a reply
-  to the player's own command or a receipt of what was done for them. An alert the player should see now (a rare, a
-  pull) goes on screen with `ns.Alert`, since a chat line is lost among other addons' output (#627).
+- `chat-alert`: only Core/Core.lua's `ns.Print` writes to chat, and each `ns.Print` call is one CHAT_REPLIES
+  names: a reply to the player's own command or a receipt of what was done for them. An alert the player should
+  see now (a rare, a pull) goes on screen with `ns.Alert`, since a chat line is lost among other addons' output
+  (#627).
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
@@ -30,15 +31,37 @@ SETTINGS_SKIP = ("tests/", "types/")
 ITEM_INFO_OWNER = "Core/ItemInfo.lua"
 ITEM_INFO_EVENT = re.compile(r"[\"'](GET_ITEM_INFO_RECEIVED|ITEM_DATA_LOAD_RESULT)[\"']")
 CHAT_OWNER = "Core/Core.lua"
-CHAT_WRITE = re.compile(r"(?<![A-Za-z0-9_.:])print\s*\(|DEFAULT_CHAT_FRAME|ChatFrame\d+\s*:\s*AddMessage")
-CHAT_PRINT = re.compile(r"\bns\.Print\s*\(")
-# Each file allowed to print, with what its lines answer.
+CHAT_WRITE = re.compile(
+    r"(?:(?<![A-Za-z0-9_.:])|(?<=_G\.))print\s*\(|_G\[[\"']print[\"']\]|DEFAULT_CHAT_FRAME|ChatFrame\d+\s*:\s*AddMessage"
+)
+# Any use of ns.Print, called or not: an alias (`local P = ns.Print`) would carry an alert past a call check.
+CHAT_PRINT = re.compile(r"\bns\s*(?:\.\s*Print\b|\[\s*[\"']Print[\"']\s*\])")
+CHAT_CALL = re.compile(r"\s*\(\s*")
+# The chat lines allowed, by file: what each `ns.Print` call's argument starts with, and what the lines answer.
 CHAT_REPLIES = {
-    "Bags/Vendor.lua": "the repair receipt",
-    "Bags/Junk.lua": "the junk sale receipt",
-    "Integrations/Navigate.lua": "where a waypoint the player asked for is, when no navigation addon takes it",
-    "UI/Settings.lua": "the slash command's help",
-    "UI/WhatsNew.lua": "the one-line update note",
+    "Bags/Vendor.lua": (
+        "the repair receipt",
+        (
+            'L["repaired for %s from guild funds."]',
+            'L["repaired for %s."]',
+            'L["not enough money to repair (%s)."]',
+            'L["repair skipped (%s)."]',
+        ),
+    ),
+    "Bags/Junk.lua": ("the junk sale receipt", ('L["Sold %d junk stacks for %s."]',)),
+    "Integrations/Navigate.lua": (
+        "where a waypoint the player asked for is, when no navigation addon takes it",
+        ('L["%s is at %s in %s."]', 'L["%s is at %s."]'),
+    ),
+    "UI/Settings.lua": (
+        "the slash command's help",
+        (
+            'L["/tw report - show a report to copy into a bug report"]',
+            'L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"]',
+        ),
+    ),
+    # Model.Message's one-line update note.
+    "UI/WhatsNew.lua": ("the one-line update note", ("message)",)),
 }
 LUACHECK = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
@@ -71,19 +94,39 @@ def item_info_listeners(files: dict[str, str]) -> list[str]:
     return hits
 
 
+def lua_code(line: str) -> str:
+    """The line before its `--` comment, a `--` inside a quoted string left alone."""
+    quote = None
+    for index, char in enumerate(line):
+        if quote:
+            if char == "\\":
+                continue
+            if char == quote and line[index - 1] != "\\":
+                quote = None
+        elif char in "\"'":
+            quote = char
+        elif line.startswith("--", index):
+            return line[:index]
+    return line
+
+
 def chat_alerts(files: dict[str, str]) -> list[str]:
     hits = []
     for path, text in files.items():
         if not LUA_LIKE.search(path) or path.startswith((*SETTINGS_SKIP, "tools/")):
             continue
+        allowed = CHAT_REPLIES.get(path, ("", ()))[1]
         for number, line in enumerate(text.splitlines(), 1):
-            code = line.split("--", 1)[0]
+            code = lua_code(line)
             if path != CHAT_OWNER and CHAT_WRITE.search(code):
                 hits.append(f"{path}:{number}: chat-alert: chat output goes through ns.Print in {CHAT_OWNER}")
-            elif path not in (*CHAT_REPLIES, CHAT_OWNER) and CHAT_PRINT.search(code):
-                hits.append(
-                    f"{path}:{number}: chat-alert: show an alert with ns.Alert; chat is for replies and receipts"
-                )
+            for use in CHAT_PRINT.finditer(code):
+                call = CHAT_CALL.match(code, use.end())
+                if path != CHAT_OWNER and not (call and code[call.end() :].startswith(allowed)):
+                    hits.append(
+                        f"{path}:{number}: chat-alert: show an alert with ns.Alert; chat is for the replies "
+                        "and receipts CHAT_REPLIES names"
+                    )
     return hits
 
 
