@@ -38,6 +38,7 @@ Data\DungeonMapArt.lua
 Data\Credits.lua
 Core\Secret.lua
 Core\Core.lua
+Core\ItemInfo.lua
 UI\Art.lua
 UI\Keys.lua
 Features\Automation.lua
