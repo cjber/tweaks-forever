@@ -548,7 +548,17 @@ assert(M.Band(false, warriorReaches, interact(true)) == "dead", "a minimum range
 assert(M.Band(false, warriorReaches, interact(false)) == "far", "every reach too short, beyond 8 yards")
 assert(M.Band(false, { reach("judgement", 0, 10, false) }, noInteract) == "far", "no minimum range, so no dead zone")
 assert(M.Band(false, warriorReaches, interact(nil)) == nil, "the 8-yard check answered nothing")
-assert(M.Band(nil, { reach("charge", 8, 25, false) }, noInteract) == nil, "melee unknown leaves the gap unclaimed")
+assert(M.Band(nil, { reach("charge", 8, 25, false) }, interact(true)) == nil, "melee unknown leaves the gap unclaimed")
+-- Out of combat the swing range has no answer; the ranged bands still light, and a reach the target is beyond rules
+-- melee out.
+assert(M.Band(nil, { reach("autoshot", 8, 35, true) }, noInteract) == "autoshot", "Auto Shot lights with melee unknown")
+assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(false)) == "far", "beyond Auto Shot is Too far")
+assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(nil)) == nil, "no 8-yard answer, melee undecided")
+assert(M.Band(nil, { reach("frostbolt", 0, 30, false) }, noInteract) == "far", "beyond a reach with no minimum")
+assert(
+	M.Band(nil, { reach("frostbolt", 0, 30, nil) }, noInteract) == nil,
+	"no reach answered false, so melee stays undecided"
+)
 -- Any unanswered spell could still reach, so the interaction answer alone cannot name the gap.
 assert(
 	M.Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == nil,

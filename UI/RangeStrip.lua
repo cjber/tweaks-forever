@@ -337,7 +337,7 @@ end
 -- spell reaches (smallest maximum range); otherwise the dead zone inside the game's 8-yard check, when a shown
 -- reach has a minimum range; otherwise Too far once every check said false. A nil that could change the answer
 -- decides nothing, so the label stays hidden rather than naming the wrong band. `interact` is called only when the
--- dead zone could decide it.
+-- dead zone could decide it or a nil melee answer needs ruling out.
 ---@param melee boolean?
 ---@param reaches TFRangeReach[]
 ---@param interact fun(): boolean?
@@ -360,9 +360,29 @@ function Model.Band(melee, reaches, interact)
 		end
 		return nearest.key
 	end
-	-- Melee may still be in reach when its check gave no answer, and a spell band could already be named above.
-	if melee ~= false then
-		return nil
+	-- The game checks the main-hand swing range only while its swing timers run, so out of combat melee has no answer.
+	-- A reach the target is beyond still rules melee out, as every shown reach outranges the melee swing: a false from a
+	-- reach with no minimum, or from any reach once the 8-yard check puts the target past its minimum. Otherwise melee
+	-- may still be in reach, and the label stays hidden.
+	if melee == nil then
+		local beyond = false
+		for _, reach in ipairs(reaches) do
+			if reach.check == false and reach.min == 0 then
+				beyond = true
+			end
+		end
+		if not beyond then
+			local within
+			for _, reach in ipairs(reaches) do
+				if reach.check == false then
+					within = interact()
+					break
+				end
+			end
+			if within ~= false then
+				return nil
+			end
+		end
 	end
 	local gap = false
 	for _, reach in ipairs(reaches) do
