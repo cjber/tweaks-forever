@@ -1,8 +1,5 @@
 package-as: TweaksForever
 
-move-folders:
-  TweaksForever/ForeverCore: ForeverCore
-
 manual-changelog:
   filename: .release-notes.md
   markup-type: markdown
@@ -31,11 +28,6 @@ optional-dependencies:
   - questie
   - titan-panel
   - mapster
-
-# ForeverCore ships inside this zip as its own folder, at the release tools/forever-core.txt pins, so an
-# update brings it along: players who updated did not get it as a required dependency.
-externals:
-  ForeverCore: https://github.com/cjber/forever-core/releases/download/v1.14.5/ForeverCore-v1.14.5-forever.zip
 
 # ForeverCore is embedded under Libs/ForeverCore, so it is listed as an embedded library: the CurseForge app links
 # it on the project page but never installs it as a required dependency.
