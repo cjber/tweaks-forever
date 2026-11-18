@@ -209,8 +209,7 @@
 ---@field Needed fun(npc: integer?): boolean
 ---@field HasQuestLines fun(data: TooltipData): boolean
 
----@class TFDatabase : ForeverFamilyDB
----@field companionHints? boolean the old hint setting, read once to carry a player's "off" over to suggestFamily
+---@class TFDatabase
 ---@field junk TFMarks
 ---@field errors ForeverCaughtError[] ForeverCore's shared error journal: earlier sessions' errors, for the report
 ---@field log ForeverDebugLogStore ForeverCore's shared log ring: recent lines, for the report
