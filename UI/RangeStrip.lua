@@ -722,7 +722,28 @@ ns.Init(function()
 	-- be missing for good (Model.SpellTexture allows it), so a missing icon waits for the client's data-loaded events.
 	local incomplete, iconMissing = false, false
 	local OnDataLoaded ---@type fun()
+	-- One callback for the weapon wait, so repeated builds while the icon is missing queue it once.
+	local function WeaponLoaded()
+		OnDataLoaded()
+	end
+	-- Whether two segment lists show the same keys, names and icons in the same order.
+	---@param a TFRangeSegment[]
+	---@param b TFRangeSegment[]
+	---@return boolean
+	local function SameSegments(a, b)
+		if #a ~= #b then
+			return false
+		end
+		for index, segment in ipairs(a) do
+			local other = b[index]
+			if segment.key ~= other.key or segment.name ~= other.name or segment.icon ~= other.icon then
+				return false
+			end
+		end
+		return true
+	end
 	local function Refresh()
+		local previous = cachedSegments
 		cachedReaches, cachedSegments = {}, {}
 		incomplete, iconMissing = false, false
 		local gap = false
@@ -749,9 +770,7 @@ ns.Init(function()
 			local weapon = GetInventoryItemID("player", INVSLOT_MAINHAND)
 			if weapon then
 				iconMissing = true
-				ns.AwaitItem(weapon, function()
-					OnDataLoaded()
-				end)
+				ns.AwaitItem(weapon, WeaponLoaded)
 			end
 		end
 		table.insert(cachedSegments, 1, {
@@ -766,6 +785,11 @@ ns.Init(function()
 				name = NAMES[DEAD_ZONE],
 				colour = COLOURS[DEAD_ZONE],
 			})
+		end
+		-- An unchanged list keeps its table, so a rebuild that read nothing new (a name still loading) does not lay
+		-- the strip out again.
+		if SameSegments(previous, cachedSegments) then
+			cachedSegments = previous
 		end
 	end
 
