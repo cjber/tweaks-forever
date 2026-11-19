@@ -351,4 +351,4 @@ L["Melee"] = "Nahkampf" -- mt
 L["Dead zone"] = "Toter Bereich" -- mt
 L["Too far"] = "Zu weit" -- mt
 
-L["Hide the crafting bar in the Professions window."] = "Herstellungsleiste im Berufefenster ausblenden." -- mt
+L["Rare and pull alerts show on screen."] = "Meldungen zu seltenen Kreaturen und Aggro-Warnungen erscheinen auf dem Bildschirm." -- mt

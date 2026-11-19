@@ -351,4 +351,4 @@ L["Melee"] = "近战" -- mt
 L["Dead zone"] = "死区" -- mt
 L["Too far"] = "过远" -- mt
 
-L["Hide the crafting bar in the Professions window."] = "隐藏专业窗口中的制造条。" -- mt
+L["Rare and pull alerts show on screen."] = "稀有生物提醒和仇恨警告现在显示在屏幕上。" -- mt
