@@ -95,6 +95,10 @@ local function Tooltip()
 		GameTooltip_AddNormalLine(GameTooltip, L["Nothing is available to train right now."])
 	elseif services == 1 then
 		GameTooltip_AddNormalLine(GameTooltip, L["Train 1 skill for %s"]:format(GetMoneyString(total)))
+		if GetMoney() < total then
+			-- The game's own line, in the player's language.
+			GameTooltip_AddErrorLine(GameTooltip, ERR_NOT_ENOUGH_MONEY)
+		end
 	else
 		GameTooltip_AddNormalLine(GameTooltip, L["Train %d skills for %s"]:format(services, GetMoneyString(total)))
 		if GetMoney() < total then

@@ -58,6 +58,7 @@ local hooked
 local money, services, bought, tradeskill = 0, {}, {}, false
 local lines = {}
 local env = setmetatable({
+	ERR_NOT_ENOUGH_MONEY = "You don't have enough money.",
 	CreateFrame = function()
 		made = FakeButton()
 		return made
@@ -135,7 +136,12 @@ assert(lines[2] == "!Not enough gold for all of them.", "the tooltip gives the r
 made.services, made.total = 1, 100
 lines = {}
 made.scripts.OnEnter()
-assert(lines[1] == "Train 1 skill for 100c", "one skill reads in the singular")
+assert(lines[1] == "Train 1 skill for 100c" and #lines == 1, "one skill reads in the singular")
+money = 50
+lines = {}
+made.scripts.OnEnter()
+assert(lines[2] == "!You don't have enough money.", "one skill out of reach says so too")
+money = 250
 made.services, made.total = 2, 300
 
 money = 300

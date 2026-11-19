@@ -59,6 +59,12 @@ class LuacheckGlobalTest(unittest.TestCase):
             unit_events({"UI/X.lua": 'ns.OnUnit("UNIT_PET", "player", fn)\nns.On("PLAYER_LOGIN", fn)\n'}), []
         )
         self.assertEqual(unit_events({"tests/x_spec.lua": 'ns.On("UNIT_PET", fn)\n'}), [])
+        listed = 'for _, event in ipairs({\n\t"PLAYER_LEVEL_UP",\n\t"UNIT_PET",\n}) do\n\tns.On(event, fn)\nend\n'
+        self.assertEqual(len(unit_events({"UI/X.lua": listed})), 1, "a name in a list registered in a loop")
+        self.assertEqual(len(unit_events({"UI/X.lua": 'f:RegisterEvent("UNIT_AURA")\n'})), 1)
+        self.assertEqual(len(unit_events({"UI/X.lua": 'ns.On(\n\t"UNIT_PET",\n\tfn\n)\n'})), 1, "a multiline call")
+        ok = 'f:RegisterUnitEvent("UNIT_AURA", "player")\nif event == "UNIT_FACTION" then\n'
+        self.assertEqual(unit_events({"UI/X.lua": ok}), [])
 
     def test_an_entry_nothing_names_fails(self):
         config = '\nread_globals = {\n\t"CreateFrame",\n\t"GetLocale",\n\t"tInvert",\n}\n'

@@ -167,6 +167,7 @@ read_globals = {
 	"EditModeManagerFrame",
 	"EditModeSystemSettingsDialog",
 	"Enum",
+	"ERR_NOT_ENOUGH_MONEY",
 	"ERR_NOT_IN_COMBAT",
 	"ForeverCore",
 	"EventRegistry",

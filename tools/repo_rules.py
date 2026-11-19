@@ -12,8 +12,10 @@
   names: a reply to the player's own command or a receipt of what was done for them. An alert the player should
   see now (a rare, a pull) goes on screen with `ns.Alert`, since a chat line is lost among other addons' output
   (#627).
-- `unit-event-for-every-unit`: a `UNIT_*` event goes through `ns.OnUnit(event, unit, fn)`, never `ns.On`. ns.On
-  registers it for every unit, so in a raid each party, raid and nameplate unit wakes the addon to be ignored.
+- `unit-event-for-every-unit`: a `UNIT_*` event is registered with `ns.OnUnit(event, unit, fn)` or
+  `RegisterUnitEvent`. `ns.On` or `RegisterEvent` registers it for every unit, so in a raid each party, raid and
+  nameplate unit wakes the addon to be ignored. Every quoted `UNIT_*` name must sit in one of those two calls or be
+  compared against (`event == "UNIT_X"`), which also catches a name kept in a list and registered in a loop.
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
@@ -65,7 +67,8 @@ CHAT_REPLIES = {
     # Model.Message's one-line update note.
     "UI/WhatsNew.lua": ("the one-line update note", ("message)",)),
 }
-UNIT_EVENT_ON = re.compile(r"\bns\.On\s*\(\s*[\"']UNIT_")
+UNIT_EVENT_NAME = re.compile(r"[\"']UNIT_[A-Z_]+[\"']")
+UNIT_EVENT_OK = re.compile(r"(\bOnUnit|RegisterUnitEvent)\s*\(\s*$|[=~]=\s*$")
 LUACHECK = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
 LUA_TEMPLATES = {"Locales/phrases.txt"}
@@ -139,7 +142,8 @@ def unit_events(files: dict[str, str]) -> list[str]:
         for path, text in files.items()
         if LUA_LIKE.search(path) and not path.startswith((*SETTINGS_SKIP, "tools/"))
         for number, line in enumerate(text.splitlines(), 1)
-        if UNIT_EVENT_ON.search(lua_code(line))
+        for name in UNIT_EVENT_NAME.finditer(lua_code(line))
+        if not UNIT_EVENT_OK.search(lua_code(line)[: name.start()])
     ]
 
 
