@@ -89,15 +89,35 @@ def number(value):
     return str(int(value)) if value.is_integer() else f"{value:g}"
 
 
+# Typos in the client's own text, by (locale, spell): (as shipped, corrected). Each is checked against the
+# source, so a build that fixes the text fails here and the entry is deleted.
+SOURCE_TYPOS = {
+    # Spell-deDE 1.60.1.70938, the Camp Benefits summary: no space before the First Aid Kit's number (#621).
+    ("deDE", CAMP_BENEFITS): ("Ausdauer um$1230124w1 erhöht", "Ausdauer um $1230124w1 erhöht"),
+}
+
+
+def corrected(locale, spell, text):
+    """The client's text for `spell` in `locale`, with its listed typo fixed."""
+    typo = SOURCE_TYPOS.get((locale, spell))
+    if not typo:
+        return text
+    shipped, fixed = typo
+    if text.count(shipped) != 1:
+        raise ValueError(f"{locale} spell {spell} no longer has {shipped!r}; remove its SOURCE_TYPOS entry")
+    return text.replace(shipped, fixed)
+
+
 class LocaleSpells:
     def __init__(self, locale, refresh, offline):
+        self.locale = locale
         self.spell = {row["ID"]: row for row in locale_db2("Spell", "ID", locale, refresh, offline)}
         self.strings = {
             row["BaseTag"]: row["TagText_lang"] for row in locale_db2("GlobalStrings", "ID", locale, refresh, offline)
         }
 
     def description(self, spell):
-        return self.spell[spell]["AuraDescription_lang"]
+        return corrected(self.locale, spell, self.spell[spell]["AuraDescription_lang"])
 
 
 def duration_text(seconds):

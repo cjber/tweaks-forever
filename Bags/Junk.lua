@@ -273,7 +273,12 @@ local function Finish(run)
 		run.sold, run.money = run.sold + 1, run.money + waiting.value
 	end
 	if run.sold > 0 then
-		ns.Print(L["Sold %d junk stacks for %s."]:format(run.sold, C_CurrencyInfo.GetCoinTextureString(run.money)))
+		local money = C_CurrencyInfo.GetCoinTextureString(run.money)
+		if run.sold == 1 then
+			ns.Print(L["Sold 1 junk stack for %s."]:format(money))
+		else
+			ns.Print(L["Sold %d junk stacks for %s."]:format(run.sold, money))
+		end
 	end
 	UpdateMerchantButton()
 	if run.manualPending and merchant == run.merchant then

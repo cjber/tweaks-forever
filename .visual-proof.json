@@ -1,53 +1,34 @@
 {
-  "input_digest": "070f45fa17f180b2af4bbcb67dd0bba86b5e184adfd915589eaebc47807e441f",
-  "runtime_sha256": "070f45fa17f180b2af4bbcb67dd0bba86b5e184adfd915589eaebc47807e441f",
-  "candidate": "5dab9c9e93391f16ccb59dec67ee69ae927e77559678563d6122cc5bb1e39ef8",
+  "input_digest": "02373ba25b1464e7f82464cd06ffd10114550b6f69a728497cea89af41513af0",
+  "runtime_sha256": "02373ba25b1464e7f82464cd06ffd10114550b6f69a728497cea89af41513af0",
+  "candidate": "e72f1ecca08fddf093158daa12d7d79364446c1be7a7bac05a5d82c8395a4c5f",
   "client_build": "1.60.1.70959 (Interface 16001)",
   "tested_artifact": "source-tree",
-  "source_commit": "a2526236965d888218fb5598770927ba318c580d",
+  "source_commit": "3ee1bfc6b4c6f4f3dff3249d55b104d286a911ca",
   "flows": [
     {
-      "name": "whats-new",
+      "name": "rare-key-banner",
       "steps": [
-        "sha256:4d566fb3c0604d1175991ff4a5379a0c654e48077312d23784d1b15fbbf32af7 whatsnew.lua"
+        "sha256:8446c04674318b99c22d784ffbd637cf70e1296b8bf0e52789e32083773af586 tweaks-rare-key-banner.lua"
       ],
       "result": "pass"
     },
     {
-      "name": "range-settings",
+      "name": "settings-tooltips",
       "steps": [
-        "sha256:3569a9031b457fa938a0fbc0fa0c2bb473a5dd738fc7132fed945c663049de9d settings.lua"
-      ],
-      "result": "pass"
-    },
-    {
-      "name": "target-out-of-combat",
-      "steps": [
-        "sha256:3d9b6f39793dd5b1cbf68c3654a150ae04253b5170a43b9041b9f93cc37b451b target.lua"
-      ],
-      "inputs": [
-        {
-          "type": "/tar Sheep"
-        },
-        {
-          "type": "/tar Rabbit"
-        }
+        "/tweaks"
       ],
       "result": "pass"
     }
   ],
   "images": [
     {
-      "url": "https://gist.githubusercontent.com/cjber/66db4b0f5d24efe3b82c2ad9bfbc0086/raw/f504c28474fb0c78f17092b6fe49a11d4b8b48ab/1-whats-new.png",
-      "sha256": "ea014e5547dd85a4a3e7e6458ad646c93c6cd012ced8ba63956c861fa0d3eadb"
+      "url": "https://gist.githubusercontent.com/cjber/e0cd9eb5711ae209ae9d423f0c9a2a73/raw/d26b424a0853818011206540a819c8a919b16b62/1-rare-key-banner.png",
+      "sha256": "3623b171e552a97a2b244aa82e6676a1e578a213bded5e2aafcf997f7c1948ed"
     },
     {
-      "url": "https://gist.githubusercontent.com/cjber/66db4b0f5d24efe3b82c2ad9bfbc0086/raw/f504c28474fb0c78f17092b6fe49a11d4b8b48ab/2-range-settings.png",
-      "sha256": "62817f42468c9a0abddfe2282cc69a6bcf804400566f816c52b8c1b8cf13b452"
-    },
-    {
-      "url": "https://gist.githubusercontent.com/cjber/66db4b0f5d24efe3b82c2ad9bfbc0086/raw/f504c28474fb0c78f17092b6fe49a11d4b8b48ab/3-target-out-of-combat.png",
-      "sha256": "6116217bd7c0a8d37a2fdaf10442966ca6cbc07701a9ce09e148474377af6c7d"
+      "url": "https://gist.githubusercontent.com/cjber/e0cd9eb5711ae209ae9d423f0c9a2a73/raw/d26b424a0853818011206540a819c8a919b16b62/2-settings-tooltips.png",
+      "sha256": "2c00979d462211eaa78245a865ffc18b9f75c7070bde48d220e327e5fe165072"
     }
   ]
 }

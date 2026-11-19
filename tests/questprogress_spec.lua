@@ -349,6 +349,14 @@ end
 ns.On = function(event, fn)
 	events[event] = fn
 end
+-- As the client's RegisterUnitEvent does: other units never reach fn.
+ns.OnUnit = function(event, unit, fn)
+	events[event] = function(fired, ...)
+		if fired == unit then
+			fn(fired, ...)
+		end
+	end
+end
 local wolf = "Creature-0-3113-0-47-10-0000ABCDEF"
 guids.nameplate9 = wolf
 initializers[1]()

@@ -10,7 +10,7 @@ Small quality-of-life tweaks for WoW: Forever that look like they came with the 
 <br><br><a href="https://github.com/sponsors/cjber"><img src="docs/github-sponsors-button.png" alt="Sponsor me on GitHub"></a> <a href="https://ko-fi.com/cjber"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi"></a>
 </p>
 
-Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can name rares near you in chat, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
+Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can warn you on screen about rares near you, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
@@ -49,7 +49,7 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Range strip.** A strip on top of the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap.
 - **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
 - **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
-- **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Turn on **Quest XP on the experience bar** (off by default) to shade the bar with the XP your quest log is worth, the ready hand-ins first, and the tooltip then adds the level they reach. Rare alerts (off by default) name nearby rares in chat; click the name, or press a bound key, to set a waypoint to it. In a group, a pull warning says in chat when your threat passes the tank's. A soft glow on the talents button reminds you while talent or pet training points are unspent.
+- **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Turn on **Quest XP on the experience bar** (off by default) to shade the bar with the XP your quest log is worth, the ready hand-ins first, and the tooltip then adds the level they reach. Rare alerts (off by default) name nearby rares at the top of the screen; press a bound key to set a waypoint to the last one. In a group, a pull warning at the top of the screen says when your threat passes the tank's. A soft glow on the talents button reminds you while talent or pet training points are unspent.
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet, and the Pet tab does the same for the abilities your pet's family can learn. With Combine Bags on, the reagent bag joins the combined bag.
 - **Train all.** A button beside the class trainer's Train button buys every spell you can afford. Off until you turn it on.

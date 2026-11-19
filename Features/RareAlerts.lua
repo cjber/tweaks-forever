@@ -12,9 +12,9 @@ ns.Feature({
 	key = KEY,
 	category = "Interface",
 	name = "Rare alerts",
-	tooltip = "A chat line and a sound when a rare creature's nameplate or map marker appears near you. "
-		.. "Not in combat, and once per rare for ten minutes. Click the rare's name in chat, or press the key "
-		.. "bound under Key Bindings > AddOns, to set a waypoint to it.",
+	tooltip = "A warning at the top of the screen and a sound when a rare creature's nameplate or map marker appears "
+		.. "near you. Not in combat, and once per rare for ten minutes. Press the key bound under Key Bindings > "
+		.. "AddOns to set a waypoint to it.",
 	default = false,
 	conflicts = {
 		{
@@ -56,12 +56,9 @@ local count = 0
 ---@field x number
 ---@field y number
 ---@field name string
----@field vignette string? its map marker, read again on a click while the marker is still up
+---@field vignette string? its map marker, read again on a key press while the marker is still up
 
--- [GUID] = where it was when it alerted, dropped with its `alerted` entry; `lastPlace` is the latest, for the
--- key binding.
----@type table<string, TFRarePlace>
-local places = {}
+-- Where the latest rare was when it alerted, for the key binding.
 ---@type TFRarePlace?
 local lastPlace
 
@@ -82,7 +79,7 @@ local function Fresh(guid, now)
 		if count > 100 then
 			for other, at in pairs(alerted) do
 				if now - at >= QUIET then
-					alerted[other], places[other], count = nil, nil, count - 1
+					alerted[other], count = nil, count - 1
 				end
 			end
 		end
@@ -98,7 +95,7 @@ local function Named(name)
 end
 
 -- Rares found within this many seconds of a chime (after a fight, in one marker update, or plates a frame apart)
--- each get their chat line but no chime of their own, so the sound never stacks.
+-- each get their alert but no chime of their own, so the sound never stacks.
 local CHIME_GAP = 2
 -- When the sound last played.
 ---@type number?
@@ -150,7 +147,7 @@ end
 ---@param place TFRarePlace?
 local function Waypoint(place)
 	if not place then
-		ns.Print(L["No rare has been found nearby yet."])
+		ns.Alert(L["No rare has been found nearby yet."])
 		return
 	end
 	place.x, place.y = Live(place)
@@ -172,7 +169,33 @@ function Model.Last()
 	return { name = place.name, map = place.map, x = x, y = y }
 end
 
-local LINK = "addon:TweaksForever:rare:"
+-- The names a scan found, shown together once it ends; nil outside a scan, when each rare shows at once.
+---@type string[]?
+local found
+
+---@param names string[]
+local function Show(names)
+	ns.Alert(L["Rare nearby: %s."]:format(table.concat(names, ", ")))
+end
+
+-- Runs `scan`, then shows every rare it found in one line: the banner has room for four messages, so five rares
+-- after a fight shown one by one would push the first off before it was read.
+---@param scan fun()
+local function Batch(scan)
+	if found then
+		return scan()
+	end
+	found = {}
+	local ok, err = pcall(scan)
+	local names = found
+	found = nil
+	if #names > 0 then
+		Show(names)
+	end
+	if not ok then
+		error(err, 0)
+	end
+end
 
 ---@param guid string
 ---@param name string
@@ -181,14 +204,14 @@ local LINK = "addon:TweaksForever:rare:"
 local function Alert(guid, name, vignette, now)
 	vignette = vignette or MarkerOf(guid)
 	local map, position = Position(vignette)
-	local shown = name
 	if map and position then
 		lastPlace = { map = map, x = position.x, y = position.y, name = name, vignette = vignette }
-		places[guid] = lastPlace
-		-- A link the chat frame hands to the SetItemRef callback below when clicked.
-		shown = NORMAL_FONT_COLOR:WrapTextInColorCode(("|H%s%s|h[%s]|h"):format(LINK, guid, name))
 	end
-	ns.Print(L["rare nearby: %s."]:format(shown))
+	if found then
+		found[#found + 1] = name
+	else
+		Show({ name })
+	end
 	-- Tell API.Subscribe's `rare` channel, once per alert.
 	ns.APIChanged("rare")
 	if not chimed or now - chimed >= CHIME_GAP then
@@ -260,14 +283,20 @@ local function Valid(event)
 end
 
 ns.On("NAME_PLATE_UNIT_ADDED", CheckUnit)
-ns.On("PLAYER_REGEN_ENABLED", AfterCombat)
+ns.On("PLAYER_REGEN_ENABLED", function()
+	Batch(AfterCombat)
+end)
 -- Nameplates and markers that appeared while the world loaded, before the settings did (#202): a nameplate is
 -- announced only once, so look again as soon as the settings are read.
-ns.Init(AfterCombat)
+ns.Init(function()
+	Batch(AfterCombat)
+end)
 -- Only where the client has map markers; registering an event it doesn't know raises.
 if C_VignetteInfo then
 	if Valid("VIGNETTES_UPDATED") then
-		ns.On("VIGNETTES_UPDATED", CheckVignettes)
+		ns.On("VIGNETTES_UPDATED", function()
+			Batch(CheckVignettes)
+		end)
 	end
 	if Valid("VIGNETTE_MINIMAP_UPDATED") then
 		ns.On("VIGNETTE_MINIMAP_UPDATED", function(id, onMinimap)
@@ -276,17 +305,6 @@ if C_VignetteInfo then
 			end
 		end)
 	end
-end
-
--- A click on a rare's name in an alert line. The chat frame triggers this through EventRegistry, which runs each
--- callback in its own secure call, and a waypoint is not a protected action.
-if EventRegistry then
-	EventRegistry:RegisterCallback("SetItemRef", function(_, link)
-		local guid = type(link) == "string" and link:sub(1, #LINK) == LINK and link:sub(#LINK + 1)
-		if guid then
-			ns.core.SafeCall("rare waypoint", Waypoint, places[guid])
-		end
-	end, places)
 end
 
 -- The key binding (Bindings.xml) clicks this button of our own, so a gamepad button can be bound to it too.

@@ -86,6 +86,8 @@ function GetUIPanelLayoutAttribute(attribute) end
 ---@type string
 ERR_NOT_IN_COMBAT = ""
 ---@type string
+ERR_NOT_ENOUGH_MONEY = ""
+---@type string
 TRAINING_POINTS_ABBREV = ""
 ---@type string
 ITEM_SPELL_KNOWN = ""
@@ -117,6 +119,12 @@ LASTONLINE_DAYS = ""
 ---@field GetRelativeTimeText? fun(timestamp: number): string
 ---@type TFFriendsListUtil
 FriendsListUtil = nil
+
+-- The raid warning banner's writer (Blizzard_RaidWarning), absent from the generated API stubs.
+---@class TFRaidWarningUtil
+---@field AddMessage fun(message: string, chatInfo: table)
+---@type TFRaidWarningUtil
+RaidWarningUtil = nil
 
 -- UIErrorsFrame's hidden message types (Blizzard_UIErrorsFrame), written by its SetMessageTypeEnabled.
 ---@type table<integer, boolean>

@@ -433,7 +433,7 @@ do -- Native selling leaves marked non-grey items to the custom seller.
 	c.visit()
 	same(c.nativeCalls, 1, "grey junk is handled by the game")
 	same(c.sold(), "3", "only the marked non-grey uses the custom seller")
-	same(c.printed[1], "Sold 1 junk stacks for 100c.", "only acknowledged custom sales are reported")
+	same(c.printed[1], "Sold 1 junk stack for 100c.", "only acknowledged custom sales are reported")
 	assert(c.slots[2], "unmarked items stay")
 end
 
@@ -558,7 +558,7 @@ do -- Each condition that blocks selling blocks it at the start and stops a run 
 		block(c)
 		c.settle()
 		same(c.sold(), "1", "block " .. index .. " under way")
-		same(c.printed[1], "Sold 1 junk stacks for 14c.", "block " .. index .. " still reports the stack that went")
+		same(c.printed[1], "Sold 1 junk stack for 14c.", "block " .. index .. " still reports the stack that went")
 	end
 end
 
@@ -591,7 +591,7 @@ do -- Item info arriving during a run retries after it, within the same visit's 
 	c.settle()
 	same(c.sold(), "2,3,4,5,6,7,8,9,10,11,12,1", "the retry sells the late item")
 	same(c.printed[1], "Sold 11 junk stacks for 154c.", "the first run's total")
-	same(c.printed[2], "Sold 1 junk stacks for 14c.", "the retry's total")
+	same(c.printed[2], "Sold 1 junk stack for 14c.", "the retry's total")
 end
 
 do -- Leatrix owns greys only when its auto-sell is on.
@@ -650,7 +650,7 @@ do -- Sell All Junk, once confirmed, also sells the marked non-grey stacks; Bliz
 	c.confirm()
 	same(c.sold(), "2", "the confirmed click sells the mark at once, and leaves the grey to Blizzard")
 	c.settle()
-	same(c.printed[1], "Sold 1 junk stacks for 100c.", "the total")
+	same(c.printed[1], "Sold 1 junk stack for 100c.", "the total")
 	c.slots[4], c.db.junk[4] = green(4), true
 	c.confirm()
 	c.settle()

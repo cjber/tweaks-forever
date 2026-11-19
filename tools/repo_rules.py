@@ -8,6 +8,15 @@
   or `ITEM_DATA_LOAD_RESULT`.
   Both fire for every item any addon asks about, in bursts, so a feature that reacts to the event itself reruns its
   work dozens of times a second; a feature names the items it waits for with `ns.AwaitItem(itemID, fn)` instead.
+- `chat-alert`: only Core/Core.lua's `ns.Print` writes to chat, and each `ns.Print` call is one CHAT_REPLIES
+  names: a reply to the player's own command or a receipt of what was done for them. An alert the player should
+  see now (a rare, a pull) goes on screen with `ns.Alert`, since a chat line is lost among other addons' output
+  (#627).
+- `unit-event-for-every-unit`: a `UNIT_*` event is registered with `ns.OnUnit(event, unit, fn)` or
+  `RegisterUnitEvent`. `ns.On` or `RegisterEvent` registers it for every unit, so in a raid each party, raid and
+  nameplate unit wakes the addon to be ignored. Every quoted `UNIT_*` name must sit in one of those two calls or be
+  compared against (`event == "UNIT_X"`), which also catches a name kept in a list and registered in a loop; an
+  event table's `UNIT_X = handler` key counts too. ALL_UNIT_EVENTS names the listeners that need every unit.
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
@@ -26,6 +35,46 @@ SETTINGS_CALL = re.compile(r"SetOnValueChangedCallback\s*\(")
 SETTINGS_SKIP = ("tests/", "types/")
 ITEM_INFO_OWNER = "Core/ItemInfo.lua"
 ITEM_INFO_EVENT = re.compile(r"[\"'](GET_ITEM_INFO_RECEIVED|ITEM_DATA_LOAD_RESULT)[\"']")
+CHAT_OWNER = "Core/Core.lua"
+CHAT_WRITE = re.compile(
+    r"(?:(?<![A-Za-z0-9_.:])|(?<=_G\.))print\s*\(|_G\[[\"']print[\"']\]|DEFAULT_CHAT_FRAME|ChatFrame\d+\s*:\s*AddMessage"
+)
+# Any use of ns.Print, called or not: an alias (`local P = ns.Print`) would carry an alert past a call check.
+CHAT_PRINT = re.compile(r"\bns\s*(?:\.\s*Print\b|\[\s*[\"']Print[\"']\s*\])")
+CHAT_CALL = re.compile(r"\s*\(\s*")
+# The chat lines allowed, by file: what each `ns.Print` call's argument starts with, and what the lines answer.
+CHAT_REPLIES = {
+    "Bags/Vendor.lua": (
+        "the repair receipt",
+        (
+            'L["repaired for %s from guild funds."]',
+            'L["repaired for %s."]',
+            'L["not enough money to repair (%s)."]',
+            'L["repair skipped (%s)."]',
+        ),
+    ),
+    "Bags/Junk.lua": ("the junk sale receipt", ('L["Sold 1 junk stack for %s."]', 'L["Sold %d junk stacks for %s."]')),
+    "Integrations/Navigate.lua": (
+        "where a waypoint the player asked for is, when no navigation addon takes it",
+        ('L["%s is at %s in %s."]', 'L["%s is at %s."]'),
+    ),
+    "UI/Settings.lua": (
+        "the slash command's help",
+        (
+            'L["/tw report - show a report to copy into a bug report"]',
+            'L["/tw issue - report a bug or request a feature with a ready-made GitHub issue link"]',
+        ),
+    ),
+    # Model.Message's one-line update note.
+    "UI/WhatsNew.lua": ("the one-line update note", ("message)",)),
+}
+UNIT_EVENT_NAME = re.compile(r"[\"']UNIT_[A-Z_]+[\"']")
+UNIT_EVENT_KEY = re.compile(r"^\s*(UNIT_[A-Z_]+)\s*=")
+# Listeners that need every unit, by file: more units than RegisterUnitEvent's two, with the reason.
+ALL_UNIT_EVENTS = {
+    ("Chat/ClassLevels.lua", "UNIT_LEVEL"): "remembers the level of any player unit that levels, nameplates included",
+}
+UNIT_EVENT_OK = re.compile(r"(\bOnUnit|RegisterUnitEvent)\s*\(\s*$|[=~]=\s*$")
 LUACHECK = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
 LUA_TEMPLATES = {"Locales/phrases.txt"}
@@ -54,6 +103,62 @@ def item_info_listeners(files: dict[str, str]) -> list[str]:
         for number, line in enumerate(text.splitlines(), 1):
             if ITEM_INFO_EVENT.search(line):
                 hits.append(f"{path}:{number}: item-info-outside-core: wait for the item with ns.AwaitItem(itemID, fn)")
+    return hits
+
+
+def lua_code(line: str) -> str:
+    """The line before its `--` comment, a `--` inside a quoted string left alone."""
+    quote = None
+    for index, char in enumerate(line):
+        if quote:
+            if char == "\\":
+                continue
+            if char == quote and line[index - 1] != "\\":
+                quote = None
+        elif char in "\"'":
+            quote = char
+        elif line.startswith("--", index):
+            return line[:index]
+    return line
+
+
+def chat_alerts(files: dict[str, str]) -> list[str]:
+    hits = []
+    for path, text in files.items():
+        if not LUA_LIKE.search(path) or path.startswith((*SETTINGS_SKIP, "tools/")):
+            continue
+        allowed = CHAT_REPLIES.get(path, ("", ()))[1]
+        for number, line in enumerate(text.splitlines(), 1):
+            code = lua_code(line)
+            if path != CHAT_OWNER and CHAT_WRITE.search(code):
+                hits.append(f"{path}:{number}: chat-alert: chat output goes through ns.Print in {CHAT_OWNER}")
+            for use in CHAT_PRINT.finditer(code):
+                call = CHAT_CALL.match(code, use.end())
+                if path != CHAT_OWNER and not (call and code[call.end() :].startswith(allowed)):
+                    hits.append(
+                        f"{path}:{number}: chat-alert: show an alert with ns.Alert; chat is for the replies "
+                        "and receipts CHAT_REPLIES names"
+                    )
+    return hits
+
+
+def unit_events(files: dict[str, str]) -> list[str]:
+    hits = []
+    for path, text in files.items():
+        if not LUA_LIKE.search(path) or path.startswith((*SETTINGS_SKIP, "tools/")):
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
+            code = lua_code(line)
+            names = [(m[0].strip("\"'"), m.start()) for m in UNIT_EVENT_NAME.finditer(code)]
+            key = UNIT_EVENT_KEY.match(code)
+            if key:
+                names.append((key[1], len(code)))
+            for name, at in names:
+                if (path, name) in ALL_UNIT_EVENTS or (at < len(code) and UNIT_EVENT_OK.search(code[:at])):
+                    continue
+                hits.append(
+                    f"{path}:{number}: unit-event-for-every-unit: register {name} with ns.OnUnit(event, unit, fn)"
+                )
     return hits
 
 
@@ -102,7 +207,7 @@ def unmatched_hashfiles(files: dict[str, str]) -> list[str]:
     return hits
 
 
-RULES = (setting_callbacks, item_info_listeners, unused_luacheck_globals, unmatched_hashfiles)
+RULES = (setting_callbacks, item_info_listeners, chat_alerts, unit_events, unused_luacheck_globals, unmatched_hashfiles)
 
 
 def findings(files: dict[str, str]) -> list[str]:

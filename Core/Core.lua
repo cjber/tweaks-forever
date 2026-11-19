@@ -43,9 +43,19 @@ local missing = {}
 local watchedCVars = {}
 local pending, ready = {}, false
 
+-- Chat is for replies to the player's own commands and receipts of what was done for them (a repair, a sale).
 ---@param message string
 function ns.Print(message)
 	print("|cffffd200Tweaks Forever:|r " .. message)
+end
+
+-- Something the player should see now (a rare, a pull): the game's raid warning banner at the top of the screen,
+-- where it is seen during play, never a chat line lost among other addons' output (#627). RaidWarningUtil, not the
+-- RaidNotice_AddMessage shim, which the client defines only while the loadDeprecationFallbacks CVar is on. The banner
+-- holds four messages and drops the oldest for a fifth, so a caller with several at once joins them into one.
+---@param message string
+function ns.Alert(message)
+	RaidWarningUtil.AddMessage(message, ChatTypeInfo.RAID_WARNING)
 end
 
 -- Widens a button to its label, never below `width`: a translated label can run past the width chosen for the
@@ -315,6 +325,20 @@ function ns.On(event, fn)
 		events:RegisterEvent(event)
 	end
 	table.insert(handlers[event], fn)
+end
+
+-- Run fn for a unit event about `unit` only. RegisterUnitEvent has the client filter the units, so an event that
+-- fires for every party, raid and nameplate unit wakes the addon only for the one it reads (#637). Each call owns
+-- its frame: a second RegisterUnitEvent for the same event on one frame replaces the first's units.
+---@param event WowEvent
+---@param unit string
+---@param fn function
+function ns.OnUnit(event, unit, fn)
+	local frame = CreateFrame("Frame")
+	frame:SetScript("OnEvent", function(_, _, ...)
+		ns.core.SafeCall(event, fn, ...)
+	end)
+	frame:RegisterUnitEvent(event, unit)
 end
 
 -- A feature that yields to one of the game's own settings follows that setting as the player changes it.
