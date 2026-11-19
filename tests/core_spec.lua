@@ -427,4 +427,41 @@ do
 	assert(shown[1].color == warning and #chat == 0, "the game's raid warning colour, and no chat line")
 end
 
+-- A unit event is registered for its one unit, on a frame of its own, and reaches fn with the event's arguments.
+do
+	local ns, frames, got = {}, {}, {}
+	local env = setmetatable({
+		CreateFrame = function()
+			local frame = { units = {} }
+			function frame.RegisterEvent() end
+			function frame:RegisterUnitEvent(event, ...)
+				self.units[event] = { ... }
+			end
+			function frame:SetScript(_, fn)
+				self.script = fn
+			end
+			frames[#frames + 1] = frame
+			return frame
+		end,
+	}, { __index = _G })
+	Core(env)
+	setfenv(Chunk("Core/Core.lua"), env)("TweaksForever", ns)
+	ns.core = {
+		SafeCall = function(_, fn, ...)
+			return fn(...)
+		end,
+	}
+	local before = #frames
+	ns.OnUnit("UNIT_PET", "player", function(...)
+		got[#got + 1] = { ... }
+	end)
+	ns.OnUnit("UNIT_THREAT_LIST_UPDATE", "target", function() end)
+	local pet, threat = frames[before + 1], frames[before + 2]
+	assert(#frames == before + 2, "a frame each, so neither replaces the other's units")
+	assert(#pet.units.UNIT_PET == 1 and pet.units.UNIT_PET[1] == "player", "the player only")
+	assert(threat.units.UNIT_THREAT_LIST_UPDATE[1] == "target")
+	pet.script(pet, "UNIT_PET", "player")
+	assert(#got == 1 and got[1][1] == "player", "fn gets the event's arguments")
+end
+
 print("core: ok")

@@ -12,6 +12,8 @@
   names: a reply to the player's own command or a receipt of what was done for them. An alert the player should
   see now (a rare, a pull) goes on screen with `ns.Alert`, since a chat line is lost among other addons' output
   (#627).
+- `unit-event-for-every-unit`: a `UNIT_*` event goes through `ns.OnUnit(event, unit, fn)`, never `ns.On`. ns.On
+  registers it for every unit, so in a raid each party, raid and nameplate unit wakes the addon to be ignored.
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
@@ -48,7 +50,7 @@ CHAT_REPLIES = {
             'L["repair skipped (%s)."]',
         ),
     ),
-    "Bags/Junk.lua": ("the junk sale receipt", ('L["Sold %d junk stacks for %s."]',)),
+    "Bags/Junk.lua": ("the junk sale receipt", ('L["Sold 1 junk stack for %s."]', 'L["Sold %d junk stacks for %s."]')),
     "Integrations/Navigate.lua": (
         "where a waypoint the player asked for is, when no navigation addon takes it",
         ('L["%s is at %s in %s."]', 'L["%s is at %s."]'),
@@ -63,6 +65,7 @@ CHAT_REPLIES = {
     # Model.Message's one-line update note.
     "UI/WhatsNew.lua": ("the one-line update note", ("message)",)),
 }
+UNIT_EVENT_ON = re.compile(r"\bns\.On\s*\(\s*[\"']UNIT_")
 LUACHECK = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
 LUA_TEMPLATES = {"Locales/phrases.txt"}
@@ -130,6 +133,16 @@ def chat_alerts(files: dict[str, str]) -> list[str]:
     return hits
 
 
+def unit_events(files: dict[str, str]) -> list[str]:
+    return [
+        f"{path}:{number}: unit-event-for-every-unit: register it with ns.OnUnit(event, unit, fn)"
+        for path, text in files.items()
+        if LUA_LIKE.search(path) and not path.startswith((*SETTINGS_SKIP, "tools/"))
+        for number, line in enumerate(text.splitlines(), 1)
+        if UNIT_EVENT_ON.search(lua_code(line))
+    ]
+
+
 def luacheck_entries(text: str) -> list[tuple[str, int]]:
     """(name, line) for each quoted name inside a `globals` or `read_globals` table that opens its own line."""
     found, inside = [], False
@@ -175,7 +188,7 @@ def unmatched_hashfiles(files: dict[str, str]) -> list[str]:
     return hits
 
 
-RULES = (setting_callbacks, item_info_listeners, chat_alerts, unused_luacheck_globals, unmatched_hashfiles)
+RULES = (setting_callbacks, item_info_listeners, chat_alerts, unit_events, unused_luacheck_globals, unmatched_hashfiles)
 
 
 def findings(files: dict[str, str]) -> list[str]:

@@ -401,6 +401,7 @@ TweaksForeverCharDB = nil
 ---@field SettingVariable fun(key: string): string
 ---@field OnSettingChanged fun(key: string, fn: function)
 ---@field On fun(event: WowEvent, fn: function)
+---@field OnUnit fun(event: WowEvent, unit: string, fn: function)
 ---@field Init fun(fn: fun())
 ---@field AwaitItem fun(itemID: integer?, callback: function)
 ---@field ForgetItems fun(callback: function)

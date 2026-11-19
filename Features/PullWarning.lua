@@ -56,16 +56,8 @@ local function Check()
 	end
 end
 
-ns.On("UNIT_THREAT_SITUATION_UPDATE", function(unit)
-	if unit == "player" then
-		Check()
-	end
-end)
-ns.On("UNIT_THREAT_LIST_UPDATE", function(unit)
-	if unit == "target" then
-		Check()
-	end
-end)
+ns.OnUnit("UNIT_THREAT_SITUATION_UPDATE", "player", Check)
+ns.OnUnit("UNIT_THREAT_LIST_UPDATE", "target", Check)
 ns.On("PLAYER_TARGET_CHANGED", function()
 	warned = false
 	Check()

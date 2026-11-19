@@ -6,6 +6,7 @@ from tools.repo_rules import (
     chat_alerts,
     item_info_listeners,
     setting_callbacks,
+    unit_events,
     unmatched_hashfiles,
     unused_luacheck_globals,
 )
@@ -51,6 +52,13 @@ class LuacheckGlobalTest(unittest.TestCase):
         self.assertEqual(len(chat_alerts({"Features/X.lua": "ns.Print\n"})), 1, "a call split over lines")
         self.assertEqual(len(chat_alerts({"Features/X.lua": 'local s = "--" ns.Print(s)\n'})), 1, "-- in a string")
         self.assertEqual(chat_alerts({"Core/Core.lua": "function ns.Print(message)\n"}), [])
+
+    def test_unit_events_name_their_unit(self):
+        self.assertEqual(len(unit_events({"UI/X.lua": 'ns.On("UNIT_PET", fn)\n'})), 1)
+        self.assertEqual(
+            unit_events({"UI/X.lua": 'ns.OnUnit("UNIT_PET", "player", fn)\nns.On("PLAYER_LOGIN", fn)\n'}), []
+        )
+        self.assertEqual(unit_events({"tests/x_spec.lua": 'ns.On("UNIT_PET", fn)\n'}), [])
 
     def test_an_entry_nothing_names_fails(self):
         config = '\nread_globals = {\n\t"CreateFrame",\n\t"GetLocale",\n\t"tInvert",\n}\n'

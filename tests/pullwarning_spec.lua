@@ -14,6 +14,14 @@ local ns = {
 	On = function(event, fn)
 		handlers[event] = fn
 	end,
+	-- As the client's RegisterUnitEvent does: other units never reach fn.
+	OnUnit = function(event, unit, fn)
+		handlers[event] = function(fired, ...)
+			if fired == unit then
+				fn(fired, ...)
+			end
+		end
+	end,
 	Active = function(key)
 		return db[key]
 	end,

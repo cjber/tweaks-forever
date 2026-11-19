@@ -93,6 +93,8 @@ local function Tooltip()
 	GameTooltip:SetOwner(button, "ANCHOR_RIGHT")
 	if services == 0 then
 		GameTooltip_AddNormalLine(GameTooltip, L["Nothing is available to train right now."])
+	elseif services == 1 then
+		GameTooltip_AddNormalLine(GameTooltip, L["Train 1 skill for %s"]:format(GetMoneyString(total)))
 	else
 		GameTooltip_AddNormalLine(GameTooltip, L["Train %d skills for %s"]:format(services, GetMoneyString(total)))
 		if GetMoney() < total then

@@ -485,11 +485,7 @@ ns.Init(function()
 		end)
 	end
 	ns.On("QUEST_LOG_UPDATE", Changed)
-	ns.On("UNIT_QUEST_LOG_CHANGED", function(unit)
-		if unit == "player" then
-			Changed()
-		end
-	end)
+	ns.OnUnit("UNIT_QUEST_LOG_CHANGED", "player", Changed)
 	ns.OnSettingChanged(PLATES, UpdatePlates)
 	Model.Rebuild()
 	UpdatePlates()

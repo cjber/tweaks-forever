@@ -327,6 +327,20 @@ function ns.On(event, fn)
 	table.insert(handlers[event], fn)
 end
 
+-- Run fn for a unit event about `unit` only. RegisterUnitEvent has the client filter the units, so an event that
+-- fires for every party, raid and nameplate unit wakes the addon only for the one it reads (#637). Each call owns
+-- its frame: a second RegisterUnitEvent for the same event on one frame replaces the first's units.
+---@param event WowEvent
+---@param unit string
+---@param fn function
+function ns.OnUnit(event, unit, fn)
+	local frame = CreateFrame("Frame")
+	frame:SetScript("OnEvent", function(_, _, ...)
+		ns.core.SafeCall(event, fn, ...)
+	end)
+	frame:RegisterUnitEvent(event, unit)
+end
+
 -- A feature that yields to one of the game's own settings follows that setting as the player changes it.
 ns.On("CVAR_UPDATE", function(name)
 	if ready and watchedCVars[name] then

@@ -132,6 +132,11 @@ lines = {}
 made.scripts.OnEnter()
 assert(lines[1] == "Train 2 skills for 300c")
 assert(lines[2] == "!Not enough gold for all of them.", "the tooltip gives the reason")
+made.services, made.total = 1, 100
+lines = {}
+made.scripts.OnEnter()
+assert(lines[1] == "Train 1 skill for 100c", "one skill reads in the singular")
+made.services, made.total = 2, 300
 
 money = 300
 bought = {}

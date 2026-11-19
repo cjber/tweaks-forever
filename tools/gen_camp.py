@@ -142,6 +142,10 @@ def resolve(spells, text, own, duration=duration_text):
         bases[index] = number(row["EffectBasePointsF"])
         return bases[index]
 
+    # A number never runs into the word before it in a script that spaces words. One client language's text has
+    # a token glued to its word ("Ausdauer um$1230124w1", #621), which would read "um56"; the space goes in before
+    # the number, never in scripts written without spaces between words.
+    text = re.sub(r"(?<=[A-Za-z\u00c0-\u024f\u0400-\u04ff])(?=\$(\d+)?[wtd])", " ", text)
     resolved = re.sub(r"\$(\d+)?([wtd])(\d)?", value, text)
     if "$" in resolved:
         raise ValueError(f"unresolved token in {resolved!r}")
