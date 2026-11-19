@@ -78,8 +78,17 @@ local RANGED_SPELLS = {
 	[16] = 2764, -- thrown: Throw
 }
 
--- Melee reach in yards: a spell whose own maximum is no further is not worth a segment beyond Melee.
+-- Melee reach in yards, measured as the spell ranges are, from the player's edge to the target's: a spell whose own
+-- maximum is no further is not worth a segment beyond Melee. The client measures spell ranges between the two
+-- creatures' edges and the swing between their centres against both combat reaches plus 4/3 (at least 5), so in edge
+-- terms the swing never reaches past 5 yards whatever the target's size; that is what lets a spell's answer rule
+-- melee out while the swing check is silent out of combat.
 local MELEE_REACH = 5
+
+-- What the game's interact check (Model.Interact) says about distance: true puts the target nearer than 10 yards
+-- (the duel distance, 9.9), false puts it at least 8 away (the shortest minimum range of any shown reach). The two
+-- edges hold whichever side of them the client's own radius falls on.
+local INTERACT_NEAR, INTERACT_FAR = 8, 10
 
 -- Each class's reach spells, in the order their labels read when spells share a range. The client answers each
 -- spell's current range, so a talent that extends one moves it past the others; nothing here is a fixed distance.
@@ -103,22 +112,6 @@ local RANGED_REACH = {
 	WARRIOR = true,
 	ROGUE = true,
 }
-
--- The melee spells each class checks its melee reach with: attack spells whose own range is the game's Combat Range,
--- 5 yards. The druid's two are form spells, which answer nothing outside their form. The other classes name no melee
--- attack of their own.
----@type table<string, integer[]>
-local MELEE_SPELLS = {
-	WARRIOR = { 78 }, -- Heroic Strike
-	ROGUE = { 1752 }, -- Sinister Strike
-	HUNTER = { 2973, 2974, 1495 }, -- Raptor Strike, Wing Clip, Mongoose Bite
-	DRUID = { 1082, 6807 }, -- Claw, Maul
-}
--- The game's own Attack, which every class also checks. It is no spellbook entry, so the client may not list it as
--- known or answer it: a true from it is melee reach, and an answer of nothing decides nothing, as any nil does.
-local ATTACK_SPELL = 6603
--- A class that names no melee spell of its own still checks Attack, so the loop never allocates.
-local NO_SPELLS = {}
 
 ---@class TFRangeReach
 ---@field key string
@@ -320,41 +313,19 @@ function Model.Reaches(class, known, rangedSpell, range)
 	return reaches
 end
 
--- Melee reach from the melee spells the player knows: true when any of them reaches, false when none does and at
--- least one answered, and nil when none answered or none is known, which decides nothing, as before. A spell the
--- player has not learned is skipped, and an answer of nil decides nothing either. The class's own spells are asked
--- first, then the game's Attack.
----@param class string
----@param known fun(spell: integer): boolean
----@param check fun(spell: integer): boolean?
+-- Whether the target is in melee reach: the game's own answer for the main-hand auto attack, the one its Main Hand
+-- swing timer dims by. Nil when the client made no check (no weapon, or the native range check is off), which decides
+-- nothing. The strip only shows while the native timers do, and the game checks their range while they show.
 ---@return boolean?
-function Model.Melee(class, known, check)
-	local answeredFalse = false
-	local function Reaches(spell)
-		if not known(spell) then
-			return false
-		end
-		local answer = check(spell)
-		if answer == true then
-			return true
-		end
-		if answer ~= nil then
-			answeredFalse = true
-		end
-		return false
+function Model.Melee()
+	if not (C_SwingTimer and C_SwingTimer.IsTargetWithinSwingRange and Enum and Enum.PlayerSwingType) then
+		return nil
 	end
-	for _, spell in ipairs(MELEE_SPELLS[class] or NO_SPELLS) do
-		if Reaches(spell) then
-			return true
-		end
+	local ok, within = pcall(C_SwingTimer.IsTargetWithinSwingRange, Enum.PlayerSwingType.MainHand)
+	if not ok then
+		return nil
 	end
-	if Reaches(ATTACK_SPELL) then
-		return true
-	end
-	if answeredFalse then
-		return false
-	end
-	return nil
+	return ns.Readable(within)
 end
 
 -- Whether the target is within 8 yards, the game's own interact distance. The minimum-range shots players meet
@@ -371,63 +342,98 @@ function Model.Interact()
 	return ns.Readable(within)
 end
 
--- The band key, or nil when the answers cannot say. Melee wins when it reaches; otherwise the nearest reach whose
--- spell reaches (smallest maximum range); otherwise the dead zone inside the game's 8-yard check, when a shown
--- reach has a minimum range; otherwise Too far once every check said false. A nil that could change the answer
--- decides nothing, so the label stays hidden rather than naming the wrong band. `interact` is called only when the
--- dead zone could decide it.
+-- The band a target at `distance` yards stands in: Melee inside melee reach; otherwise the nearest reach that
+-- reaches it (smallest maximum range); otherwise the dead zone, inside a shown reach's minimum range; otherwise Too
+-- far.
+---@param distance number
+---@param reaches TFRangeReach[]
+---@return string
+local function BandAt(distance, reaches)
+	if distance <= MELEE_REACH then
+		return MELEE
+	end
+	local nearest
+	local inside = false
+	for _, reach in ipairs(reaches) do
+		if distance >= reach.min and distance <= reach.max and (not nearest or reach.max < nearest.max) then
+			nearest = reach
+		end
+		inside = inside or distance < reach.min
+	end
+	if nearest then
+		return nearest.key
+	end
+	if inside then
+		return DEAD_ZONE
+	end
+	return TOO_FAR
+end
+
+-- The one band every distance agreeing with the answers puts the target in, or nil when they leave more than one.
+-- False when no distance agrees: the answers break the yard model.
+-- The bands change only at the range edges, so each edge, a point between two edges and one past the last stand for
+-- every distance.
+---@param melee boolean?
+---@param interact boolean?
+---@param reaches TFRangeReach[]
+---@return string|false|nil
+local function Solve(melee, interact, reaches)
+	local edges = { 0, MELEE_REACH, INTERACT_NEAR, INTERACT_FAR }
+	for _, reach in ipairs(reaches) do
+		edges[#edges + 1] = reach.min
+		edges[#edges + 1] = reach.max
+	end
+	table.sort(edges)
+	local samples = {}
+	for i, edge in ipairs(edges) do
+		samples[#samples + 1] = edge
+		samples[#samples + 1] = edges[i + 1] and (edge + edges[i + 1]) / 2 or edge + 1
+	end
+	---@type string|false
+	local band = false
+	for _, distance in ipairs(samples) do
+		local agrees = (melee == nil or melee == (distance <= MELEE_REACH))
+			and (
+				interact == nil
+				or (interact and distance < INTERACT_FAR)
+				or (not interact and distance >= INTERACT_NEAR)
+			)
+		for _, reach in ipairs(reaches) do
+			if reach.check ~= nil and reach.check ~= (distance >= reach.min and distance <= reach.max) then
+				agrees = false
+			end
+		end
+		if agrees then
+			local here = BandAt(distance, reaches)
+			if band and band ~= here then
+				return nil
+			end
+			band = here
+		end
+	end
+	return band
+end
+
+-- The band key, or nil when the answers cannot say. Each answer narrows where the target can stand: melee from the
+-- game's swing range (nil out of combat: the game checks it only while its swing timers run), each reach from its
+-- spell, and the game's interact check. A band is named only when every distance left gives that band, so a missing
+-- answer hides only the bands it could change and never names a wrong one. `interact` is called only when the other
+-- answers leave more than one band.
 ---@param melee boolean?
 ---@param reaches TFRangeReach[]
 ---@param interact fun(): boolean?
 ---@return string?
 function Model.Band(melee, reaches, interact)
+	-- The game's own swing answer wins outright.
 	if melee == true then
 		return MELEE
 	end
-	local nearest
-	for _, reach in ipairs(reaches) do
-		if reach.check == true and (not nearest or reach.max < nearest.max) then
-			nearest = reach
-		end
+	local band = Solve(melee, nil, reaches)
+	if band == nil then
+		band = Solve(melee, interact(), reaches)
 	end
-	if nearest then
-		for _, reach in ipairs(reaches) do
-			if reach.check == nil and reach.max <= nearest.max then
-				return nil
-			end
-		end
-		return nearest.key
-	end
-	-- Melee may still be in reach when its check gave no answer, and a spell band could already be named above.
-	if melee ~= false then
-		return nil
-	end
-	local gap = false
-	for _, reach in ipairs(reaches) do
-		if reach.min > 0 then
-			gap = true
-		end
-	end
-	if gap then
-		local within = interact()
-		if within == true then
-			-- An unanswered spell could still reach; the interaction answer alone cannot rule it out.
-			for _, reach in ipairs(reaches) do
-				if reach.check == nil then
-					return nil
-				end
-			end
-			return DEAD_ZONE
-		elseif within == nil then
-			return nil
-		end
-	end
-	for _, reach in ipairs(reaches) do
-		if reach.check == nil then
-			return nil
-		end
-	end
-	return TOO_FAR
+	-- No distance fits every answer: something the yard model does not hold for, so no band can be named safely.
+	return band or nil
 end
 
 ns.Init(function()
@@ -743,7 +749,7 @@ ns.Init(function()
 		for _, segment in ipairs(spellSegments) do
 			segments[#segments + 1] = segment
 		end
-		local band = Model.Band(Model.Melee(class, Model.Known, Model.Check), reaches, Model.Interact)
+		local band = Model.Band(Model.Melee(), reaches, Model.Interact)
 		return band, segments
 	end
 

@@ -349,4 +349,4 @@ L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt
 
-L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever сообщает, когда ForeverCore требует исправления." -- mt
+L["Hide the crafting bar in the Professions window."] = "Скрыть полосу изготовления в окне профессий." -- mt
