@@ -118,6 +118,12 @@ LASTONLINE_DAYS = ""
 ---@type TFFriendsListUtil
 FriendsListUtil = nil
 
+-- The raid warning banner's writer (Blizzard_RaidWarning), absent from the generated API stubs.
+---@class TFRaidWarningUtil
+---@field AddMessage fun(message: string, chatInfo: table)
+---@type TFRaidWarningUtil
+RaidWarningUtil = nil
+
 -- UIErrorsFrame's hidden message types (Blizzard_UIErrorsFrame), written by its SetMessageTypeEnabled.
 ---@type table<integer, boolean>
 BLACK_LISTED_MESSAGE_TYPES = {}
