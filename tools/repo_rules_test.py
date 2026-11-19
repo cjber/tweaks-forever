@@ -63,6 +63,12 @@ class LuacheckGlobalTest(unittest.TestCase):
         self.assertEqual(len(unit_events({"UI/X.lua": listed})), 1, "a name in a list registered in a loop")
         self.assertEqual(len(unit_events({"UI/X.lua": 'f:RegisterEvent("UNIT_AURA")\n'})), 1)
         self.assertEqual(len(unit_events({"UI/X.lua": 'ns.On(\n\t"UNIT_PET",\n\tfn\n)\n'})), 1, "a multiline call")
+        self.assertEqual(
+            len(unit_events({"UI/X.lua": "local EVENTS = {\n\tUNIT_PET = Refresh,\n}\n"})), 1, "a table key"
+        )
+        self.assertEqual(
+            unit_events({"Chat/ClassLevels.lua": "\tUNIT_LEVEL = RememberUnit,\n"}), [], "named as every unit"
+        )
         ok = 'f:RegisterUnitEvent("UNIT_AURA", "player")\nif event == "UNIT_FACTION" then\n'
         self.assertEqual(unit_events({"UI/X.lua": ok}), [])
 

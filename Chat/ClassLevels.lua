@@ -197,6 +197,8 @@ local EVENTS = {
 		RememberUnit("mouseover")
 	end,
 	GROUP_ROSTER_UPDATE = Model.RefreshGroup,
+	-- Any player unit that levels, party, raid or nameplate: RegisterUnitEvent takes two units, so this one listens
+	-- to every unit by design (tools/repo_rules.py ALL_UNIT_EVENTS).
 	UNIT_LEVEL = RememberUnit,
 	GUILD_ROSTER_UPDATE = Model.RefreshGuild,
 	FRIENDLIST_UPDATE = Model.RefreshFriends,

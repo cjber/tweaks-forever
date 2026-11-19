@@ -15,7 +15,8 @@
 - `unit-event-for-every-unit`: a `UNIT_*` event is registered with `ns.OnUnit(event, unit, fn)` or
   `RegisterUnitEvent`. `ns.On` or `RegisterEvent` registers it for every unit, so in a raid each party, raid and
   nameplate unit wakes the addon to be ignored. Every quoted `UNIT_*` name must sit in one of those two calls or be
-  compared against (`event == "UNIT_X"`), which also catches a name kept in a list and registered in a loop.
+  compared against (`event == "UNIT_X"`), which also catches a name kept in a list and registered in a loop; an
+  event table's `UNIT_X = handler` key counts too. ALL_UNIT_EVENTS names the listeners that need every unit.
 - `unused-luacheck-global`: every `globals`/`read_globals` entry in .luacheckrc is named by some Lua or XML file;
   luacheck never reports an allowed global that nothing reads. Locales/phrases.txt counts as Lua: translators copy
   it into Locales/<locale>.lua, so its `GetLocale()` line needs the entry.
@@ -68,6 +69,11 @@ CHAT_REPLIES = {
     "UI/WhatsNew.lua": ("the one-line update note", ("message)",)),
 }
 UNIT_EVENT_NAME = re.compile(r"[\"']UNIT_[A-Z_]+[\"']")
+UNIT_EVENT_KEY = re.compile(r"^\s*(UNIT_[A-Z_]+)\s*=")
+# Listeners that need every unit, by file: more units than RegisterUnitEvent's two, with the reason.
+ALL_UNIT_EVENTS = {
+    ("Chat/ClassLevels.lua", "UNIT_LEVEL"): "remembers the level of any player unit that levels, nameplates included",
+}
 UNIT_EVENT_OK = re.compile(r"(\bOnUnit|RegisterUnitEvent)\s*\(\s*$|[=~]=\s*$")
 LUACHECK = ".luacheckrc"
 LUA_LIKE = re.compile(r"\.(lua|xml)$")
@@ -137,14 +143,23 @@ def chat_alerts(files: dict[str, str]) -> list[str]:
 
 
 def unit_events(files: dict[str, str]) -> list[str]:
-    return [
-        f"{path}:{number}: unit-event-for-every-unit: register it with ns.OnUnit(event, unit, fn)"
-        for path, text in files.items()
-        if LUA_LIKE.search(path) and not path.startswith((*SETTINGS_SKIP, "tools/"))
-        for number, line in enumerate(text.splitlines(), 1)
-        for name in UNIT_EVENT_NAME.finditer(lua_code(line))
-        if not UNIT_EVENT_OK.search(lua_code(line)[: name.start()])
-    ]
+    hits = []
+    for path, text in files.items():
+        if not LUA_LIKE.search(path) or path.startswith((*SETTINGS_SKIP, "tools/")):
+            continue
+        for number, line in enumerate(text.splitlines(), 1):
+            code = lua_code(line)
+            names = [(m[0].strip("\"'"), m.start()) for m in UNIT_EVENT_NAME.finditer(code)]
+            key = UNIT_EVENT_KEY.match(code)
+            if key:
+                names.append((key[1], len(code)))
+            for name, at in names:
+                if (path, name) in ALL_UNIT_EVENTS or (at < len(code) and UNIT_EVENT_OK.search(code[:at])):
+                    continue
+                hits.append(
+                    f"{path}:{number}: unit-event-for-every-unit: register {name} with ns.OnUnit(event, unit, fn)"
+                )
+    return hits
 
 
 def luacheck_entries(text: str) -> list[tuple[str, int]]:
