@@ -86,6 +86,8 @@ function GetUIPanelLayoutAttribute(attribute) end
 ---@type string
 ERR_NOT_IN_COMBAT = ""
 ---@type string
+ERR_NOT_ENOUGH_MONEY = ""
+---@type string
 TRAINING_POINTS_ABBREV = ""
 ---@type string
 ITEM_SPELL_KNOWN = ""
