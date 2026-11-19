@@ -351,4 +351,4 @@ L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt
 
-L["Hide the crafting bar in the Professions window."] = "전문 기술 창의 제작 바 숨기기." -- mt
+L["Rare and pull alerts show on screen."] = "희귀 몬스터 알림과 어그로 경고가 화면에 표시됩니다." -- mt

@@ -10,6 +10,20 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.1] - 2026-11-19
+
+### Changed
+
+- **Rare and pull alerts show on screen.** Rare alerts and the pull warning now appear as a warning at the top of the screen instead of a chat line, so other addons' chat no longer buries them. To set a waypoint to the last rare, press the key bound under Key Bindings > AddOns; a rare's name is no longer a link in chat. The missing-lure warning already showed on screen, and its tooltip now says so.
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
+### Fixed
+
+- **German camp text reads "Ausdauer um 56 erhöht".** The First Aid Kit's camp benefit was missing the space before its number.
+- **Less work in groups and raids.** The pull warning, the pet trainer note and quest progress now hear only about you or your target, instead of every party, raid and nameplate unit.
+- **One sold stack reads in the singular.** Selling a single junk stack now says "Sold 1 junk stack", and Train all's tooltip says "Train 1 skill" for one skill.
+- **/tweaks says why Tweaks Forever stopped.** When ForeverCore is missing or out of date, typing /tweaks now repeats the line naming the fix.
+
 ## [2.9.0] - 2026-11-18
 
 <!-- discord-image: docs/screenshots/rangestrip.png -->
