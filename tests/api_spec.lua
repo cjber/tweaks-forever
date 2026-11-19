@@ -187,6 +187,9 @@ local env = setmetatable({
 		return "Choice", 0, rewardItems[index] and rewardItems[index].count or 1
 	end,
 	C_Item = {
+		GetItemInfoInstant = function(link)
+			return tonumber(link:match("^item:(%d+)"))
+		end,
 		GetItemInfo = function(link)
 			for _, item in ipairs(rewardItems) do
 				if item.link == link then
@@ -274,6 +277,8 @@ ns.ClickMode = function(mode)
 	clickMode = mode
 end
 ns.HookBagButtons = function() end
+-- Core/ItemInfo.lua's wait for an item's data; tests/junk_spec.lua and tests/bestreward_spec.lua load the real one.
+ns.AwaitItem = function() end
 ns.OnTooltip = function() end
 ns.ForEachBagButton = function() end
 ns.IsBagActionClick = function()

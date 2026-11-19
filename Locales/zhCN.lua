@@ -104,7 +104,6 @@ L["Flight map"] = "飞行地图"
 L["Flight paths"] = "飞行路线"
 L["Fold repeated messages"] = "合并重复消息"
 L["Forever"] = "Forever"
-L["Forever addons"] = "Forever插件"
 L["Friends / Social"] = "好友 / 社交"
 L["From your friends, Battle.net friends and guild. Not while you are queued for a battleground, since joining could take you out of the queue. Hold Shift to answer it yourself."] = "来自好友、战网好友和公会成员。排队等待战场时不接受，因为加入可能会让你退出队列。按住Shift可自己回应。"
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "来自你的队伍，且不来自战斗中的人，因此战斗复活的时机仍由你决定。如果你很快再次死亡，会等待游戏的延迟。按住Shift可自己回应。"
@@ -350,4 +349,4 @@ L["Melee"] = "近战" -- mt
 L["Dead zone"] = "死区" -- mt
 L["Too far"] = "过远" -- mt
 
-L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever 会在 ForeverCore 需要修复时提醒你。" -- mt
+L["Hide the crafting bar in the Professions window."] = "隐藏专业窗口中的制造条。" -- mt

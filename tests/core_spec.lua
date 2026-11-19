@@ -149,14 +149,17 @@ assert(Load(saved) == saved, "existing settings keep their identity and player c
 assert(not saved.enabled and saved.junk[42] and saved.gearMark == "dots")
 assert(Load({}).junk, "older settings receive the junk table before initializers")
 
--- Settings retired with features that are gone: the entrance pins' switch, and the old hint setting whose off
--- carries over once to the shared family setting.
-local retired = Load({ companionHints = false, dungeonEntrances = true })
-assert(retired.suggestFamily == false and retired.companionHints == nil, "an old off turns the shared setting off")
+-- Settings retired with what they belonged to: the entrance pins' switch, the old hint setting and the Forever
+-- addons page's setting and dismissed hints are forgotten.
+local retired = Load({
+	companionHints = false,
+	suggestFamily = false,
+	familyDismissed = { a = true },
+	dungeonEntrances = true,
+})
+assert(retired.companionHints == nil and retired.suggestFamily == nil, "the old hint settings are forgotten")
+assert(retired.familyDismissed == nil, "the dismissed hints are forgotten")
 assert(retired.dungeonEntrances == nil, "the entrance pins' switch is forgotten")
-assert(Load({ companionHints = true }).suggestFamily == nil, "an old on leaves the shared setting's default")
-local chosen = Load({ companionHints = false, suggestFamily = true })
-assert(chosen.suggestFamily == true and chosen.companionHints == nil, "a shared setting already chosen wins")
 
 do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but "off", while Polestar is loaded.
 	local loaded, settings = {}, {}

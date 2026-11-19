@@ -104,7 +104,6 @@ L["Flight map"] = "Carte des trajets aériens"
 L["Flight paths"] = "Trajets aériens"
 L["Fold repeated messages"] = "Regrouper les messages répétés"
 L["Forever"] = "Forever"
-L["Forever addons"] = "Addons Forever"
 L["Friends / Social"] = "Amis / Social"
 L["From your friends, Battle.net friends and guild. Not while you are queued for a battleground, since joining could take you out of the queue. Hold Shift to answer it yourself."] = "De vos amis, contacts Battle.net et de votre guilde. Pas pendant une file d'attente de champ de bataille, car rejoindre pourrait vous en faire sortir. Maintenez Maj pour répondre vous-même."
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "De votre groupe, et pas de quelqu'un en combat, pour que vous choisissiez toujours le moment d'une résurrection en combat. Attend le délai du jeu si vous mourez à nouveau peu après. Maintenez Maj pour répondre vous-même."
@@ -350,4 +349,4 @@ L["Melee"] = "Corps à corps" -- mt
 L["Dead zone"] = "Zone morte" -- mt
 L["Too far"] = "Trop loin" -- mt
 
-L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever vous avertit lorsque ForeverCore doit être réparé." -- mt
+L["Hide the crafting bar in the Professions window."] = "Masquer la barre de fabrication dans la fenêtre des métiers." -- mt

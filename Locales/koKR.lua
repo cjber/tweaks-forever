@@ -104,7 +104,6 @@ L["Flight map"] = "비행 지도"
 L["Flight paths"] = "비행 경로"
 L["Fold repeated messages"] = "반복 메시지 접기"
 L["Forever"] = "Forever"
-L["Forever addons"] = "Forever 애드온"
 L["Friends / Social"] = "친구 / 소셜"
 L["From your friends, Battle.net friends and guild. Not while you are queued for a battleground, since joining could take you out of the queue. Hold Shift to answer it yourself."] = "친구, Battle.net 친구, 길드원의 초대를 수락합니다. 전장 대기 중에는 수락하지 않습니다. 참가하면 대기열에서 빠질 수 있기 때문입니다. 직접 응답하려면 Shift를 누르고 있으세요."
 L["From your group, and not from someone in combat, so a battle resurrection is still yours to time. Waits out the game's delay after dying again soon. Hold Shift to answer it yourself."] = "파티원의 부활만 수락하며, 전투 중인 사람의 부활은 수락하지 않아 전투 부활 시점은 직접 정할 수 있습니다. 곧 다시 죽으면 게임의 대기 시간을 기다립니다. 직접 응답하려면 Shift를 누르고 있으세요."
@@ -350,4 +349,4 @@ L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt
 
-L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever가 ForeverCore를 수정해야 할 때 알려줍니다." -- mt
+L["Hide the crafting bar in the Professions window."] = "전문 기술 창의 제작 바 숨기기." -- mt

@@ -1,5 +1,5 @@
 ---@type string, TFNamespace
-local addonName, ns = ...
+local _, ns = ...
 
 if ns.broken then
 	return
@@ -233,19 +233,6 @@ ns.Init(function()
 			end, nil, false)
 		)
 	end
-	-- The Forever addons page is ForeverCore's, with the hint setting on it. With the gamepad interface on it is the
-	-- client's own rows so the Options navigation can enter it (#382); otherwise its canvas frame, and nothing of
-	-- ours goes into the settings search. A failure there is caught and leaves the rest of the settings and /tweaks
-	-- working.
-	ns.core.SafeCall("Forever addons page", function()
-		local family = ForeverCore.Family.Register(category, ns.db, addonName, ns.core.SafeCall)
-		Settings.RegisterInitializer(
-			category,
-			Secure(CreateSettingsButtonInitializer)(L["Forever addons"], L["Open"], function()
-				ForeverCore.OpenSettingsPanel(family:GetID())
-			end, nil, false)
-		)
-	end)
 	Settings.RegisterAddOnCategory(category)
 	-- Another addon's settings may have changed since login. Not with the gamepad UI on (#168): its navigation
 	-- pushes and pops input bindings as this panel and its rows show and hide, and a blocked
