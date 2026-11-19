@@ -8,8 +8,8 @@ from tools.gen_camp import (
     TENT,
     TENT_AURA,
     benefits,
+    corrected,
     localised_effects,
-    resolve,
     summary_branches,
 )
 
@@ -105,12 +105,12 @@ class CampTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "another order"):
             localised_effects(spells, texts, benefits(spells))
 
-    def test_a_number_glued_to_its_word_gets_a_space(self):
-        spells = FakeSpells(features(1))
-        self.assertEqual(resolve(spells, f"Ausdauer um${FIRST}w1 erhöht", FIRST)[0], "Ausdauer um 87 erhöht")
-        self.assertEqual(resolve(spells, f"Сила на${FIRST}w1", FIRST)[0], "Сила на 87")
-        self.assertEqual(resolve(spells, f"耐力提高${FIRST}w1点", FIRST)[0], "耐力提高87点", "no spaces in Chinese")
-        self.assertEqual(resolve(spells, f"um ${FIRST}w1 und ${FIRST}w1%", FIRST)[0], "um 87 und 87%")
+    def test_a_listed_source_typo_is_corrected(self):
+        text = "Erhält: $?a1[Ausdauer um$1230124w1 erhöht.][]"
+        self.assertEqual(corrected("deDE", CAMP_BENEFITS, text), "Erhält: $?a1[Ausdauer um $1230124w1 erhöht.][]")
+        self.assertEqual(corrected("frFR", CAMP_BENEFITS, "x$1w1"), "x$1w1", "only that locale's text")
+        with self.assertRaisesRegex(ValueError, "remove its SOURCE_TYPOS entry"):
+            corrected("deDE", CAMP_BENEFITS, "Ausdauer um $1230124w1 erhöht")
 
 
 if __name__ == "__main__":
