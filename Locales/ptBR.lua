@@ -349,4 +349,4 @@ L["Melee"] = "Corpo a corpo" -- mt
 L["Dead zone"] = "Zona morta" -- mt
 L["Too far"] = "Longe demais" -- mt
 
-L["Tweaks Forever tells you when ForeverCore needs fixing."] = "Tweaks Forever avisa quando o ForeverCore precisa de reparos." -- mt
+L["Hide the crafting bar in the Professions window."] = "Ocultar a barra de criação na janela de profissões." -- mt

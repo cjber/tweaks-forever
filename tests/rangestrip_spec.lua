@@ -1,5 +1,5 @@
--- Range strip (UI/RangeStrip.lua): each class's reaches from the client's own spell ranges, melee from the client's
--- own spell range checks, the band rule from the nearest reach that answers true, the dead zone only when a shown
+-- Range strip (UI/RangeStrip.lua): each class's reaches from the client's own spell ranges, melee from the game's
+-- own main-hand swing range, the band rule from the nearest reach that answers true, the dead zone only when a shown
 -- reach has a minimum range, and a ticker while the strip shows. The file is compiled once, and a Load only gives it
 -- a fresh environment.
 local CHUNK = assert(loadfile("UI/RangeStrip.lua"))
@@ -148,7 +148,10 @@ local function Load(class, knownSpells)
 	local interact, target = true, true
 	local uiScale = 1
 	knownSpells = knownSpells or {}
-	local answers = {}
+	-- The client says its melee attacks reach at every distance (#574), so their answers are always true here and
+	-- the strip must take melee from the swing range instead.
+	local answers = { [78] = true, [1752] = true, [2973] = true, [2974] = true, [1495] = true, [6603] = true }
+	local swing = false
 	local ranges = {}
 	for spell, range in pairs(SPELL_RANGES) do
 		ranges[spell] = { range[1], range[2] }
@@ -220,6 +223,13 @@ local function Load(class, knownSpells)
 			return target
 		end,
 		CheckInteractDistance = interactCheck,
+		Enum = { PlayerSwingType = { MainHand = 0, OffHand = 1, Ranged = 2 } },
+		C_SwingTimer = {
+			IsTargetWithinSwingRange = function(swingType)
+				assert(swingType == 0, "melee reads the main-hand swing")
+				return swing
+			end,
+		},
 		C_Spell = {
 			IsSpellInRange = function(spell)
 				return answers[spell] == true
@@ -317,6 +327,9 @@ local function Load(class, knownSpells)
 			else
 				ranges[spell] = { minRange, maxRange }
 			end
+		end,
+		setSwing = function(value)
+			swing = value
 		end,
 		setAnswer = function(spell, value)
 			answers[spell] = value
@@ -458,40 +471,15 @@ hunter.setMainHand(nil)
 assert(M.MainHandTexture() == nil, "an empty main hand has no icon")
 hunter.setMainHand(SWORD)
 
--- Melee reach from the class's own melee spells and the game's Attack: true from any that reaches, false when a
--- known spell answered and none reaches, and nil when nothing answered. A spell the player has not learned is
--- skipped, and an answer of nil decides nothing.
-local function said(map)
-	return function(spell)
-		return map[spell]
-	end
-end
-
-local warrior = known({ [78] = true })
-assert(M.Melee("WARRIOR", warrior, said({ [78] = true })) == true, "a melee spell that reaches is melee")
-assert(M.Melee("WARRIOR", warrior, said({ [78] = false })) == false, "every known spell out of reach is not melee")
-assert(M.Melee("WARRIOR", warrior, said({})) == nil, "a known spell that answered nothing decides nothing")
-assert(M.Melee("WARRIOR", known({}), said({ [78] = true })) == nil, "a spell the player has not learned is skipped")
-assert(
-	M.Melee("HUNTER", known({ [2974] = true }), said({ [2973] = true, [2974] = false })) == false,
-	"Raptor Strike is not learned, so its answer is skipped"
-)
-assert(
-	M.Melee("HUNTER", known({ [2973] = true, [2974] = true }), said({ [2974] = false })) == false,
-	"a melee spell that answered nothing leaves the other's false standing"
-)
--- Attack is checked by every class, whether or not it has a melee spell of its own.
-assert(
-	M.Melee("WARRIOR", known({ [78] = true, [6603] = true }), said({ [78] = false, [6603] = true })) == true,
-	"Attack that reaches is melee"
-)
-assert(M.Melee("MAGE", known({}), said({ [6603] = true })) == nil, "Attack is skipped while it is not known")
-assert(M.Melee("MAGE", known({ [6603] = true }), said({ [6603] = true })) == true, "a class with only Attack")
-assert(M.Melee("MAGE", known({ [6603] = true }), said({ [6603] = false })) == false, "Attack out of reach")
-assert(
-	M.Melee("WARRIOR", known({ [78] = true, [6603] = true }), said({ [78] = false })) == false,
-	"Attack answering nothing leaves the melee spell's false standing"
-)
+-- Melee reach is the game's own main-hand swing range, as its Main Hand timer reads it: true, false, or nil when the
+-- client made no check. Raptor Strike and Attack answer true at every distance (#574) and decide nothing.
+hunter.setSwing(true)
+assert(M.Melee() == true, "in swing range is melee")
+hunter.setSwing(false)
+assert(M.Melee() == false, "out of swing range is not melee, whatever Raptor Strike says")
+hunter.setSwing(nil)
+assert(M.Melee() == nil, "no swing check decides nothing")
+hunter.setSwing(true)
 
 -- The client's own ranges decide order and merging: equal maxima are one segment named by the first spell in table
 -- order, and a talent that extends one splits them.
@@ -517,7 +505,8 @@ assert(
 )
 
 -- The band rule, by hand: melee wins, then the nearest reach that answers true, then the dead zone the 8-yard
--- check opens for a reach with a minimum, then Too far. A nil that could change the answer hides the band.
+-- check opens for a reach with a minimum, then Too far. A nil that could change the answer hides the band, and the
+-- 8-yard check runs only when the other answers leave more than one band.
 local function reach(key, min, max, check)
 	return { key = key, min = min, max = max, check = check }
 end
@@ -542,7 +531,7 @@ assert(
 	"the nearest reach that answers true"
 )
 assert(
-	M.Band(false, { reach("fireblast", 0, 20, nil), reach("frostbolt", 0, 30, true) }, noInteract) == nil,
+	M.Band(false, { reach("fireblast", 0, 20, nil), reach("frostbolt", 0, 30, true) }, interact(false)) == nil,
 	"a nearer reach with no answer hides the band"
 )
 assert(
@@ -560,15 +549,25 @@ assert(M.Band(false, warriorReaches, interact(true)) == "dead", "a minimum range
 assert(M.Band(false, warriorReaches, interact(false)) == "far", "every reach too short, beyond 8 yards")
 assert(M.Band(false, { reach("judgement", 0, 10, false) }, noInteract) == "far", "no minimum range, so no dead zone")
 assert(M.Band(false, warriorReaches, interact(nil)) == nil, "the 8-yard check answered nothing")
-assert(M.Band(nil, { reach("charge", 8, 25, false) }, noInteract) == nil, "melee unknown leaves the gap unclaimed")
--- Any unanswered spell could still reach, so the interaction answer alone cannot name the gap.
+assert(M.Band(nil, { reach("charge", 8, 25, false) }, interact(true)) == nil, "melee unknown leaves the gap unclaimed")
+-- Out of combat the swing range has no answer; the ranged bands still light, and a reach the target is beyond rules
+-- melee out.
+assert(M.Band(nil, { reach("autoshot", 8, 35, true) }, noInteract) == "autoshot", "Auto Shot lights with melee unknown")
+assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(false)) == "far", "beyond Auto Shot is Too far")
+assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(nil)) == nil, "no 8-yard answer, melee undecided")
+assert(M.Band(nil, { reach("frostbolt", 0, 30, false) }, noInteract) == "far", "beyond a reach with no minimum")
 assert(
-	M.Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == nil,
-	"a spell with no minimum and no answer could reach inside 8 yards"
+	M.Band(nil, { reach("frostbolt", 0, 30, nil) }, interact(true)) == nil,
+	"no reach answered false, so melee stays undecided"
+)
+-- The interact check reaches past 8 yards, so it alone cannot say an unanswered 8-yard minimum is out of reach.
+assert(
+	M.Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == "wrath",
+	"inside the interact check and out of melee, a spell reaching from 0 to 30 yards reaches"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == nil,
-	"a positive minimum does not make an unanswered spell false"
+	M.Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == "dead",
+	"a false 8 to 30 reach inside the interact check puts the target inside 8 yards, inside Charge's minimum too"
 )
 
 assert(
@@ -584,9 +583,143 @@ assert(
 	"different positive minima do not resolve unanswered reaches"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, false), reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
-	"a known false reach does not resolve another unanswered reach"
+	M.Band(false, { reach("charge", 8, 25, false), reach("autoshot", 8, 35, nil) }, interact(true)) == "dead",
+	"a false reach sharing the unanswered one's minimum puts the target inside both"
 )
+
+-- Answers no distance fits (Fire Blast in range, Frostbolt with the longer reach not) break the yard model, so the
+-- band is hidden rather than guessed.
+assert(
+	M.Band(false, { reach("fireblast", 0, 20, true), reach("frostbolt", 0, 30, false) }, interact(nil)) == nil,
+	"contradicting answers name no band"
+)
+
+-- The band rule over every reach set, every distance and every pattern of unanswered checks. The target stands at a
+-- distance; melee reaches 5 yards, the interact check answers inside the client's radius (8 or 9.9 here, the two ends
+-- the strip allows for), and each reach answers inside its own range. Any answer may be missing (melee is out of
+-- combat, a spell or the interact check may say nothing). The rule must never name a wrong band, and must name the
+-- band whenever the answers leave only one band possible: a missing answer hides only the bands it could change.
+local function TrueBand(distance, reaches)
+	if distance <= 5 then
+		return "melee"
+	end
+	local nearest, inside
+	for _, r in ipairs(reaches) do
+		if distance >= r.min and distance <= r.max and (not nearest or r.max < nearest.max) then
+			nearest = r
+		end
+		inside = inside or distance < r.min
+	end
+	if nearest then
+		return nearest.key
+	end
+	return inside and "dead" or "far"
+end
+
+local function Within(distance, r)
+	return distance >= r.min and distance <= r.max
+end
+
+-- Shapes the client gives a reach: no minimum, an 8-yard minimum, short and long maxima, and two sharing a minimum.
+local SHAPES = { { 0, 10 }, { 0, 20 }, { 0, 30 }, { 8, 25 }, { 8, 35 }, { 8, 41 }, { 10, 35 } }
+local reachSets = { {} }
+for a = 1, #SHAPES do
+	reachSets[#reachSets + 1] = { a }
+	for b = a + 1, #SHAPES do
+		reachSets[#reachSets + 1] = { a, b }
+		for c = b + 1, #SHAPES do
+			reachSets[#reachSets + 1] = { a, b, c }
+		end
+	end
+end
+
+for _, set in ipairs(reachSets) do
+	local reaches = {}
+	for i, shape in ipairs(set) do
+		reaches[i] = reach("r" .. shape, SHAPES[shape][1], SHAPES[shape][2], nil)
+	end
+	local n = #reaches
+	-- This samples only each edge, the point between two edges and one past the last. That stands for every distance
+	-- because nothing here changes between edges: each answer and TrueBand compare the distance only against 5, the
+	-- interact radius and the reach edges, all of them in `edges`. A 0.01-yard walk from 0 to 60 yards gives the same
+	-- 769 distinct answer sets with the same bands (PR #613).
+	local edges = { 0, 5, 8, 9.9, 10 }
+	for _, r in ipairs(reaches) do
+		edges[#edges + 1] = r.min
+		edges[#edges + 1] = r.max
+	end
+	table.sort(edges)
+	local samples = {}
+	for i, edge in ipairs(edges) do
+		samples[#samples + 1] = edge
+		samples[#samples + 1] = edges[i + 1] and (edge + edges[i + 1]) / 2 or edge + 1
+	end
+	-- Each distinct set of answers once, with every band a target giving those answers can stand in.
+	local cases, order = {}, {}
+	for _, radius in ipairs({ 8, 9.9 }) do
+		for _, distance in ipairs(samples) do
+			-- Bit 0 drops melee, bit 1 the interact check, bit i + 1 reach i.
+			for mask = 0, 2 ^ (n + 2) - 1 do
+				local function Kept(bit, value)
+					if math.floor(mask / 2 ^ bit) % 2 == 1 then
+						return nil
+					end
+					return value
+				end
+				local melee, near, checks = Kept(0, distance <= 5), Kept(1, distance < radius), {}
+				local key = tostring(melee) .. tostring(near)
+				for i, r in ipairs(reaches) do
+					checks[i] = Kept(i + 1, Within(distance, r))
+					key = key .. tostring(checks[i])
+				end
+				local case = cases[key]
+				if not case then
+					case = { melee = melee, near = near, checks = checks, bands = {}, at = distance }
+					cases[key] = case
+					order[#order + 1] = key
+				end
+				case.bands[TrueBand(distance, reaches)] = true
+			end
+		end
+	end
+	for _, key in ipairs(order) do
+		local case = cases[key]
+		for i = 1, n do
+			reaches[i].check = case.checks[i]
+		end
+		local got = M.Band(case.melee, reaches, function()
+			return case.near
+		end)
+		local failure =
+			string.format("reaches %s near %.1f yd (%s): got %s", table.concat(set, ","), case.at, key, tostring(got))
+		-- Never wrong: a named band is the band at every distance giving these answers.
+		if got ~= nil then
+			for band in pairs(case.bands) do
+				assert(band == got, failure .. ", but " .. band .. " gives the same answers")
+			end
+		end
+		-- Never hidden needlessly: the strip knows the interact radius only to lie from 8 to 10 yards, so the bands
+		-- possible are those at every distance some radius there would give these answers.
+		local only, count = nil, 0
+		local possible = {}
+		for _, distance in ipairs(samples) do
+			local agrees = (case.melee == nil or case.melee == (distance <= 5))
+				and (case.near == nil or (case.near and distance < 10) or (not case.near and distance >= 8))
+			for i, r in ipairs(reaches) do
+				agrees = agrees and (case.checks[i] == nil or case.checks[i] == Within(distance, r))
+			end
+			if agrees then
+				local band = TrueBand(distance, reaches)
+				if not possible[band] then
+					possible[band], count, only = true, count + 1, band
+				end
+			end
+		end
+		if count == 1 then
+			assert(got == only, failure .. ", the answers leave only " .. only)
+		end
+	end
+end
 
 -- A hunter's strip: Melee, the Dead zone its Auto Shot minimum leaves, then Auto Shot.
 hunter.initializers[1]()
@@ -606,7 +739,7 @@ assert(hunter.ranged.scripts.OnShow and hunter.ranged.scripts.OnHide and hunter.
 
 hunter.db.rangeStrip = true
 hunter.db.rangeStripIcons, hunter.db.rangeStripLabel = true, true
-hunter.setAnswer(2973, true)
+hunter.setSwing(true)
 hunter.changed()
 assert(hunter.strip.shown, "on, the strip shows")
 -- The game stacks its timers, so the strip docks under the lowest one: the Ranged timer, whose bottom is lower.
@@ -673,13 +806,13 @@ hunter.changed()
 assert(hunter.strip.points[1][2] == hunter.mainHand, "the lower timer takes the strip")
 
 -- Auto Shot reaches: its band is named by the spell while the ticker keeps running.
-hunter.setAnswer(2973, false)
+hunter.setSwing(false)
 hunter.setAnswer(75, true)
 hunter.changed()
 assert(hunter.fontStrings[1].string == "Auto Shot", "the reach that answers names the band")
 assert(art(hunter, 3).fill.shown and not art(hunter, 1).fill.shown, "only the spell band is lit")
 assert(#hunter.tickers == 1 and not hunter.tickers[1].cancelled, "the ticker keeps running in a spell band")
-hunter.setAnswer(2973, true)
+hunter.setSwing(true)
 hunter.changed()
 assert(
 	hunter.fontStrings[1].string == "Melee" and not hunter.tickers[1].cancelled,
@@ -687,7 +820,7 @@ assert(
 )
 
 -- Out of reach but inside 8 yards: the Dead zone. Beyond it: Too far. With no 8-yard answer: no label at all.
-hunter.setAnswer(2973, false)
+hunter.setSwing(false)
 hunter.setAnswer(75, false)
 hunter.setInteract(true)
 hunter.changed()
@@ -715,7 +848,7 @@ assert(not hunter.strip.shown, "no strip without a shown timer")
 hunter.ranged.shown = true
 hunter.ranged.scale = 0.7
 hunter.setUIScale(0.5)
-hunter.setAnswer(2973, true)
+hunter.setSwing(true)
 hunter.changed()
 assert(hunter.strip.shown and math.abs(hunter.strip.scale - 1.4) < 1e-9, "the strip takes its timer's scale")
 assert(#hunter.tickers == 2 and not hunter.tickers[2].cancelled, "shown again, a new ticker starts")
@@ -773,7 +906,10 @@ local mage = Load("MAGE", { [2136] = true, [116] = true, [133] = true })
 mage.initializers[1]()
 mage.db.rangeStrip = true
 mage.db.rangeStripIcons, mage.db.rangeStripLabel = true, true
+-- Within 20 yards every reach answers true, as the client does.
 mage.setAnswer(2136, true)
+mage.setAnswer(116, true)
+mage.setAnswer(133, true)
 mage.changed()
 assert(joined(segments(mage)) == "Melee | Fire Blast | Frostbolt | Fireball", "the mage's reaches near to far")
 assert(mage.fontStrings[1].string == "Fire Blast", "the nearest reach names the band")
@@ -781,6 +917,8 @@ assert(mage.fontStrings[1].string == "Fire Blast", "the nearest reach names the 
 -- Improved Fire Blast (+15 yards) moves Fire Blast past Frostbolt, level with Fireball: the two are one segment,
 -- and CHARACTER_POINTS_CHANGED rebuilds the strip from the client's ranges and lays the narrower row out again.
 mage.setRange(2136, 0, 35)
+-- Between 30 and 35 yards: Frostbolt falls short, the talented Fire Blast and Fireball reach.
+mage.setAnswer(116, false)
 mage.handlers.CHARACTER_POINTS_CHANGED()
 assert(joined(segments(mage)) == "Melee | Frostbolt | Fire Blast", "a talent reorders and merges the mage strip")
 assert(mage.fontStrings[1].string == "Fire Blast", "the talented reach still names the band")
