@@ -36,7 +36,7 @@ local L = ns.L
 # 404 page it gets back fails the release. Split so this file doesn't carry it.
 PACKAGER_KEYWORD = "@local" + "ization"
 # Declarations whose English text is translated where it is shown, and the fields that hold it.
-DECLARATIONS = {"Feature": {"category", "name", "tooltip"}, "ClickMode": {"label", "tooltip"}}
+DECLARATIONS = {"Feature": {"category", "section", "name", "tooltip"}, "ClickMode": {"label", "tooltip"}}
 # UI calls and the argument (from 1) that is shown to the player.
 SINKS = {
     "SetText": 1,

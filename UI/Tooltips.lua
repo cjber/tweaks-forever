@@ -10,6 +10,7 @@ local KEY, STYLE = "retailTooltips", "tooltipStyle"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Tooltips and nameplates",
 	name = "Modern tooltips",
 	tooltip = "Tooltips get a thin grey border with rounded corners in place of the beige one. A player's name "
 		.. "is in their class colour with their race and class on one line, and a unit's health bar sits inside "
@@ -32,6 +33,7 @@ ns.Feature({
 ns.Feature({
 	key = STYLE,
 	category = "Interface",
+	section = "Tooltips and nameplates",
 	name = "Tooltip style",
 	tooltip = "Modern is a neutral charcoal that keeps the text crisp over any scenery. Retail is the retail "
 		.. "game's navy, a little see-through. Forever keeps the game's own beige border.",

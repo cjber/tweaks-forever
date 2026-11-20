@@ -8,7 +8,8 @@ local L = ns.L
 
 ns.Feature({
 	key = "foreverQuests",
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quests",
 	name = "Highlight new Forever quests",
 	tooltip = "A soft gold background marks quests added in WoW: Forever in the quest log and quest text.",
 	default = true,
@@ -16,7 +17,8 @@ ns.Feature({
 })
 ns.Feature({
 	key = "bulkAbandon",
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quests",
 	name = "Abandon multiple quests",
 	tooltip = "Adds an Abandon quests button to the quest log. Choose quests, then confirm once for the whole selection.",
 	default = true,

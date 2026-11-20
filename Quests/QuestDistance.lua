@@ -8,7 +8,8 @@ local L = ns.L
 
 ns.Feature({
 	key = "questDistance",
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quests",
 	name = "Nearest quests first",
 	tooltip = "Sorts the quest tracker nearest first and shows how far away each quest is. The quest whose "
 		.. "area you're standing in is marked 'here' with a soft highlight.",

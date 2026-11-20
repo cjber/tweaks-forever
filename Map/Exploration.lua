@@ -7,7 +7,8 @@ end
 
 ns.Feature({
 	key = "exploration",
-	category = "Maps",
+	category = "Quests and maps",
+	section = "World map",
 	name = "Reveal unexplored areas",
 	tooltip = "Show unexplored zone terrain with a dim blue tint. Explored areas keep their normal appearance.",
 	default = false,

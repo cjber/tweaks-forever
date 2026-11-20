@@ -11,6 +11,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Names and links",
 	name = "Item icons in chat",
 	tooltip = "A small picture of the item appears before each item link in chat, so a trade or a loot link is "
 		.. "recognised at a glance. Quest, spell and other links are left alone.",

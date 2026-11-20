@@ -11,6 +11,7 @@ local KEY = "xpRate"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "XP per hour on the experience bar",
 	tooltip = "Pointing at the experience bar adds your XP per hour over the last 15 minutes, the time to your next "
 		.. "level at that pace, and about how many kills or quests that is.",

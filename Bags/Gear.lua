@@ -8,7 +8,8 @@ local L = ns.L
 
 ns.Feature({
 	key = "gearGroups",
-	category = "Gear",
+	category = "Bags and vendors",
+	section = "Gear groups",
 	name = "Sort gear into named groups",
 	tooltip = "Ctrl+Right-click a bag item, or pick Group gear from a bag's portrait menu, to put it in a named "
 		.. "group, such as Healing, DPS or Levelling, or to start a new one. The same menu equips a whole group "
@@ -27,7 +28,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "beforeFishing",
-	category = "Gear",
+	category = "Bags and vendors",
+	section = "Gear groups",
 	name = "Keep swapped weapons",
 	tooltip = "Equipping a fishing pole keeps the weapons it replaced as a Before fishing group, marked in your "
 		.. "bags. Ctrl+Right-click one of them and pick Equip Before fishing to put them back on.",
@@ -37,7 +39,8 @@ ns.Feature({
 
 ns.Feature({
 	key = "gearMark",
-	category = "Gear",
+	category = "Bags and vendors",
+	section = "Gear groups",
 	name = "Mark grouped gear with",
 	tooltip = "How grouped gear shows in your bags, in each group's colour. A strip along the bottom of the slot "
 		.. "keeps clear of the item quality border; a border takes the place of the quality border, split between "

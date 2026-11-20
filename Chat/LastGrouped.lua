@@ -13,6 +13,7 @@ local Record = ns.ChatPlayerRecord
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Whispers",
 	name = "Last grouped with",
 	tooltip = "A whisper window starts with a grey line saying when you last grouped with that player and where, "
 		.. "from what this character has seen. Nothing is added when you have never grouped with them.",

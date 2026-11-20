@@ -12,6 +12,7 @@ local ICONS_KEY, LABEL_KEY = "rangeStripIcons", "rangeStripLabel"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Range strip",
 	tooltip = "A strip under the game's swing timers naming which of your attacks reach your target, from "
 		.. "melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the "
@@ -22,6 +23,7 @@ ns.Feature({
 ns.Feature({
 	key = ICONS_KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Show icons",
 	tooltip = "Each segment starts with its attack's icon: your weapon for Melee, the spell for the rest.",
 	default = true,
@@ -31,6 +33,7 @@ ns.Feature({
 ns.Feature({
 	key = LABEL_KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Show band label",
 	tooltip = "The band's name in its colour under the strip.",
 	default = true,
@@ -680,7 +683,6 @@ ns.Init(function()
 	end
 
 	local docked
-	local laidOut
 	local ticker
 	local Update
 
@@ -706,76 +708,107 @@ ns.Init(function()
 		StopTicker()
 	end
 
-	-- The class's known reaches, rebuilt when a spell is learned, a talent moves it or the ranged weapon changes.
+	-- The class's known reaches and their segments, rebuilt when a spell is learned, a talent moves it or the
+	-- ranged weapon changes. Segment names and icons are read only then, not on every tick: the tick refreshes
+	-- each reach's range answer and re-derives the band from the cached segments.
 	---@type TFRangeReach[]
-	local knownReaches = {}
-	local function Refresh()
-		knownReaches = Model.Reaches(class, Model.Known, Model.EquippedRanged())
+	local cachedReaches = {}
+	---@type TFRangeSegment[]
+	local cachedSegments = {}
+	-- The segments and shape options last laid out, so a tick with none of them changed only re-lights the band.
+	---@type TFRangeSegment[]?
+	local shownSegments
+	local shownIcons, shownLabel
+	local SPELL_COLOUR = { SPELL_R, SPELL_G, SPELL_B }
+	-- The client can answer a known spell's name late, before its data has loaded: a build that missed one is read
+	-- again on the next update, so the reach joins the strip without waiting for the next spell event. An icon may
+	-- be missing for good (Model.SpellTexture allows it), so a missing icon waits for the client's data-loaded events.
+	local incomplete, iconMissing = false, false
+	local OnDataLoaded ---@type fun()
+	-- One callback for the weapon wait, so repeated builds while the icon is missing queue it once.
+	local function WeaponLoaded()
+		OnDataLoaded()
 	end
-
-	-- The band and its segments, near to far: Melee, then Dead zone when a shown reach has a minimum range, then
-	-- the class's known reaches with their client-side names. Each segment's icon is read here, so a changed weapon
-	-- or spell icon lays the strip out again. A reach whose name cannot be read is not shown, and a strip with
-	-- nothing beyond Melee has nothing to say.
-	---@return string?, TFRangeSegment[]
-	local function Read()
-		local reaches = {}
-		local spellSegments = {}
-		for _, reach in ipairs(knownReaches) do
+	-- Whether two segment lists show the same keys, names and icons in the same order.
+	---@param a TFRangeSegment[]
+	---@param b TFRangeSegment[]
+	---@return boolean
+	local function SameSegments(a, b)
+		if #a ~= #b then
+			return false
+		end
+		for index, segment in ipairs(a) do
+			local other = b[index]
+			if segment.key ~= other.key or segment.name ~= other.name or segment.icon ~= other.icon then
+				return false
+			end
+		end
+		return true
+	end
+	local function Refresh()
+		local previous = cachedSegments
+		cachedReaches, cachedSegments = {}, {}
+		incomplete, iconMissing = false, false
+		local gap = false
+		for _, reach in ipairs(Model.Reaches(class, Model.Known, Model.EquippedRanged())) do
 			local name = Model.SpellName(reach.spell)
+			local icon = name and Model.SpellTexture(reach.spell)
+			incomplete = incomplete or not name
+			iconMissing = iconMissing or (name ~= nil and not icon)
 			if name then
-				reach.check = Model.Check(reach.spell)
-				reaches[#reaches + 1] = reach
-				spellSegments[#spellSegments + 1] = {
+				cachedReaches[#cachedReaches + 1] = reach
+				gap = gap or reach.min > 0
+				cachedSegments[#cachedSegments + 1] = {
 					key = reach.key,
 					name = name,
-					colour = { SPELL_R, SPELL_G, SPELL_B },
-					icon = Model.SpellTexture(reach.spell),
+					colour = SPELL_COLOUR,
+					icon = icon,
 				}
 			end
 		end
-		local gap = false
-		for _, reach in ipairs(reaches) do
-			if reach.min > 0 then
-				gap = true
+		-- Melee first, then Dead zone when a shown reach has a minimum range, then the reaches near to far.
+		local mainHand = Model.MainHandTexture()
+		-- A weapon whose icon has not loaded yet is awaited through the shared item wait.
+		if mainHand == nil and type(GetInventoryItemID) == "function" then
+			local weapon = GetInventoryItemID("player", INVSLOT_MAINHAND)
+			if weapon then
+				iconMissing = true
+				ns.AwaitItem(weapon, WeaponLoaded)
 			end
 		end
-		local segments = {
-			{ key = MELEE, name = NAMES[MELEE], colour = COLOURS[MELEE], icon = Model.MainHandTexture() },
-		}
+		table.insert(cachedSegments, 1, {
+			key = MELEE,
+			name = NAMES[MELEE],
+			colour = COLOURS[MELEE],
+			icon = mainHand,
+		})
 		if gap then
-			segments[#segments + 1] = { key = DEAD_ZONE, name = NAMES[DEAD_ZONE], colour = COLOURS[DEAD_ZONE] }
+			table.insert(cachedSegments, 2, {
+				key = DEAD_ZONE,
+				name = NAMES[DEAD_ZONE],
+				colour = COLOURS[DEAD_ZONE],
+			})
 		end
-		for _, segment in ipairs(spellSegments) do
-			segments[#segments + 1] = segment
+		-- An unchanged list keeps its table, so a rebuild that read nothing new (a name still loading) does not lay
+		-- the strip out again.
+		if SameSegments(previous, cachedSegments) then
+			cachedSegments = previous
 		end
-		local band = Model.Band(Model.Melee(), reaches, Model.Interact)
-		return band, segments
 	end
 
-	-- The band and its segment lit, with every shown segment named in its own width.
-	---@param band string?
-	---@param segments TFRangeSegment[]
-	local function Paint(band, segments)
-		ShowSegments(segments)
-		Apply(band, segments)
-	end
-
-	-- The segments' keys and icons, and the two shape options, in shown order. The strip lays out again only when
-	-- this changes, so a changed key list, icon or option lays it out at once and a tick with none of them does not.
-	---@param segments TFRangeSegment[]
-	---@return string
-	local function Signature(segments)
-		local keys = {}
-		for index, segment in ipairs(segments) do
-			keys[index] = segment.icon and (segment.key .. "=" .. segment.icon) or segment.key
+	-- The current band from the cached reaches: each reach's range answer is refreshed, then the band is derived.
+	---@return string?
+	local function Band()
+		for _, reach in ipairs(cachedReaches) do
+			reach.check = Model.Check(reach.spell)
 		end
-		keys[#keys + 1] = ns.Active(ICONS_KEY) and "icons" or "no icons"
-		keys[#keys + 1] = ns.Active(LABEL_KEY) and "label" or "no label"
-		return table.concat(keys, "|")
+		return Model.Band(Model.Melee(), cachedReaches, Model.Interact)
 	end
 
 	function Update()
+		if incomplete then
+			Refresh()
+		end
 		if not ns.Active(KEY) or not ns.Readable(UnitCanAttack("player", "target")) then
 			Hide()
 			return
@@ -796,16 +829,19 @@ ns.Init(function()
 		if parentScale and parentScale > 0 then
 			strip:SetScale(timer:GetEffectiveScale() / parentScale)
 		end
-		local band, segments = Read()
-		if #segments <= 1 then
+		if #cachedSegments <= 1 then
 			Hide()
 			return
 		end
-		Paint(band, segments)
+		local icons, labelOn = ns.Active(ICONS_KEY), ns.Active(LABEL_KEY)
+		local changed = shownSegments ~= cachedSegments or shownIcons ~= icons or shownLabel ~= labelOn
+		if changed then
+			shownSegments, shownIcons, shownLabel = cachedSegments, icons, labelOn
+			ShowSegments(cachedSegments)
+		end
+		Apply(Band(), cachedSegments)
 		strip:Show()
-		local signature = Signature(segments)
-		if signature ~= laidOut then
-			laidOut = signature
+		if changed then
 			Layout()
 		end
 		-- No event says when melee reach changes now, and walking between two spell bands fires none either, so the
@@ -841,4 +877,12 @@ ns.Init(function()
 	-- PLAYER_TALENT_UPDATE is not an event on every client this addon runs on: registering one the client lacks
 	-- raises, so try it and keep the rest when it does not exist.
 	pcall(ns.On, "PLAYER_TALENT_UPDATE", ReachesChanged)
+	-- A spell's data loading late brings its icon; the event does not exist on every client either. The weapon's icon
+	-- arrives through the shared item wait. Only a build still missing an icon reads it again.
+	function OnDataLoaded()
+		if iconMissing then
+			ReachesChanged()
+		end
+	end
+	pcall(ns.On, "SPELL_DATA_LOAD_RESULT", OnDataLoaded)
 end)

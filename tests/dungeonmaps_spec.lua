@@ -221,7 +221,7 @@ ns.DungeonMapArt = art
 local feature = features.dungeonMaps
 
 -- On by default, with no optional addon dependency.
-assert(feature.default == true and feature.category == "Maps")
+assert(feature.default == true and feature.category == "Quests and maps")
 assert(#(feature.conflicts or {}) == 0)
 
 -- Floors come from generated native client metadata, including the tile stem.

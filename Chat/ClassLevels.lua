@@ -11,6 +11,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Names and links",
 	name = "Class colours and levels",
 	tooltip = "Player names in chat take their class colour, and the level follows the name in grey when the game "
 		.. "knows it exactly: your group, guild, friends, /who, your target or the player under your mouse. Turning "

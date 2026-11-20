@@ -8,6 +8,7 @@ end
 ns.Feature({
 	key = "hideMacroNames",
 	category = "Interface",
+	section = "Small things",
 	name = "Hide macro names",
 	tooltip = "Action buttons show a macro's icon without its name across the bottom.",
 	default = false,

@@ -10,6 +10,20 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.2] - 2026-11-20
+
+### Changed
+
+- **Settings are five pages under short headings.** Automation (with Fishing), Bags and vendors, Quests and maps, Interface and Chat replace the old seven, and each page groups its options under headings such as Dialogue and loot, Vendors and World map, with the ones most people use first. Every option and its saved choice is still there.
+
+### Fixed
+
+- **Quest giver and trainer lookups take less work as more NPCs are queued.** Reading NPC places from QuestieDB no longer shifts the whole queue for every NPC it takes. The range strip reads its spells and weapon icon when they change (spells, talents, level, equipment or entering the world) instead of five times a second, and reads a spell again until the client has loaded its name.
+
+### Removed
+
+- **The Forever addons page.** The page that listed my other addons, with its "suggest" setting, is gone from Tweaks Forever's settings.
+
 ## [2.9.1] - 2026-11-19
 
 ### Changed

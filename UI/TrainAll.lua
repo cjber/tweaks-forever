@@ -11,6 +11,7 @@ local KEY = "trainAll"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Spells and training",
 	name = "Train all button",
 	tooltip = "Adds a Train all button beside the class trainer's Train button. One click buys every spell the "
 		.. "trainer is offering that your gold covers. It buys nothing on its own and stays disabled, saying why in "

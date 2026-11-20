@@ -8,6 +8,7 @@ end
 ns.Feature({
 	key = "quietErrors",
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Quiet repeated combat errors",
 	tooltip = "No red text or spoken error for the ones a spammed macro repeats: not ready yet, out of range, "
 		.. "not enough mana, rage or energy, no target, and facing the wrong way. Full bags and other errors "

@@ -8,6 +8,7 @@ end
 ns.Feature({
 	key = "reloadCommand",
 	category = "Interface",
+	section = "Small things",
 	name = "Type /rl to reload the UI",
 	tooltip = "A shorter /reload. Switching this on or off takes effect after the next reload.",
 	default = true,

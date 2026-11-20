@@ -10,6 +10,7 @@ local KEY = "chatWhisperTabs"
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Whispers",
 	name = "Whisper tabs",
 	tooltip = "Every person who whispers you gets their own tab in the chat window, using the game's own New Whispers "
 		.. "setting. Turning this off puts your previous setting back.",

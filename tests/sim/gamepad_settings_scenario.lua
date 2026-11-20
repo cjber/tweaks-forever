@@ -17,8 +17,8 @@
 -- a failure of this scenario on its own: under the gamepad interface every choice row must be a slider, not a
 -- dropdown.
 --
--- #382: the Options navigation enters only the client's vertical pages, so the Forever addons page is registered as
--- the client's own rows with the gamepad interface on, and every page the cursor lands on must show its first target.
+-- #382: the Options navigation enters only the client's vertical pages, so every page is the client's own rows, and
+-- every page the cursor lands on must show its first target.
 local CHOICES = {
 	["Tooltip style"] = { key = "tooltipStyle", values = { "modern", "retail", "forever" } },
 	["Mark grouped gear with"] = { key = "gearMark", values = { "strip", "border", "dots", "none" } },
@@ -130,8 +130,7 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 	local stepped = {}
 	for _, sub in ipairs(category:GetSubcategories()) do
 		local page = sub:GetName()
-		-- Every Tweaks page, the shared Forever addons one included, is the client's own rows with the gamepad UI on:
-		-- the cursor cannot enter a canvas page (#382).
+		-- Every Tweaks page is the client's own rows with the gamepad UI on: the cursor cannot enter a canvas page (#382).
 		assert(
 			G.SettingsPanel:GetLayout(sub):IsVerticalLayout(),
 			page .. " is a canvas page, which the gamepad cursor cannot enter (#382)"

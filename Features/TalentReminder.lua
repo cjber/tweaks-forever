@@ -12,6 +12,7 @@ local GLOW_ATLAS = "collections-newglow"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Unspent talent reminder",
 	tooltip = "A soft glow over the talents button while you have unspent talent points, or your pet has unspent "
 		.. "training points, until they are spent. Nothing in combat.",

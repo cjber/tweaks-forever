@@ -11,6 +11,7 @@ local KEY = "petTrainerHint"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Spells and training",
 	name = "Pet trainer hint",
 	tooltip = "At a pet trainer, names the abilities you know that your pet has not learned, and adds a button "
 		.. "that opens Beast Training. Nothing shows in Beast Training itself, and the button waits until combat "

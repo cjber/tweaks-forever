@@ -10,6 +10,7 @@ local KEY = "largerNameplates"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Tooltips and nameplates",
 	name = "Larger, clearer nameplates",
 	tooltip = "Nameplates get a taller health bar in the retail frame, with the full name centred above it and the "
 		.. "level, coloured by difficulty, after the name. Your target is outlined and the bars of the others are "

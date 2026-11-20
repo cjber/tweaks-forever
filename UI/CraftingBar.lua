@@ -10,6 +10,7 @@ local KEY = "hideCraftingBar"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Small things",
 	name = "Hide the crafting bar in the Professions window",
 	tooltip = "Hides the cast bar the Professions window draws over the recipe while you craft. "
 		.. "The game turns the player cast bar off while the window has its own, so crafts there show no bar.",

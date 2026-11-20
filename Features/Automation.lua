@@ -20,6 +20,7 @@ end
 ns.Feature({
 	key = "quests",
 	category = "Automation",
+	section = "Dialogue and loot",
 	name = "Accept and turn in quests",
 	tooltip = "Quests are accepted and turned in for you as you talk to an NPC. Hold Shift while talking to skip "
 		.. "it. A quest with a choice of rewards is left for you to pick, and so is one that flags you for PvP or "
@@ -46,6 +47,7 @@ ns.Feature({
 ns.Feature({
 	key = "gossip",
 	category = "Automation",
+	section = "Dialogue and loot",
 	name = "Skip single-option gossip",
 	tooltip = "Goes straight to the only thing an NPC offers, or a flight master's flight map. Hold Shift to see it.",
 	default = false,
@@ -55,6 +57,7 @@ ns.Feature({
 ns.Feature({
 	key = "summons",
 	category = "Automation",
+	section = "Summons and deaths",
 	name = "Accept summons",
 	tooltip = "Not somewhere you can't teleport from, and in combat it waits for the fight to end. Hold Shift to "
 		.. "answer it yourself.",
@@ -65,6 +68,7 @@ ns.Feature({
 ns.Feature({
 	key = "resurrections",
 	category = "Automation",
+	section = "Summons and deaths",
 	name = "Accept resurrections",
 	tooltip = "From your group, and not from someone in combat, so a battle resurrection is still yours to time. "
 		.. "Waits out the game's delay after dying again soon. Hold Shift to answer it yourself.",
@@ -75,6 +79,7 @@ ns.Feature({
 ns.Feature({
 	key = "releasePvP",
 	category = "Automation",
+	section = "Summons and deaths",
 	name = "Release in battlegrounds",
 	tooltip = "Releases your spirit as soon as you die in a battleground, unless you can resurrect yourself (a "
 		.. "soulstone or Reincarnation) or hold Shift.",
@@ -85,6 +90,7 @@ ns.Feature({
 ns.Feature({
 	key = "declineDuels",
 	category = "Automation",
+	section = "Groups and duels",
 	name = "Decline duels",
 	default = false,
 	conflicts = { Leatrix("NoDuelRequests"), { polestar = "qol.declineDuels" } },
@@ -93,6 +99,7 @@ ns.Feature({
 ns.Feature({
 	key = "duelFriends",
 	category = "Automation",
+	section = "Groups and duels",
 	name = "Except friends and guild",
 	tooltip = "Duels from your friends, Battle.net friends and guild still ask you.",
 	default = false,
@@ -102,6 +109,7 @@ ns.Feature({
 ns.Feature({
 	key = "partyFriends",
 	category = "Automation",
+	section = "Groups and duels",
 	name = "Accept party invites from friends",
 	tooltip = "From your friends, Battle.net friends and guild. Not while you are queued for a battleground, since "
 		.. "joining could take you out of the queue. Hold Shift to answer it yourself.",
@@ -112,6 +120,7 @@ ns.Feature({
 ns.Feature({
 	key = "partyStrangers",
 	category = "Automation",
+	section = "Groups and duels",
 	name = "Decline party invites from strangers",
 	tooltip = "Invites from anyone who isn't your friend, Battle.net friend or in your guild are declined. Hold "
 		.. "Shift to answer one yourself.",
@@ -122,6 +131,7 @@ ns.Feature({
 ns.Feature({
 	key = "fastLoot",
 	category = "Automation",
+	section = "Dialogue and loot",
 	name = "Faster auto loot",
 	tooltip = "Takes everything at once instead of waiting for the loot window. Only while auto loot applies.",
 	default = true,

@@ -161,15 +161,23 @@ ns = {
 		-- `needs` an addon, so its tooltip can carry a note and is read as it shows.
 		{
 			key = "repair",
-			category = "Merchants",
+			category = "Bags and vendors",
+			section = "Vendors",
 			name = "Repair",
 			tooltip = "Repairs.",
 			needs = { title = "QuestieDB", check = function() end },
 		},
-		{ key = "guildRepair", category = "Merchants", name = "Guild repair", parent = "repair" },
+		{
+			key = "guildRepair",
+			category = "Bags and vendors",
+			section = "Vendors",
+			name = "Guild repair",
+			parent = "repair",
+		},
 		{
 			key = "gearMark",
-			category = "Bags",
+			category = "Bags and vendors",
+			section = "Gear groups",
 			name = "Mark",
 			tooltip = "Marks.",
 			default = "border",
@@ -178,6 +186,7 @@ ns = {
 		{
 			key = "iconSize",
 			category = "Interface",
+			section = "Small things",
 			name = "Icon size",
 			default = 100,
 			slider = { min = 50, max = 200, step = 5 },
@@ -226,6 +235,12 @@ ns.core = {
 	},
 }
 env.ForeverCore = {
+	-- ForeverCore's heading row, registered through the client's secure delegate like every row.
+	SettingsSections = {
+		Register = function(category, name)
+			env.Settings.RegisterInitializer(category, { kind = "heading", name = name })
+		end,
+	},
 	-- The real ForeverCore wraps this client function in its secure delegate (Core/OpenSettings.lua); here the same
 	-- delegate is made in place, so the call path stays the one UI/Settings.lua asks for.
 	OpenSettingsPanel = function(categoryID, element)
@@ -235,25 +250,30 @@ env.ForeverCore = {
 env.ForeverCore.OpenSettingsPanel = env.CreateSecureDelegate(env.ForeverCore.OpenSettingsPanel)
 assert(loadfile("Locales/enUS.lua"))("TweaksForever", ns)
 -- A packaged German client: features declare English, and the settings show the translation where there is one.
-ns.L["Bags"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
+ns.L["Bags and vendors"], ns.L["Repair"], ns.L["Repairs."] = "Taschen", "Reparieren", "Repariert."
 -- The settings page asks ForeverCore's opener, not Settings.OpenToCategory.
 setfenv(assert(loadfile("UI/Settings.lua")), env)("TweaksForever", ns)
 
--- Rows per page, in order: each subpage's settings, then the index's button to it.
+-- Rows per page, in order: each subpage's headings and settings, then the index's button to it. Pages and headings
+-- no feature uses are left out, and there is no Forever addons page.
 local kinds = {}
 for index, entry in ipairs(registered) do
 	kinds[index] = entry.initializer.kind .. "@" .. entry.category.name
 end
 assert(
 	table.concat(kinds, " ")
-		== "checkbox@Merchants checkbox@Merchants button@Tweaks Forever dropdown@Taschen button@Tweaks Forever "
-			.. "slider@Interface button@Tweaks Forever",
+		== "heading@Taschen checkbox@Taschen checkbox@Taschen heading@Taschen dropdown@Taschen button@Tweaks Forever "
+			.. "heading@Interface slider@Interface button@Tweaks Forever",
 	table.concat(kinds, " ")
 )
-local repair, guildRepair = registered[1].initializer, registered[2].initializer
--- The index's Open buttons open their page through the client's own function,
--- carried by one secure delegate. Settings.OpenToCategory is Blizzard's Lua around the restricted call, which the
--- client refuses from addon code (cjber/forever-core#333).
+local repair, guildRepair = registered[2].initializer, registered[3].initializer
+for _, entry in ipairs(registered) do
+	assert(entry.initializer.name ~= "Forever addons", "the Forever addons page is gone")
+end
+
+-- The index's Open buttons open their page through the client's own function, carried by one secure delegate.
+-- Settings.OpenToCategory is Blizzard's Lua around the restricted call, which the client refuses from addon code
+-- (cjber/forever-core#333).
 do
 	local buttons = 0
 	for _, entry in ipairs(registered) do
@@ -266,7 +286,7 @@ do
 			assert(opened == initializer.name, initializer.name .. ": on its own page")
 		end
 	end
-	assert(buttons == 3, "the index has a button per subpage")
+	assert(buttons == 2, "the index has a button per page")
 	assert(opens == buttons, "every page opens through the shared opener")
 end
 
@@ -294,11 +314,11 @@ missing.repair = "QuestieDB"
 assert(not Modifiable(repair), "a row missing an addon it needs is greyed out")
 assert(repair.tooltip():find("Needs QuestieDB, which isn't loaded", 1, true), "and says so")
 missing.repair = nil
-assert(registered[4].initializer.setting.variable == "TweaksForever_gearMark")
+assert(registered[5].initializer.setting.variable == "TweaksForever_gearMark")
 -- A row with no conflict and no needed addon carries its text, not a function of ours: under the gamepad interface a
 -- dropdown row's tooltip shows in the same call that pushes its footer bindings (#168).
-assert(registered[4].initializer.tooltip == "Marks.", "a row that can't carry a note gets its text")
-local size = registered[6].initializer
+assert(registered[5].initializer.tooltip == "Marks.", "a row that can't carry a note gets its text")
+local size = registered[8].initializer
 assert(
 	size.setting.variable == "TweaksForever_iconSize" and size.setting.varType == "number",
 	"a slider is a number setting"

@@ -254,6 +254,7 @@ TweaksForeverCharDB = nil
 ---@class TFFeature
 ---@field key string
 ---@field category string
+---@field section string
 ---@field name string
 ---@field tooltip? string
 ---@field default boolean|string|number
