@@ -14,6 +14,7 @@
 ## X-Curse-Project-ID: 1708506
 ## X-Forever-Core: v1.15.3
 ## SavedVariables: TweaksForeverDB
+## X-Forever-Core-Embed: 1
 ## SavedVariablesPerCharacter: TweaksForeverCharDB
 
 Locales\enUS.lua
