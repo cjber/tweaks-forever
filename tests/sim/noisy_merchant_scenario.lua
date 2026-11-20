@@ -60,6 +60,9 @@ scenario("Tweaks' work per noisy item event stays flat at a merchant", function(
 	for _, event in ipairs(NOISE) do
 		local a, b, c = closed[event], open[event], later[event]
 		assert(b.ours == a.ours and c.ours == a.ours, event .. ": the same handlers, merchant open or closed")
+		if event ~= "MERCHANT_UPDATE" then
+			assert(a.runs > 0 and b.runs > 0 and c.runs > 0, event .. ": the noise raises it in every window")
+		end
 		assert(c.maxApiCalls <= b.maxApiCalls, event .. ": an event costs no more as the noise runs on")
 	end
 	for _, event in ipairs({ "GET_ITEM_INFO_RECEIVED", "ITEM_DATA_LOAD_RESULT" }) do

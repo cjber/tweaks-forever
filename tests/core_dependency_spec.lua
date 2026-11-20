@@ -75,7 +75,14 @@ assert(
 	missingLines[1].text
 )
 
-local ready, readyLines = Load({ APIKit = { Hub = function() end, NotReady = function() end } })
+-- ForeverCore before 1.12.0 has the API kit but no SettingsSections, which the settings page's headings call.
+local noSections = Load({ APIKit = { Hub = function() end, NotReady = function() end } })
+assert(noSections.broken == true, "a ForeverCore without SettingsSections stops the addon")
+
+local ready, readyLines = Load({
+	APIKit = { Hub = function() end, NotReady = function() end },
+	SettingsSections = { Register = function() end },
+})
 assert(ready.broken == nil, "a ForeverCore with every member this addon calls runs it")
 assert(#readyLines == 0, "and says nothing")
 
