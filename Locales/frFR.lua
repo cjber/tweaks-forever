@@ -349,7 +349,7 @@ L["Melee"] = "Corps à corps" -- mt
 L["Dead zone"] = "Zone morte" -- mt
 L["Too far"] = "Trop loin" -- mt
 
-L["Rare and pull alerts show on screen."] = "Les alertes de rares et d'aggro s'affichent à l'écran." -- mt
+L["Settings are five pages under short headings."] = "Les options tiennent en cinq pages, sous de courts titres." -- mt
 L["Bags"] = "Sacs"
 L["Bags and vendors"] = "Sacs et marchands"
 L["Bars and alerts"] = "Barres et alertes"

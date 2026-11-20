@@ -349,7 +349,7 @@ L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt
 
-L["Rare and pull alerts show on screen."] = "Оповещения о редких и предупреждения об агро теперь на экране." -- mt
+L["Settings are five pages under short headings."] = "Настройки теперь на пяти страницах с короткими заголовками." -- mt
 L["Bags"] = "Сумки"
 L["Bags and vendors"] = "Сумки и торговцы"
 L["Bars and alerts"] = "Полосы и оповещения"

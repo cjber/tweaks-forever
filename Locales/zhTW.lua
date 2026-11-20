@@ -349,7 +349,7 @@ L["Melee"] = "近戰" -- mt
 L["Dead zone"] = "死區" -- mt
 L["Too far"] = "過遠" -- mt
 
-L["Rare and pull alerts show on screen."] = "稀有生物提醒和仇恨警告現在顯示在螢幕上。" -- mt
+L["Settings are five pages under short headings."] = "設定現在分為五頁，每頁有簡短的標題。" -- mt
 L["Bags"] = "背包"
 L["Bags and vendors"] = "背包與商人"
 L["Bars and alerts"] = "狀態列與提醒"
