@@ -65,17 +65,34 @@ function ForeverCore.files(directory)
 	return files
 end
 
+-- True in the packed addon, whose TOC loads the embedded copy from Libs/ForeverCore. There the scenarios run with no
+-- standalone ForeverCore, as for a player who has it turned off, so the embedded copy is the one checked.
+---@return boolean
+function ForeverCore.embedded()
+	local file = io.open("TweaksForever.toc", "r")
+	if not file then
+		return false
+	end
+	local toc = file:read("*a")
+	file:close()
+	return toc:find("Libs\\ForeverCore\\", 1, true) ~= nil
+end
+
 -- ForeverCore as an extra addon for the client simulator: the folder and its addon name, registered next to the
--- one under test so the TOC's dependency resolves to the real checkout.
+-- one under test so the TOC's dependency resolves to the real checkout. None in the packed addon, which carries its
+-- own.
 ---@return { [1]: string, [2]: string }[]
 function ForeverCore.addons()
+	if ForeverCore.embedded() then
+		return {}
+	end
 	return { { ForeverCore.directory(), "ForeverCore" } }
 end
 
 ---@param names string[]?
 ---@return table<string, boolean>
 local function wanted(names)
-	local set = { ["Locales/enUS.lua"] = true }
+	local set = { ["Core.lua"] = true, ["Locales/enUS.lua"] = true }
 	for _, name in ipairs(names or {}) do
 		set[name] = true
 	end
