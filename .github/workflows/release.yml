@@ -169,7 +169,28 @@ jobs:
           persist-credentials: false
       - name: Embed ForeverCore
         run: python3 -m tools.forever_tools.embed --core forever-core
-      - uses: BigWigsMods/packager@01e8631a69c69d7654c788d152630d5fed9e3812 # v2.7.0
+      - name: Build the release ZIP
+        uses: BigWigsMods/packager@01e8631a69c69d7654c788d152630d5fed9e3812 # v2.7.0
+        with:
+          args: -d
+      - name: Check packaged ForeverCore
+        id: validated
         env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -m tools.forever_tools.core_archive --release-dir .release --latest
+      - name: Verify the release ZIP checksum
+        env:
+          ARCHIVE: ${{ steps.validated.outputs.archive }}
+          ARCHIVE_SHA256: ${{ steps.validated.outputs.sha256 }}
+        run: printf '%s  %s\n' "$ARCHIVE_SHA256" "$ARCHIVE" | sha256sum --check --status
+      - name: Upload the validated ZIP
+        uses: BigWigsMods/packager@01e8631a69c69d7654c788d152630d5fed9e3812 # v2.7.0
+        with:
+          args: -c -z
+        env:
+          archive: ${{ steps.validated.outputs.archive }}
+          archive_name: ${{ steps.validated.outputs.archive_name }}
+          archive_label: ${{ steps.target.outputs.tag }}-forever
+          archive_version: ${{ steps.target.outputs.tag }}
           CF_API_KEY: ${{ secrets.CF_API_KEY }}
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
