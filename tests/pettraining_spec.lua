@@ -19,6 +19,15 @@ local function Load(options)
 			handlers[event] = handlers[event] or {}
 			handlers[event][#handlers[event] + 1] = fn
 		end,
+		-- As the client's RegisterUnitEvent does: other units never reach fn.
+		OnUnit = function(event, unit, fn)
+			handlers[event] = handlers[event] or {}
+			handlers[event][#handlers[event] + 1] = function(fired, ...)
+				if fired == unit then
+					fn(fired, ...)
+				end
+			end
+		end,
 		OnSettingChanged = function(key)
 			assert(key == "petTrainerHint")
 		end,

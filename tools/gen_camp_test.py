@@ -8,6 +8,7 @@ from tools.gen_camp import (
     TENT,
     TENT_AURA,
     benefits,
+    corrected,
     localised_effects,
     summary_branches,
 )
@@ -103,6 +104,13 @@ class CampTest(unittest.TestCase):
         texts = FakeLocale("Эффекты:\r\n\r\n" + first + rest, "Отдых после $d возле палатки.")
         with self.assertRaisesRegex(ValueError, "another order"):
             localised_effects(spells, texts, benefits(spells))
+
+    def test_a_listed_source_typo_is_corrected(self):
+        text = "Erhält: $?a1[Ausdauer um$1230124w1 erhöht.][]"
+        self.assertEqual(corrected("deDE", CAMP_BENEFITS, text), "Erhält: $?a1[Ausdauer um $1230124w1 erhöht.][]")
+        self.assertEqual(corrected("frFR", CAMP_BENEFITS, "x$1w1"), "x$1w1", "only that locale's text")
+        with self.assertRaisesRegex(ValueError, "remove its SOURCE_TYPOS entry"):
+            corrected("deDE", CAMP_BENEFITS, "Ausdauer um $1230124w1 erhöht")
 
 
 if __name__ == "__main__":

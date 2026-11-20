@@ -374,6 +374,7 @@ TweaksForeverCharDB = nil
 ---@field QuestieDB fun(): TFQuestieDB?
 ---@field QuestieSource TFQuestieSource
 ---@field Print fun(message: string)
+---@field Alert fun(message: string)
 ---@field FitButton fun(button: Button, width: number)
 ---@field EscapeCloses fun(frame: Frame)
 ---@field Navigate fun(uiMapID: integer, x: number, y: number, title: string)
@@ -400,6 +401,7 @@ TweaksForeverCharDB = nil
 ---@field SettingVariable fun(key: string): string
 ---@field OnSettingChanged fun(key: string, fn: function)
 ---@field On fun(event: WowEvent, fn: function)
+---@field OnUnit fun(event: WowEvent, unit: string, fn: function)
 ---@field Init fun(fn: fun())
 ---@field AwaitItem fun(itemID: integer?, callback: function)
 ---@field ForgetItems fun(callback: function)

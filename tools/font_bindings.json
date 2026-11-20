@@ -401,7 +401,7 @@
     },
     {
       "source": "UI/PetTrainer.lua",
-      "sha256": "49996fb348ff5ba72838642cb31b7ba22ec19756a53f01a8a044d80d70480404",
+      "sha256": "38af3df64cfd95a57c84406d6cf2730b3e22f42689269f7dc62fa6eb6ca06ef9",
       "review": "Read Model.Note, Make, Show, Layout, Refresh and event callers. note explicitly inherits GameFontNormalSmall and Show sets Model.Note output with no font change. Dynamic pet and ability names are excluded. teach inherits SharedButtonSmallTemplate,SecureActionButtonTemplate. Pinned ThreeSliceButtonTemplate.xml specifies all three bound states; SecureTemplates.xml SecureActionButtonTemplate inherits SecureFrameTemplate and adds the secure click script, with no font declaration. Core.FitButton changes width only. Tooltips, settings and client Beast Training spell name are excluded.",
       "bindings": [
         {
@@ -433,7 +433,7 @@
     },
     {
       "source": "UI/TrainAll.lua",
-      "sha256": "4a0bfeb8de654cb3b1644a9627bce0d98a625f98d2f02934c37e042479ba2ee0",
+      "sha256": "86161b1af342b3a88a62dfe83f76e2b5e915b584d067ee9813d4c963de4e7585",
       "review": "Read Attach, Refresh, Click, Tooltip and init/event callers. Attach creates SharedButtonSmallTemplate and sets Train all once; Refresh can disable it. Pinned ThreeSliceButtonTemplate.xml and reviewed ThreeSliceButtonMixin/UIButtonMixin preserve GameFontNormal, GameFontHighlight and GameFontDisable. FitButton in Core/Core.lua only changes width. Tooltip phrases, game service names, costs and settings text are excluded.",
       "bindings": [
         {
@@ -613,7 +613,7 @@
     },
     {
       "source": "Core/Core.lua",
-      "sha256": "57ba97cffc9713d0d59051c7e8c801f02402376df81b5a426fbbabb714d1eb3a",
+      "sha256": "47bb9d42c4ab77e0971952ccf5dda16ff4a4a54f4bb1147cc4fe600f13322bd1",
       "review": "Reviewed FitButton and its QuestLog, PetTrainer, TrainAll and DungeonMaps callers: FitButton changes only width from GetTextWidth, never fonts. Empty bindings pin this shared helper dependency. ReportTitle delegates to ForeverCore report UI; Print is chat output. Neither establishes font coverage here.",
       "bindings": []
     },

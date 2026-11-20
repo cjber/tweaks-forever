@@ -114,11 +114,11 @@ ns.Init(function()
 		"TRAIT_CONFIG_UPDATED",
 		"TRAIT_NODE_CHANGED",
 		"PLAYER_TALENT_UPDATE",
-		"UNIT_PET",
-		"UNIT_PET_TRAINING_POINTS",
 	}) do
 		ns.On(event, Refresh)
 	end
+	ns.OnUnit("UNIT_PET", "player", Refresh)
+	ns.OnUnit("UNIT_PET_TRAINING_POINTS", "player", Refresh)
 	ns.On("PLAYER_ENTERING_WORLD", Refresh)
 	ns.On("PLAYER_REGEN_DISABLED", Refresh)
 	ns.On("PLAYER_REGEN_ENABLED", Refresh)

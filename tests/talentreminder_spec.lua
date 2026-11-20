@@ -18,6 +18,15 @@ local ns = {
 		handlers[event] = handlers[event] or {}
 		table.insert(handlers[event], fn)
 	end,
+	-- As the client's RegisterUnitEvent does: other units never reach fn.
+	OnUnit = function(event, unit, fn)
+		handlers[event] = handlers[event] or {}
+		table.insert(handlers[event], function(fired, ...)
+			if fired == unit then
+				fn(fired, ...)
+			end
+		end)
+	end,
 	Active = function(key)
 		return db[key]
 	end,
@@ -182,11 +191,14 @@ assert(glow.shown, "the glow follows a level-up's point")
 
 -- Only the pet waits now: the glow stays until its last point is spent, with no chat.
 quantity = 0
-petTotal, petUsed = 3, 1
-Fire("UNIT_PET")
+petTotal, petUsed = 3, 3
+Fire("UNIT_PET", "raid4")
+assert(glow.shown, "another player's pet changes nothing: the glow is not read again")
+petUsed = 1
+Fire("UNIT_PET", "player")
 assert(glow.shown, "the glow follows pet points")
 petUsed = 3
-Fire("UNIT_PET_TRAINING_POINTS")
+Fire("UNIT_PET_TRAINING_POINTS", "player")
 assert(not glow.shown, "the glow clears when the pet points are spent")
 
 -- Both kinds waiting, then combat: no glow.

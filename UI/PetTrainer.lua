@@ -314,10 +314,6 @@ ns.Init(function()
 	end)
 	ns.On("PLAYER_REGEN_ENABLED", Refresh)
 	ns.On("SPELLS_CHANGED", Refresh)
-	ns.On("UNIT_PET", function(unit)
-		if unit == "player" then
-			Refresh()
-		end
-	end)
+	ns.OnUnit("UNIT_PET", "player", Refresh)
 	ns.OnSettingChanged(KEY, Refresh)
 end)

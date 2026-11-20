@@ -1,4 +1,4 @@
--- Pull warning (Features/PullWarning.lua): in a group, one chat line when your threat on your target passes the
+-- Pull warning (Features/PullWarning.lua): in a group, one on-screen warning when your threat on your target passes the
 -- tank's (UnitThreatSituation 1), re-armed only by dropping back below the tank, a new target or leaving combat, and
 -- silent while the threat or the name is secret.
 local features, handlers, db, printed = {}, {}, {}, {}
@@ -14,10 +14,22 @@ local ns = {
 	On = function(event, fn)
 		handlers[event] = fn
 	end,
+	-- As the client's RegisterUnitEvent does: other units never reach fn.
+	OnUnit = function(event, unit, fn)
+		handlers[event] = function(fired, ...)
+			if fired == unit then
+				fn(fired, ...)
+			end
+		end
+	end,
 	Active = function(key)
 		return db[key]
 	end,
+	-- On screen only: a chat line is a failure (#627).
 	Print = function(message)
+		error("printed to chat: " .. message)
+	end,
+	Alert = function(message)
 		printed[#printed + 1] = message
 	end,
 }
@@ -53,7 +65,7 @@ end
 
 Threat(1)
 assert(
-	#printed == 1 and printed[1] == "you are about to pull Defias Pillager off the tank.",
+	#printed == 1 and printed[1] == "You are about to pull Defias Pillager off the tank.",
 	"warns once over the tank"
 )
 Threat(1)
@@ -80,7 +92,7 @@ assert(#printed == 3, "a secret threat answer changes nothing")
 handlers.PLAYER_REGEN_ENABLED()
 name = SECRET
 Threat(1)
-assert(printed[4] == "you are about to pull your target off the tank.", "a secret name is left out")
+assert(printed[4] == "You are about to pull your target off the tank.", "a secret name is left out")
 name = "Defias Pillager"
 
 Threat(0)
