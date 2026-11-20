@@ -11,6 +11,7 @@ local KEY = "questXPBar"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Quest XP on the experience bar",
 	tooltip = "Draws the XP of the quests in your log on the experience bar: the quests ready to hand in from "
 		.. "where your XP is now, then the rest of the log fainter after them. Pointing at the bar adds both "

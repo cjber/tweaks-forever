@@ -10,7 +10,8 @@ local KEY = "questButtons"
 
 ns.Feature({
 	key = KEY,
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quests",
 	name = "Quest item and target keys",
 	tooltip = "Two keys you can bind under Key Bindings > AddOns: one uses the quest item of your nearest quest, "
 		.. "the other targets a creature your nearest quest still needs, a different one each press. In combat "

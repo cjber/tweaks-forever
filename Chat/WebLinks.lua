@@ -11,6 +11,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Names and links",
 	name = "Clickable web links",
 	tooltip = "A web address in chat shows as a light blue link. Clicking it opens a small box with the address "
 		.. "selected, ready to copy, because the game cannot open a browser itself.",

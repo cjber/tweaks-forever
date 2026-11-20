@@ -13,6 +13,7 @@ local KEY = "chatTimestamps"
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Messages",
 	name = "Chat timestamps",
 	tooltip = "Opens the game's own Chat Timestamps setting, where you pick the format or turn it off. Tweaks "
 		.. "Forever does not change timestamps itself.",

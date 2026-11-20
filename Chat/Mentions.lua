@@ -11,6 +11,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Messages",
 	name = "Mention marker",
 	tooltip = "A chat line from another player that names your character as a whole word gets a small chat icon at "
 		.. "its start and your name in the game's normal colour. No sound plays and no line is added.",

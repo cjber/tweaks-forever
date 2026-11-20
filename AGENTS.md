@@ -23,8 +23,8 @@ A change's player-facing notes go in `changes/<issue>.md`; only the release comm
 
 ## Layout
 
-- `Core/Core.lua` has `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, and TOC order sets the
-  settings subpage order. A new file goes in `TweaksForever.toc` or never runs (Lua 5.1, no `require`).
+- `Core/Core.lua` has `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, naming its settings
+  page and heading (`UI/Settings.lua` lists them in order). A new file goes in `TweaksForever.toc` or never runs (Lua 5.1, no `require`).
 - `Bags/`, `Quests/`, `Map/`, `Features/`, `Chat/`: feature modules by the part of the game they change. `UI/`:
   settings, tooltips, nameplates, `UI/Art.lua`. `Integrations/QuestieSource.lua` is the one place QuestieDB is opened.
 - `Data/`: lookup tables for what neither QuestieDB nor AtlasLoot holds; a generated one names its generator and

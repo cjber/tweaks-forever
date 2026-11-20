@@ -11,6 +11,7 @@ local KEY = "rareAlerts"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Rare alerts",
 	tooltip = "A warning at the top of the screen and a sound when a rare creature's nameplate or map marker appears "
 		.. "near you. Not in combat, and once per rare for ten minutes. Press the key bound under Key Bindings > "

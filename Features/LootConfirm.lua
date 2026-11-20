@@ -8,6 +8,7 @@ end
 ns.Feature({
 	key = "lootConfirm",
 	category = "Automation",
+	section = "Dialogue and loot",
 	name = "Skip loot confirmations",
 	tooltip = "Confirms the game's warning when you roll Need or Disenchant on loot, and when you loot a Bind on "
 		.. "Pickup item. Only the warnings your own clicks raise, and nothing rolls or loots by itself.",

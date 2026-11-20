@@ -12,6 +12,7 @@ local Chat = ns.Chat
 ns.Feature({
 	key = KEY,
 	category = "Chat",
+	section = "Whispers",
 	name = "Unread whispers on tabs",
 	tooltip = "A whisper tab you are not reading shows how many whispers have arrived since you last opened it, "
 		.. "after the player's name, such as Thrall (3). The game's own glow marks a new whisper as before.",

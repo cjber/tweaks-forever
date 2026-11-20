@@ -10,7 +10,8 @@ local KEY = "giverTooltips"
 
 ns.Feature({
 	key = KEY,
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quest markers",
 	name = "Quests on minimap givers",
 	tooltip = "Pointing at a quest giver on the minimap lists the quests they have for you, coloured by level, "
 		.. "and the quests in your log they take back, with a gold ? once one is ready to hand in. Needs Questie, or "

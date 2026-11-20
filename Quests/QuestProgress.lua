@@ -28,7 +28,8 @@ local NEEDS = { title = "QuestieDB", check = Library }
 
 ns.Feature({
 	key = TOOLTIP,
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quest markers",
 	name = "Quest progress on tooltips",
 	tooltip = "Pointing at a creature you need for a quest, to kill or for an item it drops, adds the quest and "
 		.. 'your progress to its tooltip, such as "Mangy Wolf slain: 3/10", in white until it is done and grey '
@@ -45,7 +46,8 @@ ns.Feature({
 
 ns.Feature({
 	key = PLATES,
-	category = "Interface",
+	category = "Quests and maps",
+	section = "Quest markers",
 	name = "Quest icons on nameplates",
 	tooltip = "A small quest icon sits beside the nameplate of each creature you still need for a quest in your "
 		.. "log, to kill or for an item it drops, and goes once you have enough. Needs Questie, or its QuestieDB addon "

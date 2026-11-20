@@ -4,6 +4,7 @@ import unittest
 
 from tools.repo_rules import (
     chat_alerts,
+    feature_headings,
     item_info_listeners,
     setting_callbacks,
     unit_events,
@@ -85,6 +86,23 @@ class HashFilesTest(unittest.TestCase):
         self.assertEqual(unmatched_hashfiles({**files, ".github/workflows/ci.yml": WORKFLOW % "'**/*.lock'"}), [])
         dead = unmatched_hashfiles({**files, ".github/workflows/ci.yml": WORKFLOW % "'tools/db2.py'"})
         self.assertEqual([hit.split(": ")[0] for hit in dead], [".github/workflows/ci.yml:2"])
+
+
+class FeatureHeadingTest(unittest.TestCase):
+    SETTINGS = 'local LAYOUT = {\n\t{ "Chat", { "Names", "Messages" } },\n}\nns.LAYOUT = LAYOUT\n'
+
+    @staticmethod
+    def feature(section):
+        return f'ns.Feature({{\n\tkey = "a",\n\tcategory = "Chat",\n\tsection = "{section}",\n}})\n'
+
+    def test_a_feature_and_a_heading_need_each_other(self):
+        files = {
+            "UI/Settings.lua": self.SETTINGS,
+            "Chat/A.lua": self.feature("Names"),
+            "Chat/B.lua": self.feature("Messages"),
+        }
+        self.assertEqual(feature_headings(files), [])
+        self.assertEqual(len(feature_headings({**files, "Chat/B.lua": self.feature("Other")})), 2)
 
 
 if __name__ == "__main__":

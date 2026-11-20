@@ -10,7 +10,8 @@ local KEY = "mapCoords"
 
 ns.Feature({
 	key = KEY,
-	category = "Maps",
+	category = "Quests and maps",
+	section = "World map",
 	name = "Coordinates on the world map",
 	tooltip = "Your position and the cursor's, as map coordinates, along the bottom of the world map.",
 	default = true,

@@ -11,6 +11,7 @@ local KEY = "pullWarning"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
+	section = "Bars and alerts",
 	name = "Pull warning",
 	tooltip = "In a group, a warning at the top of the screen when your threat on your target passes the tank's, "
 		.. "just before it turns on you. Once each time, until you drop back below the tank or change target. To "
