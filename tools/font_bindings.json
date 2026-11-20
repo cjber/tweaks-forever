@@ -401,7 +401,7 @@
     },
     {
       "source": "UI/PetTrainer.lua",
-      "sha256": "347f1b108af672d4fee0fe68642905a05f5de3c64806933b89ec689eb1cd88dc",
+      "sha256": "38af3df64cfd95a57c84406d6cf2730b3e22f42689269f7dc62fa6eb6ca06ef9",
       "review": "Read Model.Note, Make, Show, Layout, Refresh and event callers. note explicitly inherits GameFontNormalSmall and Show sets Model.Note output with no font change. Dynamic pet and ability names are excluded. teach inherits SharedButtonSmallTemplate,SecureActionButtonTemplate. Pinned ThreeSliceButtonTemplate.xml specifies all three bound states; SecureTemplates.xml SecureActionButtonTemplate inherits SecureFrameTemplate and adds the secure click script, with no font declaration. Core.FitButton changes width only. Tooltips, settings and client Beast Training spell name are excluded.",
       "bindings": [
         {
@@ -433,7 +433,7 @@
     },
     {
       "source": "UI/TrainAll.lua",
-      "sha256": "ef0d542839b0bdd210591bdb853ad5b8f0b42365f200eaea9c3057782ff7cd5c",
+      "sha256": "86161b1af342b3a88a62dfe83f76e2b5e915b584d067ee9813d4c963de4e7585",
       "review": "Read Attach, Refresh, Click, Tooltip and init/event callers. Attach creates SharedButtonSmallTemplate and sets Train all once; Refresh can disable it. Pinned ThreeSliceButtonTemplate.xml and reviewed ThreeSliceButtonMixin/UIButtonMixin preserve GameFontNormal, GameFontHighlight and GameFontDisable. FitButton in Core/Core.lua only changes width. Tooltip phrases, game service names, costs and settings text are excluded.",
       "bindings": [
         {
@@ -455,7 +455,7 @@
     },
     {
       "source": "UI/RangeStrip.lua",
-      "sha256": "c09b1b619db98bdccf00903764153c15c2830d5cdb3dc6e0150bad06ab38599d",
+      "sha256": "8f5cbc4983268456f1045ea8bc190d4326846e1f57f5bf3fa1f13e18b582fbb5",
       "review": "Read NAMES, Widget, ShowSegments, Apply, Refresh, Band, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Refresh puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. Too far is displayed only in label, never a segment. Later updates change text, colour, geometry and visibility only. Client spell names/icons and settings phrases are excluded.",
       "bindings": [
         {
@@ -613,7 +613,7 @@
     },
     {
       "source": "Core/Core.lua",
-      "sha256": "daacb9cc5c6caff075650a606eb88e132379d6e1057a15837e269a9f59d484b1",
+      "sha256": "47bb9d42c4ab77e0971952ccf5dda16ff4a4a54f4bb1147cc4fe600f13322bd1",
       "review": "Reviewed FitButton and its QuestLog, PetTrainer, TrainAll and DungeonMaps callers: FitButton changes only width from GetTextWidth, never fonts. Empty bindings pin this shared helper dependency. ReportTitle delegates to ForeverCore report UI; Print is chat output. Neither establishes font coverage here.",
       "bindings": []
     },
@@ -625,7 +625,7 @@
     },
     {
       "source": "UI/Settings.lua",
-      "sha256": "fc57d511d50ea2336e1fba6fc752392b99a8fec4385c6ccee3cb8a0b86fc4589",
+      "sha256": "74911f47b0bebed90c32be170371fe3be28b2992bcbb040addd98a9260bfb52e",
       "review": "Read AddSetting, Tooltip, Nest, registration and slash callers. Localized feature/category/button/option labels are handed to Blizzard secure settings initializers rather than an explicitly owned FontString. No font contract is inferred from those helper arguments. Tooltip descriptions, dropdown menus, addon compartment callbacks and chat output are excluded.",
       "bindings": []
     },

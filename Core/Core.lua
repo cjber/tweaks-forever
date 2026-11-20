@@ -444,9 +444,7 @@ login:SetScript("OnEvent", function()
 	-- this same table, which Attach makes when they are missing and merges into when an older save has them.
 	ns.core.Attach(db)
 	TweaksForeverCharDB = TweaksForeverCharDB or {}
-	-- Protected: the conflict check reads other addons' state, and an error there must not keep the settings page and
-	-- /tweaks (started below) from loading.
-	ns.core.SafeCall("startup", ns.RefreshConflicts)
+	ns.RefreshConflicts()
 	-- Polestar applies its settings at once, so its matching features here follow them at once too.
 	if Polestar and type(Polestar.On) == "function" and C_AddOns.IsAddOnLoaded("Polestar") then
 		pcall(Polestar.On, "SETTING_CHANGED", function()
