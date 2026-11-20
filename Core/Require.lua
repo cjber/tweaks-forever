@@ -16,4 +16,8 @@ local ready = ForeverCore ~= nil
 	and type(ForeverCore.SettingsSections) == "table"
 	and type(ForeverCore.SettingsSections.Register) == "function"
 
-ns.ForeverRequire(ready, { key = "TWEAKSFOREVER", "/tweaks", "/tweaksforever" })
+-- UI/Settings.lua's slash words; the pin gate (forever_tools.require_slash) keeps the two lists equal. A
+-- stopped addon still answers them with the line that names the fix, as its addon compartment entry does.
+ns.Slash = { key = "TWEAKSFOREVER", "/tweaks", "/tweaksforever" }
+
+ns.ForeverRequire(ready, ns.Slash)

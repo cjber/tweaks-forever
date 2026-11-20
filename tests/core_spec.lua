@@ -31,7 +31,7 @@ local function Chunk(path)
 	return chunk
 end
 
-local function Load(saved)
+local function Load(saved, beforeLogin)
 	local frames, errors, callbacks = {}, {}, {}
 	local env = setmetatable({
 		TweaksForeverDB = saved,
@@ -78,6 +78,15 @@ local function Load(saved)
 	ns.Feature({ key = "needsPresent", default = true, needs = { title = "Present", check = present } })
 	ns.Feature({ key = "needsMissing", default = true, needs = { title = "Missing", check = function() end } })
 	ns.Feature({ key = "needsBroken", default = true, needs = { title = "Broken", check = error } })
+	if beforeLogin then
+		beforeLogin(ns)
+		local started = false
+		ns.Init(function()
+			started = true
+		end)
+		frames[2].callback()
+		return started
+	end
 	-- A setting callback names the variable UI/Settings.lua registers, and only for a declared feature.
 	local seen
 	local changed = function(_, _, value)
@@ -121,6 +130,17 @@ local function Load(saved)
 	assert(ready, "initializers registered after login run immediately")
 	return ns.db
 end
+
+-- A conflict check that fails at login still leaves every initializer running, the settings page and /tweaks among
+-- them.
+assert(
+	Load(nil, function(ns)
+		ns.RefreshConflicts = function()
+			error("conflict check failed")
+		end
+	end),
+	"initializers run after a failed conflict check"
+)
 
 local fresh = Load(nil)
 assert(fresh.enabled and fresh.gearMark == "strip" and not next(fresh.junk))

@@ -349,7 +349,7 @@ L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt
 
-L["Settings are five pages under short headings."] = "설정이 짧은 제목 아래 다섯 페이지로 정리되었습니다." -- mt
+L["Tweaks Forever carries ForeverCore inside itself."] = "이제 ForeverCore가 Tweaks Forever에 포함됩니다." -- mt
 L["Bags"] = "가방"
 L["Bags and vendors"] = "가방과 상인"
 L["Bars and alerts"] = "바와 알림"
