@@ -927,4 +927,14 @@ assert(
 	"the narrower row is laid out again, each name 3 clear inside its bar"
 )
 
+-- A spell the client has not loaded yet answers no name: the strip leaves that reach out, then reads it again on the
+-- next update, so it comes back without waiting for another spell or talent event.
+local fireBlast = SPELL_NAMES[2136]
+SPELL_NAMES[2136] = nil
+mage.handlers.SPELLS_CHANGED()
+assert(not joined(segments(mage)):find("Fire Blast", 1, true), "an unloaded spell has no segment yet")
+SPELL_NAMES[2136] = fireBlast
+mage.handlers.PLAYER_TARGET_CHANGED()
+assert(joined(segments(mage)):find("Fire Blast", 1, true), "the next update reads the loaded spell again")
+
 print("rangestrip: ok")
