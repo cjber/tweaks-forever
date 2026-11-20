@@ -349,7 +349,7 @@ L["Melee"] = "Nahkampf" -- mt
 L["Dead zone"] = "Toter Bereich" -- mt
 L["Too far"] = "Zu weit" -- mt
 
-L["Settings are five pages under short headings."] = "Die Einstellungen sind jetzt fünf Seiten mit kurzen Überschriften." -- mt
+L["Tweaks Forever carries ForeverCore inside itself."] = "ForeverCore ist jetzt in Tweaks Forever enthalten." -- mt
 L["Bags"] = "Taschen"
 L["Bags and vendors"] = "Taschen und Händler"
 L["Bars and alerts"] = "Leisten und Hinweise"

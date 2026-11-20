@@ -349,7 +349,7 @@ L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt
 
-L["Settings are five pages under short headings."] = "Настройки теперь на пяти страницах с короткими заголовками." -- mt
+L["Tweaks Forever carries ForeverCore inside itself."] = "ForeverCore теперь входит в Tweaks Forever." -- mt
 L["Bags"] = "Сумки"
 L["Bags and vendors"] = "Сумки и торговцы"
 L["Bars and alerts"] = "Полосы и оповещения"

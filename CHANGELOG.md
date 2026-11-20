@@ -10,6 +10,17 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.3] - 2026-11-20
+
+### Changed
+
+- **Tweaks Forever carries ForeverCore inside itself.** It now works with ForeverCore turned off or uninstalled, and your ForeverCore settings carry over. You no longer need to install ForeverCore separately. If you have it installed, you can keep it or remove it. (cjber/forever-core#801)
+
+### Fixed
+
+- **/tweaks says why Tweaks Forever stopped.** While Tweaks Forever cannot start, typing /tweaks repeats the line naming the fix instead of reading "Unknown command".
+- **/tweaks and the settings page survive a failed conflict check.** If checking other addons for conflicts fails at login, /tweaks and the Tweaks Forever settings still load.
+
 ## [2.9.2] - 2026-11-20
 
 ### Changed
