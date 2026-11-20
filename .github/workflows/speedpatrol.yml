@@ -41,7 +41,7 @@ jobs:
       - uses: cjber/forever-core/.github/actions/toolchain@5af33e8122201201634ef3efc80977a407e1e7a2 # main
         with:
           tools: lua
-      - uses: agent-labs-dev/speedpatrol@f80460788957c55923f5c2798a04ecaed8670ddc # v0
+      - uses: agent-labs-dev/speedpatrol@a3208bcc3eb969b964163e360c061efaffb38aff # v0
         with:
           benchmarks: gate.specs
           fail-on-regression: true
