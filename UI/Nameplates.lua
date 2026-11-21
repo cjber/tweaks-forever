@@ -74,7 +74,7 @@ local function Highlight(frame)
 			local atlas = NamePlateConstants.SELECTED_BORDER_ATLAS
 			focusBorder:SetAtlas(atlas, TextureKitConstants.IgnoreAtlasSize) -- art-ok: matches the native border
 			focusBorder:SetAllPoints(border)
-			focusBorder:SetVertexColor(NORMAL_FONT_COLOR:GetRGB())
+			focusBorder:SetVertexColor(NORMAL_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 			focusBorders[frame] = focusBorder
 		end
 		border:SetAlphaFromBoolean(target, 1, 0)
