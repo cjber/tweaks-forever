@@ -48,8 +48,8 @@ A change's player-facing notes go in `changes/<issue>.md`; only the release comm
   `tools/lint_art.py` refuses a raw `SetAtlas`/`SetTexture` elsewhere unless its line says `-- art-ok: reason`.
 - New host globals go in `.luacheckrc`, with real types in `types/Forever.lua` where upstream lacks them. Never add a
   LuaLS globals allowlist.
-- Specs are a headless harness with stubbed client APIs. Frames, menus, tooltips and the tracker are checked in the
-  headless client (`wow-forever-addon` `in-game.md`); the PR lists what was checked.
+- Specs are an offline harness with stubbed client APIs. Frames, menus, tooltips and the tracker are checked by hand in
+  game; the PR lists what was checked.
 
 ## Waivers
 
