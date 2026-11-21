@@ -273,6 +273,7 @@ read_globals = {
 	"MicroMenu",
 	"MinimalSliderWithSteppersMixin",
 	"MouselookStop",
+	"NamePlateConstants",
 	"NamePlateDriverFrame",
 	"NamePlateSetupOptions",
 	"NineSliceUtil",

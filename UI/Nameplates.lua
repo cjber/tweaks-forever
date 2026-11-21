@@ -40,19 +40,27 @@ local HEALTH, CAST, GAP, NAME_GAP, HEALTH_TEXT = 16, 12, 2, 4, 11
 ---@type table<NamePlateUnitFrame, true>
 local styled = setmetatable({}, { __mode = "k" })
 
+---@type table<NamePlateUnitFrame, Texture>
+local focusBorders = setmetatable({}, { __mode = "k" })
+
 -- Retail's selection outline, which Blizzard switches off for the Classic style, white round the target and gold round
 -- the focus, and its deselected overlay, which darkens the bar of every plate that is neither. Asks the game rather
 -- than reading the frame's cached isTarget. In dungeons and raids UnitIsUnit answers with a secret boolean that addon
--- code cannot test, so there the engine's FromBoolean setters take it as it is and the focus goes unmarked.
+-- code cannot test, so each outline takes its own boolean. The overlay only follows the target there because addon
+-- code cannot OR the two secret booleans.
 ---@param frame NamePlateUnitFrame
 local function Highlight(frame)
 	local unit = frame.unit
 	local bar = frame.HealthBarsContainer.healthBar
 	local border = bar.selectedBorder
 	local overlay = bar.deselectedOverlay
+	local focusBorder = focusBorders[frame]
 	if not unit then
 		border:Hide()
 		overlay:Hide()
+		if focusBorder then
+			focusBorder:SetAlpha(0)
+		end
 		return
 	end
 	local target, focus = UnitIsUnit(unit, "target"), UnitIsUnit(unit, "focus")
@@ -60,9 +68,22 @@ local function Highlight(frame)
 	border:Show()
 	overlay:Show()
 	if not (canaccessvalue(target) and canaccessvalue(focus)) then
+		if not focusBorder then
+			-- The selected border is on OVERLAY at sublevel 0. White draws over gold when both are visible.
+			focusBorder = bar:CreateTexture(nil, "OVERLAY", nil, -1)
+			local atlas = NamePlateConstants.SELECTED_BORDER_ATLAS
+			focusBorder:SetAtlas(atlas, TextureKitConstants.IgnoreAtlasSize) -- art-ok: matches the native border
+			focusBorder:SetAllPoints(border)
+			focusBorder:SetVertexColor(NORMAL_FONT_COLOR:GetRGB())
+			focusBorders[frame] = focusBorder
+		end
 		border:SetAlphaFromBoolean(target, 1, 0)
+		focusBorder:SetAlphaFromBoolean(focus, 1, 0)
 		overlay:SetAlphaFromBoolean(target, 0, 1)
 		return
+	end
+	if focusBorder then
+		focusBorder:SetAlpha(0)
 	end
 	if focus and not target then
 		border:SetVertexColor(NORMAL_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
