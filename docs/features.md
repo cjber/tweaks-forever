@@ -69,7 +69,9 @@ All off until you turn them on, except faster auto loot.
 - Announce camp benefits. Each camp benefit you gain is named at the top of the screen, in the game's yellow, with what it gives you: "Camp benefit gained: Fish Bowl (all stats increased by 8%)". Once per benefit, not for the ones you had when you logged in, and one gained mid-fight shows once the fight is over.
 - Future spells in spellbook. Each tab ends with the spells you haven't learned yet under a Future Spells heading, greyed out as the retail spellbook shows them: the ones your trainer can teach you now glow and say "See your trainer", the rest name their level, and the tooltip gives the cost. Only each spell's next rank shows. Every class trainer's list is built in, so it works from your first login, and visiting your trainer brings its levels and prices up to date. The Pet tab does the same for the current pet's family: its abilities, and the ones every pet can learn, with each rank's pet level and training point cost, all built in and brought up to date by a visit to a pet trainer.
 - Unspent talent reminder. A soft glow over the talents button while you have unspent talent points, or your pet has unspent training points, until they are spent. Nothing in combat. On by default.
+- Modern tooltips: a thin grey border with rounded corners in place of the beige one, over a neutral charcoal that keeps the text crisp over any scenery. Tooltip style switches to the retail game's navy, or keeps the game's own border. A player's name is in their class colour, with the guild in brackets, race and class on one line and the faction in its colour. A unit's health bar sits inside its tooltip in the retail game's own bar and frame, in class or reaction colour, with health as numbers for players and a percentage for others, and a comparison tooltip's Equipped label moves inside it in grey. On by default.
 - Tooltip at the cursor (off by default). The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them.
+- Larger, clearer nameplates. A taller health bar in the retail game's own frame, with the full name centred above it and the level, coloured by difficulty, after the name. Your target is outlined in white and your focus in gold, and the other plates' bars are slightly darker. Casts show in a slim bar with the spell's icon and name inside, grey with a shield when they can't be interrupted. Health numbers inside the bar follow the game's own Nameplates options. Friendly plates in dungeons are the game's own and can't be restyled. On by default; turning it off takes effect after a reload.
 
 ## Chat
 
@@ -146,5 +148,7 @@ A feature steps aside while one of these is loaded. For Leatrix Plus, Leatrix Ma
 | Quest levels in quest dialogs | Polestar, while its quest levels are on |
 | Reagent bag in the combined bag | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
 | Sort gear into named groups | AdiBags, ArkInventory, Baganator, Bagnon, BetterBags |
+| Modern tooltips | Aurora, ElvUI, TinyTooltip, TipTac, Leatrix Plus |
 | Tooltip at the cursor | Leatrix Plus |
+| Nameplates | Plater, Kui Nameplates, Threat Plates, Platynator, ElvUI |
 | Fishing | FishingBuddy, FishingAce |

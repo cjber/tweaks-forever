@@ -1,4 +1,4 @@
-Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can warn you on screen about rares near you, and it repairs and sells junk at merchants. Gear groups, maps and more sit beside them in the game's settings.
+Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can warn you on screen about rares near you, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game's settings.
 
 If you already run Polestar, Naowh Forever, Leatrix Plus, OpenMap, Questie, BlizzMove, Peddler or similar, the overlapping option greys out and names that addon. Repairs, selling junk and faster auto loot start on; everything else that acts for you starts off.
 
@@ -13,9 +13,9 @@ Free, with nothing locked behind it. If it saves you time, you can [sponsor me o
 - Campsite buff effects show in English on a game language the addon has no text for yet, such as Italian.
 - Moving windows in Edit Mode is switched off while the gamepad UI is on.
 
-![A junk coin on an item that sells with your greys](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
+![Nameplates and a junk coin](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif)
 
-The junk coin marks what sells with your greys at a merchant.
+The junk coin marks what sells with your greys at a merchant. Also nameplates.
 
 ![The world map inside Blackfathom Deeps with its floor and legend](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png)
 
@@ -25,9 +25,17 @@ Inside a dungeon or raid the map opens on its painted parchment sheet, with a bu
 
 Chat options on: short headers, class colours with the level beside a name, an item's icon before its link, a folded repeat, a mention marker and clickable web links. The lines that survived a reload sit above their own divider.
 
+![Three enemy nameplates with a Fireball cast](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png)
+
+Nameplates in retail's own frame, with your target outlined.
+
 ![The range strip in each band, docked on the swing timers](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/rangestrip.png)
 
 The range strip under the swing timers: melee, dead zone, auto shot and too far.
+
+![Enemy and player tooltips with health bars](https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png)
+
+Health bars in creature and player tooltips.
 
 These images are generated previews of the Tweaks UI.
 
@@ -37,7 +45,7 @@ These images are generated previews of the Tweaks UI.
 - **Vendors and gear groups.** Repair automatically (from guild funds when allowed) and sell grey junk through the game's own bulk sale, all staying in buyback; Alt+Right-click marks anything as junk when turned on, and holding Shift as a merchant opens skips both. Ctrl+Right-click a bag item to put it in a coloured group, then equip the group in one click.
 - **Chat, rares and levelling.** Optional chat fixes, all off until you turn them on: short channel names, class colours with levels when the game knows them, item icons in links, repeated lines folded into a grey count, a marker when someone mentions you, clickable web links that open a copy box, whisper tabs with an unread count and a line saying when you last grouped with the player, a card on hover with what the game knows about them, a bag item picker when you type [ and a few letters (Enter puts the link in and sends the line; a click puts it in so you can keep typing), and the last 200 lines after a reload. Nothing is sent to other players beyond the line you send. The Chat page also opens the game's own Chat Timestamps setting. Rare alerts on screen, XP per hour and time to level on the experience bar, and the XP your quest log is worth shaded onto the bar. For every class, a strip on the swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap.
 - **Maps.** Zones show their level range, the map shows coordinates, and unexplored areas show in a blue tint. Dungeons and raids show their painted map when you are inside.
-- **Windows and tooltips.** Tooltips can follow the cursor. Move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
+- **Nameplates, tooltips and windows.** A taller plate with name and level above, your target outlined and casts in a slim bar; tooltips with a thin rounded border, class-coloured names and the health bar inside. Move and scale Blizzard windows from Edit Mode, per layout (not with the gamepad UI).
 - **Quests and camps.** Quest levels on the map, tracker and quest dialogs, a coin on the best-selling reward choice, Abandon quests with one confirmation, the tracker sorted nearest first, and keys for your nearest quest's item and target. With [Questie](https://www.curseforge.com/wow/addons/questie), minimap quest givers list their quests and creatures, quest items and objects you need show your progress, and items that start a quest say so. Quest item sparkles use the game's own effect, as in Forever Loot Sparkles: off by default, they turn outlines off, and removing them needs a restart.
 - **Spellbook, trainers and fishing.** Unlearned spells in the spellbook, the Pet tab's future abilities, a pet trainer note naming what your pet has not learned with a button to Beast Training, known ranks marked in Beast Training, Train all for what you can afford, and the reagent bag in the combined bag. Double right-click to cast or apply a lure, with a warning when you have none.
 - **Also.** Camp tooltips, deeper camera zoom, no screen glow, a hidden Professions crafting bar, quiet macro errors, hidden macro names, an unspent talent and pet training point glow, and `/rl`.

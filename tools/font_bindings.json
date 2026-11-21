@@ -499,7 +499,7 @@
     },
     {
       "source": "UI/Frames.lua",
-      "sha256": "9f58d88756b85234e633756e2260f5550f15ff5fb76e3a2719276531d53e486f",
+      "sha256": "bc3c7d25ba26f094910bf7cfb03c4428516e4c4386c53cf35cc37562c285fae3",
       "review": "Read windows table, Label helper, Select, BuildEditor and label/record.label callers; checked all font assignments. Label uses the exact font argument at each reviewed call. Select writes record.label to dialog.Title, created by Label with GameFontHighlightLarge, with no later font changes. Bound explicit editor labels and the translated window labels shown in dialog.Title. Client GlobalStrings and dynamic layout names are excluded. PanelTabButtonTemplate tabs are excluded: client PanelTemplates changes their disabled font after creation. EditMode checkbox labels and selection overlay labels delegate to template mixins and are not covered here; no inferred font is assigned to those separate consumers.",
       "bindings": [
         {
@@ -613,7 +613,7 @@
     },
     {
       "source": "Core/Core.lua",
-      "sha256": "36075f9de5fa4c2f2d51425489205513a0dc10b573a95a80e7b0039ab53c2026",
+      "sha256": "dc021f7c67d21063cc1675b0b8d7f6bdfd21f24925e39c229639d19883e4ddc9",
       "review": "Reviewed FitButton and its QuestLog, PetTrainer, TrainAll and DungeonMaps callers: FitButton changes only width from GetTextWidth, never fonts. Empty bindings pin this shared helper dependency. ReportTitle delegates to ForeverCore report UI; Print is chat output. Neither establishes font coverage here.",
       "bindings": []
     },
@@ -625,7 +625,7 @@
     },
     {
       "source": "UI/Settings.lua",
-      "sha256": "e8410a28ec53a50a74d5981c0bac2c8c5f0452e7ad8699f585b462fb918102a6",
+      "sha256": "fc57d511d50ea2336e1fba6fc752392b99a8fec4385c6ccee3cb8a0b86fc4589",
       "review": "Read AddSetting, Tooltip, Nest, registration and slash callers. Localized feature/category/button/option labels are handed to Blizzard secure settings initializers rather than an explicitly owned FontString. No font contract is inferred from those helper arguments. Tooltip descriptions, dropdown menus, addon compartment callbacks and chat output are excluded.",
       "bindings": []
     },

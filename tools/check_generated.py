@@ -16,6 +16,8 @@ DATA = (
     "Data/DungeonEntrances.lua",
     "Data/ClassSpells.lua",
     "Data/ForeverQuests.lua",
+    "media/TooltipBorderModern.tga",
+    "media/TooltipBorderRetail.tga",
     "Locales/phrases.txt",
 )
 
@@ -43,6 +45,7 @@ def regenerate(root, offline):
     mode = ["--offline"] if offline else []
     for generator in ("overlays", "camp", "zonelevels", "dungeons", "classspells", "foreverquests"):
         run(root, sys.executable, f"tools/gen_{generator}.py", *mode)
+    run(root, sys.executable, "tools/tooltip_border.py")
     run(root, sys.executable, "-m", "tools.phrases", "--write")
 
 
