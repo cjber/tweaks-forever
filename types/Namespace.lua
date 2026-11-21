@@ -325,6 +325,7 @@ TweaksForeverCharDB = nil
 ---@field Gear TFGear
 ---@field Fishing TFFishing
 ---@field Frames TFFrames
+---@field Tooltips TFTooltips
 ---@field WhisperInvite TFWhisperInvite
 ---@field Chat TFChat
 ---@field ChatShortNames TFChatShortNames

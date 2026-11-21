@@ -12,6 +12,7 @@ python3 tools/latest_build.py      # newest Forever build on wago.tools
 python3 tools/changelog.py 0.1.0   # one version's CHANGELOG entry
 python3 tools/changelog.py --check # every v* tag has a CHANGELOG entry and changes/*.md is well formed
 python3 tools/screenshots.py       # docs/screenshots/*.png and demo.gif (Pillow)
+python3 tools/tooltip_border.py    # media/TooltipBorder{Modern,Retail}.tga (stdlib only)
 python3 -m tools.phrases --write     # Locales/phrases.txt, the template translators copy (stdlib only)
 ```
 
@@ -101,8 +102,19 @@ the addon's own modules draw them, using the `wowmock` library from the
 [forever-core/tools/wowmock](https://github.com/cjber/forever-core/tree/main/tools/wowmock)
 skill. It looks for the library in `$FOREVER_CORE`, else
 the sibling `forever-core/tools/wowmock` checkout, and needs Pillow. `demo.gif` strings the
-junk scenes together, and the script fails if it passes 3 MB.
+nameplate and junk scenes together, and the script fails if it passes 3 MB.
 Two runs give byte-identical images.
+
+`tooltip_border.py` draws `media/TooltipBorderModern.tga` and
+`media/TooltipBorderRetail.tga`, the whole tooltip *Modern tooltips* draws in place of
+Forever's beige one, one file per Tooltip style: a rounded one-unit grey line lit
+brighter along the top, with the tooltip's background baked in everywhere inside it,
+at two texels per unit. `UI/Tooltips.lua` cuts all nine NineSlice pieces from one such
+file, the Center included: the 7-unit corners, and a 2-unit middle it stretches along
+each edge and across the middle. Tooltips draw without pixel snapping, so the line and
+the background have to be one image; as two textures meeting edge to edge, a sub-pixel
+gap opens between them on one side or the other. The colours are final, drawn
+untinted. Two runs give byte-identical files.
 
 ## Shared tooling
 

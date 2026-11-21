@@ -27,6 +27,7 @@ SOURCES = (
     "tools/screenshots.py",
     "UI/Frames.lua",
     "Map/Coordinates.lua",
+    "media/TooltipBorderModern.tga",
 )
 SCENES = {
     path.name: functools.partial(screens.files, ROOT, SOURCES)

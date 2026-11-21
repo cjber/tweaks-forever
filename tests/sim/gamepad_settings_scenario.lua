@@ -20,6 +20,7 @@
 -- #382: the Options navigation enters only the client's vertical pages, so every page is the client's own rows, and
 -- every page the cursor lands on must show its first target.
 local CHOICES = {
+	["Tooltip style"] = { key = "tooltipStyle", values = { "modern", "retail", "forever" } },
 	["Mark grouped gear with"] = { key = "gearMark", values = { "strip", "border", "dots", "none" } },
 	["Invite keyword"] = { key = "whisperInviteKeyword", values = { "inv", "invite", "group" } },
 }
@@ -172,7 +173,7 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 			end
 		end
 	end
-	assert(#stepped == 2, "both choices stepped: " .. table.concat(stepped, ", "))
+	assert(#stepped == 3, "all three choices stepped: " .. table.concat(stepped, ", "))
 
 	-- B out of the rows, then out of the panel.
 	sim:input(function()
