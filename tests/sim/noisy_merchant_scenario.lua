@@ -1,10 +1,7 @@
 -- luacheck: read globals scenario ADDON
--- #639: a live client raises item, bag and merchant traffic that no addon asked for. Tweaks waits for item data
--- through one listener (Core/ItemInfo.lua, #636), so its work per noisy event stays the same with the merchant open
--- or closed and as the noise runs on: the same handlers, no client API calls from addon code on item data it was not
--- waiting for, and a bag update that costs no more over time. The sim counts every frame's handlers, Blizzard's
--- included, so Tweaks' own are read from ns.On's table. The quest reward choice half waits on the sim's quest reward
--- panel (cjber/forever-core#927).
+-- #639: Tweaks waits for item data through one listener (Core/ItemInfo.lua, #636). Unrequested item data
+-- should cost no addon API calls, and noisy event paths should stay flat with a merchant or quest reward panel open.
+-- The sim counts Blizzard's handlers too, so read Tweaks' own registrations from ns.On's table.
 local NOISE =
 	{ "GET_ITEM_INFO_RECEIVED", "ITEM_DATA_LOAD_RESULT", "BAG_UPDATE", "BAG_UPDATE_DELAYED", "MERCHANT_UPDATE" }
 
@@ -35,31 +32,21 @@ local function Window(sim, ns, seconds)
 	return out
 end
 
-scenario("Tweaks' work per noisy item event stays flat at a merchant", function(sim)
-	dofile("tests/sim/forever_core.lua").install(sim)
-	sim.world.items[2589] = { name = "Linen Cloth" }
-	sim.world.items[2592] = { name = "Wool Cloth" }
-	sim:login()
+local function Namespace(sim)
 	local ns
 	for _, entry in ipairs(sim.loader.addons) do
 		if entry.name == ADDON then
 			ns = entry.ns
 		end
 	end
-	assert(ns, "Tweaks loaded")
+	return assert(ns, "Tweaks loaded")
+end
 
-	sim:noisy({ seed = 11 })
-	local closed = Window(sim, ns, 2)
-	assert(closed.GET_ITEM_INFO_RECEIVED.runs > 0, "the noise raises item info")
+local function AssertFlat(closed, open, later)
 	assert(closed.GET_ITEM_INFO_RECEIVED.ours == 1, "one item info listener (#636)")
-
-	sim:openMerchant()
-	local open = Window(sim, ns, 2)
-	local later = Window(sim, ns, 2)
-	assert(open.MERCHANT_UPDATE.runs > 0, "the merchant churns while open")
 	for _, event in ipairs(NOISE) do
 		local a, b, c = closed[event], open[event], later[event]
-		assert(b.ours == a.ours and c.ours == a.ours, event .. ": the same handlers, merchant open or closed")
+		assert(b.ours == a.ours and c.ours == a.ours, event .. ": the same handlers, panel open or closed")
 		if event ~= "MERCHANT_UPDATE" then
 			assert(a.runs > 0 and b.runs > 0 and c.runs > 0, event .. ": the noise raises it in every window")
 		end
@@ -67,10 +54,74 @@ scenario("Tweaks' work per noisy item event stays flat at a merchant", function(
 	end
 	for _, event in ipairs({ "GET_ITEM_INFO_RECEIVED", "ITEM_DATA_LOAD_RESULT" }) do
 		for name, window in pairs({ closed = closed[event], open = open[event], later = later[event] }) do
-			assert(window.apiCalls == 0, ("%s: no client calls from addon code, merchant %s"):format(event, name))
+			assert(window.apiCalls == 0, ("%s: no client calls from addon code, panel %s"):format(event, name))
 		end
 	end
+end
+
+scenario("Tweaks' work per noisy item event stays flat at a merchant", function(sim)
+	dofile("tests/sim/forever_core.lua").install(sim)
+	sim.world.items[2589] = { name = "Linen Cloth" }
+	sim.world.items[2592] = { name = "Wool Cloth" }
+	sim:login()
+	local ns = Namespace(sim)
+
+	sim:noisy({ seed = 11 })
+	local closed = Window(sim, ns, 2)
+
+	sim:openMerchant()
+	local open = Window(sim, ns, 2)
+	local later = Window(sim, ns, 2)
+	assert(open.MERCHANT_UPDATE.runs > 0, "the merchant churns while open")
+	AssertFlat(closed, open, later)
 	sim:closeMerchant()
+	sim:noisy(false)
+	sim:expectNoErrors(ADDON)
+end)
+
+scenario("Tweaks' work per noisy item event stays flat on a quest reward choice", function(sim)
+	dofile("tests/sim/forever_core.lua").install(sim)
+	sim.world.items[2589] = { name = "Linen Cloth", sell = 13 }
+	sim.world.items[2592] = { name = "Wool Cloth", sell = 33 }
+	sim:login()
+	local ns = Namespace(sim)
+
+	sim:noisy({ seed = 17 })
+	local closed = Window(sim, ns, 2)
+
+	sim:openQuestReward(1, { choices = { 2589, 2592 } })
+	local open = Window(sim, ns, 2)
+	local later = Window(sim, ns, 2)
+	AssertFlat(closed, open, later)
+
+	local rewards = sim.G.QuestInfoRewardsFrame
+	assert(sim.G.QuestFrameRewardPanel:IsVisible(), "the quest reward panel is visible")
+	local choices = {}
+	for _, button in ipairs(rewards.RewardButtons) do
+		if button:IsVisible() and button.type == "choice" then
+			choices[#choices + 1] = button
+		end
+	end
+	assert(#choices == 2, "both quest choices are visible")
+
+	local marked = {}
+	for _, child in ipairs({ rewards:GetChildren() }) do
+		if child:IsVisible() then
+			for _, region in ipairs({ child:GetRegions() }) do
+				if
+					region:GetObjectType() == "Texture"
+					and region:IsVisible()
+					and region:GetTexture() == "Interface\\MoneyFrame\\UI-GoldIcon"
+				then
+					local _, anchor = child:GetPoint()
+					marked[#marked + 1] = anchor
+				end
+			end
+		end
+	end
+	assert(#marked == 1 and marked[1] == choices[2].Icon, "only the higher-value reward has a visible gold coin")
+
+	sim:closeQuestReward()
 	sim:noisy(false)
 	sim:expectNoErrors(ADDON)
 end)
