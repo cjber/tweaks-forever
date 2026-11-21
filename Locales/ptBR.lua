@@ -247,6 +247,7 @@ L["The game itself"] = "O próprio jogo" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "As dicas do jogo seguem o cursor do mouse em vez do canto fixo do jogo. Dicas que uma janela posiciona por conta própria, como a de um item da bolsa, ficam onde ela as coloca."
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "As últimas 200 linhas de cada janela de chat voltam após recarregar ou sair, acima de uma linha Antes do seu /reload. Guardadas só para este personagem, e linhas que o jogo mantém em segredo ficam de fora."
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "A lista da saudação de missões (um PNJ ou quadro só com missões) e o título da missão nas páginas de detalhes e recompensa mostram o nível dela, como [12]."
+L["The range strip now shows with any attackable target, out of combat too."] = "A faixa de alcance agora aparece com qualquer alvo atacável, inclusive fora de combate." -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "O sussurro inteiro que convida o remetente: a mensagem deve ser só esta palavra."
 L["Time to level: %s"] = "Tempo até o próximo nível: %s"
 L["Tooltip at the cursor"] = "Dica no cursor"
@@ -347,7 +348,6 @@ L["Melee"] = "Corpo a corpo" -- mt
 L["Dead zone"] = "Zona morta" -- mt
 L["Too far"] = "Longe demais" -- mt
 
-L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "Seu alvo de foco agora tem um contorno dourado na placa de nome em masmorras e raides." -- mt
 L["Bags"] = "Bolsas"
 L["Bags and vendors"] = "Bolsas e vendedores"
 L["Bars and alerts"] = "Barras e avisos"

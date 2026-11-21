@@ -247,6 +247,7 @@ L["The game itself"] = "Le jeu lui-même" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "Les infobulles du jeu suivent le curseur au lieu du coin fixe du jeu. Les infobulles qu'une fenêtre place elle-même, comme celle d'un objet de sac, restent où elle les met."
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "Les 200 dernières lignes de chaque fenêtre de chat reviennent après un rechargement ou une déconnexion, au-dessus d'une ligne Avant votre /reload. Conservées pour ce personnage uniquement, et les lignes que le jeu garde secrètes sont omises."
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "La liste de l'accueil de quête (un PNJ ou un panneau avec seulement des quêtes) et le titre de la quête sur ses pages de détails et de récompense affichent son niveau, comme [12]."
+L["The range strip now shows with any attackable target, out of combat too."] = "La bande de portée s'affiche désormais avec toute cible attaquable, même hors combat." -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "Le chuchotement complet qui invite son auteur : le message doit être ce mot seul."
 L["Time to level: %s"] = "Temps avant le niveau : %s"
 L["Tooltip at the cursor"] = "Infobulle au curseur"
@@ -347,7 +348,6 @@ L["Melee"] = "Corps à corps" -- mt
 L["Dead zone"] = "Zone morte" -- mt
 L["Too far"] = "Trop loin" -- mt
 
-L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "Votre cible de focalisation a désormais un contour doré sur sa barre d'info en donjon et en raid." -- mt
 L["Bags"] = "Sacs"
 L["Bags and vendors"] = "Sacs et marchands"
 L["Bars and alerts"] = "Barres et alertes"
