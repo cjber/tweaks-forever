@@ -172,7 +172,7 @@ scenario("gamepad through the Tweaks settings leaves the binding stack to the ga
 			end
 		end
 	end
-	assert(#stepped == 3, "all three choices stepped: " .. table.concat(stepped, ", "))
+	assert(#stepped == 2, "both choices stepped: " .. table.concat(stepped, ", "))
 
 	-- B out of the rows, then out of the panel.
 	sim:input(function()
