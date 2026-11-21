@@ -626,8 +626,9 @@ assert(
 -- distance; melee reaches 5 yards, the interact check answers true inside the client's radius (8 or 9.9 here, the two
 -- ends the strip allows for) measured between centres, which lie the two units' combat reaches (0, 3 or 10 yards
 -- here) beyond the edge distance every other range uses, and each reach answers inside its own range. Any answer may
--- be missing (the swing check is off, a spell or the interact check may say nothing). The rule must never name a wrong band, and must name the
--- band whenever the answers leave only one band possible: a missing answer hides only the bands it could change.
+-- be missing (the swing check is off, a spell or the interact check may say nothing). The rule must never name a
+-- wrong band, and must name the band whenever the answers leave only one band possible: a missing answer hides only
+-- the bands it could change.
 local function TrueBand(distance, reaches)
 	if distance <= 5 then
 		return "melee"
