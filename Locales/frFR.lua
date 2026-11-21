@@ -348,7 +348,6 @@ L["Melee"] = "Corps à corps" -- mt
 L["Dead zone"] = "Zone morte" -- mt
 L["Too far"] = "Trop loin" -- mt
 
-L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "Votre cible de focalisation a désormais un contour doré sur sa barre d'info en donjon et en raid." -- mt
 L["Bags"] = "Sacs"
 L["Bags and vendors"] = "Sacs et marchands"
 L["Bars and alerts"] = "Barres et alertes"

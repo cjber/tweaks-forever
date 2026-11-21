@@ -348,7 +348,6 @@ L["Melee"] = "近战" -- mt
 L["Dead zone"] = "死区" -- mt
 L["Too far"] = "过远" -- mt
 
-L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "在地下城和团队副本中，你的焦点目标的姓名板现在有金色轮廓。" -- mt
 L["Bags"] = "背包"
 L["Bags and vendors"] = "背包与商人"
 L["Bars and alerts"] = "状态条与提醒"

@@ -348,7 +348,6 @@ L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt
 
-L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "Цель фокуса теперь обведена золотым контуром на индикаторе здоровья в подземельях и рейдах." -- mt
 L["Bags"] = "Сумки"
 L["Bags and vendors"] = "Сумки и торговцы"
 L["Bars and alerts"] = "Полосы и оповещения"
