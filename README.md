@@ -10,7 +10,7 @@ Small quality-of-life tweaks for WoW: Forever that look like they came with the 
 <br><br><a href="https://github.com/sponsors/cjber"><img src="docs/github-sponsors-button.png" alt="Sponsor me on GitHub"></a> <a href="https://ko-fi.com/cjber"><img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi"></a>
 </p>
 
-Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can warn you on screen about rares near you, and it repairs and sells junk at merchants. Gear groups, maps and more sit beside them in the game’s settings.
+Tweaks Forever can accept and turn in quests, standing down while Polestar does. It can warn you on screen about rares near you, and it repairs and sells junk at merchants. Gear groups, maps, nameplates and more sit beside them in the game’s settings.
 
 When another addon already does one of these jobs, that feature is greyed out and its tooltip names the addon, so the two never fight.
 
@@ -22,10 +22,10 @@ When another addon already does one of these jobs, that feature is greyed out an
 - Moving windows in Edit Mode is switched off while the gamepad UI is on.
 
 <p align="center">
-<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="A junk coin on an item that sells with your greys">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/demo.gif" width="760" alt="Nameplates and a junk coin">
 </p>
 
-<p align="center">The junk coin marks what sells with your greys at a merchant.</p>
+<p align="center">The junk coin marks what sells with your greys at a merchant. Also nameplates.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/dungeonmap.png" width="768" alt="The world map inside Blackfathom Deeps, showing the client's painted dungeon floor">
@@ -45,8 +45,10 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 - **Map extras.** Unexplored areas in a blue tint on the world and zone maps (off until you turn it on), each zone's level range coloured like quest levels, and your and the cursor's coordinates.
 - **Dungeon maps.** Inside a dungeon or raid the world map shows the client's own painted map, with its area names and boss rooms, a button for the floor and a Back to map button. The maps come with WoW: Forever; no extra addon is needed.
 - **Movable windows.** A **Windows** tab in Edit Mode moves and scales 21 Blizzard windows, per layout (not with the gamepad UI).
+- **Nameplates.** A taller bar in retail's own frame, name and level above, your target outlined, and cast bars with the spell's icon.
 - **Range strip.** A strip on top of the game's own swing timers names which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, out of combat too.
-- **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, with a quest icon by its nameplate, and Questie's markers in the game's own quest symbols.
+- **Tooltips.** A thin rounded border over charcoal, class-coloured names and a health bar inside. The style is charcoal, retail's navy, or the game's own border.
+- **Questie extras.** Needs [Questie](https://www.curseforge.com/wow/addons/questie) or its QuestieDB addon. Quests listed when you point at a minimap giver, your progress in a creature's, quest item's or object's tooltip, items that start a quest marked, and Questie's markers in the game's own quest symbols.
 - **Levelling.** The experience bar's tooltip adds your XP per hour, the time to level at that pace and about how many kills or quests that is. Turn on **Quest XP on the experience bar** (off by default) to shade the bar with the XP your quest log is worth, the ready hand-ins first, and the tooltip then adds the level they reach. Rare alerts (off by default) name nearby rares at the top of the screen; press a bound key to set a waypoint to the last one. In a group, a pull warning at the top of the screen says when your threat passes the tank's. A soft glow on the talents button reminds you while talent or pet training points are unspent.
 - **Camps.** Camp tooltips say what sitting nearby gives you, and each benefit you gain is named on screen.
 - **Spellbook and bags.** Each spellbook tab ends with the spells you have not learned yet, and the Pet tab does the same for the abilities your pet's family can learn. With Combine Bags on, the reagent bag joins the combined bag.
@@ -63,6 +65,18 @@ Every feature has its own setting; [docs/features.md](docs/features.md) has the 
 </p>
 
 <p align="center">Chat options on: short headers, class colours and levels, an item icon, a folded repeat, a mention, a web link and the lines that survived a reload.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/nameplates.png" width="644" alt="Three enemy nameplates, the target outlined with a Fireball cast">
+</p>
+
+<p align="center">Nameplates in retail's own frame, with your target outlined and a quest icon on what you still need.</p>
+
+<p align="center">
+<img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/tooltips.png" width="394" alt="An enemy's and a shaman's tooltip with health bars">
+</p>
+
+<p align="center">Unit tooltips with the health bar inside, in the retail game's own bar and frame.</p>
 
 <p align="center">
 <img src="https://raw.githubusercontent.com/cjber/tweaks-forever/main/docs/screenshots/editmode.png" width="100%" alt="Edit Mode's Windows tab and the Character window's Scale slider">
@@ -103,7 +117,7 @@ Translated into German, French, Spanish, Korean, Brazilian Portuguese, Russian a
 
 ## Works alongside
 
-A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) for journeys and waypoints. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
+A feature steps aside while Leatrix Plus, Leatrix Maps, Mapster, OpenMap, Questie, Legacy Forever, Polestar, Naowh Forever, BlizzMove, Peddler, FishingBuddy, Forever Loot Sparkles, a nameplate or tooltip addon such as Plater or ElvUI, or a similar addon already does its job. [docs/features.md](docs/features.md#works-alongside) lists which addon covers which feature. It also works with [Shortest Path Forever](https://www.curseforge.com/wow/addons/shortest-path-forever) for journeys and waypoints. [Adventure Guide Forever](https://www.curseforge.com/wow/addons/adventure-guide-forever) uses Tweaks' class trainer locations for its spell reminders, and the Windows option moves its guide window.
 
 <!-- forever-family:start -->
 

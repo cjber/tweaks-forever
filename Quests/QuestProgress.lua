@@ -6,9 +6,9 @@ if ns.broken then
 end
 local L = ns.L
 
-local TOOLTIP, PLATES = "questTooltips", "questPlates"
+local TOOLTIP = "questTooltips"
 
--- Questie shows its own objectives on tooltips and nameplates while these options of its are on.
+-- Questie shows its own objectives on tooltips while this option of its is on.
 ---@param option string
 ---@return fun(): boolean?
 local function QuestieOption(option)
@@ -44,22 +44,6 @@ ns.Feature({
 	needs = NEEDS,
 })
 
-ns.Feature({
-	key = PLATES,
-	category = "Quests and maps",
-	section = "Quest markers",
-	name = "Quest icons on nameplates",
-	tooltip = "A small quest icon sits beside the nameplate of each creature you still need for a quest in your "
-		.. "log, to kill or for an item it drops, and goes once you have enough. Needs Questie, or its QuestieDB addon "
-		.. "on its own.",
-	default = true,
-	conflicts = {
-		{ addon = "Questie", when = QuestieOption("nameplateEnabled") },
-		{ addon = "Polestar_QuestDB", polestar = "qol.nameplateIcons" },
-	},
-	needs = NEEDS,
-})
-
 -- Your quests, their objectives and your progress are the quest log's, read by quest ID and objective position; a
 -- creature is known by the ID in its GUID. Which creatures count toward an objective is QuestieDB's, read at runtime:
 -- kills, kill credit and the creatures that drop a quest's items. QuestieDB lists a quest's objectives by kind, and
@@ -78,8 +62,6 @@ local GROUPS = {
 	{ slot = 5, kind = "monster", first = "killCreditObjectiveFirst", credit = true },
 	{ slot = 6, kind = "spell", first = "spellObjectiveFirst" },
 }
--- The stock objective marker, this big and this far right of the health bar.
-local ICON, SIZE, GAP = "questobjective", 20, 4
 
 ---@class TFQuestProgress
 local Model = {}
@@ -370,22 +352,6 @@ function Model.Starts(item)
 	return L["Starts a quest: %s"]:format(type(quest.name) == "string" and quest.name or tostring(quest.id))
 end
 
--- Whether a creature still counts toward a quest in your log that isn't complete.
----@param npc integer?
----@return boolean
-function Model.Needed(npc)
-	for _, match in ipairs(Model.Matches(npc)) do
-		if not match.quest.complete then
-			for _, objective in ipairs(match.objectives) do
-				if not objective.finished then
-					return true
-				end
-			end
-		end
-	end
-	return false
-end
-
 -- Whether the game has already put quest lines in a tooltip.
 ---@param data TooltipData
 ---@return boolean
@@ -399,79 +365,10 @@ function Model.HasQuestLines(data)
 	return false
 end
 
--- One quest icon per nameplate, on a frame of our own parented to the plate, right of Blizzard's health bar; the
--- raid mark and elite dragon sit to its left. Nothing is written into Blizzard's frames.
-local function Plates()
-	---@type table<NamePlateFrame, Texture>
-	local icons = setmetatable({}, { __mode = "k" })
-	-- [unit token] = its nameplate, while it has one.
-	---@type table<string, NamePlateFrame>
-	local shown = {}
-
-	---@param plate NamePlateFrame
-	---@return Texture
-	local function Icon(plate)
-		local icon = icons[plate]
-		if not icon then
-			local holder = CreateFrame("Frame", nil, plate)
-			holder:SetSize(SIZE, SIZE)
-			local anchor = plate.UnitFrame and plate.UnitFrame.HealthBarsContainer or plate
-			holder:SetPoint("LEFT", anchor, "RIGHT", GAP, 0)
-			icon = holder:CreateTexture(nil, "OVERLAY")
-			ns.Art.Fit(icon, ICON, SIZE, SIZE)
-			icon:SetPoint("CENTER")
-			icons[plate] = icon
-		end
-		return icon
-	end
-
-	---@param unit string
-	local function Update(unit)
-		local plate = shown[unit]
-		if not plate then
-			return
-		end
-		local need = ns.Active(PLATES) and Model.Needed(Model.NpcId(UnitGUID(unit)))
-		if need then
-			Icon(plate):Show()
-		elseif icons[plate] then
-			icons[plate]:Hide()
-		end
-	end
-
-	local function UpdateAll()
-		for unit in pairs(shown) do
-			Update(unit)
-		end
-	end
-
-	ns.On("NAME_PLATE_UNIT_ADDED", function(unit)
-		-- A forbidden plate (a friendly one in an instance) is never handed to addon code.
-		shown[unit] = C_NamePlate.GetNamePlateForUnit(unit)
-		Update(unit)
-	end)
-	ns.On("NAME_PLATE_UNIT_REMOVED", function(unit)
-		local plate = shown[unit]
-		if plate and icons[plate] then
-			icons[plate]:Hide()
-		end
-		shown[unit] = nil
-	end)
-	-- Plates already up before login, as after a reload.
-	for _, plate in ipairs(C_NamePlate.GetNamePlates()) do
-		local unit = plate.UnitFrame and plate.UnitFrame.unit
-		if unit then
-			shown[unit] = plate
-		end
-	end
-	return UpdateAll
-end
-
 ns.Init(function()
 	if not Model.Attach() then
 		return
 	end
-	local UpdatePlates = Plates()
 
 	-- Progress changes arrive as several events in one frame: rebuild once, on the next.
 	local pending = false
@@ -483,14 +380,11 @@ ns.Init(function()
 		C_Timer.After(0, function()
 			pending = false
 			Model.Rebuild()
-			UpdatePlates()
 		end)
 	end
 	ns.On("QUEST_LOG_UPDATE", Changed)
 	ns.OnUnit("UNIT_QUEST_LOG_CHANGED", "player", Changed)
-	ns.OnSettingChanged(PLATES, UpdatePlates)
 	Model.Rebuild()
-	UpdatePlates()
 
 	---@param data TooltipData
 	---@return boolean

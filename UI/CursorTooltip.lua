@@ -10,7 +10,7 @@ local KEY = "cursorTooltips"
 ns.Feature({
 	key = KEY,
 	category = "Interface",
-	section = "Tooltips and windows",
+	section = "Tooltips and nameplates",
 	name = "Tooltip at the cursor",
 	tooltip = "The game's own tooltips follow the mouse cursor instead of the game's fixed corner. "
 		.. "Tooltips a window places itself, such as a bag item's, stay where it puts them.",
