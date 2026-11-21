@@ -92,6 +92,11 @@ local MELEE_REACH = 5
 -- (the duel distance, 9.9). The check's yards are server constants the API does not describe, and a false answer
 -- puts nothing under the target's distance: it can stand inside any reach's minimum range as well as beyond.
 local INTERACT_FAR = 10
+-- The follow distance check (Model.Follow, CheckInteractDistance index 4), the client's 28 yards: true puts the target
+-- within 28 and false beyond it. It is the same family of server constants as the duel distance (the shortest-path-
+-- forever Routing/Band.lua header calls them server constants, and LibRangeCheck-3.0 lists index 4 as 28 yd), so
+-- the API does not describe how it measures.
+local FOLLOW = 28
 
 -- Each class's reach spells, in the order their labels read when spells share a range. The client answers each
 -- spell's current range, so a talent that extends one moves it past the others; nothing here is a fixed distance.
@@ -332,6 +337,20 @@ function Model.Melee()
 	return ns.Readable(within)
 end
 
+-- Whether the game's follow distance check reaches the target: true within 28 yards, false beyond. Nil when the game
+-- cannot answer, and a call that raises answers nothing either.
+---@return boolean?
+function Model.Follow()
+	if type(CheckInteractDistance) ~= "function" then
+		return nil
+	end
+	local ok, within = pcall(CheckInteractDistance, "target", 4)
+	if not ok then
+		return nil
+	end
+	return ns.Readable(within)
+end
+
 -- Whether the game's interact check (the duel distance) reaches the target: true puts it within 10 yards, false says
 -- nothing about how near it is. Nil when the game cannot answer, and a call that raises answers nothing either.
 ---@return boolean?
@@ -379,10 +398,11 @@ end
 -- every distance.
 ---@param melee boolean?
 ---@param interact boolean?
+---@param follow boolean?
 ---@param reaches TFRangeReach[]
 ---@return string|false|nil
-local function Solve(melee, interact, reaches)
-	local edges = { 0, MELEE_REACH, INTERACT_FAR }
+local function Solve(melee, interact, follow, reaches)
+	local edges = { 0, MELEE_REACH, INTERACT_FAR, FOLLOW }
 	for _, reach in ipairs(reaches) do
 		edges[#edges + 1] = reach.min
 		edges[#edges + 1] = reach.max
@@ -398,6 +418,7 @@ local function Solve(melee, interact, reaches)
 	for _, distance in ipairs(samples) do
 		local agrees = (melee == nil or melee == (distance <= MELEE_REACH))
 			and (interact ~= true or distance < INTERACT_FAR)
+			and (follow == nil or follow == (distance <= FOLLOW))
 		for _, reach in ipairs(reaches) do
 			if reach.check ~= nil and reach.check ~= (distance >= reach.min and distance <= reach.max) then
 				agrees = false
@@ -417,19 +438,23 @@ end
 -- The band key, or nil when the answers cannot say. Each answer narrows where the target can stand: melee from the
 -- game's swing range, each reach from its spell, and the game's interact check. A band is named only when every
 -- distance left gives that band, so a missing answer hides only the bands it could change and never names a wrong
--- one. `interact` is called only when the other answers leave more than one band.
+-- one. `interact` and `follow` are called only when the other answers leave more than one band.
 ---@param melee boolean?
 ---@param reaches TFRangeReach[]
 ---@param interact fun(): boolean?
+---@param follow? fun(): boolean?
 ---@return string?
-function Model.Band(melee, reaches, interact)
+function Model.Band(melee, reaches, interact, follow)
 	-- The game's own swing answer wins outright.
 	if melee == true then
 		return MELEE
 	end
-	local band = Solve(melee, nil, reaches)
+	local band = Solve(melee, nil, nil, reaches)
 	if band == nil then
-		band = Solve(melee, interact(), reaches)
+		band = Solve(melee, interact(), nil, reaches)
+	end
+	if band == nil and follow then
+		band = Solve(melee, interact(), follow(), reaches)
 	end
 	-- No distance fits every answer: something the yard model does not hold for, so no band can be named safely.
 	return band or nil
@@ -826,7 +851,7 @@ ns.Init(function()
 		for _, reach in ipairs(cachedReaches) do
 			reach.check = Model.Check(reach.spell)
 		end
-		return Model.Band(Model.Melee(), cachedReaches, Model.Interact)
+		return Model.Band(Model.Melee(), cachedReaches, Model.Interact, Model.Follow)
 	end
 
 	function Update()

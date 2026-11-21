@@ -180,7 +180,14 @@ local function Load(class, knownSpells)
 	local mainHand = setmetatable({ bottom = 300, shown = true, scale = 1, scripts = {} }, { __index = Timer })
 	local ranged = setmetatable({ bottom = 200, shown = true, scale = 1, scripts = {} }, { __index = Timer })
 
-	local function interactCheck()
+	-- The follow distance check (index 4, 28 yards): no answer unless a check sets one.
+	local follow
+	local function interactCheck(unit, index)
+		assert(unit == "target", "the interact checks read the target")
+		if index == 4 then
+			return follow
+		end
+		assert(index == 3, "the duel distance is index 3")
 		interactCalls = interactCalls + 1
 		return interact
 	end
@@ -332,6 +339,9 @@ local function Load(class, knownSpells)
 		tickers = tickers,
 		interactCalls = function()
 			return interactCalls
+		end,
+		setFollow = function(value)
+			follow = value
 		end,
 		setInteract = function(value)
 			interact = value
@@ -565,6 +575,46 @@ assert(
 	"a farther nil does not decide"
 )
 
+-- Model.Follow is the game's follow distance check (28 yards): nil when it cannot answer.
+hunter.setFollow(false)
+assert(M.Follow() == false, "past the follow distance")
+hunter.setFollow(true)
+assert(M.Follow() == true, "inside the follow distance")
+hunter.setFollow(nil)
+assert(M.Follow() == nil, "no follow answer")
+
+local function follow(answer)
+	return function()
+		return answer
+	end
+end
+
+-- Past the follow distance (28 yards) the target is beyond every reach shorter than that: Too far from a real answer,
+-- where the interact check says nothing. A reach to 30 yards stays undecided until its own spell answers.
+assert(
+	M.Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(false)) == "far",
+	"past 28 yards, beyond Charge"
+)
+assert(
+	M.Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, nil) }, interact(false), follow(false)) == nil,
+	"28 to 30 yards may still be inside a shot's reach: undecided"
+)
+assert(
+	M.Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, false) }, interact(false), follow(false))
+		== "far",
+	"the shot's own answer settles it: past 30 yards"
+)
+assert(
+	M.Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, true) }, interact(false), follow(false))
+		== "ranged",
+	"the shot's own answer settles it: inside 30 yards"
+)
+assert(M.Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(nil)) == nil, "no follow answer")
+assert(
+	M.Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(true)) == nil,
+	"inside 28 yards: unknown"
+)
+
 -- The dead zone needs a shown reach with a minimum range and the game's own 8-yard answer.
 local warriorReaches = { reach("charge", 8, 25, false), reach("ranged", 8, 30, false) }
 assert(M.Band(false, warriorReaches, interact(true)) == "dead", "a minimum range and a target inside 8 yards")
@@ -673,7 +723,7 @@ for _, set in ipairs(reachSets) do
 	-- because nothing here changes between edges: each answer and TrueBand compare the distance only against 5, the
 	-- interact radius and the reach edges, all of them in `edges`. A 0.01-yard walk from 0 to 60 yards gives the same
 	-- 769 distinct answer sets with the same bands (PR #613).
-	local edges = { 0, 5, 8, 9.9, 10 }
+	local edges = { 0, 5, 8, 9.9, 10, 28 }
 	for _, r in ipairs(reaches) do
 		edges[#edges + 1] = r.min
 		edges[#edges + 1] = r.max
@@ -689,8 +739,8 @@ for _, set in ipairs(reachSets) do
 	for _, radius in ipairs({ 8, 9.9 }) do
 		for _, reachSum in ipairs({ 0, 3, 10 }) do
 			for _, distance in ipairs(samples) do
-				-- Bit 0 drops melee, bit 1 the interact check, bit i + 1 reach i.
-				for mask = 0, 2 ^ (n + 2) - 1 do
+				-- Bit 0 drops melee, bit 1 the interact check, bit 2 the follow check, bit i + 2 reach i.
+				for mask = 0, 2 ^ (n + 3) - 1 do
 					local function Kept(bit, value)
 						if math.floor(mask / 2 ^ bit) % 2 == 1 then
 							return nil
@@ -698,14 +748,17 @@ for _, set in ipairs(reachSets) do
 						return value
 					end
 					local melee, near, checks = Kept(0, distance <= 5), Kept(1, distance + reachSum < radius), {}
-					local key = tostring(melee) .. tostring(near)
+					-- The follow check is modelled as measuring the edge distance, which the strip assumes for it: measured between
+					-- centres, a large target would answer false inside 28 yards of edge distance.
+					local far = Kept(2, distance <= 28)
+					local key = tostring(melee) .. tostring(near) .. tostring(far)
 					for i, r in ipairs(reaches) do
-						checks[i] = Kept(i + 1, Within(distance, r))
+						checks[i] = Kept(i + 2, Within(distance, r))
 						key = key .. tostring(checks[i])
 					end
 					local case = cases[key]
 					if not case then
-						case = { melee = melee, near = near, checks = checks, bands = {}, at = distance }
+						case = { melee = melee, near = near, far = far, checks = checks, bands = {}, at = distance }
 						cases[key] = case
 						order[#order + 1] = key
 					end
@@ -721,6 +774,8 @@ for _, set in ipairs(reachSets) do
 		end
 		local got = M.Band(case.melee, reaches, function()
 			return case.near
+		end, function()
+			return case.far
 		end)
 		local failure =
 			string.format("reaches %s near %.1f yd (%s): got %s", table.concat(set, ","), case.at, key, tostring(got))
@@ -735,7 +790,9 @@ for _, set in ipairs(reachSets) do
 		local only, count = nil, 0
 		local possible = {}
 		for _, distance in ipairs(samples) do
-			local agrees = (case.melee == nil or case.melee == (distance <= 5)) and (case.near ~= true or distance < 10)
+			local agrees = (case.melee == nil or case.melee == (distance <= 5))
+				and (case.near ~= true or distance < 10)
+				and (case.far == nil or case.far == (distance <= 28))
 			for i, r in ipairs(reaches) do
 				agrees = agrees and (case.checks[i] == nil or case.checks[i] == Within(distance, r))
 			end
@@ -1013,6 +1070,10 @@ assert(bandOf(warrior) == "Dead zone", "5 to 8 yards: the dead zone")
 -- Melee false, Charge out, interact false: Charge's minimum or beyond its maximum, and the game cannot say which.
 warrior.setInteract(false)
 assert(bandOf(warrior) == nil, "past 25 yards or inside 8 behind a large target: the strip cannot tell")
+-- The follow check says past 28 yards: beyond Charge's 25, a real answer for Too far.
+warrior.setFollow(false)
+assert(bandOf(warrior) == "Too far", "past 28 yards: Too far, so the player sees Charge cannot reach")
+warrior.setFollow(nil)
 -- No Charge answer at all (the client gave none): nothing is named from it.
 warrior.setAnswer(100, "none")
 warrior.setInteract(true)
