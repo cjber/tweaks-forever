@@ -8,7 +8,6 @@ are fetched from wago.tools once and cached under ~/.cache/wowmock/<build>/.
 
 import functools
 import io
-import math
 import os
 import re
 import sys
@@ -29,8 +28,6 @@ from wowmock import (  # ty: ignore[import-not-found]
     FONTS,
     FRIZQT,
     NORMAL,
-    TOOLTIP_LINE_GAP,
-    TOOLTIP_PADDING,
     Font,
     TooltipLine,
     Ui,
@@ -740,34 +737,6 @@ def rangestrip_classes(ui):
     scene(ui, [(c, 0, 0)], MARGIN).save(OUT / "rangestrip-classes.png")
 
 
-# UI/Nameplates.lua at the Medium size: a 190-wide plate less Blizzard's 12 inset each side, health 16 over a 2 gap
-# and a 12 cast bar, name and level 4 above the bar, the target outlined and every other plate's bar darkened by
-# Blizzard's own deselected overlay.
-PLATE_W, PLATE_HEALTH, PLATE_CAST, PLATE_GAP = 166, 16, 12, 2
-QUEST_ICON, QUEST_GAP = 20, 4
-HOSTILE, ROGUE = (1.0, 0.0, 0.0), (1.0, 0.96, 0.41)
-FAIR, EASY = (1.0, 0.82, 0.0), (0.25, 0.75, 0.25)
-FIREBALL, REND, SUNDER = 135812, 132155, 132363
-# A level 15 warrior in Westfall, targeting a Pillager casting Fireball: (name, level, level colour, health colour,
-# health, target, (spell, icon, progress) or None, [(icon, stacks, remaining)], a quest objective you still need).
-PLATES = [
-    (
-        "Defias Pillager",
-        15,
-        FAIR,
-        HOSTILE,
-        0.62,
-        True,
-        ("Fireball", FIREBALL, 0.55),
-        [(REND, None, 0.4), (SUNDER, 3, 0.8)],
-        True,
-    ),
-    ("Defias Tide Crawler", 12, EASY, HOSTILE, 1.0, False, None, [], False),
-    ("Grimtusk", 16, FAIR, ROGUE, 0.45, False, None, [], False),
-]
-PLATE_POSITIONS = [(40, 60), (270, 140), (-150, 150)]
-
-
 def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
     image = ui.texture(fdid)
     w, h = image.size
@@ -776,90 +745,11 @@ def spell_icon(ui, canvas, fdid, x, y, size, crop=0.08):
     )
 
 
-def nameplate(ui, name, level, level_colour, colour, health, target, cast, debuffs, quest):
-    """One nameplate as UI/Nameplates.lua lays out Blizzard's, with the Health Percent option on."""
-
-    c = ui.canvas(240, 120)
-    x, w = 37, PLATE_W
-    cast_y = 110 - PLATE_CAST
-    y = cast_y - PLATE_GAP - PLATE_HEALTH
-    # Retail's bar art as its default style lays it out: the trough 2 left, 3 above, 6 right and 6 below the bar,
-    # and the target outline 1 outside the trough's top left and 3 inside its bottom right.
-    c.draw(ui.atlas("UI-HUD-CoolDownManager-Bar-BG"), x - 2, y - 3, w + 8, PLATE_HEALTH + 9)
-    c.draw(ui.atlas("UI-HUD-CoolDownManager-Bar"), x, y, w * health, PLATE_HEALTH, color=(*colour, 1))
-    if target:
-        c.draw(ui.atlas("UI-HUD-Nameplates-Selected"), x - 3, y - 4, w + 6, PLATE_HEALTH + 7)
-    else:
-        # Blizzard's own darkening of a bar that is neither the target nor the focus, 1 beyond the bar's top and
-        # bottom as its XML anchors it.
-        c.draw(ui.atlas("ui-hud-nameplates-deselected-overlay"), x, y - 1, w, PLATE_HEALTH + 2)
-    if quest:
-        # Quests/QuestProgress.lua: the 20-square questobjective atlas 4 right of the health bar, centred on it.
-        c.draw(
-            ui.atlas("questobjective"), x + w + QUEST_GAP, y + (PLATE_HEALTH - QUEST_ICON) / 2, QUEST_ICON, QUEST_ICON
-        )
-    c.text(
-        x,
-        y,
-        f"{round(health * 100)}%",
-        Font(FRIZQT, 11, (1, 1, 1), None, True),
-        box_height=PLATE_HEALTH,
-        justify="RIGHT",
-        width=w - 4,
-    )
-
-    # The full name centred above the bar, and Blizzard's 28-wide level frame, without its box, 4 into its end.
-    name_y = y - 4 - 14
-    font = Font(FRIZQT, 14, (1, 1, 1), (1, -1))
-    name_w = c.text_width(name, font)
-    name_x = x + (w - name_w) / 2
-    c.text(name_x, name_y, name, font)
-    c.text(
-        name_x + name_w - 4,
-        name_y,
-        str(level),
-        Font(FRIZQT, 10, level_colour, None, True),
-        box_height=14,
-        justify="CENTER",
-        width=28,
-    )
-
-    # Blizzard's own debuff tiles, untouched: 25 square, cooldown-manager mask and frame, stacks bottom right.
-    for i, (fdid, count, remaining) in enumerate(debuffs):
-        tx, ty = x + i * 25, name_y - 25
-        tile = ui.canvas(25, 25)
-        spell_icon(ui, tile, fdid, 0, 0, 25, crop=0)
-        tile.fill(0, 0, 25, 25 * (1 - remaining), (0, 0, 0, 0.5))
-        tile.mask(ui.atlas("UI-HUD-CoolDownManager-Mask").image, 0, 0, 25, 25)
-        c.paste(tile, tx, ty)
-        c.draw(ui.atlas("UI-HUD-CoolDownManager-IconOverlay"), tx - 6, ty - 5, 37, 35)
-        if count:
-            c.text(tx + 13, ty + 14, str(count), Font(ARIALN, 12, (1, 1, 1), None, True), justify="RIGHT", width=12)
-
-    if cast:
-        spell, fdid, progress = cast
-        c.draw(ui.atlas("ui-castingbar-background"), x + 1, cast_y, w - 2, PLATE_CAST)
-        c.draw(ui.atlas("ui-castingbar-filling-standard"), x, cast_y, w * progress, PLATE_CAST)
-        c.draw(ui.atlas("ui-castingbar-pip"), x + w * progress - 2, cast_y, 4, PLATE_CAST)
-        spell_icon(ui, c, fdid, x, cast_y, PLATE_CAST)
-        c.text(x + PLATE_CAST + 3, cast_y, spell, Font(FRIZQT, 10, (1, 1, 1), None, True), box_height=PLATE_CAST)
-    return c
-
-
-def nameplates(ui):
-    nameplates_scene(ui).save(OUT / "nameplates.png")
-
-
-def nameplates_scene(ui):
-    layers = [(nameplate(ui, *plate), px, py) for plate, (px, py) in zip(PLATES, PLATE_POSITIONS, strict=True)]
-    return scene(ui, layers, MARGIN)
-
-
-# The demo: a short tour of nameplates and junk coins, at 10 frames a second.
+# The demo: a short tour of the junk coin, at 10 frames a second.
 DEMO_SIZE = (760, 520)
 DEMO_LIMIT = 3_000_000
 # (scene, tenths of a second held); a cut to a new scene crossfades over DEMO_FADE tenths.
-DEMO_SHOTS = [("nameplates", 20), ("junk idle", 6), ("junk", 19)]
+DEMO_SHOTS = [("junk idle", 16), ("junk", 19)]
 DEMO_FADE = 5
 DEMO_HOVERS = {("junk idle", "junk")}
 
@@ -879,7 +769,6 @@ def fitted(canvas):
 def demo(ui):
     junk_shown, junk_idle = junk_layers(ui)
     shots = {
-        "nameplates": fitted(nameplates_scene(ui)),
         "junk idle": fitted(junk_idle),
         "junk": fitted(junk_shown),
     }
@@ -892,8 +781,8 @@ def demo(ui):
         frames += [shots[name]] * tenths
         previous = name
     # One palette for every frame, from each scene, so colours hold still and two runs encode the same bytes.
-    sample = Image.new("RGB", (DEMO_SIZE[0], DEMO_SIZE[1] * 3))
-    for index, name in enumerate(("nameplates", "junk idle", "junk")):
+    sample = Image.new("RGB", (DEMO_SIZE[0], DEMO_SIZE[1] * 2))
+    for index, name in enumerate(("junk idle", "junk")):
         sample.paste(shots[name], (0, DEMO_SIZE[1] * index))
     palette = sample.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
     indexed = [frame.quantize(palette=palette, dither=Image.Dither.NONE) for frame in frames]
@@ -903,87 +792,6 @@ def demo(ui):
     assert len(data) <= DEMO_LIMIT, f"demo.gif is {len(data)} bytes, over {DEMO_LIMIT}"
     (OUT / "demo.gif").write_bytes(data)
     return len(frames), len(data)
-
-
-# UI/Tooltips.lua under Modern tooltips: the nine pieces cut from media/TooltipBorderModern.tga (PIECES, in sixteenths),
-# with room under the last line for the health bar (EDGE, BOTTOM, HEIGHT, GAP, PADDING). Its fill and track are the
-# game's cooldown bar, UI-HUD-CoolDownManager-Bar, 124x10 native and always 10 tall, the track at TRACK_SHADE.
-TIP_PIECES = {
-    "TopLeftCorner": (0, 7, 0, 7),
-    "TopRightCorner": (9, 16, 0, 7),
-    "BottomLeftCorner": (0, 7, 9, 16),
-    "BottomRightCorner": (9, 16, 9, 16),
-    "TopEdge": (7, 9, 0, 7),
-    "BottomEdge": (7, 9, 9, 16),
-    "LeftEdge": (0, 7, 7, 9),
-    "RightEdge": (9, 16, 7, 9),
-    "Center": (7, 9, 7, 9),
-}
-TIP_CORNER = 7
-BAR_EDGE, BAR_BOTTOM, BAR_HEIGHT, BAR_GAP = 10, 11, 10, 10
-BAR_PADDING = BAR_BOTTOM + BAR_HEIGHT + BAR_GAP - 10
-BAR_TRACK_SHADE = 0.3
-BAR = "UI-HUD-CoolDownManager-Bar"
-BAR_TEXT = Font(ARIALN, 12, (1, 1, 1), None, outline=True)  # Number12FontOutline
-GUILD = (0.6, 0.6, 0.6)
-HORDE = (0.90, 0.05, 0.07)  # PLAYER_FACTION_COLORS[0]
-SHAMAN = (0 / 255, 112 / 255, 221 / 255)  # ChrClasses SHAMAN ClassColor
-
-
-def unit_tooltip(ui, lines, colour, health, text):
-    """GameTooltip as UI/Tooltips.lua's Paint and HealthBar draw it, with `health` of the bar filled."""
-    border = Image.open(ROOT / "media" / "TooltipBorderModern.tga").convert("RGBA")
-    measure = ui.canvas(1, 1)
-    fonts = [FONTS["GameTooltipHeaderText"]] + [FONTS["GameTooltipText"]] * (len(lines) - 1)
-    width = math.ceil(max(measure.text_width(line.left, font) for line, font in zip(lines, fonts, strict=True)))
-    width += 2 * TOOLTIP_PADDING
-    inner = sum(font.height for font in fonts) + TOOLTIP_LINE_GAP * (len(lines) - 1)
-    height = inner + 2 * TOOLTIP_PADDING + BAR_PADDING
-    c = ui.canvas(width, height)
-    k = TIP_CORNER
-    rects = {
-        "TopLeftCorner": (0, 0, k, k),
-        "TopRightCorner": (width - k, 0, k, k),
-        "BottomLeftCorner": (0, height - k, k, k),
-        "BottomRightCorner": (width - k, height - k, k, k),
-        "TopEdge": (k, 0, width - 2 * k, k),
-        "BottomEdge": (k, height - k, width - 2 * k, k),
-        "LeftEdge": (0, k, k, height - 2 * k),
-        "RightEdge": (width - k, k, k, height - 2 * k),
-        "Center": (k, k, width - 2 * k, height - 2 * k),
-    }
-    texel = border.width / 16
-    for name, (left, right, top, bottom) in TIP_PIECES.items():
-        piece = border.crop((round(left * texel), round(top * texel), round(right * texel), round(bottom * texel)))
-        c.draw(piece, *rects[name])
-    y = TOOLTIP_PADDING
-    for line, font in zip(lines, fonts, strict=True):
-        c.text(TOOLTIP_PADDING, y, line.left, font, line.color)
-        y += font.height + TOOLTIP_LINE_GAP
-    x, w, y = BAR_EDGE, width - 2 * BAR_EDGE, height - BAR_BOTTOM - BAR_HEIGHT
-    bar = ui.atlas(BAR)
-    c.draw(bar, x, y, w, BAR_HEIGHT, color=(*(v * BAR_TRACK_SHADE for v in colour), 1))
-    # A StatusBar crops its texture to the value rather than squeezing it: draw the fill at the bar's own width, then
-    # keep the shown part.
-    full = ui.canvas(w, BAR_HEIGHT)
-    full.draw(bar, 0, 0, w, BAR_HEIGHT, color=(*colour, 1))
-    shown = full.image.crop((0, 0, max(1, round(full.image.width * health)), full.image.height))
-    c.draw(shown, x, y, w * health, BAR_HEIGHT)
-    c.text(x, y, text, BAR_TEXT, justify="CENTER", width=w, box_height=BAR_HEIGHT)
-    return c
-
-
-def tooltips(ui):
-    red = ui.global_color("FACTION_RED_COLOR")[:3]
-    npc = unit_tooltip(ui, [TooltipLine("Defias Pillager", red), TooltipLine("Level 14 Humanoid")], red, 0.72, "72%")
-    player = [
-        TooltipLine("Durin", SHAMAN),
-        TooltipLine("<Forever Friends>", GUILD),
-        TooltipLine("Level 20 Orc Shaman (Player)"),
-        TooltipLine("Horde", HORDE),
-    ]
-    tip = unit_tooltip(ui, player, SHAMAN, 412 / 520, "412 / 520")
-    scene(ui, [(npc, 0, 0), (tip, npc.width + 24, 0)], MARGIN).save(OUT / "tooltips.png")
 
 
 def quest_abandon(ui):
@@ -1234,8 +1042,6 @@ def main():
     editmode(ui)
     rangestrip(ui)
     rangestrip_classes(ui)
-    nameplates(ui)
-    tooltips(ui)
     frames, size = demo(ui)
     print(f"demo.gif: {frames} frames, {size} bytes")
 

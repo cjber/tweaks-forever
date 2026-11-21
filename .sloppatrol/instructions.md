@@ -92,8 +92,7 @@ Shapes that look like defects here but are not. Read this before raising a findi
 - `tools/screenshots.py` restates Lua layout constants on purpose: it draws without the game.
 - Gear's colour kinds `"group"`/`"set"`/`"fishing"`: persisted keys in `TweaksForeverCharDB.colours`.
 - Campsites' `if x and y and map` after `Here()` (which returns nothing where the position is secret).
-- Gear's `Char()` short alias, Frames' repeated `if Active() then Schedule() end`, and Tooltips'
-  single-caller `HealthBarStyle` (kept under the function-length limit).
+- Gear's `Char()` short alias and Frames' repeated `if Active() then Schedule() end`.
 - Small nil-safe reads of a saved variable or a Questie profile option (`Features/Automation.lua`, `Quests/QuestDistance.lua`):
   each site reads a different option for a different predicate, not one implementation.
 - Junk's and Gear's click and mark guards: Gear needs `gearGroups` and Ctrl, Junk `markJunk` and Alt; Junk's icons

@@ -110,10 +110,8 @@ authorization. A preparation-only request ends before tags or uploads.
 
 - Review every generated table and `docs/features.md`. Check default settings
   and companion conflicts against the actual feature registrations.
-- After tooltip art changes, regenerate `media/TooltipBorder*.tga` using the
-  procedure in `tools/README.md`, as well as the screenshots.
 - User checks: settings toggles, companion conflicts, map and tracker updates,
-  tooltips, range icons and combat behaviour without Lua errors or blocked actions.
+  the cursor tooltip, range icons and combat behaviour without Lua errors or blocked actions.
 
 ## Command discovery
 

@@ -213,7 +213,7 @@ local LAYOUT = {
 	{ "Automation", { "Dialogue and loot", "Groups and duels", "Summons and deaths", "Fishing" } },
 	{ "Bags and vendors", { "Vendors", "Bags", "Gear groups" } },
 	{ "Quests and maps", { "Quests", "Quest markers", "World map" } },
-	{ "Interface", { "Tooltips and nameplates", "Bars and alerts", "Spells and training", "Small things" } },
+	{ "Interface", { "Tooltips and windows", "Bars and alerts", "Spells and training", "Small things" } },
 	{ "Chat", { "Names and links", "Messages", "Whispers" } },
 }
 
