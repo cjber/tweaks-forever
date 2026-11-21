@@ -16,6 +16,12 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 - Ships with the same shared code as your other Forever addons, so they keep working together.
 
+## [2.9.5] - 2026-11-20
+
+<!-- forever-core-sync -->
+
+- Ships with the same shared code as your other Forever addons, so they keep working together.
+
 ## [2.9.4] - 2026-11-20
 
 <!-- forever-core-sync -->
