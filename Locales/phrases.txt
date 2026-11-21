@@ -344,7 +344,6 @@ L["You are about to pull %s off the tank."] = "You are about to pull %s off the 
 L["You are about to pull your target off the tank."] = "You are about to pull your target off the tank."
 L["You don't have this"] = "You don't have this"
 L["Your fishing pole has no lure."] = "Your fishing pole has no lure."
-L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "Your focus target now has a gold nameplate outline in dungeons and raids."
 L["Your position and the cursor's, as map coordinates, along the bottom of the world map."] = "Your position and the cursor's, as map coordinates, along the bottom of the world map."
 L["Zone level ranges on the map"] = "Zone level ranges on the map"
 L["Zone: %s"] = "Zone: %s"
