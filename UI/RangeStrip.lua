@@ -15,8 +15,8 @@ ns.Feature({
 	section = "Bars and alerts",
 	name = "Range strip",
 	tooltip = "A strip under the game's swing timers naming which of your attacks reach your target, from "
-		.. "melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the "
-		.. "swing timers show, with the game's own Interface option and Edit Mode.",
+		.. "melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any "
+		.. "attackable target, in combat or not, where the swing timers sit, even while they are hidden.",
 	default = true,
 })
 
@@ -89,9 +89,9 @@ local RANGED_SPELLS = {
 local MELEE_REACH = 5
 
 -- What the game's interact check (Model.Interact) says about distance: true puts the target nearer than 10 yards
--- (the duel distance, 9.9), false puts it at least 8 away (the shortest minimum range of any shown reach). The two
--- edges hold whichever side of them the client's own radius falls on.
-local INTERACT_NEAR, INTERACT_FAR = 8, 10
+-- (the duel distance, 9.9). The check's yards are server constants the API does not describe, and a false answer
+-- puts nothing under the target's distance: it can stand inside any reach's minimum range as well as beyond.
+local INTERACT_FAR = 10
 
 -- Each class's reach spells, in the order their labels read when spells share a range. The client answers each
 -- spell's current range, so a talent that extends one moves it past the others; nothing here is a fixed distance.
@@ -317,8 +317,9 @@ function Model.Reaches(class, known, rangedSpell, range)
 end
 
 -- Whether the target is in melee reach: the game's own answer for the main-hand auto attack, the one its Main Hand
--- swing timer dims by. Nil when the client made no check (no weapon, or the native range check is off), which decides
--- nothing. The strip only shows while the native timers do, and the game checks their range while they show.
+-- swing timer dims by. Nil when the client made no check (no weapon, or no check enabled for the swing), which decides
+-- nothing. The client checks a swing's range only while a check is enabled for it (C_SwingTimer.EnableRangeCheck): the
+-- game's own timer enables it for itself, and the strip enables its own while it shows (SwingCheck).
 ---@return boolean?
 function Model.Melee()
 	if not (C_SwingTimer and C_SwingTimer.IsTargetWithinSwingRange and Enum and Enum.PlayerSwingType) then
@@ -331,8 +332,8 @@ function Model.Melee()
 	return ns.Readable(within)
 end
 
--- Whether the target is within 8 yards, the game's own interact distance. The minimum-range shots players meet
--- (Auto Shot, Charge) start there. Nil when the game cannot answer, and a call that raises answers nothing either.
+-- Whether the game's interact check (the duel distance) reaches the target: true puts it within 10 yards, false says
+-- nothing about how near it is. Nil when the game cannot answer, and a call that raises answers nothing either.
 ---@return boolean?
 function Model.Interact()
 	if type(CheckInteractDistance) ~= "function" then
@@ -381,7 +382,7 @@ end
 ---@param reaches TFRangeReach[]
 ---@return string|false|nil
 local function Solve(melee, interact, reaches)
-	local edges = { 0, MELEE_REACH, INTERACT_NEAR, INTERACT_FAR }
+	local edges = { 0, MELEE_REACH, INTERACT_FAR }
 	for _, reach in ipairs(reaches) do
 		edges[#edges + 1] = reach.min
 		edges[#edges + 1] = reach.max
@@ -396,11 +397,7 @@ local function Solve(melee, interact, reaches)
 	local band = false
 	for _, distance in ipairs(samples) do
 		local agrees = (melee == nil or melee == (distance <= MELEE_REACH))
-			and (
-				interact == nil
-				or (interact and distance < INTERACT_FAR)
-				or (not interact and distance >= INTERACT_NEAR)
-			)
+			and (interact ~= true or distance < INTERACT_FAR)
 		for _, reach in ipairs(reaches) do
 			if reach.check ~= nil and reach.check ~= (distance >= reach.min and distance <= reach.max) then
 				agrees = false
@@ -418,10 +415,9 @@ local function Solve(melee, interact, reaches)
 end
 
 -- The band key, or nil when the answers cannot say. Each answer narrows where the target can stand: melee from the
--- game's swing range (nil out of combat: the game checks it only while its swing timers run), each reach from its
--- spell, and the game's interact check. A band is named only when every distance left gives that band, so a missing
--- answer hides only the bands it could change and never names a wrong one. `interact` is called only when the other
--- answers leave more than one band.
+-- game's swing range, each reach from its spell, and the game's interact check. A band is named only when every
+-- distance left gives that band, so a missing answer hides only the bands it could change and never names a wrong
+-- one. `interact` is called only when the other answers leave more than one band.
 ---@param melee boolean?
 ---@param reaches TFRangeReach[]
 ---@param interact fun(): boolean?
@@ -669,17 +665,44 @@ ns.Init(function()
 		end
 	end
 
-	-- The shown timer lowest on screen, which the strip docks under.
+	-- The timer lowest on screen, which the strip docks under: the lowest shown one, or while none shows, the lowest
+	-- where they would, so the strip sits in the same place with the swing timers hidden.
 	local function LowestTimer()
 		local lowest
 		for _, timer in ipairs(timers) do
-			if timer:IsShown() then
-				if not lowest or (timer:GetBottom() or 0) < (lowest:GetBottom() or 0) then
-					lowest = timer
-				end
+			if not lowest then
+				lowest = timer
+			elseif timer:IsShown() ~= lowest:IsShown() then
+				lowest = timer:IsShown() and timer or lowest
+			elseif (timer:GetBottom() or 0) < (lowest:GetBottom() or 0) then
+				lowest = timer
 			end
 		end
 		return lowest
+	end
+
+	-- Whether the strip enabled the main-hand swing range check, so it gives back only its own: the game's timer
+	-- enables the same check for itself, and a check it holds is left alone.
+	local ownSwingCheck = false
+
+	-- The client answers the swing range only while a check is enabled for it, and the game's own timer enables it
+	-- only while it shows. While the strip shows with that timer's check off (swing timers hidden), it enables its own;
+	-- the game may switch the check off again when its timer changes, so the strip asks again on every update.
+	local function SwingCheck(wanted)
+		local main = SwingTimerMainHandFrame
+		if not (C_SwingTimer and C_SwingTimer.EnableRangeCheck and Enum and Enum.PlayerSwingType and main) then
+			return
+		end
+		local native = type(main.IsRangeCheckEnabled) == "function" and main:IsRangeCheckEnabled() or false
+		if wanted and not native then
+			pcall(C_SwingTimer.EnableRangeCheck, Enum.PlayerSwingType.MainHand, true)
+			ownSwingCheck = true
+		elseif not wanted and ownSwingCheck then
+			ownSwingCheck = false
+			if not native then
+				pcall(C_SwingTimer.EnableRangeCheck, Enum.PlayerSwingType.MainHand, false)
+			end
+		end
 	end
 
 	local docked
@@ -703,6 +726,7 @@ ns.Init(function()
 	end
 
 	local function Hide()
+		SwingCheck(false)
 		strip:Hide()
 		docked = nil
 		StopTicker()
@@ -833,6 +857,7 @@ ns.Init(function()
 			Hide()
 			return
 		end
+		SwingCheck(true)
 		local icons, labelOn = ns.Active(ICONS_KEY), ns.Active(LABEL_KEY)
 		local changed = shownSegments ~= cachedSegments or shownIcons ~= icons or shownLabel ~= labelOn
 		if changed then

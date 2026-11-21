@@ -138,6 +138,10 @@ end
 function Timer.HookScript(self, script, fn)
 	self.scripts[script] = fn
 end
+-- The game's own timer knows whether it asked the client for its swing range check (SwingTimerMixin).
+function Timer.IsRangeCheckEnabled(self)
+	return self.rangeCheck == true
+end
 
 local function Load(class, knownSpells)
 	local features, initializers, handlers, db = {}, {}, {}, {}
@@ -152,6 +156,10 @@ local function Load(class, knownSpells)
 	-- the strip must take melee from the swing range instead.
 	local answers = { [78] = true, [1752] = true, [2973] = true, [2974] = true, [1495] = true, [6603] = true }
 	local swing = false
+	-- The client answers a swing range only while a check is enabled for the swing type (C_SwingTimer.EnableRangeCheck),
+	-- as the game's own timer enables it for itself; the harness starts with the game's timer not checking.
+	local swingChecks = {}
+	local enableCalls = {}
 	local ranges = {}
 	for spell, range in pairs(SPELL_RANGES) do
 		ranges[spell] = { range[1], range[2] }
@@ -225,13 +233,25 @@ local function Load(class, knownSpells)
 		CheckInteractDistance = interactCheck,
 		Enum = { PlayerSwingType = { MainHand = 0, OffHand = 1, Ranged = 2 } },
 		C_SwingTimer = {
+			EnableRangeCheck = function(swingType, enable)
+				assert(swingType == 0, "the strip only checks the main-hand swing")
+				swingChecks[swingType] = enable
+				enableCalls[#enableCalls + 1] = enable
+			end,
 			IsTargetWithinSwingRange = function(swingType)
 				assert(swingType == 0, "melee reads the main-hand swing")
+				if not (swingChecks[swingType] or mainHand.rangeCheck) then
+					return nil
+				end
 				return swing
 			end,
 		},
 		C_Spell = {
 			IsSpellInRange = function(spell)
+				-- "none" is the client giving no answer (nil), which a missing entry is not: that one is out of range.
+				if answers[spell] == "none" then
+					return nil
+				end
 				return answers[spell] == true
 			end,
 			GetSpellName = function(spell)
@@ -308,6 +328,7 @@ local function Load(class, knownSpells)
 		fontStrings = strip.fontStrings,
 		mainHand = mainHand,
 		ranged = ranged,
+		enableCalls = enableCalls,
 		tickers = tickers,
 		interactCalls = function()
 			return interactCalls
@@ -473,6 +494,7 @@ hunter.setMainHand(SWORD)
 
 -- Melee reach is the game's own main-hand swing range, as its Main Hand timer reads it: true, false, or nil when the
 -- client made no check. Raptor Strike and Attack answer true at every distance (#574) and decide nothing.
+hunter.mainHand.rangeCheck = true
 hunter.setSwing(true)
 assert(M.Melee() == true, "in swing range is melee")
 hunter.setSwing(false)
@@ -546,14 +568,20 @@ assert(
 -- The dead zone needs a shown reach with a minimum range and the game's own 8-yard answer.
 local warriorReaches = { reach("charge", 8, 25, false), reach("ranged", 8, 30, false) }
 assert(M.Band(false, warriorReaches, interact(true)) == "dead", "a minimum range and a target inside 8 yards")
-assert(M.Band(false, warriorReaches, interact(false)) == "far", "every reach too short, beyond 8 yards")
+-- The interact check only bounds a target from above. A false answer is a centre distance of 9.9 yards or more, and
+-- the reaches' own ranges are edge to edge, so it puts no floor under the target's distance: dead zone and Too far
+-- both fit, and the strip names neither.
+assert(M.Band(false, warriorReaches, interact(false)) == nil, "no interact answer to say inside, so no band")
 assert(M.Band(false, { reach("judgement", 0, 10, false) }, noInteract) == "far", "no minimum range, so no dead zone")
 assert(M.Band(false, warriorReaches, interact(nil)) == nil, "the 8-yard check answered nothing")
 assert(M.Band(nil, { reach("charge", 8, 25, false) }, interact(true)) == nil, "melee unknown leaves the gap unclaimed")
 -- Out of combat the swing range has no answer; the ranged bands still light, and a reach the target is beyond rules
 -- melee out.
 assert(M.Band(nil, { reach("autoshot", 8, 35, true) }, noInteract) == "autoshot", "Auto Shot lights with melee unknown")
-assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(false)) == "far", "beyond Auto Shot is Too far")
+assert(
+	M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(false)) == nil,
+	"beyond Auto Shot or inside it: unknown"
+)
 assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(nil)) == nil, "no 8-yard answer, melee undecided")
 assert(M.Band(nil, { reach("frostbolt", 0, 30, false) }, noInteract) == "far", "beyond a reach with no minimum")
 assert(
@@ -595,9 +623,10 @@ assert(
 )
 
 -- The band rule over every reach set, every distance and every pattern of unanswered checks. The target stands at a
--- distance; melee reaches 5 yards, the interact check answers inside the client's radius (8 or 9.9 here, the two ends
--- the strip allows for), and each reach answers inside its own range. Any answer may be missing (melee is out of
--- combat, a spell or the interact check may say nothing). The rule must never name a wrong band, and must name the
+-- distance; melee reaches 5 yards, the interact check answers true inside the client's radius (8 or 9.9 here, the two
+-- ends the strip allows for) measured between centres, which lie the two units' combat reaches (0, 3 or 10 yards
+-- here) beyond the edge distance every other range uses, and each reach answers inside its own range. Any answer may
+-- be missing (the swing check is off, a spell or the interact check may say nothing). The rule must never name a wrong band, and must name the
 -- band whenever the answers leave only one band possible: a missing answer hides only the bands it could change.
 local function TrueBand(distance, reaches)
 	if distance <= 5 then
@@ -657,28 +686,30 @@ for _, set in ipairs(reachSets) do
 	-- Each distinct set of answers once, with every band a target giving those answers can stand in.
 	local cases, order = {}, {}
 	for _, radius in ipairs({ 8, 9.9 }) do
-		for _, distance in ipairs(samples) do
-			-- Bit 0 drops melee, bit 1 the interact check, bit i + 1 reach i.
-			for mask = 0, 2 ^ (n + 2) - 1 do
-				local function Kept(bit, value)
-					if math.floor(mask / 2 ^ bit) % 2 == 1 then
-						return nil
+		for _, reachSum in ipairs({ 0, 3, 10 }) do
+			for _, distance in ipairs(samples) do
+				-- Bit 0 drops melee, bit 1 the interact check, bit i + 1 reach i.
+				for mask = 0, 2 ^ (n + 2) - 1 do
+					local function Kept(bit, value)
+						if math.floor(mask / 2 ^ bit) % 2 == 1 then
+							return nil
+						end
+						return value
 					end
-					return value
+					local melee, near, checks = Kept(0, distance <= 5), Kept(1, distance + reachSum < radius), {}
+					local key = tostring(melee) .. tostring(near)
+					for i, r in ipairs(reaches) do
+						checks[i] = Kept(i + 1, Within(distance, r))
+						key = key .. tostring(checks[i])
+					end
+					local case = cases[key]
+					if not case then
+						case = { melee = melee, near = near, checks = checks, bands = {}, at = distance }
+						cases[key] = case
+						order[#order + 1] = key
+					end
+					case.bands[TrueBand(distance, reaches)] = true
 				end
-				local melee, near, checks = Kept(0, distance <= 5), Kept(1, distance < radius), {}
-				local key = tostring(melee) .. tostring(near)
-				for i, r in ipairs(reaches) do
-					checks[i] = Kept(i + 1, Within(distance, r))
-					key = key .. tostring(checks[i])
-				end
-				local case = cases[key]
-				if not case then
-					case = { melee = melee, near = near, checks = checks, bands = {}, at = distance }
-					cases[key] = case
-					order[#order + 1] = key
-				end
-				case.bands[TrueBand(distance, reaches)] = true
 			end
 		end
 	end
@@ -698,13 +729,12 @@ for _, set in ipairs(reachSets) do
 				assert(band == got, failure .. ", but " .. band .. " gives the same answers")
 			end
 		end
-		-- Never hidden needlessly: the strip knows the interact radius only to lie from 8 to 10 yards, so the bands
-		-- possible are those at every distance some radius there would give these answers.
+		-- Never hidden needlessly: a true interact answer puts the target inside 10 yards, and a false one says nothing
+		-- about its edge distance, so the bands possible are those at every distance that fits the rest.
 		local only, count = nil, 0
 		local possible = {}
 		for _, distance in ipairs(samples) do
-			local agrees = (case.melee == nil or case.melee == (distance <= 5))
-				and (case.near == nil or (case.near and distance < 10) or (not case.near and distance >= 8))
+			local agrees = (case.melee == nil or case.melee == (distance <= 5)) and (case.near ~= true or distance < 10)
 			for i, r in ipairs(reaches) do
 				agrees = agrees and (case.checks[i] == nil or case.checks[i] == Within(distance, r))
 			end
@@ -825,9 +855,10 @@ hunter.setAnswer(75, false)
 hunter.setInteract(true)
 hunter.changed()
 assert(hunter.fontStrings[1].string == "Dead zone" and art(hunter, 2).fill.shown, "a target inside 8 yards")
+-- Beyond the interact check the target may still stand in the dead zone: no band is named, and no segment lit.
 hunter.setInteract(false)
 hunter.changed()
-assert(hunter.fontStrings[1].string == "Too far", "a target beyond 8 yards")
+assert(not hunter.fontStrings[1].shown, "no label when the interact check says only that it is not inside 10 yards")
 assert(not art(hunter, 1).fill.shown and not art(hunter, 2).fill.shown and not art(hunter, 3).fill.shown)
 hunter.setInteract(nil)
 hunter.changed()
@@ -838,11 +869,24 @@ hunter.setTarget(false)
 hunter.changed()
 assert(not hunter.strip.shown and hunter.tickers[1].cancelled, "no strip and no ticker without a target")
 
--- No shown timer hides it too.
+-- The strip shows with any attackable target, out of combat too, where the game's swing timers are hidden: it docks
+-- in the same place, under the timer lowest on screen, shown or not.
 hunter.setTarget(true)
 hunter.mainHand.shown, hunter.ranged.shown = false, false
+hunter.mainHand.bottom, hunter.ranged.bottom = 100, 400
 hunter.changed()
-assert(not hunter.strip.shown, "no strip without a shown timer")
+assert(hunter.strip.shown, "the strip shows with hidden swing timers")
+assert(hunter.strip.points[1][2] == hunter.mainHand, "docked under the lowest timer though hidden")
+assert(hunter.strip.points[1][3] == "BOTTOMLEFT" and hunter.strip.points[1][5] == -6, "6 below it, as when shown")
+hunter.mainHand.bottom, hunter.ranged.bottom = 300, 200
+hunter.changed()
+assert(hunter.strip.points[1][2] == hunter.ranged, "the lowest hidden timer, by its bottom edge")
+-- A shown timer still takes the strip over a lower hidden one.
+hunter.mainHand.shown = true
+hunter.changed()
+assert(hunter.strip.points[1][2] == hunter.mainHand, "a shown timer is the one the strip docks under")
+hunter.mainHand.shown = false
+hunter.changed()
 
 -- With a timer again the strip takes its timer's scale and starts a fresh ticker.
 hunter.ranged.shown = true
@@ -936,5 +980,61 @@ assert(not joined(segments(mage)):find("Fire Blast", 1, true), "an unloaded spel
 SPELL_NAMES[2136] = fireBlast
 mage.handlers.PLAYER_TARGET_CHANGED()
 assert(joined(segments(mage)):find("Fire Blast", 1, true), "the next update reads the loaded spell again")
+
+-- A warrior with a target, out of combat and with the game's swing timers hidden, in every band. The client answers
+-- the swing range only for a swing type with a check enabled; the game's own timer enables it only while it shows, so
+-- the strip asks for its own while it shows and gives it back when it hides.
+local warrior = Load("WARRIOR", { [100] = true, [20252] = true })
+SPELL_NAMES[100], SPELL_NAMES[20252] = "Charge", "Intercept"
+SPELL_ICONS[100], SPELL_ICONS[20252] = 132184, 132307
+warrior.initializers[1]()
+warrior.db.rangeStrip = true
+warrior.db.rangeStripIcons, warrior.db.rangeStripLabel = true, true
+warrior.mainHand.shown, warrior.ranged.shown = false, false
+-- Charge and Intercept share one range: Melee | Dead zone | Charge.
+warrior.setSwing(true)
+warrior.changed()
+assert(warrior.strip.shown, "out of combat, the strip shows with an attackable target")
+assert(warrior.enableCalls[1] == true, "the strip enables the main-hand swing range check itself")
+assert(warrior.fontStrings[1].string == "Melee", "in melee reach the swing answers")
+local function bandOf(h)
+	h.changed()
+	return h.fontStrings[1].shown and h.fontStrings[1].string or nil
+end
+-- Melee false, Charge in range: its band.
+warrior.setSwing(false)
+warrior.setAnswer(100, true)
+assert(bandOf(warrior) == "Charge", "8 to 25 yards: Charge reaches")
+-- Melee false, Charge out, interact true: inside the minimum range.
+warrior.setAnswer(100, false)
+warrior.setInteract(true)
+assert(bandOf(warrior) == "Dead zone", "5 to 8 yards: the dead zone")
+-- Melee false, Charge out, interact false: Charge's minimum or beyond its maximum, and the game cannot say which.
+warrior.setInteract(false)
+assert(bandOf(warrior) == nil, "past 25 yards or inside 8 behind a large target: the strip cannot tell")
+-- No Charge answer at all (the client gave none): nothing is named from it.
+warrior.setAnswer(100, "none")
+warrior.setInteract(true)
+assert(bandOf(warrior) == nil, "no answer for Charge: no band")
+-- Hiding gives the check back, once.
+warrior.setTarget(false)
+warrior.changed()
+assert(not warrior.strip.shown and warrior.enableCalls[#warrior.enableCalls] == false, "the check is given back")
+local calls = #warrior.enableCalls
+warrior.changed()
+assert(#warrior.enableCalls == calls, "hidden, nothing more is toggled")
+
+-- The game's own timer checking the range already: the strip leaves it alone, and never turns it off.
+local checked = Load("WARRIOR", { [100] = true })
+checked.initializers[1]()
+checked.db.rangeStrip = true
+checked.mainHand.rangeCheck = true
+checked.setSwing(false)
+checked.setAnswer(100, true)
+checked.changed()
+assert(checked.strip.shown and #checked.enableCalls == 0, "the game's own check is left as it is")
+checked.setTarget(false)
+checked.changed()
+assert(#checked.enableCalls == 0, "and is not turned off when the strip hides")
 
 print("rangestrip: ok")
