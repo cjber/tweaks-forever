@@ -342,6 +342,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s устарели
 L["%s could not start. Reinstall %s to fix this."] = "Не удалось запустить %s. Переустановите %s, чтобы исправить это." -- mt
 
 L["Range strip"] = "Полоса дальности"
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden."] = "Полоса под таймерами ударов игры, показывающая, какие из ваших атак достают до цели — от ближнего боя до самой большой дальности, с мёртвой зоной там, где минимальная дальность оставляет разрыв. Показывается при любой атакуемой цели, в бою или нет, там, где стоят таймеры ударов, даже когда они скрыты."
 L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt

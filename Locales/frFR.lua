@@ -342,6 +342,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s : %s sont obsolètes
 L["%s could not start. Reinstall %s to fix this."] = "%s n'a pas pu démarrer. Réinstallez %s pour corriger cela." -- mt
 
 L["Range strip"] = "Bande de portée"
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden."] = "Une bande sous les minuteurs de frappe du jeu qui indique lesquelles de vos attaques atteignent votre cible, du corps à corps à votre portée la plus longue, avec une zone morte là où une portée minimale laisse un vide. Elle s'affiche avec toute cible attaquable, en combat ou non, là où se trouvent les minuteurs de frappe, même masqués."
 L["Melee"] = "Corps à corps" -- mt
 L["Dead zone"] = "Zone morte" -- mt
 L["Too far"] = "Trop loin" -- mt
