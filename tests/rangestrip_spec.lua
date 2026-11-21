@@ -700,8 +700,10 @@ local function Within(distance, r)
 	return distance >= r.min and distance <= r.max
 end
 
--- Shapes the client gives a reach: no minimum, an 8-yard minimum, short and long maxima, and two sharing a minimum.
-local SHAPES = { { 0, 10 }, { 0, 20 }, { 0, 30 }, { 8, 25 }, { 8, 35 }, { 8, 41 }, { 10, 35 } }
+-- Shapes the client gives a reach, one for each edge the solver compares: no minimum and a maximum at the duel
+-- distance (10), at the follow distance's neighbour (30), an 8-yard minimum with a maximum before and past 28, and a
+-- 10-yard minimum.
+local SHAPES = { { 0, 10 }, { 0, 30 }, { 8, 25 }, { 8, 35 }, { 10, 35 } }
 local reachSets = { {} }
 for a = 1, #SHAPES do
 	reachSets[#reachSets + 1] = { a }
@@ -736,34 +738,36 @@ for _, set in ipairs(reachSets) do
 	end
 	-- Each distinct set of answers once, with every band a target giving those answers can stand in.
 	local cases, order = {}, {}
-	for _, radius in ipairs({ 8, 9.9 }) do
-		for _, reachSum in ipairs({ 0, 3, 10 }) do
-			for _, distance in ipairs(samples) do
-				-- Bit 0 drops melee, bit 1 the interact check, bit 2 the follow check, bit i + 2 reach i.
-				for mask = 0, 2 ^ (n + 3) - 1 do
-					local function Kept(bit, value)
-						if math.floor(mask / 2 ^ bit) % 2 == 1 then
-							return nil
-						end
-						return value
+	for _, distance in ipairs(samples) do
+		-- What the interact check can answer at this edge distance. Its radius lies from 8 to 9.9 yards and it measures
+		-- between centres, 0 to 10 yards beyond the edge distance: true is possible only inside 9.9 yards (radius 9.9,
+		-- no reach), and false always is (the largest reach pushes any distance past 9.9).
+		local nears = distance < 9.9 and { true, false } or { false }
+		for _, nearValue in ipairs(nears) do
+			-- Bit 0 drops melee, bit 1 the interact check, bit 2 the follow check, bit i + 2 reach i.
+			for mask = 0, 2 ^ (n + 3) - 1 do
+				local function Kept(bit, value)
+					if math.floor(mask / 2 ^ bit) % 2 == 1 then
+						return nil
 					end
-					local melee, near, checks = Kept(0, distance <= 5), Kept(1, distance + reachSum < radius), {}
-					-- The follow check is modelled as measuring the edge distance, which the strip assumes for it: measured between
-					-- centres, a large target would answer false inside 28 yards of edge distance.
-					local far = Kept(2, distance <= 28)
-					local key = tostring(melee) .. tostring(near) .. tostring(far)
-					for i, r in ipairs(reaches) do
-						checks[i] = Kept(i + 2, Within(distance, r))
-						key = key .. tostring(checks[i])
-					end
-					local case = cases[key]
-					if not case then
-						case = { melee = melee, near = near, far = far, checks = checks, bands = {}, at = distance }
-						cases[key] = case
-						order[#order + 1] = key
-					end
-					case.bands[TrueBand(distance, reaches)] = true
+					return value
 				end
+				local melee, near, checks = Kept(0, distance <= 5), Kept(1, nearValue), {}
+				-- The follow check is modelled as measuring the edge distance, which the strip assumes for it: measured
+				-- between centres, a large target would answer false inside 28 yards of edge distance.
+				local far = Kept(2, distance <= 28)
+				local key = tostring(melee) .. tostring(near) .. tostring(far)
+				for i, r in ipairs(reaches) do
+					checks[i] = Kept(i + 2, Within(distance, r))
+					key = key .. tostring(checks[i])
+				end
+				local case = cases[key]
+				if not case then
+					case = { melee = melee, near = near, far = far, checks = checks, bands = {}, at = distance }
+					cases[key] = case
+					order[#order + 1] = key
+				end
+				case.bands[TrueBand(distance, reaches)] = true
 			end
 		end
 	end
