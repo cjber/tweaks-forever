@@ -342,7 +342,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s：%s 已过时。请
 L["%s could not start. Reinstall %s to fix this."] = "%s 无法启动。请重新安装 %s 以解决此问题。" -- mt
 
 L["Range strip"] = "距离条"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "在游戏挥击计时器下方显示一条距离条，标明你的哪些攻击能够够到目标，从近战一直到你最远的射程；最小射程留下的空档会显示为死区。只要挥击计时器显示（使用游戏界面选项和编辑模式），它就会显示。"
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden."] = "在游戏挥击计时器下方显示一条距离条，标明你的哪些攻击能够够到目标，从近战一直到你最远的射程；最小射程留下的空档会显示为死区。只要有可攻击的目标就会显示，无论是否在战斗中，位置在挥击计时器处，即使计时器已隐藏。"
 L["Melee"] = "近战" -- mt
 L["Dead zone"] = "死区" -- mt
 L["Too far"] = "过远" -- mt
