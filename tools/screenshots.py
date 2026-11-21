@@ -1209,7 +1209,7 @@ def chat(ui):
             chat_grey("14:09")
             + f" [P] {members['mirabelle']}: "
             + atlas_markup("communities-icon-chat", 12, 12)
-            + f" {colored('Barry', NORMAL)} can you pull the next pack? I'm out of mana",
+            + f" {colored('Caldwyn', NORMAL)} can you pull the next pack? I'm out of mana",
             CHAT_TYPE["party"],
         ),
     ]
