@@ -118,9 +118,16 @@ assert(#printed == 0 and db.lastVersion == "0.6.0")
 printed, db = Login({ lastVersion = "0.5.0" }, "@project-version@")
 assert(#printed == 0 and db.lastVersion == "0.5.0")
 
--- The packager replaces its keywords in Lua too; a release must still announce and save its version.
-printed, db = Login({ lastVersion = "v0.7.3" }, "v0.7.4", true, true, "v0.7.4")
-assert(#printed == 1 and db.lastVersion == "v0.7.4", "packaged release still announces its update")
+-- The packager replaces its keywords in Lua too; a prefixed TOC still announces and saves the bare version.
+printed, db = Login({ lastVersion = "2.9.2" }, "v2.9.3", true, true, "2.9.3")
+assert(#printed == 1 and db.lastVersion == "2.9.3", "a prefixed TOC version still announces its update")
+assert(printed[1] == "|cffffd200Tweaks Forever:|r updated to 2.9.3. " .. shippedHeadline, printed[1])
+
+printed, db = Login({ lastVersion = "v2.9.2" }, "2.9.3", true, true, "2.9.3")
+assert(#printed == 1 and db.lastVersion == "2.9.3", "a prefixed saved version still announces a real update")
+
+printed, db = Login({ lastVersion = "v2.9.3" }, "2.9.3", true, true, "2.9.3")
+assert(#printed == 0 and db.lastVersion == "2.9.3", "a prefix change alone is silent")
 
 -- The newest release with a bold lead, skipping the maintenance entries a core sync adds above it. Each entry is its
 -- heading and the text up to the next versioned heading.

@@ -5,9 +5,14 @@
 -- A region or frame with every setter the file calls on it, remembering the state the spec reads back.
 local function Region(fields)
 	local region = fields or {}
-	function region.SetAtlas() end
+	function region:SetAtlas(atlas, useAtlasSize)
+		self.atlas, self.useAtlasSize = atlas, useAtlasSize
+	end
 	function region.SetDrawLayer() end
 	function region.ClearAllPoints() end
+	function region:SetAllPoints(relativeTo)
+		self.relativeTo = relativeTo
+	end
 	function region.SetPoint() end
 	function region.SetSize() end
 	function region.SetHeight() end
@@ -24,6 +29,7 @@ local function Region(fields)
 		self.alpha = alpha
 	end
 	function region:SetAlphaFromBoolean(value, whenTrue, whenFalse)
+		self.alpha = nil
 		self.fromBoolean = { value, whenTrue, whenFalse }
 	end
 	function region:Show()
@@ -51,6 +57,11 @@ local function Plate(unit, alphas)
 		RightText = Region(),
 		LeftText = Region(),
 	}
+	function bar:CreateTexture(_, layer, _, sublevel)
+		assert(self.focusTexture == nil, "a pooled bar creates its focus texture once")
+		self.focusTexture = Region({ layer = layer, sublevel = sublevel })
+		return self.focusTexture
+	end
 	local cast = Region({ Spark = Region(), Icon = Region(), Text = Region() })
 	local frame = Region({
 		unit = unit,
@@ -72,6 +83,9 @@ local function Plate(unit, alphas)
 	return frame
 end
 
+local namePlateConstants = { SELECTED_BORDER_ATLAS = "UI-HUD-CoolDownManager-Selected-yellow" }
+local textureKitConstants = { IgnoreAtlasSize = false }
+
 -- Loads UI/Nameplates.lua against plates for `units` (false for a frame with no unit), asks `isUnit` for target and
 -- focus and `canAccess` whether the answer can be read, then runs the file's initializer. Returns the plates and every
 -- alpha the file put on a unit frame.
@@ -80,6 +94,8 @@ local function Boot(units, isUnit, canAccess)
 	local plates = {}
 	local initializer
 	local env = setmetatable({
+		NamePlateConstants = namePlateConstants,
+		TextureKitConstants = textureKitConstants,
 		NamePlateSetupOptions = { verticalScale = 1, healthBarFontHeight = 11 },
 		NORMAL_FONT_COLOR = {
 			GetRGB = function()
@@ -170,24 +186,28 @@ end
 
 -- In an instance UnitIsUnit answers with a secret boolean: the engine's FromBoolean setters take it as it is.
 do
-	local secret = {}
-	local env = Boot({ "enemy" }, function()
-		return secret
-	end, function(value)
-		return value ~= secret
+	local secretTarget, secretFocus = {}, {}
+	local inInstance = true
+	local env = Boot({ "enemy" }, function(_, token)
+		if inInstance then
+			return token == "target" and secretTarget or secretFocus
+		end
+		return token == "focus"
+	end, function()
+		return not inInstance
 	end)
 	local bar = Bar(env, 1)
 	assert(#env.alphas == 0, "secret booleans never reach a unit frame alpha")
 	assert(bar.selectedBorder.fromBoolean ~= nil, "the border takes the secret boolean")
 	assert(
-		bar.selectedBorder.fromBoolean[1] == secret
+		bar.selectedBorder.fromBoolean[1] == secretTarget
 			and bar.selectedBorder.fromBoolean[2] == 1
 			and bar.selectedBorder.fromBoolean[3] == 0,
 		"the border is shown on a secret target"
 	)
 	assert(bar.deselectedOverlay.fromBoolean ~= nil, "the overlay takes the secret boolean")
 	assert(
-		bar.deselectedOverlay.fromBoolean[1] == secret
+		bar.deselectedOverlay.fromBoolean[1] == secretTarget
 			and bar.deselectedOverlay.fromBoolean[2] == 0
 			and bar.deselectedOverlay.fromBoolean[3] == 1,
 		"the overlay clears on a secret target"
@@ -196,6 +216,29 @@ do
 		bar.selectedBorder.alpha == nil and bar.deselectedOverlay.alpha == nil,
 		"a secret answer sets no plain alpha"
 	)
+	local focus = assert(bar.focusTexture, "secret focus gets its own texture")
+	assert(focus.atlas == namePlateConstants.SELECTED_BORDER_ATLAS, "the focus uses the client's selection atlas")
+	assert(focus.useAtlasSize == textureKitConstants.IgnoreAtlasSize, "the selection atlas keeps the border's bounds")
+	assert(
+		focus.fromBoolean[1] == secretFocus and focus.fromBoolean[2] == 1 and focus.fromBoolean[3] == 0,
+		"the gold texture takes the secret focus boolean"
+	)
+	assert(focus.red == 1 and focus.green == 0.82 and focus.blue == 0, "the secret focus outline is gold")
+	assert(
+		focus.relativeTo == bar.selectedBorder and focus.layer == "OVERLAY" and focus.sublevel < 0,
+		"the focus outline lines up with and draws below the target outline"
+	)
+
+	local frame = env.plates[1].UnitFrame
+	inInstance = false
+	frame.handlers.OnEvent(frame, "PLAYER_FOCUS_CHANGED")
+	assert(focus.alpha == 0, "open-world focus uses only the original border")
+
+	inInstance = true
+	frame.handlers.OnEvent(frame, "PLAYER_FOCUS_CHANGED")
+	frame.unit = nil
+	frame.handlers.OnEvent(frame, "PLAYER_TARGET_CHANGED")
+	assert(focus.alpha == 0, "clearing a pooled frame's unit hides the secret focus outline")
 end
 
 -- A refresh before the game hands the frame its unit hides both marks, and still never touches the frame's alpha.
