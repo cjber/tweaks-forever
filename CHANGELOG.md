@@ -10,6 +10,13 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.7] - 2026-11-21
+
+### Fixed
+
+- **Your focus target now has a gold nameplate outline in dungeons and raids.** You can spot your focus at a glance in places where only your current target was marked before.
+- **What's New now appears in chat after an update with a headline.** You can see what changed when you log in after a store update, where the version's leading v used to hide the message.
+
 ## [2.9.6] - 2026-11-21
 
 <!-- forever-core-sync -->
