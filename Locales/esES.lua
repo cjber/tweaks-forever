@@ -342,7 +342,6 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s están desactual
 L["%s could not start. Reinstall %s to fix this."] = "%s no pudo iniciarse. Reinstala %s para solucionarlo." -- mt
 
 L["Range strip"] = "Franja de alcance"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Una franja debajo de los temporizadores de golpe del juego que indica cuáles de tus ataques alcanzan a tu objetivo, desde el cuerpo a cuerpo hasta tu mayor alcance, con una zona muerta donde un alcance mínimo deja un hueco. Se muestra mientras se ven los temporizadores de golpe, con la opción de interfaz del juego y el modo de edición."
 L["Melee"] = "Cuerpo a cuerpo" -- mt
 L["Dead zone"] = "Zona muerta" -- mt
 L["Too far"] = "Demasiado lejos" -- mt

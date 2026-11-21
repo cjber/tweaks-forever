@@ -342,7 +342,6 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s sind veraltet. A
 L["%s could not start. Reinstall %s to fix this."] = "%s konnte nicht starten. Installiere %s neu, um dies zu beheben." -- mt
 
 L["Range strip"] = "Reichweitenleiste"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows while the swing timers show, with the game's own Interface option and Edit Mode."] = "Ein Streifen unter den Schwung-Timern des Spiels, der nennt, welche Eurer Angriffe Euer Ziel erreichen, vom Nahkampf bis zu Eurer größten Reichweite, mit einem Toten Bereich, wo eine Mindestreichweite eine Lücke lässt. Er erscheint, solange die Schwung-Timer angezeigt werden, mit der Option des Spiels unter Interface und im Editiermodus."
 L["Melee"] = "Nahkampf" -- mt
 L["Dead zone"] = "Toter Bereich" -- mt
 L["Too far"] = "Zu weit" -- mt
