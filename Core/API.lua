@@ -118,7 +118,7 @@ function API.IsJunk(itemID)
 		return NotReady("loading")
 	end
 	if not IsInteger(itemID) then
-		return nil, "invalid"
+		return APIKit.Invalid()
 	end
 	if not ns.Active("markJunk") then
 		return NotReady("disabled")
@@ -174,7 +174,7 @@ end
 ---@return TFAPIReason?
 function API.ZoneLevels(map)
 	if map ~= nil and not IsInteger(map) then
-		return nil, "invalid"
+		return APIKit.Invalid()
 	end
 	local mapID = map or C_Map.GetBestMapForUnit("player")
 	if not mapID then
@@ -236,7 +236,7 @@ end
 ---@return TFAPIReason?
 function API.Unexplored(map)
 	if map ~= nil and not IsInteger(map) then
-		return nil, "invalid"
+		return APIKit.Invalid()
 	end
 	local mapID = map or C_Map.GetBestMapForUnit("player")
 	if not mapID then
