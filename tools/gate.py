@@ -3,6 +3,7 @@
 
     python3 tools/gate.py             # every step
     python3 tools/gate.py --changed   # only the steps the diff against origin/main reaches; tools/ reaches all
+                                      # but LuaLS itself, which stays in CI
 
 Every step runs even after one fails, as in CI, and the exit status is 1 when any failed. The specs load ForeverCore
 from $FOREVER_CORE, else the sibling ../forever-core checkout; set it when working from a worktree. The simulator,
@@ -31,6 +32,8 @@ class Step:
     reaches: tuple[str, ...] = ()
     # The step loads ForeverCore from $FOREVER_CORE.
     needs_core: bool = False
+    # Arguments --changed adds, for a step with a part too heavy for the shared machine that it leaves to CI.
+    changed_args: tuple[str, ...] = ()
 
 
 STEPS = (
@@ -51,6 +54,9 @@ STEPS = (
             "ruff.toml",
             ".pkgmeta",
         ),
+        # The whole-repo LuaLS run inside typecheck.sh holds about 5 GB; --changed leaves it to CI, which
+        # runs it as a required check. Every other check in that script still runs.
+        changed_args=("--no-luals",),
     ),
     Step("specs", ("python3", "-m", "tools.forever_tools.specs"), LUA, needs_core=True),
     Step("deadcode", ("python3", "tools/deadcode.py", "--check"), LUA),
@@ -130,10 +136,11 @@ def main() -> int:
         if step not in selected:
             print(f"-- {step.name}: skipped, the diff does not reach it", flush=True)
             continue
-        print(f"== {step.name}: {' '.join(step.argv)}", flush=True)
+        argv = (*step.argv, *step.changed_args) if args.changed and step.changed_args else step.argv
+        print(f"== {step.name}: {' '.join(argv)}", flush=True)
         started = time.monotonic()
         try:
-            code = subprocess.run(step.argv, cwd=ROOT, env=env, stdin=subprocess.DEVNULL).returncode
+            code = subprocess.run(argv, cwd=ROOT, env=env, stdin=subprocess.DEVNULL).returncode
         except OSError as exc:
             print(f"== {step.name}: cannot start: {exc}", flush=True)
             code = 127

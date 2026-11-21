@@ -2,6 +2,11 @@
 set -eu
 
 cd "$(CDPATH='' cd -- "$(dirname -- "$0")/.." && pwd)"
+# --no-luals runs every check here but LuaLS itself, which holds gigabytes; CI always runs it.
+run_luals=1
+if [ "${1:-}" = "--no-luals" ]; then
+    run_luals=0
+fi
 # The annotation checkout and the LuaLS version come from tools/toolchain.json, synced from ForeverCore: the one
 # place either is pinned, and the file CI installs LuaLS from.
 pins=$(python3 -c 'import json; t = json.load(open("tools/toolchain.json"))["tools"]; print(t["annotations"]["commit"], t["luals"]["version"])')
@@ -25,7 +30,7 @@ if [ -n "$(git -C "$library" status --porcelain --untracked-files=all)" ]; then
     echo "$library: annotations must match the pinned checkout" >&2
     exit 1
 fi
-if [ "$(lua-language-server --version)" != "$luals" ]; then
+if [ "$run_luals" = 1 ] && [ "$(lua-language-server --version)" != "$luals" ]; then
     echo "typecheck requires lua-language-server $luals on PATH (tools/toolchain.json)" >&2
     exit 1
 fi
@@ -45,6 +50,11 @@ python3 tools/check_locales.py --release
 python3 tools/check_family.py
 python3 tools/check_store_page.py
 python3 -m tools.phrases --check
+# --no-luals (gate --changed): the checks above run, and the whole-repo LuaLS run is left to CI.
+if [ "$run_luals" = 0 ]; then
+    echo "typecheck: LuaLS left to CI (--no-luals)"
+    exit 0
+fi
 # A fresh output path prevents a crashed checker from reusing an earlier green report.
 report=$(mktemp -d "${TMPDIR:-/tmp}/tweaks-typecheck.XXXXXX")
 trap 'rm -rf "$report"' EXIT HUP INT TERM
