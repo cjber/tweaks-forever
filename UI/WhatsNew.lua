@@ -40,16 +40,19 @@ function Model.Message(seen, version)
 	end
 end
 
+-- Older packages and saved versions can both carry the release tag's v prefix.
+---@param version string?
+local function Bare(version)
+	return version and (version:gsub("^[vV](%d)", "%1"))
+end
+
 -- Saved variables may not load on this client, so the saved table can be a fresh one every login.
 ns.Init(function()
-	local version = C_AddOns.GetAddOnMetadata(addonName, "Version")
+	local version = Bare(C_AddOns.GetAddOnMetadata(addonName, "Version"))
 	if not version or version == UNPACKAGED then
 		return
 	end
-	-- Older packages and saved versions can both carry the release tag's v prefix.
-	version = version:gsub("^[vV](%d)", "%1")
-	local seen = ns.db.lastVersion
-	local message = Model.Message(seen and seen:gsub("^[vV](%d)", "%1"), version)
+	local message = Model.Message(Bare(ns.db.lastVersion), version)
 	if message and ns.Active("whatsNew") then
 		ns.Print(message)
 	end
