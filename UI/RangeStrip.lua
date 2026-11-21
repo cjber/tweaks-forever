@@ -718,6 +718,8 @@ ns.Init(function()
 		if not (C_SwingTimer and C_SwingTimer.EnableRangeCheck and Enum and Enum.PlayerSwingType and main) then
 			return
 		end
+		-- The mixin method is not in the client annotations.
+		---@cast main table
 		local native = type(main.IsRangeCheckEnabled) == "function" and main:IsRangeCheckEnabled() or false
 		if wanted and not native then
 			pcall(C_SwingTimer.EnableRangeCheck, Enum.PlayerSwingType.MainHand, true)
