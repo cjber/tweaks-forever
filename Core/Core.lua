@@ -428,15 +428,11 @@ login:SetScript("OnEvent", function()
 	local db = TweaksForeverDB or {}
 	db.junk = db.junk or {}
 	-- Settings retired with what they belonged to: the entrance pins' switch, the old companion hints and the Forever
-	-- addons page's hint setting and dismissed hints, which ForeverCore no longer has, and the removed Modern
-	-- tooltips, Tooltip style and Larger, clearer nameplates options.
+	-- addons page's hint setting and dismissed hints, which ForeverCore no longer has.
 	db.companionHints = nil
 	db.suggestFamily = nil
 	db.familyDismissed = nil
 	db.dungeonEntrances = nil
-	db.retailTooltips = nil
-	db.tooltipStyle = nil
-	db.largerNameplates = nil
 	for _, feature in ipairs(ns.features) do
 		if db[feature.key] == nil then
 			db[feature.key] = feature.default
