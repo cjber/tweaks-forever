@@ -46,7 +46,10 @@ ns.Init(function()
 	if not version or version == UNPACKAGED then
 		return
 	end
-	local message = Model.Message(ns.db.lastVersion, version)
+	-- Older packages and saved versions can both carry the release tag's v prefix.
+	version = version:gsub("^[vV](%d)", "%1")
+	local seen = ns.db.lastVersion
+	local message = Model.Message(seen and seen:gsub("^[vV](%d)", "%1"), version)
 	if message and ns.Active("whatsNew") then
 		ns.Print(message)
 	end
