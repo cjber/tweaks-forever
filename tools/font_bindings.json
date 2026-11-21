@@ -613,7 +613,7 @@
     },
     {
       "source": "Core/Core.lua",
-      "sha256": "daacb9cc5c6caff075650a606eb88e132379d6e1057a15837e269a9f59d484b1",
+      "sha256": "dc021f7c67d21063cc1675b0b8d7f6bdfd21f24925e39c229639d19883e4ddc9",
       "review": "Reviewed FitButton and its QuestLog, PetTrainer, TrainAll and DungeonMaps callers: FitButton changes only width from GetTextWidth, never fonts. Empty bindings pin this shared helper dependency. ReportTitle delegates to ForeverCore report UI; Print is chat output. Neither establishes font coverage here.",
       "bindings": []
     },
