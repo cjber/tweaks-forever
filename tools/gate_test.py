@@ -13,8 +13,9 @@ ROOT = Path(__file__).resolve().parent.parent
 
 def load_gate():
     spec = importlib.util.spec_from_file_location("gate", ROOT / "tools" / "gate.py")
+    if spec is None or spec.loader is None:
+        raise AssertionError("cannot load tools/gate.py")
     module = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
     spec.loader.exec_module(module)
     return module
 
