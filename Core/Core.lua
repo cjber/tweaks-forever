@@ -429,7 +429,8 @@ login:SetScript("OnEvent", function()
 	db.junk = db.junk or {}
 	-- Settings retired with what they belonged to: the entrance pins' switch, the old companion hints and the Forever
 	-- addons page's hint setting and dismissed hints, which ForeverCore no longer has, and the removed Modern
-	-- tooltips, Tooltip style and Larger, clearer nameplates options.
+	-- tooltips, Tooltip style and Larger, clearer nameplates options, and the quest icon on nameplates the game draws
+	-- itself.
 	db.companionHints = nil
 	db.suggestFamily = nil
 	db.familyDismissed = nil
@@ -437,6 +438,7 @@ login:SetScript("OnEvent", function()
 	db.retailTooltips = nil
 	db.tooltipStyle = nil
 	db.largerNameplates = nil
+	db.questPlates = nil
 	for _, feature in ipairs(ns.features) do
 		if db[feature.key] == nil then
 			db[feature.key] = feature.default

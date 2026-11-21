@@ -156,10 +156,12 @@ local retired = Load({
 	suggestFamily = false,
 	familyDismissed = { a = true },
 	dungeonEntrances = true,
+	questPlates = true,
 })
 assert(retired.companionHints == nil and retired.suggestFamily == nil, "the old hint settings are forgotten")
 assert(retired.familyDismissed == nil, "the dismissed hints are forgotten")
 assert(retired.dungeonEntrances == nil, "the entrance pins' switch is forgotten")
+assert(retired.questPlates == nil, "the nameplate quest icon's switch is forgotten")
 
 do -- A `polestar` conflict reads Polestar's own setting: on, or any choice but "off", while Polestar is loaded.
 	local loaded, settings = {}, {}

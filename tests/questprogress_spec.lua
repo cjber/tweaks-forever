@@ -114,29 +114,8 @@ local objectives = {
 	[5] = { { text = "0/1 Altar of Light used", type = "object", finished = false } },
 }
 local complete = {}
-local postCalls, events, changed, timers = {}, {}, {}, {}
+local postCalls, events, timers = {}, {}, {}
 
-local icons = {}
-local function Texture()
-	local texture = { shown = false }
-	icons[#icons + 1] = texture
-	function texture.SetAtlas(self, atlas)
-		self.atlas = atlas
-	end
-	function texture.SetSize(self, width, height)
-		self.width, self.height = width, height
-	end
-	function texture.SetPoint() end
-	function texture.Show(self)
-		self.shown = true
-	end
-	function texture.Hide(self)
-		self.shown = false
-	end
-	return texture
-end
-
-local plates, guids = {}, {}
 -- The race UnitRace reports, as the client's ChrRaces ID.
 local playerRace = 1
 local env = setmetatable({
@@ -160,34 +139,11 @@ local env = setmetatable({
 			return id >= 1 and id <= 5
 		end,
 	},
-	C_Texture = {
-		GetAtlasInfo = function()
-			return { width = 40, height = 32 }
-		end,
-	},
-	C_NamePlate = {
-		GetNamePlateForUnit = function(unit)
-			return plates[unit]
-		end,
-		GetNamePlates = function()
-			return { { UnitFrame = { unit = "nameplate9", HealthBarsContainer = {} } } }
-		end,
-	},
 	C_Timer = {
 		After = function(_, fn)
 			timers[#timers + 1] = fn
 		end,
 	},
-	CreateFrame = function()
-		return {
-			SetSize = function() end,
-			SetPoint = function() end,
-			CreateTexture = Texture,
-		}
-	end,
-	UnitGUID = function(unit)
-		return guids[unit]
-	end,
 	TooltipDataProcessor = {
 		AddTooltipPostCall = function(kind, fn)
 			postCalls[kind] = fn
@@ -214,11 +170,12 @@ local env = setmetatable({
 ns.QuestieDB = function()
 	return env.LibQuestieDB
 end
-setfenv(assert(loadfile("UI/Art.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Core/Secret.lua")), env)("TweaksForever", ns)
 setfenv(assert(loadfile("Quests/QuestProgress.lua")), env)("TweaksForever", ns)
 local Model = ns.QuestProgress
-assert(features.questTooltips.default == true and features.questPlates.default == true)
+assert(features.questTooltips.default == true)
+-- The client draws its own quest icon on a nameplate, so there is no setting of ours for one.
+assert(features.questPlates == nil)
 
 local function PolestarPath(feature)
 	for _, conflict in ipairs(feature.conflicts) do
@@ -228,13 +185,12 @@ local function PolestarPath(feature)
 	end
 end
 assert(PolestarPath(features.questTooltips) == "qol.questTooltips")
-assert(PolestarPath(features.questPlates) == "qol.nameplateIcons")
 assert(#initializers == 1)
 
 -- Questie's own options stand in for these while they are on.
 assert(not features.questTooltips.conflicts[1].when())
-env.Questie = { db = { profile = { enableTooltips = true, nameplateEnabled = false } } }
-assert(features.questTooltips.conflicts[1].when() and not features.questPlates.conflicts[1].when())
+env.Questie = { db = { profile = { enableTooltips = true } } }
+assert(features.questTooltips.conflicts[1].when())
 env.Questie = nil
 
 -- Creature IDs come from creature and vehicle GUIDs only, and never from a secret one.
@@ -249,7 +205,7 @@ local needs = features.questTooltips.needs
 assert(needs.title == "QuestieDB")
 assert(not needs.check() and not Model.Attach())
 Model.Rebuild()
-assert(#Model.Lines(10) == 0 and not Model.Needed(10) and #Model.Targets(1) == 0)
+assert(#Model.Lines(10) == 0 and #Model.Targets(1) == 0)
 env.LibQuestieDB = { Quest = library.Quest }
 assert(not needs.check() and not Model.Attach(), "a QuestieDB without items isn't enough")
 
@@ -326,11 +282,6 @@ assert(Model.Attach())
 lines = Model.Lines(702, "object")
 assert(#lines == 2 and lines[2][1] == " - 5/5 Wolf Fang", "an object the quest's item drops from")
 
--- Needed: an unfinished objective in a quest that isn't complete.
-assert(Model.Needed(10) and not Model.Needed(11) and Model.Needed(21) and not Model.Needed(99))
-complete[1] = true
-Model.Rebuild()
-assert(not Model.Needed(10))
 complete[1] = nil
 Model.Rebuild()
 
@@ -338,14 +289,12 @@ Model.Rebuild()
 assert(Model.HasQuestLines({ lines = { { type = 0 }, { type = 17 } } }))
 assert(not Model.HasQuestLines({ lines = { { type = 0 } } }))
 
--- Wired up: a creature's tooltip gains its lines, a needed creature's nameplate its icon, and both toggles apply.
-ns.db = { questTooltips = true, questPlates = true }
+-- Wired up: a creature's tooltip gains its lines, and the toggle applies.
+ns.db = { questTooltips = true }
 ns.Active = function(key)
 	return ns.db[key]
 end
-ns.OnSettingChanged = function(key, fn)
-	changed[key] = fn
-end
+ns.OnSettingChanged = function() end
 ns.On = function(event, fn)
 	events[event] = fn
 end
@@ -358,10 +307,7 @@ ns.OnUnit = function(event, unit, fn)
 	end
 end
 local wolf = "Creature-0-3113-0-47-10-0000ABCDEF"
-guids.nameplate9 = wolf
 initializers[1]()
-assert(#icons == 1 and icons[1].shown, "a plate up before login")
-table.remove(icons)
 local added, shown = {}, false
 local tooltip = {
 	AddLine = function(_, text)
@@ -391,39 +337,16 @@ postCalls[2](tooltip, { guid = wolf, lines = {} })
 postCalls[0](tooltip, { id = 600, lines = {} })
 assert(#added == 8, "switched off")
 
-local plate = { UnitFrame = { HealthBarsContainer = {} } }
-plates.nameplate1, guids.nameplate1 = plate, wolf
-events.NAME_PLATE_UNIT_ADDED("nameplate1")
-assert(#icons == 1 and icons[1].shown and icons[1].atlas == "questobjective")
-assert(icons[1].width == 20 and icons[1].height == 16, "the icon keeps its atlas's shape inside its square")
 -- Progress arrives as events, coalesced into one rebuild on the next frame.
 objectives[1][1] = Kill("Mangy Wolf", 10, 10)
 events.QUEST_LOG_UPDATE()
 events.UNIT_QUEST_LOG_CHANGED("player")
 events.UNIT_QUEST_LOG_CHANGED("party1")
-assert(#timers == 1 and icons[1].shown)
+assert(#timers == 1)
 timers[1]()
-assert(not icons[1].shown, "no longer needed")
+assert(Model.Lines(10)[2][1]:find("10/10"), "the rebuilt progress")
 objectives[1][1] = Kill("Mangy Wolf", 3, 10)
 Model.Rebuild()
-ns.db.questPlates = false
-changed.questPlates()
-assert(not icons[1].shown, "switched off")
-ns.db.questPlates = true
-changed.questPlates()
-assert(#icons == 1 and icons[1].shown, "one icon per plate, reused")
-events.NAME_PLATE_UNIT_REMOVED("nameplate1")
-assert(not icons[1].shown)
--- A plate addon code isn't handed, and a secret GUID, show nothing.
-plates.nameplate2, guids.nameplate2 = nil, wolf
-events.NAME_PLATE_UNIT_ADDED("nameplate2")
-plates.nameplate3, guids.nameplate3 = { UnitFrame = { HealthBarsContainer = {} } }, "secret"
-events.NAME_PLATE_UNIT_ADDED("nameplate3")
-assert(#icons == 1)
--- A kill the log names but QuestieDB doesn't know: no icon.
-plates.nameplate4, guids.nameplate4 = { UnitFrame = { HealthBarsContainer = {} } }, "Creature-0-3113-0-47-50-0000ABCDEF"
-events.NAME_PLATE_UNIT_ADDED("nameplate4")
-assert(#icons == 1)
 
 -- Without QuestieDB the initializer hooks nothing.
 env.LibQuestieDB, postCalls[2] = nil, nil
