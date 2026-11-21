@@ -13,7 +13,7 @@ refresh that moves the pin never leaves this file behind. The addon itself is GP
 | [CMaNGOS classic-db](https://github.com/cmangos/classic-db) | Class trainer lists in `Data/ClassSpells.lua` | `CLASSICDB_COMMIT` in `tools/gen_classspells.py` | GPL-3.0 |
 | [Warcraft Wiki: Zones by level (original)](https://warcraft.wiki.gg/wiki/Zones_by_level_(original)) | The original zones' level ranges in `Data/ZoneLevels.lua`, typed into `PUBLISHED` | `SOURCE` and `PUBLISHED` in `tools/gen_zonelevels.py`; the table is the pin | Facts cited from the wiki; no text copied |
 
-`media/` is this addon's own: the icon is drawn in `media/icon.svg`, and `TooltipBorder*.tga` by `tools/tooltip_border.py`.
+`media/` is this addon's own: the icon is drawn in `media/icon.svg`.
 
 ## Read in game, never bundled
 

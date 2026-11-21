@@ -65,9 +65,7 @@ Quests\QuestProgress.lua
 Quests\QuestButtons.lua
 Quests\QuestLog.lua
 Quests\BestReward.lua
-UI\Tooltips.lua
 UI\CursorTooltip.lua
-UI\Nameplates.lua
 Map\MapDraw.lua
 Map\Exploration.lua
 Map\ZoneLevels.lua

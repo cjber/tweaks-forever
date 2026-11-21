@@ -26,7 +26,7 @@ A change's player-facing notes go in `changes/<issue>.md`; only the release comm
 - `Core/Core.lua` has `ns.Feature`/`ns.On`/`ns.Init`; every feature file registers through it, naming its settings
   page and heading (`UI/Settings.lua` lists them in order). A new file goes in `TweaksForever.toc` or never runs (Lua 5.1, no `require`).
 - `Bags/`, `Quests/`, `Map/`, `Features/`, `Chat/`: feature modules by the part of the game they change. `UI/`:
-  settings, tooltips, nameplates, `UI/Art.lua`. `Integrations/QuestieSource.lua` is the one place QuestieDB is opened.
+  settings, the cursor tooltip, window moving, `UI/Art.lua`. `Integrations/QuestieSource.lua` is the one place QuestieDB is opened.
 - `Data/`: lookup tables for what neither QuestieDB nor AtlasLoot holds; a generated one names its generator and
   sources in its header. `Locales/enUS.lua` is keyed by the English text.
 - Also ships `LibAHTab`. `tools/forever_tools/` and `tools/forever_sim/` are vendored: never edit them here.
@@ -56,7 +56,6 @@ A change's player-facing notes go in `changes/<issue>.md`; only the release comm
 Owner-approved exceptions to `wow-forever-addon`:
 
 - WFA-2: Reveal unexplored areas and Hide macro names are off by default (spoiler; changes players' own bars).
-- WFA-4: tooltips default to the charcoal Modern style, a headline feature pictured on the store page.
 - WFA-13: `Quests/QuestDistance.lua`'s 1 s ticker stays: the only catch for Questie tracker toggles, which set no flag.
 - WFA-28, data neither QuestieDB nor AtlasLoot holds, each sourced in its file: class trainer spells and trainer NPC
   ids (`Data/ClassSpells.lua`, CMaNGOS classic-db plus the client's DB2; a trainer visit's own list wins), pet family

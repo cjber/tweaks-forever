@@ -20,7 +20,6 @@
 -- #382: the Options navigation enters only the client's vertical pages, so every page is the client's own rows, and
 -- every page the cursor lands on must show its first target.
 local CHOICES = {
-	["Tooltip style"] = { key = "tooltipStyle", values = { "modern", "retail", "forever" } },
 	["Mark grouped gear with"] = { key = "gearMark", values = { "strip", "border", "dots", "none" } },
 	["Invite keyword"] = { key = "whisperInviteKeyword", values = { "inv", "invite", "group" } },
 }
