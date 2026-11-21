@@ -349,7 +349,7 @@ L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt
 
-L["Tweaks Forever carries ForeverCore inside itself."] = "이제 ForeverCore가 Tweaks Forever에 포함됩니다." -- mt
+L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "이제 던전과 공격대에서 주시 대상의 이름표에 금색 테두리가 표시됩니다." -- mt
 L["Bags"] = "가방"
 L["Bags and vendors"] = "가방과 상인"
 L["Bars and alerts"] = "바와 알림"

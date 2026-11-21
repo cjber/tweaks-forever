@@ -19,8 +19,8 @@ ns.Feature({
 -- core sync's maintenance entry has no headline, so these stay on the release before it: an update to a maintenance
 -- version says nothing new but still moves the remembered version on. Rewrite both lines for each release that has a
 -- headline (whatsnew_spec checks them against CHANGELOG.md).
-ns.WHATS_NEW_VERSION = "2.9.3"
-ns.WHATS_NEW = L["Tweaks Forever carries ForeverCore inside itself."]
+ns.WHATS_NEW_VERSION = "2.9.7"
+ns.WHATS_NEW = L["Your focus target now has a gold nameplate outline in dungeons and raids."]
 
 -- The packager's placeholder, left as is in a dev checkout.
 local UNPACKAGED = "@" .. "project-version@"

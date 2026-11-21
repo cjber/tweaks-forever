@@ -349,7 +349,7 @@ L["Melee"] = "Cuerpo a cuerpo" -- mt
 L["Dead zone"] = "Zona muerta" -- mt
 L["Too far"] = "Demasiado lejos" -- mt
 
-L["Tweaks Forever carries ForeverCore inside itself."] = "ForeverCore ahora viene incluido en Tweaks Forever." -- mt
+L["Your focus target now has a gold nameplate outline in dungeons and raids."] = "Tu objetivo de foco ahora tiene un contorno dorado en la placa de nombre en mazmorras y bandas." -- mt
 L["Bags"] = "Bolsas"
 L["Bags and vendors"] = "Bolsas y vendedores"
 L["Bars and alerts"] = "Barras y avisos"
