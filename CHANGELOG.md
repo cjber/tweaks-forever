@@ -10,6 +10,16 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.8] - 2026-11-21
+
+### Fixed
+
+- **The range strip now shows with any attackable target, out of combat too.** It sits where the swing timers sit even while they are hidden, so a warrior can see before a pull whether Charge reaches. Its melee answer no longer depends on the swing timers showing, and Too far comes from the game's 28 yard follow check. Where the game cannot tell the dead zone from Too far, the strip names neither instead of guessing.
+
+### Removed
+
+- **Quest icons on nameplates.** The game draws its own quest icon on a nameplate, which ours sat on top of, so ours and its setting are gone.
+
 ## [2.9.7] - 2026-11-21
 
 ### Fixed

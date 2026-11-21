@@ -247,6 +247,7 @@ L["The game itself"] = "遊戲本身" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "遊戲的滑鼠提示跟隨滑鼠游標，而不是固定在遊戲的角落。視窗自行放置的提示（如背包物品的提示）保持在原處。"
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "每個聊天視窗的最後 200 行會在重新載入或登出後回來，位於「在你 /reload 之前」一行上面。只為此角色儲存，遊戲保密的內容會被跳過。"
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "任務問候列表（只有任務的NPC或公告板）以及任務詳情和獎勵頁面上的任務標題會顯示等級，如[12]。"
+L["The range strip now shows with any attackable target, out of combat too."] = "距離條現在會對任何可攻擊目標顯示，脫戰時也一樣。" -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "邀請傳送者的完整悄悄話：訊息必須只有這個詞。"
 L["Time to level: %s"] = "升級所需時間：%s"
 L["Tooltip at the cursor"] = "滑鼠提示跟隨游標"
