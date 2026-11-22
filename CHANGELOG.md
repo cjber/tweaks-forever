@@ -12,9 +12,15 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 ## [2.9.14] - 2026-11-22
 
-<!-- forever-core-sync -->
+### Changed
 
 - Ships with the same shared code as your other Forever addons, so they keep working together.
+
+### Fixed
+
+- **The range strip is off for players who never turned it on.** Earlier versions saved it as on in every profile, so it kept showing after it became off by default. It is now off once for those profiles; if you use it, turn it back on at /tweaks > Interface > Bars and alerts.
+- **The range strip no longer covers the game's cooldown icons.** With the swing timers hidden it sits just above the cooldown rows when they would fall under it, so its band label stays clear of them.
+- **The range strip follows swing timer width changes while the timers are hidden.**
 
 ## [2.9.13] - 2026-11-22
 
