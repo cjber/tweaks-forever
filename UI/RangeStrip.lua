@@ -64,7 +64,8 @@ local POSSIBLE_ALPHA = 0.35
 local LABEL_HEIGHT, SEGMENT_HEIGHT, ICON_SEGMENT_HEIGHT, SEGMENT_GAP, DOCK_GAP = 20, 15, 17, 3, 6
 -- The clear between a segment's icon tile and its bar.
 local ICON_GAP = 1
-local FALLBACK_WIDTH, FALLBACK_OFFSET = 213, -150
+local FALLBACK_WIDTH = 213 -- The swing timer's modern Edit Mode preset width.
+local FALLBACK_OFFSET = -150
 local SEGMENT_INSET_X, SEGMENT_INSET_Y = 4, 3
 -- Each segment name keeps 3 clear on either side, so the client's own truncation lands inside its segment.
 local SEGMENT_TEXT_INSET = 3
@@ -719,11 +720,11 @@ ns.Init(function()
 		end
 	end
 
-	-- A visible timer only becomes a docking target after the client resolves its position.
+	-- Require an anchor and resolved geometry. Zero is also a valid bottom for a placed frame.
 	local function LowestTimer()
 		local lowest, lowestBottom
 		for _, timer in ipairs(timers) do
-			local bottom = timer:IsVisible() and timer:GetBottom()
+			local bottom = timer:IsVisible() and timer:GetNumPoints() > 0 and timer:GetBottom()
 			if bottom and (not lowestBottom or bottom < lowestBottom) then
 				lowest, lowestBottom = timer, bottom
 			end

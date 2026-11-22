@@ -136,6 +136,9 @@ local Timer = {}
 function Timer.IsVisible(self)
 	return self.shown
 end
+function Timer.GetNumPoints(self)
+	return self.numPoints
+end
 function Timer.GetBottom(self)
 	return self.bottom
 end
@@ -185,11 +188,11 @@ local function Load(class, knownSpells)
 		textOrder = 0,
 	}, { __index = Strip })
 	local mainHand = setmetatable(
-		{ bottom = 300, shown = true, scale = 1, width = 240, scripts = {} },
+		{ bottom = 300, shown = true, scale = 1, width = 240, numPoints = 1, scripts = {} },
 		{ __index = Timer }
 	)
 	local ranged = setmetatable(
-		{ bottom = 200, shown = true, scale = 1, width = 240, scripts = {} },
+		{ bottom = 200, shown = true, scale = 1, width = 240, numPoints = 1, scripts = {} },
 		{ __index = Timer }
 	)
 
@@ -1011,7 +1014,8 @@ assert(not hunter.strip.shown and hunter.tickers[1].cancelled, "no strip and no 
 -- An attackable target still gets a strip when the timers have never been placed.
 hunter.setTarget(true)
 hunter.mainHand.shown, hunter.ranged.shown = false, false
-hunter.mainHand.bottom, hunter.ranged.bottom = nil, nil
+hunter.mainHand.numPoints, hunter.ranged.numPoints = 0, 0
+hunter.mainHand.bottom, hunter.ranged.bottom = 0, nil
 hunter.changed()
 assert(hunter.strip.shown, "the strip shows with hidden swing timers")
 assert(hunter.strip.points[1][2] == hunter.uiParent, "hidden, unplaced timers use the screen fallback")
@@ -1023,8 +1027,14 @@ hunter.mainHand.shown = true
 hunter.changed()
 assert(hunter.strip.points[1][2] == hunter.uiParent, "a shown but unplaced timer also uses the fallback")
 
--- Once placed, the shown timer wins over a lower, hidden timer.
-hunter.mainHand.bottom, hunter.ranged.bottom = 300, 200
+-- A point without resolved geometry still uses the fallback.
+hunter.mainHand.numPoints, hunter.mainHand.bottom = 1, nil
+hunter.changed()
+assert(hunter.strip.points[1][2] == hunter.uiParent, "an unresolved timer uses the fallback")
+
+-- A placed timer at zero wins over a lower, hidden timer.
+hunter.mainHand.bottom = 0
+hunter.ranged.numPoints, hunter.ranged.bottom = 1, -20
 hunter.changed()
 assert(hunter.strip.points[1][2] == hunter.mainHand, "the shown, placed timer is the anchor")
 hunter.mainHand.shown = false
