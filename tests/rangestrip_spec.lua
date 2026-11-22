@@ -223,7 +223,7 @@ local function Load(class, knownSpells)
 
 	-- The game's Essential cooldowns row, hidden until a case shows it under the fallback spot.
 	local essential = setmetatable(
-		{ shown = false, scale = 1, left = 400, right = 600, top = 245, bottom = 200 },
+		{ system = 15, shown = false, scale = 1, left = 400, right = 600, top = 245, bottom = 200 },
 		{ __index = Viewer }
 	)
 
@@ -285,7 +285,10 @@ local function Load(class, knownSpells)
 			return target
 		end,
 		CheckInteractDistance = interactCheck,
-		Enum = { PlayerSwingType = { MainHand = 0, OffHand = 1, Ranged = 2 } },
+		Enum = {
+			PlayerSwingType = { MainHand = 0, OffHand = 1, Ranged = 2 },
+			EditModeSystem = { CooldownViewer = 15 },
+		},
 		C_SwingTimer = {
 			EnableRangeCheck = function(swingType, enable)
 				assert(swingType == 0, "the strip only checks the main-hand swing")
@@ -365,7 +368,7 @@ local function Load(class, knownSpells)
 				return 500, 400
 			end,
 		},
-		EssentialCooldownViewer = essential,
+		EditModeManagerFrame = { registeredSystemFrames = { essential } },
 		CreateFrame = function()
 			return strip
 		end,
@@ -1063,6 +1066,11 @@ assert(hunter.strip.shown, "the strip shows with hidden swing timers")
 assert(hunter.strip.points[1][2] == hunter.uiParent, "hidden, unplaced timers use the screen fallback")
 assert(hunter.strip.points[1][3] == "CENTER" and #hunter.strip.points == 1, "a single screen-relative anchor")
 assert(hunter.strip:GetWidth() == 240, "the fallback takes a hidden timer's width (#698)")
+hunter.mainHand.width = 280
+hunter.changed()
+assert(hunter.strip:GetWidth() == 280, "the fallback tracks hidden timer resizes without reanchoring")
+hunter.mainHand.width = 240
+hunter.changed()
 
 -- The fallback spot keeps clear of a cooldown row below it (#702): the strip's 37-high body (17 segments and the
 -- 20-high label) would reach down to 213 from its top at 400 - 150 = 250, over a row whose top is at 245, so it sits

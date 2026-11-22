@@ -755,7 +755,7 @@ ns.Init(function()
 	end
 
 	-- The fallback spot as it settles, in UIParent's units: the strip's top, center, half width, height and gap.
-	local spotTop, spotX, spotHalf, spotTall, spotGap, spotParent
+	local spotTop, spotX, spotHalf, spotTall, spotGap, spotScale
 
 	-- Lift the fallback spot 6 above one of the game's cooldown rows when the row is shown under it. Each rect is
 	-- turned into UIParent's units through its frame's effective scale.
@@ -769,7 +769,7 @@ ns.Init(function()
 		if not (left and right and top and bottom) then
 			return false
 		end
-		local ratio = viewer:GetEffectiveScale() / spotParent
+		local ratio = viewer:GetEffectiveScale() / spotScale
 		top = top * ratio
 		if
 			left * ratio < spotX + spotHalf
@@ -795,15 +795,23 @@ ns.Init(function()
 		if not (centerX and centerY and parentScale and parentScale > 0) then
 			return FALLBACK_OFFSET
 		end
+		local systems = EditModeManagerFrame and EditModeManagerFrame.registeredSystemFrames
+		local cooldownSystem = Enum.EditModeSystem and Enum.EditModeSystem.CooldownViewer
+		if not (systems and cooldownSystem) then
+			return FALLBACK_OFFSET
+		end
 		local _, height = Geometry()
 		spotTop, spotX, spotHalf = centerY + FALLBACK_OFFSET * scale, centerX, width * scale / 2
-		spotTall, spotGap, spotParent = height * scale, DOCK_GAP * scale, parentScale
-		-- A row the strip moves onto lifts it again; one pass per row settles any stack of them.
-		for _ = 1, 4 do
-			local moved = Clear(EssentialCooldownViewer)
-			moved = Clear(UtilityCooldownViewer) or moved
-			moved = Clear(BuffIconCooldownViewer) or moved
-			moved = Clear(BuffBarCooldownViewer) or moved
+		spotTall, spotGap, spotScale = height * scale, DOCK_GAP * scale, parentScale
+		-- Read the 16001 Edit Mode registrations without calling the manager's Lua methods.
+		-- Each move puts the strip fully above a row, so at most one pass per registered frame is needed.
+		for _ = 1, #systems do
+			local moved = false
+			for _, frame in ipairs(systems) do
+				if frame.system == cooldownSystem then
+					moved = Clear(frame) or moved
+				end
+			end
 			if not moved then
 				break
 			end
@@ -985,14 +993,15 @@ ns.Init(function()
 				strip:SetPoint("TOPRIGHT", timer, "BOTTOMRIGHT", 0, -DOCK_GAP)
 			end
 		else
-			local size = SizeTimer()
-			local width = size and size:GetWidth() or FALLBACK_WIDTH
+			local width = scaleFrom and scaleFrom:GetWidth() or FALLBACK_WIDTH
 			local offset = FallbackOffset(width, scale, parentScale)
 			if docked ~= UIParent or dockedOffset ~= offset then
 				docked, dockedOffset = UIParent, offset
 				strip:ClearAllPoints()
-				strip:SetWidth(width)
 				strip:SetPoint("TOP", UIParent, "CENTER", 0, offset)
+			end
+			if strip:GetWidth() ~= width then
+				strip:SetWidth(width)
 			end
 		end
 		if #cachedSegments <= 1 then
