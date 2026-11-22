@@ -62,8 +62,8 @@ local Texture = setmetatable({}, { __index = Widget })
 function Texture.SetAtlas(self, atlas)
 	self.atlas = atlas
 end
-function Texture.SetVertexColor(self, r, g, b)
-	self.colour = { r, g, b }
+function Texture.SetVertexColor(self, r, g, b, a)
+	self.colour = { r, g, b, a }
 end
 function Texture.SetColorTexture(self, r, g, b, a)
 	self.colour = { r, g, b, a }
@@ -553,6 +553,17 @@ local function interact(answer)
 	end
 end
 
+do
+	local fire = { reach("fireblast", 0, 20, true) }
+	local charge = { reach("charge", 8, 25, false) }
+	assert(table.concat(M.Bands(nil, fire, interact(true)), ",") == "melee,fireblast")
+	assert(table.concat(M.Bands(nil, charge, interact(true)), ",") == "melee,dead")
+	assert(table.concat(M.Bands(false, fire, noInteract), ",") == "fireblast")
+	assert(table.concat(M.Bands(true, charge, noInteract), ",") == "melee")
+	local contradictory = { reach("fireblast", 0, 20, true), reach("frostbolt", 0, 30, false) }
+	assert(#M.Bands(false, contradictory, noInteract) == 0)
+end
+
 assert(M.Band(true, { reach("autoshot", 8, 35, false) }, noInteract) == "melee", "melee wins")
 assert(
 	M.Band(
@@ -776,19 +787,21 @@ for _, set in ipairs(reachSets) do
 		for i = 1, n do
 			reaches[i].check = case.checks[i]
 		end
-		local got = M.Band(case.melee, reaches, function()
-			return case.near
-		end, function()
-			return case.far
-		end)
+		local near, far = interact(case.near), follow(case.far)
+		local bands = M.Bands(case.melee, reaches, near, far)
+		local got = M.Band(case.melee, reaches, near, far)
 		local failure =
 			string.format("reaches %s near %.1f yd (%s): got %s", table.concat(set, ","), case.at, key, tostring(got))
-		-- Never wrong: a named band is the band at every distance giving these answers.
-		if got ~= nil then
-			for band in pairs(case.bands) do
-				assert(band == got, failure .. ", but " .. band .. " gives the same answers")
-			end
+		local reported = {}
+		for _, band in ipairs(bands) do
+			assert(not reported[band], failure .. ", duplicate band " .. band)
+			reported[band] = true
 		end
+		for band in pairs(case.bands) do
+			assert(reported[band], failure .. ", missing possible band " .. band)
+		end
+		local onlyReported = #bands == 1 and bands[1] or nil
+		assert(got == onlyReported, failure .. ", Band must agree with Bands")
 		-- Never hidden needlessly: a true interact answer puts the target inside 10 yards, and a false one says nothing
 		-- about its edge distance, so the bands possible are those at every distance that fits the rest.
 		local only, count = nil, 0
@@ -917,11 +930,12 @@ hunter.setAnswer(75, false)
 hunter.setInteract(true)
 hunter.changed()
 assert(hunter.fontStrings[1].string == "Dead zone" and art(hunter, 2).fill.shown, "a target inside 8 yards")
--- Beyond the interact check the target may still stand in the dead zone: no band is named, and no segment lit.
+-- Beyond the interact check the target may still be in the dead zone or Too far. Only the dead zone has a fill.
 hunter.setInteract(false)
 hunter.changed()
 assert(not hunter.fontStrings[1].shown, "no label when the interact check says only that it is not inside 10 yards")
-assert(not art(hunter, 1).fill.shown and not art(hunter, 2).fill.shown and not art(hunter, 3).fill.shown)
+assert(not art(hunter, 1).fill.shown and not art(hunter, 3).fill.shown)
+assert(art(hunter, 2).fill.shown and art(hunter, 2).fill.colour[4] == 0.35)
 hunter.setInteract(nil)
 hunter.changed()
 assert(not hunter.fontStrings[1].shown, "no label when the 8-yard check answered nothing")
@@ -1019,6 +1033,22 @@ mage.setAnswer(133, true)
 mage.changed()
 assert(joined(segments(mage)) == "Melee | Fire Blast | Frostbolt | Fireball", "the mage's reaches near to far")
 assert(mage.fontStrings[1].string == "Fire Blast", "the nearest reach names the band")
+
+mage.setSwing(nil)
+mage.handlers.PLAYER_TARGET_CHANGED()
+for index = 1, 2 do
+	local segment = art(mage, index)
+	assert(segment.fill.shown and segment.fill.colour[4] == 0.35, "possible range has a faint fill")
+	assert(not segment.dim.shown, "possible range has a bright icon")
+	assert(mage.fontStrings[index + 1].colour[1] == 1, "possible range has bright text")
+end
+assert(not art(mage, 3).fill.shown and not art(mage, 4).fill.shown, "only possible ranges have fills")
+assert(not mage.fontStrings[1].shown, "ambiguous range has no band label")
+mage.setSwing(false)
+mage.handlers.PLAYER_TARGET_CHANGED()
+assert(not art(mage, 1).fill.shown and art(mage, 1).dim.shown, "melee is ruled out")
+assert(art(mage, 2).fill.colour[4] == 1, "the confirmed band is fully lit again")
+assert(mage.fontStrings[1].shown and mage.fontStrings[1].string == "Fire Blast", "the confirmed band is named")
 
 -- Improved Fire Blast (+15 yards) moves Fire Blast past Frostbolt, level with Fireball: the two are one segment,
 -- and CHARACTER_POINTS_CHANGED rebuilds the strip from the client's ranges and lays the narrower row out again.
