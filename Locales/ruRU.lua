@@ -250,7 +250,6 @@ L["The game itself"] = "Сама игра" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "Подсказки игры следуют за курсором мыши, а не стоят в фиксированном углу. Подсказки, которые окно размещает само, например у предмета в сумке, остаются там, где оно их ставит."
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "Последние 200 строк каждого окна чата возвращаются после перезагрузки или выхода из игры над строкой До вашего /reload. Хранятся только для этого персонажа, а строки, которые игра держит в секрете, пропускаются."
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "Список в приветствии (у NPC или доски только с заданиями) и название задания на страницах описания и награды показывают его уровень, например [12]."
-L["The range strip is off by default."] = "Полоса дистанции по умолчанию выключена." -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "Весь шепот, который приглашает отправителя: сообщение должно состоять только из этого слова."
 L["Time to level: %s"] = "Время до уровня: %s"
 L["Tooltip at the cursor"] = "Подсказка у курсора"
