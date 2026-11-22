@@ -211,6 +211,7 @@
 
 ---@class TFDatabase
 ---@field junk TFMarks
+---@field revisedDefaults? table<string, boolean> feature keys whose former defaults were handled at login
 ---@field errors ForeverCaughtError[] ForeverCore's shared error journal: earlier sessions' errors, for the report
 ---@field log ForeverDebugLogStore ForeverCore's shared log ring: recent lines, for the report
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
