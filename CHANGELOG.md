@@ -10,6 +10,12 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.10] - 2026-11-22
+
+### Fixed
+
+- **The range strip no longer looks empty when the game cannot tell its bands apart.** Out of combat the game gives no melee answer for some mobs, so the strip could not pick one band and lit nothing. It now lights each band still possible faintly, with no label, and names a band as soon as the game's answers leave only one.
+
 ## [2.9.9] - 2026-11-21
 
 <!-- forever-core-sync -->

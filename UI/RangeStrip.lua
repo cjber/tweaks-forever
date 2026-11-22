@@ -16,7 +16,8 @@ ns.Feature({
 	name = "Range strip",
 	tooltip = "A strip under the game's swing timers naming which of your attacks reach your target, from "
 		.. "melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any "
-		.. "attackable target, in combat or not, where the swing timers sit, even while they are hidden.",
+		.. "attackable target, in combat or not, where the swing timers sit, even while they are hidden. "
+		.. "When the game cannot tell bands apart, the strip lights each one faintly and names none.",
 	default = true,
 })
 
@@ -56,6 +57,7 @@ local SPELL_R, SPELL_G, SPELL_B = 0.25, 0.75, 0.25
 local UNLIT_R, UNLIT_G, UNLIT_B = 0.5, 0.5, 0.5
 -- How far an unlit segment's icon tile is darkened: black over it at 0.6, leaving its colour at 40%.
 local UNLIT_DIM = 0.6
+local POSSIBLE_ALPHA = 0.35
 
 -- The strip's shape, from the game's swing timer bars: segments with a square icon tile at their left (17 high with
 -- icons, 15 without), 3-wide gaps, a 20-high band label under them, and 6 between the timer and the strip below it.
@@ -392,16 +394,66 @@ local function BandAt(distance, reaches)
 	return TOO_FAR
 end
 
--- The one band every distance agreeing with the answers puts the target in, or nil when they leave more than one.
--- False when no distance agrees: the answers break the yard model.
--- The bands change only at the range edges, so each edge, a point between two edges and one past the last stand for
--- every distance.
+---@param bands string[]
+---@param band string
+local function HasBand(bands, band)
+	for _, possible in ipairs(bands) do
+		if possible == band then
+			return true
+		end
+	end
+	return false
+end
+
+-- The bands change only at range edges. Each edge, a point between two edges and one past the last
+-- stand for every distance. Keep each matching band in order of its first matching distance.
 ---@param melee boolean?
 ---@param interact boolean?
 ---@param follow boolean?
 ---@param reaches TFRangeReach[]
----@return string|false|nil
-local function Solve(melee, interact, follow, reaches)
+---@param samples number[]
+---@param bands string[]
+local function Solve(melee, interact, follow, reaches, samples, bands)
+	for i = #bands, 1, -1 do
+		bands[i] = nil
+	end
+	for _, distance in ipairs(samples) do
+		local agrees = (melee == nil or melee == (distance <= MELEE_REACH))
+			and (interact ~= true or distance < INTERACT_FAR)
+			and (follow == nil or follow == (distance <= FOLLOW))
+		for _, reach in ipairs(reaches) do
+			if reach.check ~= nil and reach.check ~= (distance >= reach.min and distance <= reach.max) then
+				agrees = false
+			end
+		end
+		if agrees then
+			local band = BandAt(distance, reaches)
+			if not HasBand(bands, band) then
+				bands[#bands + 1] = band
+			end
+		end
+	end
+end
+
+-- Every band consistent with the answers, or an empty list when no distance fits. Ask interact and
+-- follow only while the cheaper answers leave more than one band. The caller may reuse the output.
+---@param melee boolean?
+---@param reaches TFRangeReach[]
+---@param interact fun(): boolean?
+---@param follow? fun(): boolean?
+---@param bands? string[]
+---@return string[]
+function Model.Bands(melee, reaches, interact, follow, bands)
+	bands = bands or {}
+	-- The game's own swing answer wins outright.
+	if melee == true then
+		for i = #bands, 2, -1 do
+			bands[i] = nil
+		end
+		bands[1] = MELEE
+		return bands
+	end
+
 	local edges = { 0, MELEE_REACH, INTERACT_FAR, FOLLOW }
 	for _, reach in ipairs(reaches) do
 		edges[#edges + 1] = reach.min
@@ -413,51 +465,21 @@ local function Solve(melee, interact, follow, reaches)
 		samples[#samples + 1] = edge
 		samples[#samples + 1] = edges[i + 1] and (edge + edges[i + 1]) / 2 or edge + 1
 	end
-	---@type string|false
-	local band = false
-	for _, distance in ipairs(samples) do
-		local agrees = (melee == nil or melee == (distance <= MELEE_REACH))
-			and (interact ~= true or distance < INTERACT_FAR)
-			and (follow == nil or follow == (distance <= FOLLOW))
-		for _, reach in ipairs(reaches) do
-			if reach.check ~= nil and reach.check ~= (distance >= reach.min and distance <= reach.max) then
-				agrees = false
-			end
-		end
-		if agrees then
-			local here = BandAt(distance, reaches)
-			if band and band ~= here then
-				return nil
-			end
-			band = here
-		end
-	end
-	return band
-end
 
--- The band key, or nil when the answers cannot say. Each answer narrows where the target can stand: melee from the
--- game's swing range, each reach from its spell, and the game's interact check. A band is named only when every
--- distance left gives that band, so a missing answer hides only the bands it could change and never names a wrong
--- one. `interact` and `follow` are called only when the other answers leave more than one band.
----@param melee boolean?
----@param reaches TFRangeReach[]
----@param interact fun(): boolean?
----@param follow? fun(): boolean?
----@return string?
-function Model.Band(melee, reaches, interact, follow)
-	-- The game's own swing answer wins outright.
-	if melee == true then
-		return MELEE
+	Solve(melee, nil, nil, reaches, samples, bands)
+	if #bands > 1 then
+		local near = interact()
+		if near == true then
+			Solve(melee, near, nil, reaches, samples, bands)
+		end
+		if #bands > 1 and follow then
+			local far = follow()
+			if far ~= nil then
+				Solve(melee, near, far, reaches, samples, bands)
+			end
+		end
 	end
-	local band = Solve(melee, nil, nil, reaches)
-	if band == nil then
-		band = Solve(melee, interact(), nil, reaches)
-	end
-	if band == nil and follow then
-		band = Solve(melee, interact(), follow(), reaches)
-	end
-	-- No distance fits every answer: something the yard model does not hold for, so no band can be named safely.
-	return band or nil
+	return bands
 end
 
 ns.Init(function()
@@ -499,7 +521,6 @@ ns.Init(function()
 	label:Hide()
 
 	---@class TFRangeSegmentWidget
-	---@field key string
 	---@field text FontString
 	---@field fill Texture
 	---@field background Texture
@@ -547,7 +568,6 @@ ns.Init(function()
 		text:SetTextColor(UNLIT_R, UNLIT_G, UNLIT_B)
 		text:SetWordWrap(false)
 		widget = {
-			key = key,
 			background = background,
 			fill = fill,
 			border = border,
@@ -564,8 +584,8 @@ ns.Init(function()
 	---@type TFRangeSegmentWidget[]
 	local shown = {}
 
-	-- The band lit now, so a layout can dim every other segment's icon.
-	local litBand
+	-- Reused on each update to collect the possible bands.
+	local bands = {}
 
 	-- The strip's two rows: segments 17 high with icons and 15 without, and a 20-high band label under them only
 	-- while the label option is on.
@@ -615,7 +635,7 @@ ns.Init(function()
 				widget.iconFrame:SetSize(tile, tile)
 				widget.icon:Show()
 				widget.iconFrame:Show()
-				widget.dim:SetShown(widget.key ~= litBand)
+				widget.dim:SetShown(not widget.fill:IsShown())
 			else
 				widget.icon:Hide()
 				widget.dim:Hide()
@@ -652,11 +672,10 @@ ns.Init(function()
 		end
 	end
 
-	-- The band named under the strip, and its segment lit: white when lit, grey otherwise, and no segment at all
-	-- for Too far or when the game gave no answer. The label row only exists while the label option is on.
-	---@param band string?
+	-- Name a confirmed band and light its segment. Several possible bands get faint fills and no label.
 	---@param segments TFRangeSegment[]
-	local function Apply(band, segments)
+	local function Apply(segments)
+		local band = #bands == 1 and bands[1] or nil
 		local bandName, bandColour
 		if band == TOO_FAR then
 			bandName, bandColour = NAMES[TOO_FAR], COLOURS[TOO_FAR]
@@ -674,11 +693,23 @@ ns.Init(function()
 		else
 			label:Hide()
 		end
-		litBand = band
+		-- Too far has no segment. Suppress highlights only if every visible segment is possible.
+		local allPossible = #bands >= #segments
+		if allPossible then
+			for _, segment in ipairs(segments) do
+				if not HasBand(bands, segment.key) then
+					allPossible = false
+					break
+				end
+			end
+		end
+		local icons = ns.Active(ICONS_KEY)
 		for _, segment in ipairs(segments) do
 			local widget = Widget(segment.key)
-			if band == segment.key then
-				widget.fill:SetVertexColor(segment.colour[1], segment.colour[2], segment.colour[3])
+			local lit = not allPossible and HasBand(bands, segment.key)
+			if lit then
+				local colour = segment.colour
+				widget.fill:SetVertexColor(colour[1], colour[2], colour[3], band and 1 or POSSIBLE_ALPHA)
 				widget.fill:Show()
 				widget.text:SetTextColor(1, 1, 1)
 			else
@@ -686,7 +717,7 @@ ns.Init(function()
 				widget.text:SetTextColor(UNLIT_R, UNLIT_G, UNLIT_B)
 			end
 			-- An unlit segment's icon is darkened, as the mock draws it: black over the tile at 0.6.
-			widget.dim:SetShown(widget.iconFile ~= nil and ns.Active(ICONS_KEY) and band ~= segment.key)
+			widget.dim:SetShown(widget.iconFile ~= nil and icons and not lit)
 		end
 	end
 
@@ -847,13 +878,12 @@ ns.Init(function()
 		end
 	end
 
-	-- The current band from the cached reaches: each reach's range answer is refreshed, then the band is derived.
-	---@return string?
-	local function Band()
+	-- Refresh the cached reaches' answers, then find every band they allow.
+	local function UpdateBands()
 		for _, reach in ipairs(cachedReaches) do
 			reach.check = Model.Check(reach.spell)
 		end
-		return Model.Band(Model.Melee(), cachedReaches, Model.Interact, Model.Follow)
+		Model.Bands(Model.Melee(), cachedReaches, Model.Interact, Model.Follow, bands)
 	end
 
 	function Update()
@@ -891,7 +921,8 @@ ns.Init(function()
 			shownSegments, shownIcons, shownLabel = cachedSegments, icons, labelOn
 			ShowSegments(cachedSegments)
 		end
-		Apply(Band(), cachedSegments)
+		UpdateBands()
+		Apply(cachedSegments)
 		strip:Show()
 		if changed then
 			Layout()

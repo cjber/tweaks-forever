@@ -48,6 +48,9 @@ end
 function Widget.Hide(self)
 	self.shown = false
 end
+function Widget.IsShown(self)
+	return self.shown
+end
 function Widget.SetShown(self, shown)
 	self.shown = shown
 end
@@ -62,8 +65,8 @@ local Texture = setmetatable({}, { __index = Widget })
 function Texture.SetAtlas(self, atlas)
 	self.atlas = atlas
 end
-function Texture.SetVertexColor(self, r, g, b)
-	self.colour = { r, g, b }
+function Texture.SetVertexColor(self, r, g, b, a)
+	self.colour = { r, g, b, a }
 end
 function Texture.SetColorTexture(self, r, g, b, a)
 	self.colour = { r, g, b, a }
@@ -553,9 +556,25 @@ local function interact(answer)
 	end
 end
 
-assert(M.Band(true, { reach("autoshot", 8, 35, false) }, noInteract) == "melee", "melee wins")
+do
+	local fire = { reach("fireblast", 0, 20, true) }
+	local charge = { reach("charge", 8, 25, false) }
+	assert(table.concat(M.Bands(nil, fire, interact(true)), ",") == "melee,fireblast")
+	assert(table.concat(M.Bands(nil, charge, interact(true)), ",") == "melee,dead")
+	assert(table.concat(M.Bands(false, fire, noInteract), ",") == "fireblast")
+	assert(table.concat(M.Bands(true, charge, noInteract), ",") == "melee")
+	local contradictory = { reach("fireblast", 0, 20, true), reach("frostbolt", 0, 30, false) }
+	assert(#M.Bands(false, contradictory, noInteract) == 0)
+end
+
+local function Band(melee, reaches, interactCheck, followCheck)
+	local bands = M.Bands(melee, reaches, interactCheck, followCheck)
+	return #bands == 1 and bands[1] or nil
+end
+
+assert(Band(true, { reach("autoshot", 8, 35, false) }, noInteract) == "melee", "melee wins")
 assert(
-	M.Band(
+	Band(
 		false,
 		{ reach("fireblast", 0, 20, false), reach("frostbolt", 0, 30, true), reach("fireball", 0, 35, true) },
 		noInteract
@@ -563,11 +582,11 @@ assert(
 	"the nearest reach that answers true"
 )
 assert(
-	M.Band(false, { reach("fireblast", 0, 20, nil), reach("frostbolt", 0, 30, true) }, interact(false)) == nil,
+	Band(false, { reach("fireblast", 0, 20, nil), reach("frostbolt", 0, 30, true) }, interact(false)) == nil,
 	"a nearer reach with no answer hides the band"
 )
 assert(
-	M.Band(
+	Band(
 		false,
 		{ reach("fireblast", 0, 20, true), reach("frostbolt", 0, 30, nil), reach("fireball", 0, 35, true) },
 		noInteract
@@ -592,83 +611,77 @@ end
 -- Past the follow distance (28 yards) the target is beyond every reach shorter than that: Too far from a real answer,
 -- where the interact check says nothing. A reach to 30 yards stays undecided until its own spell answers.
 assert(
-	M.Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(false)) == "far",
+	Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(false)) == "far",
 	"past 28 yards, beyond Charge"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, nil) }, interact(false), follow(false)) == nil,
+	Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, nil) }, interact(false), follow(false)) == nil,
 	"28 to 30 yards may still be inside a shot's reach: undecided"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, false) }, interact(false), follow(false))
+	Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, false) }, interact(false), follow(false))
 		== "far",
 	"the shot's own answer settles it: past 30 yards"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, true) }, interact(false), follow(false))
+	Band(false, { reach("charge", 8, 25, false), reach("ranged", 8, 30, true) }, interact(false), follow(false))
 		== "ranged",
 	"the shot's own answer settles it: inside 30 yards"
 )
-assert(M.Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(nil)) == nil, "no follow answer")
-assert(
-	M.Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(true)) == nil,
-	"inside 28 yards: unknown"
-)
+assert(Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(nil)) == nil, "no follow answer")
+assert(Band(false, { reach("charge", 8, 25, false) }, interact(false), follow(true)) == nil, "inside 28 yards: unknown")
 
 -- The dead zone needs a shown reach with a minimum range and the game's own 8-yard answer.
 local warriorReaches = { reach("charge", 8, 25, false), reach("ranged", 8, 30, false) }
-assert(M.Band(false, warriorReaches, interact(true)) == "dead", "a minimum range and a target inside 8 yards")
+assert(Band(false, warriorReaches, interact(true)) == "dead", "a minimum range and a target inside 8 yards")
 -- The interact check only bounds a target from above. A false answer is a centre distance of 9.9 yards or more, and
 -- the reaches' own ranges are edge to edge, so it puts no floor under the target's distance: dead zone and Too far
 -- both fit, and the strip names neither.
-assert(M.Band(false, warriorReaches, interact(false)) == nil, "no interact answer to say inside, so no band")
-assert(M.Band(false, { reach("judgement", 0, 10, false) }, noInteract) == "far", "no minimum range, so no dead zone")
-assert(M.Band(false, warriorReaches, interact(nil)) == nil, "the 8-yard check answered nothing")
-assert(M.Band(nil, { reach("charge", 8, 25, false) }, interact(true)) == nil, "melee unknown leaves the gap unclaimed")
+assert(Band(false, warriorReaches, interact(false)) == nil, "no interact answer to say inside, so no band")
+assert(Band(false, { reach("judgement", 0, 10, false) }, noInteract) == "far", "no minimum range, so no dead zone")
+assert(Band(false, warriorReaches, interact(nil)) == nil, "the 8-yard check answered nothing")
+assert(Band(nil, { reach("charge", 8, 25, false) }, interact(true)) == nil, "melee unknown leaves the gap unclaimed")
 -- Out of combat the swing range has no answer; the ranged bands still light, and a reach the target is beyond rules
 -- melee out.
-assert(M.Band(nil, { reach("autoshot", 8, 35, true) }, noInteract) == "autoshot", "Auto Shot lights with melee unknown")
+assert(Band(nil, { reach("autoshot", 8, 35, true) }, noInteract) == "autoshot", "Auto Shot lights with melee unknown")
+assert(Band(nil, { reach("autoshot", 8, 35, false) }, interact(false)) == nil, "beyond Auto Shot or inside it: unknown")
+assert(Band(nil, { reach("autoshot", 8, 35, false) }, interact(nil)) == nil, "no 8-yard answer, melee undecided")
+assert(Band(nil, { reach("frostbolt", 0, 30, false) }, noInteract) == "far", "beyond a reach with no minimum")
 assert(
-	M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(false)) == nil,
-	"beyond Auto Shot or inside it: unknown"
-)
-assert(M.Band(nil, { reach("autoshot", 8, 35, false) }, interact(nil)) == nil, "no 8-yard answer, melee undecided")
-assert(M.Band(nil, { reach("frostbolt", 0, 30, false) }, noInteract) == "far", "beyond a reach with no minimum")
-assert(
-	M.Band(nil, { reach("frostbolt", 0, 30, nil) }, interact(true)) == nil,
+	Band(nil, { reach("frostbolt", 0, 30, nil) }, interact(true)) == nil,
 	"no reach answered false, so melee stays undecided"
 )
 -- The interact check reaches past 8 yards, so it alone cannot say an unanswered 8-yard minimum is out of reach.
 assert(
-	M.Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == "wrath",
+	Band(false, { reach("feralcharge", 8, 25, false), reach("wrath", 0, 30, nil) }, interact(true)) == "wrath",
 	"inside the interact check and out of melee, a spell reaching from 0 to 30 yards reaches"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == "dead",
+	Band(false, { reach("charge", 8, 25, nil), reach("ranged", 8, 30, false) }, interact(true)) == "dead",
 	"a false 8 to 30 reach inside the interact check puts the target inside 8 yards, inside Charge's minimum too"
 )
 
 assert(
-	M.Band(false, { reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
+	Band(false, { reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
 	"a single unanswered positive-minimum reach leaves the band unknown"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, nil), reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
+	Band(false, { reach("charge", 8, 25, nil), reach("autoshot", 8, 35, nil) }, interact(true)) == nil,
 	"multiple unanswered positive-minimum reaches leave the band unknown"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, nil), reach("autoshot", 10, 35, nil) }, interact(true)) == nil,
+	Band(false, { reach("charge", 8, 25, nil), reach("autoshot", 10, 35, nil) }, interact(true)) == nil,
 	"different positive minima do not resolve unanswered reaches"
 )
 assert(
-	M.Band(false, { reach("charge", 8, 25, false), reach("autoshot", 8, 35, nil) }, interact(true)) == "dead",
+	Band(false, { reach("charge", 8, 25, false), reach("autoshot", 8, 35, nil) }, interact(true)) == "dead",
 	"a false reach sharing the unanswered one's minimum puts the target inside both"
 )
 
 -- Answers no distance fits (Fire Blast in range, Frostbolt with the longer reach not) break the yard model, so the
 -- band is hidden rather than guessed.
 assert(
-	M.Band(false, { reach("fireblast", 0, 20, true), reach("frostbolt", 0, 30, false) }, interact(nil)) == nil,
+	Band(false, { reach("fireblast", 0, 20, true), reach("frostbolt", 0, 30, false) }, interact(nil)) == nil,
 	"contradicting answers name no band"
 )
 
@@ -715,6 +728,41 @@ for a = 1, #SHAPES do
 	end
 end
 
+local function Kept(mask, flag, value)
+	if math.floor(mask / flag) % 2 == 0 then
+		return value
+	end
+end
+
+-- Each answer is one base-3 digit, including an explicit digit for nil.
+local function AnswerDigit(answer)
+	return answer == nil and 0 or (answer and 1 or 2)
+end
+
+local nearAnswer, farAnswer
+local function CaseInteract()
+	return nearAnswer
+end
+local function CaseFollow()
+	return farAnswer
+end
+
+local function Failure(set, case, bands, reason)
+	local answers = { tostring(case.melee), tostring(case.near), tostring(case.far) }
+	for i = 1, #set do
+		answers[#answers + 1] = tostring(case.checks[i])
+	end
+	return string.format(
+		"reaches %s near %.1f yd (%s): got %s, %s",
+		table.concat(set, ","),
+		case.at,
+		table.concat(answers, ","),
+		table.concat(bands, ","),
+		reason
+	)
+end
+
+local result, possible, reported = {}, {}, {}
 for _, set in ipairs(reachSets) do
 	local reaches = {}
 	for i, shape in ipairs(set) do
@@ -737,37 +785,46 @@ for _, set in ipairs(reachSets) do
 		samples[#samples + 1] = edges[i + 1] and (edge + edges[i + 1]) / 2 or edge + 1
 	end
 	-- Each distinct set of answers once, with every band a target giving those answers can stand in.
-	local cases, order = {}, {}
-	for _, distance in ipairs(samples) do
+	local cases, order, checks = {}, {}, {}
+	local maskCount = 2 ^ (n + 3)
+	local sampleAnswers = {}
+	for sample, distance in ipairs(samples) do
+		local answers = {
+			melee = distance <= 5,
+			insideInteract = distance < 10,
+			far = distance <= 28,
+			band = TrueBand(distance, reaches),
+		}
+		for i, r in ipairs(reaches) do
+			answers[i] = Within(distance, r)
+		end
+		sampleAnswers[sample] = answers
 		-- What the interact check can answer at this edge distance. Its radius lies from 8 to 9.9 yards and it measures
 		-- between centres, 0 to 10 yards beyond the edge distance: true is possible only inside 9.9 yards (radius 9.9,
 		-- no reach), and false always is (the largest reach pushes any distance past 9.9).
 		local nears = distance < 9.9 and { true, false } or { false }
 		for _, nearValue in ipairs(nears) do
 			-- Bit 0 drops melee, bit 1 the interact check, bit 2 the follow check, bit i + 2 reach i.
-			for mask = 0, 2 ^ (n + 3) - 1 do
-				local function Kept(bit, value)
-					if math.floor(mask / 2 ^ bit) % 2 == 1 then
-						return nil
-					end
-					return value
-				end
-				local melee, near, checks = Kept(0, distance <= 5), Kept(1, nearValue), {}
+			for mask = 0, maskCount - 1 do
+				local melee, near = Kept(mask, 1, answers.melee), Kept(mask, 2, nearValue)
 				-- The follow check is modelled as measuring the edge distance, which the strip assumes for it: measured
 				-- between centres, a large target would answer false inside 28 yards of edge distance.
-				local far = Kept(2, distance <= 28)
-				local key = tostring(melee) .. tostring(near) .. tostring(far)
-				for i, r in ipairs(reaches) do
-					checks[i] = Kept(i + 2, Within(distance, r))
-					key = key .. tostring(checks[i])
+				local far = Kept(mask, 4, answers.far)
+				local key = (AnswerDigit(melee) * 3 + AnswerDigit(near)) * 3 + AnswerDigit(far)
+				local flag = 8
+				for i = 1, n do
+					checks[i] = Kept(mask, flag, answers[i])
+					key = key * 3 + AnswerDigit(checks[i])
+					flag = flag * 2
 				end
 				local case = cases[key]
 				if not case then
 					case = { melee = melee, near = near, far = far, checks = checks, bands = {}, at = distance }
 					cases[key] = case
 					order[#order + 1] = key
+					checks = {}
 				end
-				case.bands[TrueBand(distance, reaches)] = true
+				case.bands[answers.band] = true
 			end
 		end
 	end
@@ -776,40 +833,48 @@ for _, set in ipairs(reachSets) do
 		for i = 1, n do
 			reaches[i].check = case.checks[i]
 		end
-		local got = M.Band(case.melee, reaches, function()
-			return case.near
-		end, function()
-			return case.far
-		end)
-		local failure =
-			string.format("reaches %s near %.1f yd (%s): got %s", table.concat(set, ","), case.at, key, tostring(got))
-		-- Never wrong: a named band is the band at every distance giving these answers.
-		if got ~= nil then
-			for band in pairs(case.bands) do
-				assert(band == got, failure .. ", but " .. band .. " gives the same answers")
-			end
-		end
-		-- Never hidden needlessly: a true interact answer puts the target inside 10 yards, and a false one says nothing
-		-- about its edge distance, so the bands possible are those at every distance that fits the rest.
+		-- A true interact answer puts the target inside 10 yards. A false one gives no bound on edge distance.
 		local only, count = nil, 0
-		local possible = {}
-		for _, distance in ipairs(samples) do
-			local agrees = (case.melee == nil or case.melee == (distance <= 5))
-				and (case.near ~= true or distance < 10)
-				and (case.far == nil or case.far == (distance <= 28))
-			for i, r in ipairs(reaches) do
-				agrees = agrees and (case.checks[i] == nil or case.checks[i] == Within(distance, r))
+		for band in pairs(possible) do
+			possible[band] = nil
+		end
+		for _, answers in ipairs(sampleAnswers) do
+			local agrees = (case.melee == nil or case.melee == answers.melee)
+				and (case.near ~= true or answers.insideInteract)
+				and (case.far == nil or case.far == answers.far)
+			for i = 1, n do
+				agrees = agrees and (case.checks[i] == nil or case.checks[i] == answers[i])
 			end
 			if agrees then
-				local band = TrueBand(distance, reaches)
+				local band = answers.band
 				if not possible[band] then
 					possible[band], count, only = true, count + 1, band
 				end
 			end
 		end
-		if count == 1 then
-			assert(got == only, failure .. ", the answers leave only " .. only)
+		nearAnswer, farAnswer = case.near, case.far
+		local bands = M.Bands(case.melee, reaches, CaseInteract, CaseFollow, result)
+		for band in pairs(reported) do
+			reported[band] = nil
 		end
+		for _, band in ipairs(bands) do
+			if not possible[band] then
+				error(Failure(set, case, bands, "impossible band " .. band))
+			end
+			if reported[band] then
+				error(Failure(set, case, bands, "duplicate band " .. band))
+			end
+			reported[band] = true
+		end
+		if #bands ~= count then
+			error(Failure(set, case, bands, "expected " .. count .. " possible bands"))
+		end
+		for band in pairs(case.bands) do
+			if not reported[band] then
+				error(Failure(set, case, bands, "missing real band " .. band))
+			end
+		end
+		assert((#bands == 1 and bands[1] == only) == (count == 1), "only a confirmed band is named")
 	end
 end
 
@@ -917,11 +982,12 @@ hunter.setAnswer(75, false)
 hunter.setInteract(true)
 hunter.changed()
 assert(hunter.fontStrings[1].string == "Dead zone" and art(hunter, 2).fill.shown, "a target inside 8 yards")
--- Beyond the interact check the target may still stand in the dead zone: no band is named, and no segment lit.
+-- Beyond the interact check the target may still be in the dead zone or Too far. Only the dead zone has a fill.
 hunter.setInteract(false)
 hunter.changed()
 assert(not hunter.fontStrings[1].shown, "no label when the interact check says only that it is not inside 10 yards")
-assert(not art(hunter, 1).fill.shown and not art(hunter, 2).fill.shown and not art(hunter, 3).fill.shown)
+assert(not art(hunter, 1).fill.shown and not art(hunter, 3).fill.shown)
+assert(art(hunter, 2).fill.shown and art(hunter, 2).fill.colour[4] == 0.35)
 hunter.setInteract(nil)
 hunter.changed()
 assert(not hunter.fontStrings[1].shown, "no label when the 8-yard check answered nothing")
@@ -1019,6 +1085,39 @@ mage.setAnswer(133, true)
 mage.changed()
 assert(joined(segments(mage)) == "Melee | Fire Blast | Frostbolt | Fireball", "the mage's reaches near to far")
 assert(mage.fontStrings[1].string == "Fire Blast", "the nearest reach names the band")
+
+mage.setSwing(nil)
+mage.handlers.PLAYER_TARGET_CHANGED()
+for index = 1, 2 do
+	local segment = art(mage, index)
+	assert(segment.fill.shown and segment.fill.colour[4] == 0.35, "possible range has a faint fill")
+	assert(not segment.dim.shown, "possible range has a bright icon")
+	assert(mage.fontStrings[index + 1].colour[1] == 1, "possible range has bright text")
+end
+assert(not art(mage, 3).fill.shown and not art(mage, 4).fill.shown, "only possible ranges have fills")
+assert(not mage.fontStrings[1].shown, "ambiguous range has no band label")
+-- When every segment is possible, the strip has no highlight or label.
+mage.setInteract(nil)
+mage.setFollow(nil)
+for _, spell in ipairs({ 2136, 116, 133 }) do
+	mage.setAnswer(spell, "none")
+end
+mage.handlers.PLAYER_TARGET_CHANGED()
+mage.strip.scripts.OnSizeChanged()
+for index = 1, 4 do
+	local segment = art(mage, index)
+	assert(not segment.fill.shown and segment.dim.shown, "all possible ranges stay unlit")
+	assert(mage.fontStrings[index + 1].colour[1] == 0.5, "unlit ranges have grey text")
+end
+assert(not mage.fontStrings[1].shown, "no answers leave the label hidden")
+for _, spell in ipairs({ 2136, 116, 133 }) do
+	mage.setAnswer(spell, true)
+end
+mage.setSwing(false)
+mage.handlers.PLAYER_TARGET_CHANGED()
+assert(not art(mage, 1).fill.shown and art(mage, 1).dim.shown, "melee is ruled out")
+assert(art(mage, 2).fill.colour[4] == 1, "the confirmed band is fully lit again")
+assert(mage.fontStrings[1].shown and mage.fontStrings[1].string == "Fire Blast", "the confirmed band is named")
 
 -- Improved Fire Blast (+15 yards) moves Fire Blast past Frostbolt, level with Fireball: the two are one segment,
 -- and CHARACTER_POINTS_CHANGED rebuilds the strip from the client's ranges and lays the narrower row out again.

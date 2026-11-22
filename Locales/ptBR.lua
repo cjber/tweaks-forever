@@ -247,7 +247,7 @@ L["The game itself"] = "O próprio jogo" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "As dicas do jogo seguem o cursor do mouse em vez do canto fixo do jogo. Dicas que uma janela posiciona por conta própria, como a de um item da bolsa, ficam onde ela as coloca."
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "As últimas 200 linhas de cada janela de chat voltam após recarregar ou sair, acima de uma linha Antes do seu /reload. Guardadas só para este personagem, e linhas que o jogo mantém em segredo ficam de fora."
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "A lista da saudação de missões (um PNJ ou quadro só com missões) e o título da missão nas páginas de detalhes e recompensa mostram o nível dela, como [12]."
-L["The range strip now shows with any attackable target, out of combat too."] = "A faixa de alcance agora aparece com qualquer alvo atacável, inclusive fora de combate." -- mt
+L["The range strip no longer looks empty when the game cannot tell its bands apart."] = "A faixa de alcance não parece mais vazia quando o jogo não consegue distinguir suas faixas." -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "O sussurro inteiro que convida o remetente: a mensagem deve ser só esta palavra."
 L["Time to level: %s"] = "Tempo até o próximo nível: %s"
 L["Tooltip at the cursor"] = "Dica no cursor"
@@ -343,7 +343,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s estão desatuali
 L["%s could not start. Reinstall %s to fix this."] = "%s não pôde iniciar. Reinstale %s para corrigir isto." -- mt
 
 L["Range strip"] = "Faixa de alcance"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden."] = "Uma faixa abaixo dos cronômetros de golpe do jogo que indica quais dos seus ataques alcançam o alvo, do corpo a corpo até o seu maior alcance, com uma zona morta onde um alcance mínimo deixa uma lacuna. Ela aparece com qualquer alvo atacável, em combate ou não, onde ficam os cronômetros de golpe, mesmo escondidos."
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden. When the game cannot tell bands apart, the strip lights each one faintly and names none."] = "Uma faixa abaixo dos cronômetros de golpe do jogo que indica quais dos seus ataques alcançam o alvo, do corpo a corpo até o seu maior alcance, com uma zona morta onde um alcance mínimo deixa uma lacuna. Ela aparece com qualquer alvo atacável, em combate ou não, onde ficam os cronômetros de golpe, mesmo escondidos. Quando o jogo não consegue distinguir as faixas possíveis, elas brilham discretamente e nenhum nome é exibido."
 L["Melee"] = "Corpo a corpo" -- mt
 L["Dead zone"] = "Zona morta" -- mt
 L["Too far"] = "Longe demais" -- mt

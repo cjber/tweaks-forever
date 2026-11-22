@@ -247,7 +247,7 @@ L["The game itself"] = "游戏本身" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "游戏的鼠标提示跟随鼠标指针，而不是固定在游戏的角落。窗口自行放置的提示（如背包物品的提示）保持在原处。"
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "每个聊天窗口的最后 200 行会在重新加载或退出游戏后回来，位于“在你 /reload 之前”一行上面。只为此角色保存，游戏保密的内容会被跳过。"
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "任务问候列表（只有任务的NPC或公告板）以及任务详情和奖励页面上的任务标题会显示等级，如[12]。"
-L["The range strip now shows with any attackable target, out of combat too."] = "距离条现在会对任何可攻击目标显示，脱战时也一样。" -- mt
+L["The range strip no longer looks empty when the game cannot tell its bands apart."] = "当游戏无法区分距离区间时，距离条不再显示为空。" -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "邀请发送者的完整悄悄话：消息必须只有这个词。"
 L["Time to level: %s"] = "升级所需时间：%s"
 L["Tooltip at the cursor"] = "鼠标提示跟随光标"
@@ -343,7 +343,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s：%s 已过时。请
 L["%s could not start. Reinstall %s to fix this."] = "%s 无法启动。请重新安装 %s 以解决此问题。" -- mt
 
 L["Range strip"] = "距离条"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden."] = "在游戏挥击计时器下方显示一条距离条，标明你的哪些攻击能够够到目标，从近战一直到你最远的射程；最小射程留下的空档会显示为死区。只要有可攻击的目标就会显示，无论是否在战斗中，位置在挥击计时器处，即使计时器已隐藏。"
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden. When the game cannot tell bands apart, the strip lights each one faintly and names none."] = "在游戏挥击计时器下方显示一条距离条，标明你的哪些攻击能够够到目标，从近战一直到你最远的射程；最小射程留下的空档会显示为死区。只要有可攻击的目标就会显示，无论是否在战斗中，位置在挥击计时器处，即使计时器已隐藏。游戏无法区分多个距离区间时，所有可能的区间都会微亮，且不显示区间名称。"
 L["Melee"] = "近战" -- mt
 L["Dead zone"] = "死区" -- mt
 L["Too far"] = "过远" -- mt

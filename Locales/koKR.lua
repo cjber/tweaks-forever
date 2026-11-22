@@ -247,7 +247,7 @@ L["The game itself"] = "게임 자체" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "게임의 툴팁이 고정된 구석 대신 마우스 커서를 따라다닙니다. 가방 아이템처럼 창이 직접 위치를 정하는 툴팁은 그 자리에 그대로 있습니다."
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "각 채팅 창의 마지막 200줄이 /reload 또는 로그아웃 후에 '내 /reload 전' 줄 위에 다시 나타납니다. 이 캐릭터에만 저장되며, 게임이 비밀로 유지하는 줄은 제외됩니다."
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "퀘스트 인사말의 목록(퀘스트만 있는 NPC나 게시판)과 상세 정보 및 보상 페이지의 퀘스트 제목에 [12]처럼 레벨을 표시합니다."
-L["The range strip now shows with any attackable target, out of combat too."] = "이제 사거리 표시줄이 전투 중이 아닐 때도 공격 가능한 모든 대상에 표시됩니다." -- mt
+L["The range strip no longer looks empty when the game cannot tell its bands apart."] = "게임이 사거리 구간을 구분할 수 없을 때도 사거리 표시줄이 더 이상 비어 보이지 않습니다." -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "보낸 사람을 초대하는 귓속말 전체입니다. 메시지가 이 단어 하나여야 합니다."
 L["Time to level: %s"] = "레벨업까지 남은 시간: %s"
 L["Tooltip at the cursor"] = "커서 위치에 툴팁"
@@ -343,7 +343,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s 버전이 오래
 L["%s could not start. Reinstall %s to fix this."] = "%s을(를) 시작할 수 없습니다. 문제를 해결하려면 %s을(를) 다시 설치하세요." -- mt
 
 L["Range strip"] = "사거리 표시줄"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden."] = "게임의 공격 타이머 아래에 표시되는 표시줄로, 근접 공격부터 가장 긴 사거리까지 어떤 공격이 대상을 사거리 안에 두는지 알려 주며, 최소 사거리 때문에 생기는 빈 구간은 사각지대로 표시합니다. 공격할 수 있는 대상이 있으면 전투 중이든 아니든, 공격 타이머가 있는 자리에 표시되며 타이머가 숨겨져 있어도 나타납니다."
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden. When the game cannot tell bands apart, the strip lights each one faintly and names none."] = "게임의 공격 타이머 아래에 표시되는 표시줄로, 근접 공격부터 가장 긴 사거리까지 어떤 공격이 대상을 사거리 안에 두는지 알려 주며, 최소 사거리 때문에 생기는 빈 구간은 사각지대로 표시합니다. 공격할 수 있는 대상이 있으면 전투 중이든 아니든, 공격 타이머가 있는 자리에 표시되며 타이머가 숨겨져 있어도 나타납니다. 게임이 사거리 구간을 구분할 수 없으면 가능한 구간이 모두 희미하게 빛나고 이름은 표시되지 않습니다."
 L["Melee"] = "근접" -- mt
 L["Dead zone"] = "사각지대" -- mt
 L["Too far"] = "사거리 밖" -- mt

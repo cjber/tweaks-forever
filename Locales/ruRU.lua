@@ -247,7 +247,7 @@ L["The game itself"] = "Сама игра" -- mt
 L["The game's own tooltips follow the mouse cursor instead of the game's fixed corner. Tooltips a window places itself, such as a bag item's, stay where it puts them."] = "Подсказки игры следуют за курсором мыши, а не стоят в фиксированном углу. Подсказки, которые окно размещает само, например у предмета в сумке, остаются там, где оно их ставит."
 L["The last 200 lines of each chat window come back after a reload or logging out, above a Before your /reload line. Kept for this character only, and lines the game keeps secret are left out."] = "Последние 200 строк каждого окна чата возвращаются после перезагрузки или выхода из игры над строкой До вашего /reload. Хранятся только для этого персонажа, а строки, которые игра держит в секрете, пропускаются."
 L["The quest greeting's list (an NPC or board with only quests) and the quest's own title on its detail and reward pages show its level, such as [12]."] = "Список в приветствии (у NPC или доски только с заданиями) и название задания на страницах описания и награды показывают его уровень, например [12]."
-L["The range strip now shows with any attackable target, out of combat too."] = "Полоса дальности теперь отображается для любой атакуемой цели, в том числе вне боя." -- mt
+L["The range strip no longer looks empty when the game cannot tell its bands apart."] = "Полоса дальности больше не выглядит пустой, когда игра не может различить её диапазоны." -- mt
 L["The whole whisper that invites its sender: the message must be this word alone."] = "Весь шепот, который приглашает отправителя: сообщение должно состоять только из этого слова."
 L["Time to level: %s"] = "Время до уровня: %s"
 L["Tooltip at the cursor"] = "Подсказка у курсора"
@@ -343,7 +343,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s: %s устарели
 L["%s could not start. Reinstall %s to fix this."] = "Не удалось запустить %s. Переустановите %s, чтобы исправить это." -- mt
 
 L["Range strip"] = "Полоса дальности"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden."] = "Полоса под таймерами ударов игры, показывающая, какие из ваших атак достают до цели — от ближнего боя до самой большой дальности, с мёртвой зоной там, где минимальная дальность оставляет разрыв. Показывается при любой атакуемой цели, в бою или нет, там, где стоят таймеры ударов, даже когда они скрыты."
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden. When the game cannot tell bands apart, the strip lights each one faintly and names none."] = "Полоса под таймерами ударов игры, показывающая, какие из ваших атак достают до цели, от ближнего боя до самой большой дальности, с мёртвой зоной там, где минимальная дальность оставляет разрыв. Показывается при любой атакуемой цели, в бою или нет, там, где стоят таймеры ударов, даже когда они скрыты. Если игра не может различить несколько диапазонов, они слабо подсвечиваются, а их названия не отображаются."
 L["Melee"] = "Ближний бой" -- mt
 L["Dead zone"] = "Мёртвая зона" -- mt
 L["Too far"] = "Слишком далеко" -- mt
