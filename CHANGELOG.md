@@ -10,6 +10,16 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.12] - 2026-11-22
+
+### Changed
+
+- **The range strip is off by default.** Turn it on at /tweaks > Interface > Bars and alerts.
+
+### Fixed
+
+- **The range strip stays near the lower center of the screen when the swing timers are hidden.** It docks below the lowest visible swing timer once the timer is in place.
+
 ## [2.9.11] - 2026-11-22
 
 <!-- forever-core-sync -->
