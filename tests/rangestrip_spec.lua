@@ -156,6 +156,27 @@ function Timer.IsRangeCheckEnabled(self)
 	return self.rangeCheck == true
 end
 
+-- The game's cooldown viewer rows, which the strip only reads to keep clear of them.
+local Viewer = {}
+function Viewer.IsVisible(self)
+	return self.shown
+end
+function Viewer.GetEffectiveScale(self)
+	return self.scale
+end
+function Viewer.GetLeft(self)
+	return self.left
+end
+function Viewer.GetRight(self)
+	return self.right
+end
+function Viewer.GetTop(self)
+	return self.top
+end
+function Viewer.GetBottom(self)
+	return self.bottom
+end
+
 local function Load(class, knownSpells)
 	-- Segment names default on, as the saved settings do; older cases predate the option.
 	local features, initializers, handlers, db = {}, {}, {}, { rangeStripNames = true }
@@ -198,6 +219,12 @@ local function Load(class, knownSpells)
 	local ranged = setmetatable(
 		{ bottom = 200, shown = true, scale = 1, width = 240, numPoints = 1, scripts = {} },
 		{ __index = Timer }
+	)
+
+	-- The game's Essential cooldowns row, hidden until a case shows it under the fallback spot.
+	local essential = setmetatable(
+		{ shown = false, scale = 1, left = 400, right = 600, top = 245, bottom = 200 },
+		{ __index = Viewer }
 	)
 
 	-- The follow distance check (index 4, 28 yards): no answer unless a check sets one.
@@ -334,7 +361,11 @@ local function Load(class, knownSpells)
 			GetEffectiveScale = function()
 				return uiScale
 			end,
+			GetCenter = function()
+				return 500, 400
+			end,
 		},
+		EssentialCooldownViewer = essential,
 		CreateFrame = function()
 			return strip
 		end,
@@ -356,6 +387,7 @@ local function Load(class, knownSpells)
 		fontStrings = strip.fontStrings,
 		mainHand = mainHand,
 		ranged = ranged,
+		essential = essential,
 		enableCalls = enableCalls,
 		tickers = tickers,
 		interactCalls = function()
@@ -915,6 +947,9 @@ assert(not hunter.strip.shown, "off at login")
 assert(hunter.mainHand.scripts.OnShow and hunter.mainHand.scripts.OnHide and hunter.mainHand.scripts.OnSizeChanged)
 assert(hunter.ranged.scripts.OnShow and hunter.ranged.scripts.OnHide and hunter.ranged.scripts.OnSizeChanged)
 
+-- Off by default (#701), and a profile still holding the old default that earlier releases saved gets the new one.
+assert(hunter.features.rangeStrip.default == false, "the range strip starts off")
+assert(hunter.features.rangeStrip.formerDefault == true, "the saved old default is revised once")
 hunter.db.rangeStrip = true
 hunter.db.rangeStripIcons, hunter.db.rangeStripLabel, hunter.db.rangeStripNames = true, true, true
 hunter.setSwing(true)
@@ -1028,6 +1063,24 @@ assert(hunter.strip.shown, "the strip shows with hidden swing timers")
 assert(hunter.strip.points[1][2] == hunter.uiParent, "hidden, unplaced timers use the screen fallback")
 assert(hunter.strip.points[1][3] == "CENTER" and #hunter.strip.points == 1, "a single screen-relative anchor")
 assert(hunter.strip:GetWidth() == 240, "the fallback takes a hidden timer's width (#698)")
+
+-- The fallback spot keeps clear of a cooldown row below it (#702): the strip's 37-high body (17 segments and the
+-- 20-high label) would reach down to 213 from its top at 400 - 150 = 250, over a row whose top is at 245, so it sits
+-- 6 above that row instead, its top at 245 + 6 + 37 = 288.
+hunter.essential.shown = true
+hunter.changed()
+assert(hunter.strip.points[1][3] == "CENTER" and hunter.strip.points[1][5] == 288 - 400, "the strip clears the row")
+-- In the row's own scale its top is half as high on screen, under the strip's bottom: the default spot stands.
+hunter.essential.scale = 0.5
+hunter.changed()
+assert(hunter.strip.points[1][5] == -150, "a row below the strip leaves the fallback spot")
+-- A row off to the side leaves it as well.
+hunter.essential.scale, hunter.essential.left, hunter.essential.right = 1, 700, 900
+hunter.changed()
+assert(hunter.strip.points[1][5] == -150, "a row beside the strip leaves the fallback spot")
+hunter.essential.left, hunter.essential.right, hunter.essential.shown = 400, 600, false
+hunter.changed()
+assert(hunter.strip.points[1][5] == -150, "a hidden row leaves the fallback spot")
 
 -- A shown timer without a resolved position cannot displace the fallback.
 hunter.mainHand.shown = true

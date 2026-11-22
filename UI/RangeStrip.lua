@@ -19,6 +19,8 @@ ns.Feature({
 		.. "attackable target, below the swing timers when visible or near the lower center of the screen. "
 		.. "When the game cannot tell bands apart, the strip lights each one faintly and names none.",
 	default = false,
+	-- On until 2.9.12, and saved that way in every profile that loaded an earlier release (#701).
+	formerDefault = true,
 })
 
 ns.Feature({
@@ -752,6 +754,63 @@ ns.Init(function()
 		end
 	end
 
+	-- The fallback spot as it settles, in UIParent's units: the strip's top, center, half width, height and gap.
+	local spotTop, spotX, spotHalf, spotTall, spotGap, spotParent
+
+	-- Lift the fallback spot 6 above one of the game's cooldown rows when the row is shown under it. Each rect is
+	-- turned into UIParent's units through its frame's effective scale.
+	---@param viewer Frame?
+	---@return boolean moved
+	local function Clear(viewer)
+		if not (viewer and viewer:IsVisible()) then
+			return false
+		end
+		local left, right, top, bottom = viewer:GetLeft(), viewer:GetRight(), viewer:GetTop(), viewer:GetBottom()
+		if not (left and right and top and bottom) then
+			return false
+		end
+		local ratio = viewer:GetEffectiveScale() / spotParent
+		top = top * ratio
+		if
+			left * ratio < spotX + spotHalf
+			and right * ratio > spotX - spotHalf
+			and bottom * ratio < spotTop
+			and top > spotTop - spotTall
+		then
+			spotTop = top + spotGap + spotTall
+			return true
+		end
+		return false
+	end
+
+	-- The fallback spot's offset from the screen's center, in the strip's own units: 150 below it, or, where a shown
+	-- cooldown row of the game's (near the lower center in its default layout) lies under the strip there, 6 above
+	-- that row's top (#702). The strip's height is the one its current options give it.
+	---@param width number
+	---@param scale number
+	---@param parentScale number
+	---@return number
+	local function FallbackOffset(width, scale, parentScale)
+		local centerX, centerY = UIParent:GetCenter()
+		if not (centerX and centerY and parentScale and parentScale > 0) then
+			return FALLBACK_OFFSET
+		end
+		local _, height = Geometry()
+		spotTop, spotX, spotHalf = centerY + FALLBACK_OFFSET * scale, centerX, width * scale / 2
+		spotTall, spotGap, spotParent = height * scale, DOCK_GAP * scale, parentScale
+		-- A row the strip moves onto lifts it again; one pass per row settles any stack of them.
+		for _ = 1, 4 do
+			local moved = Clear(EssentialCooldownViewer)
+			moved = Clear(UtilityCooldownViewer) or moved
+			moved = Clear(BuffIconCooldownViewer) or moved
+			moved = Clear(BuffBarCooldownViewer) or moved
+			if not moved then
+				break
+			end
+		end
+		return (spotTop - centerY) / scale
+	end
+
 	-- Whether the strip enabled the main-hand swing range check, so it gives back only its own: the game's timer
 	-- enables the same check for itself, and a check it holds is left alone.
 	local ownSwingCheck = false
@@ -778,7 +837,7 @@ ns.Init(function()
 		end
 	end
 
-	local docked
+	local docked, dockedOffset
 	local ticker
 	local Update
 
@@ -801,7 +860,7 @@ ns.Init(function()
 	local function Hide()
 		SwingCheck(false)
 		strip:Hide()
-		docked = nil
+		docked, dockedOffset = nil, nil
 		StopTicker()
 	end
 
@@ -910,26 +969,31 @@ ns.Init(function()
 			return
 		end
 		local timer = LowestTimer()
-		local anchor = timer or UIParent
-		if docked ~= anchor then
-			docked = anchor
-			strip:ClearAllPoints()
-			if timer then
-				strip:SetPoint("TOPLEFT", timer, "BOTTOMLEFT", 0, -DOCK_GAP)
-				strip:SetPoint("TOPRIGHT", timer, "BOTTOMRIGHT", 0, -DOCK_GAP)
-			else
-				local size = SizeTimer()
-				strip:SetWidth(size and size:GetWidth() or FALLBACK_WIDTH)
-				strip:SetPoint("TOP", UIParent, "CENTER", 0, FALLBACK_OFFSET)
-			end
-		end
 		-- Match the docked timer's scale, or at the fallback spot a hidden timer's, else inherit UIParent's.
 		local parentScale = UIParent:GetEffectiveScale()
 		local scaleFrom = timer or SizeTimer()
+		local scale = 1
 		if scaleFrom and parentScale and parentScale > 0 then
-			strip:SetScale(scaleFrom:GetEffectiveScale() / parentScale)
+			scale = scaleFrom:GetEffectiveScale() / parentScale
+		end
+		strip:SetScale(scale)
+		if timer then
+			if docked ~= timer then
+				docked, dockedOffset = timer, nil
+				strip:ClearAllPoints()
+				strip:SetPoint("TOPLEFT", timer, "BOTTOMLEFT", 0, -DOCK_GAP)
+				strip:SetPoint("TOPRIGHT", timer, "BOTTOMRIGHT", 0, -DOCK_GAP)
+			end
 		else
-			strip:SetScale(1)
+			local size = SizeTimer()
+			local width = size and size:GetWidth() or FALLBACK_WIDTH
+			local offset = FallbackOffset(width, scale, parentScale)
+			if docked ~= UIParent or dockedOffset ~= offset then
+				docked, dockedOffset = UIParent, offset
+				strip:ClearAllPoints()
+				strip:SetWidth(width)
+				strip:SetPoint("TOP", UIParent, "CENTER", 0, offset)
+			end
 		end
 		if #cachedSegments <= 1 then
 			Hide()

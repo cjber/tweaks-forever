@@ -258,6 +258,7 @@ TweaksForeverCharDB = nil
 ---@field name string
 ---@field tooltip? string
 ---@field default boolean|string|number
+---@field formerDefault? boolean|string|number an earlier default every profile saved; once, a profile still holding it gets `default`
 ---@field conflicts? TFConflict[]
 ---@field options? [string, string][]
 ---@field slider? { min: number, max: number, step?: number }
