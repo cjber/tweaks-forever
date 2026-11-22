@@ -221,6 +221,7 @@ L["Short channel names"] = "Короткие названия каналов"
 L["Show a window to move and scale it. Changes save at once for this layout."] = "Показывает окно, чтобы перемещать и масштабировать его. Изменения сразу сохраняются для этой раскладки."
 L["Show segment names"] = "Показывать названия сегментов" -- mt
 L["Each segment names its attack. Off, with icons and the band label off too, the strip is bars only."] = "Каждый сегмент подписан своей атакой. Если выключить вместе со значками и названием зоны, останутся только полосы." -- mt
+L["Bars-only range strip."] = "Полоса дистанции только из полос." -- mt
 L["Show band label"] = "Показывать название зоны"
 L["Show icons"] = "Показывать значки"
 L["Show quest item sparkles"] = "Показывать блеск предметов заданий"

@@ -221,6 +221,7 @@ L["Short channel names"] = "Noms de canal courts"
 L["Show a window to move and scale it. Changes save at once for this layout."] = "Affiche une fenêtre pour la déplacer et la redimensionner. Les changements sont enregistrés aussitôt pour cette disposition."
 L["Show segment names"] = "Afficher les noms des segments" -- mt
 L["Each segment names its attack. Off, with icons and the band label off too, the strip is bars only."] = "Chaque segment nomme son attaque. Désactivé, avec les icônes et le nom de la bande, la bande n'affiche que des barres." -- mt
+L["Bars-only range strip."] = "Bande de portée en barres seules." -- mt
 L["Show band label"] = "Afficher le nom de la bande"
 L["Show icons"] = "Afficher les icônes"
 L["Show quest item sparkles"] = "Afficher les scintillements des objets de quête"

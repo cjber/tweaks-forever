@@ -221,6 +221,7 @@ L["Short channel names"] = "짧은 채널 이름"
 L["Show a window to move and scale it. Changes save at once for this layout."] = "창을 이동하고 크기를 조절할 수 있게 표시합니다. 변경 사항은 이 레이아웃에 바로 저장됩니다."
 L["Show segment names"] = "구간 공격 이름 표시" -- mt
 L["Each segment names its attack. Off, with icons and the band label off too, the strip is bars only."] = "각 구간에 공격 이름을 표시합니다. 아이콘과 구간 이름도 끄면 막대만 표시됩니다." -- mt
+L["Bars-only range strip."] = "막대만 표시하는 사거리 띠." -- mt
 L["Show band label"] = "구간 이름 표시"
 L["Show icons"] = "아이콘 표시"
 L["Show quest item sparkles"] = "퀘스트 물체 반짝임 표시"
