@@ -14,11 +14,11 @@ ns.Feature({
 	category = "Interface",
 	section = "Bars and alerts",
 	name = "Range strip",
-	tooltip = "A strip under the game's swing timers naming which of your attacks reach your target, from "
+	tooltip = "Shows which of your attacks reach your target, from "
 		.. "melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any "
-		.. "attackable target, in combat or not, where the swing timers sit, even while they are hidden. "
+		.. "attackable target, below the swing timers when visible or near the lower center of the screen. "
 		.. "When the game cannot tell bands apart, the strip lights each one faintly and names none.",
-	default = true,
+	default = false,
 })
 
 ns.Feature({
@@ -64,6 +64,8 @@ local POSSIBLE_ALPHA = 0.35
 local LABEL_HEIGHT, SEGMENT_HEIGHT, ICON_SEGMENT_HEIGHT, SEGMENT_GAP, DOCK_GAP = 20, 15, 17, 3, 6
 -- The clear between a segment's icon tile and its bar.
 local ICON_GAP = 1
+local FALLBACK_WIDTH = 213 -- The swing timer's modern Edit Mode preset width.
+local FALLBACK_OFFSET = -150
 local SEGMENT_INSET_X, SEGMENT_INSET_Y = 4, 3
 -- Each segment name keeps 3 clear on either side, so the client's own truncation lands inside its segment.
 local SEGMENT_TEXT_INSET = 3
@@ -498,11 +500,8 @@ ns.Init(function()
 	if SwingTimerRangedFrame then
 		timers[#timers + 1] = SwingTimerRangedFrame
 	end
-	if #timers == 0 then
-		return
-	end
 
-	-- Our own frame over Blizzard's own timers: theirs is only read and hooked, never written to (WFA-38).
+	-- Our own frame can dock below Blizzard's timers. The timers are read and hooked through scripts (WFA-38).
 	local strip = CreateFrame("Frame", nil, UIParent)
 	strip:SetFrameStrata("MEDIUM")
 	strip:SetFrameLevel(10)
@@ -721,17 +720,13 @@ ns.Init(function()
 		end
 	end
 
-	-- The timer lowest on screen, which the strip docks under: the lowest shown one, or while none shows, the lowest
-	-- where they would, so the strip sits in the same place with the swing timers hidden.
+	-- Require an anchor and resolved geometry. Zero is also a valid bottom for a placed frame.
 	local function LowestTimer()
-		local lowest
+		local lowest, lowestBottom
 		for _, timer in ipairs(timers) do
-			if not lowest then
-				lowest = timer
-			elseif timer:IsShown() ~= lowest:IsShown() then
-				lowest = timer:IsShown() and timer or lowest
-			elseif (timer:GetBottom() or 0) < (lowest:GetBottom() or 0) then
-				lowest = timer
+			local bottom = timer:IsVisible() and timer:GetNumPoints() > 0 and timer:GetBottom()
+			if bottom and (not lowestBottom or bottom < lowestBottom) then
+				lowest, lowestBottom = timer, bottom
 			end
 		end
 		return lowest
@@ -895,20 +890,24 @@ ns.Init(function()
 			return
 		end
 		local timer = LowestTimer()
-		if not timer then
-			Hide()
-			return
-		end
-		if docked ~= timer then
-			docked = timer
+		local anchor = timer or UIParent
+		if docked ~= anchor then
+			docked = anchor
 			strip:ClearAllPoints()
-			strip:SetPoint("TOPLEFT", timer, "BOTTOMLEFT", 0, -DOCK_GAP)
-			strip:SetPoint("TOPRIGHT", timer, "BOTTOMRIGHT", 0, -DOCK_GAP)
+			if timer then
+				strip:SetPoint("TOPLEFT", timer, "BOTTOMLEFT", 0, -DOCK_GAP)
+				strip:SetPoint("TOPRIGHT", timer, "BOTTOMRIGHT", 0, -DOCK_GAP)
+			else
+				strip:SetWidth(FALLBACK_WIDTH)
+				strip:SetPoint("TOP", UIParent, "CENTER", 0, FALLBACK_OFFSET)
+			end
 		end
-		-- The timer's own scale, relative to the strip's parent.
+		-- Match the timer's scale when docked, or inherit UIParent's at the fallback spot.
 		local parentScale = UIParent:GetEffectiveScale()
-		if parentScale and parentScale > 0 then
+		if timer and parentScale and parentScale > 0 then
 			strip:SetScale(timer:GetEffectiveScale() / parentScale)
+		else
+			strip:SetScale(1)
 		end
 		if #cachedSegments <= 1 then
 			Hide()

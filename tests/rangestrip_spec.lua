@@ -105,8 +105,12 @@ function Strip.SetFrameLevel() end
 function Strip.SetHeight(self, height)
 	self.height = height
 end
+function Strip.SetWidth(self, width)
+	self.width = width
+end
 function Strip.GetWidth(self)
-	return self.width
+	local right = self.points[2]
+	return right and right[2].width or self.width
 end
 function Strip.SetScale(self, scale)
 	self.scale = scale
@@ -129,8 +133,11 @@ end
 
 -- The game's swing timer frames, which the strip only reads and hooks.
 local Timer = {}
-function Timer.IsShown(self)
+function Timer.IsVisible(self)
 	return self.shown
+end
+function Timer.GetNumPoints(self)
+	return self.numPoints
 end
 function Timer.GetBottom(self)
 	return self.bottom
@@ -180,8 +187,14 @@ local function Load(class, knownSpells)
 		fontStrings = {},
 		textOrder = 0,
 	}, { __index = Strip })
-	local mainHand = setmetatable({ bottom = 300, shown = true, scale = 1, scripts = {} }, { __index = Timer })
-	local ranged = setmetatable({ bottom = 200, shown = true, scale = 1, scripts = {} }, { __index = Timer })
+	local mainHand = setmetatable(
+		{ bottom = 300, shown = true, scale = 1, width = 240, numPoints = 1, scripts = {} },
+		{ __index = Timer }
+	)
+	local ranged = setmetatable(
+		{ bottom = 200, shown = true, scale = 1, width = 240, numPoints = 1, scripts = {} },
+		{ __index = Timer }
+	)
 
 	-- The follow distance check (index 4, 28 yards): no answer unless a check sets one.
 	local follow
@@ -334,6 +347,7 @@ local function Load(class, knownSpells)
 			settingChanged[key or "rangeStrip"]()
 		end,
 		strip = strip,
+		uiParent = env.UIParent,
 		textures = strip.textures,
 		fontStrings = strip.fontStrings,
 		mainHand = mainHand,
@@ -441,9 +455,9 @@ end
 local hunter = Load("HUNTER", { [75] = true, [2973] = true })
 local M = hunter.model
 
--- The feature is on by default and lives on the Interface page, for every class.
+-- The feature is off by default and lives on the Interface page, for every class.
 local feature = hunter.features.rangeStrip
-assert(feature.default == true and feature.category == "Interface", "on by default on the Interface page")
+assert(feature.default == false and feature.category == "Interface", "off by default on the Interface page")
 assert(feature.name == "Range strip", "named for every class")
 
 -- Two options under it, both on by default: each segment's own icon, and the band's name under the strip.
@@ -997,24 +1011,35 @@ hunter.setTarget(false)
 hunter.changed()
 assert(not hunter.strip.shown and hunter.tickers[1].cancelled, "no strip and no ticker without a target")
 
--- The strip shows with any attackable target, out of combat too, where the game's swing timers are hidden: it docks
--- in the same place, under the timer lowest on screen, shown or not.
+-- An attackable target still gets a strip when the timers have never been placed.
 hunter.setTarget(true)
 hunter.mainHand.shown, hunter.ranged.shown = false, false
-hunter.mainHand.bottom, hunter.ranged.bottom = 100, 400
+hunter.mainHand.numPoints, hunter.ranged.numPoints = 0, 0
+hunter.mainHand.bottom, hunter.ranged.bottom = 0, nil
 hunter.changed()
 assert(hunter.strip.shown, "the strip shows with hidden swing timers")
-assert(hunter.strip.points[1][2] == hunter.mainHand, "docked under the lowest timer though hidden")
-assert(hunter.strip.points[1][3] == "BOTTOMLEFT" and hunter.strip.points[1][5] == -6, "6 below it, as when shown")
-hunter.mainHand.bottom, hunter.ranged.bottom = 300, 200
-hunter.changed()
-assert(hunter.strip.points[1][2] == hunter.ranged, "the lowest hidden timer, by its bottom edge")
--- A shown timer still takes the strip over a lower hidden one.
+assert(hunter.strip.points[1][2] == hunter.uiParent, "hidden, unplaced timers use the screen fallback")
+assert(hunter.strip.points[1][3] == "CENTER" and #hunter.strip.points == 1, "a single screen-relative anchor")
+assert(hunter.strip:GetWidth() == 213, "the fallback has its own width")
+
+-- A shown timer without a resolved position cannot displace the fallback.
 hunter.mainHand.shown = true
 hunter.changed()
-assert(hunter.strip.points[1][2] == hunter.mainHand, "a shown timer is the one the strip docks under")
+assert(hunter.strip.points[1][2] == hunter.uiParent, "a shown but unplaced timer also uses the fallback")
+
+-- A point without resolved geometry still uses the fallback.
+hunter.mainHand.numPoints, hunter.mainHand.bottom = 1, nil
+hunter.changed()
+assert(hunter.strip.points[1][2] == hunter.uiParent, "an unresolved timer uses the fallback")
+
+-- A placed timer at zero wins over a lower, hidden timer.
+hunter.mainHand.bottom = 0
+hunter.ranged.numPoints, hunter.ranged.bottom = 1, -20
+hunter.changed()
+assert(hunter.strip.points[1][2] == hunter.mainHand, "the shown, placed timer is the anchor")
 hunter.mainHand.shown = false
 hunter.changed()
+assert(hunter.strip.points[1][2] == hunter.uiParent, "hiding the last placed timer restores the fallback")
 
 -- With a timer again the strip takes its timer's scale and starts a fresh ticker.
 hunter.ranged.shown = true
@@ -1024,6 +1049,12 @@ hunter.setSwing(true)
 hunter.changed()
 assert(hunter.strip.shown and math.abs(hunter.strip.scale - 1.4) < 1e-9, "the strip takes its timer's scale")
 assert(#hunter.tickers == 2 and not hunter.tickers[2].cancelled, "shown again, a new ticker starts")
+hunter.ranged.shown = false
+hunter.ranged.scripts.OnHide()
+assert(hunter.strip.points[1][2] == hunter.uiParent and hunter.strip.scale == 1, "fallback restores UI scale")
+hunter.ranged.shown = true
+hunter.ranged.scripts.OnShow()
+assert(hunter.strip:GetWidth() == 240, "docking restores the timer width")
 
 -- The band label off: no label and no 20-unit row, so the segments fill the strip and it still docks 6 below the
 -- timer, while the tiles keep their height.
