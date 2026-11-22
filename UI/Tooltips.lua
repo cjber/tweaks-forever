@@ -139,15 +139,11 @@ local function Repaint(tooltips)
 	end
 end
 
--- The game's cooldown bar, UI-HUD-CoolDownManager-Bar: 124 by 10 units native, and the cooldown manager keeps it
--- 10 tall while varying only its width, so the art stretches along the bar alone. It fills the bar (StatusBar
--- textures take an atlas name) and, at TRACK_SHADE, is the track under it.
-local BAR = "UI-HUD-CoolDownManager-Bar"
-
+-- GameTooltipTemplate's StatusBar uses UI-TargetingFrame-BarFill on this host.
+-- https://github.com/Gethe/wow-ui-source/blob/70ef1b2fd78061a73f886c4a1e79dc5b5cff6d5e/Interface/AddOns/Blizzard_GameTooltip/Mainline/GameTooltip.xml#L8-L22
 local function HealthBarArt(bar)
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
-	-- art-ok: the cooldown bar's own 10 units tall, stretched along the bar alone by design
-	track:SetAtlas(BAR)
+	track:SetTexture(bar:GetStatusBarTexture():GetTexture()) -- art-ok: same stretch as the native tooltip health fill
 	track:SetAllPoints()
 	-- The Arial Narrow outline Blizzard puts on its own bars' numbers (the profession rank bar, retail's damage meter).
 	local text = bar:CreateFontString(nil, "OVERLAY", "Number12FontOutline")
@@ -163,13 +159,11 @@ local function HealthBarStyle(tooltip, bar, art, Update, Fit)
 			bar:SetPoint("BOTTOMLEFT", EDGE, BOTTOM)
 			bar:SetPoint("BOTTOMRIGHT", -EDGE, BOTTOM)
 			bar:SetHeight(HEIGHT)
-			bar:SetStatusBarTexture(BAR)
 		else
-			-- GameTooltip.xml's own placement and art.
+			-- GameTooltip.xml's own placement.
 			bar:SetPoint("TOPLEFT", tooltip, "BOTTOMLEFT", 2, -1)
 			bar:SetPoint("TOPRIGHT", tooltip, "BOTTOMRIGHT", -2, -1)
 			bar:SetHeight(HEIGHT)
-			bar:SetStatusBarTexture(BAR)
 			bar:SetStatusBarColor(0, 1, 0)
 		end
 		for _, region in ipairs(art) do
@@ -183,7 +177,7 @@ local function HealthBarStyle(tooltip, bar, art, Update, Fit)
 end
 
 -- The unit health bar Blizzard hangs under GameTooltip, moved inside it. Blizzard still watches the unit and sets the
--- bar's value, which can be secret; this file never reads it. It only anchors, sizes, textures and colours the bar
+-- bar's value, which can be secret; this file never reads it. It only anchors, sizes and colours the bar
 -- (engine calls) and adds a track and text of its own.
 local function HealthBar()
 	local tooltip = GameTooltip
