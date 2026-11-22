@@ -140,7 +140,8 @@ local function Repaint(tooltips)
 end
 
 -- GameTooltipTemplate's StatusBar uses UI-TargetingFrame-BarFill on this host.
--- https://github.com/Gethe/wow-ui-source/blob/70ef1b2fd78061a73f886c4a1e79dc5b5cff6d5e/Interface/AddOns/Blizzard_GameTooltip/Mainline/GameTooltip.xml#L8-L22
+-- Gethe/wow-ui-source 966519cf0ad2c10301ea011a88c14b25697c9687
+-- Interface/AddOns/Blizzard_GameTooltip/Mainline/GameTooltip.xml:8-22
 local function HealthBarArt(bar)
 	local track = bar:CreateTexture(nil, "BACKGROUND", nil, -7)
 	track:SetTexture(bar:GetStatusBarTexture():GetTexture()) -- art-ok: same stretch as the native tooltip health fill

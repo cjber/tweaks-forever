@@ -1,1 +1,3 @@
-Use the game’s tooltip health bar art in Modern tooltips.
+### Fixed
+
+- Modern tooltips use the game's own health bar art.

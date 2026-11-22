@@ -907,7 +907,7 @@ def demo(ui):
 
 # UI/Tooltips.lua under Modern tooltips: the nine pieces cut from media/TooltipBorderModern.tga (PIECES, in sixteenths),
 # with room under the last line for the health bar (EDGE, BOTTOM, HEIGHT, GAP, PADDING). Its fill and track are the
-# game's cooldown bar, UI-HUD-CoolDownManager-Bar, 124x10 native and always 10 tall, the track at TRACK_SHADE.
+# native GameTooltip health texture, with the track at TRACK_SHADE.
 TIP_PIECES = {
     "TopLeftCorner": (0, 7, 0, 7),
     "TopRightCorner": (9, 16, 0, 7),
@@ -923,7 +923,9 @@ TIP_CORNER = 7
 BAR_EDGE, BAR_BOTTOM, BAR_HEIGHT, BAR_GAP = 10, 11, 10, 10
 BAR_PADDING = BAR_BOTTOM + BAR_HEIGHT + BAR_GAP - 10
 BAR_TRACK_SHADE = 0.3
-BAR = "UI-HUD-CoolDownManager-Bar"
+# UI-TargetingFrame-BarFill from GameTooltipTemplate, scoped to the unit tooltip host.
+# https://github.com/Gethe/wow-ui-source/blob/966519cf0ad2c10301ea011a88c14b25697c9687/Interface/AddOns/Blizzard_GameTooltip/Mainline/GameTooltip.xml#L8-L22
+TOOLTIP_HEALTH_FILE = 137014
 BAR_TEXT = Font(ARIALN, 12, (1, 1, 1), None, outline=True)  # Number12FontOutline
 GUILD = (0.6, 0.6, 0.6)
 HORDE = (0.90, 0.05, 0.07)  # PLAYER_FACTION_COLORS[0]
@@ -961,7 +963,8 @@ def unit_tooltip(ui, lines, colour, health, text):
         c.text(TOOLTIP_PADDING, y, line.left, font, line.color)
         y += font.height + TOOLTIP_LINE_GAP
     x, w, y = BAR_EDGE, width - 2 * BAR_EDGE, height - BAR_BOTTOM - BAR_HEIGHT
-    bar = ui.atlas(BAR)
+    # As with chat_host, load this specific native host texture directly. texture() rejects pre-Legion art.
+    bar = ui._image(TOOLTIP_HEALTH_FILE)
     c.draw(bar, x, y, w, BAR_HEIGHT, color=(*(v * BAR_TRACK_SHADE for v in colour), 1))
     # A StatusBar crops its texture to the value rather than squeezing it: draw the fill at the bar's own width, then
     # keep the shown part.
