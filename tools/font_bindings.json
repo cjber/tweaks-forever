@@ -455,8 +455,8 @@
     },
     {
       "source": "UI/RangeStrip.lua",
-      "sha256": "97fe89e848f4365a75e2e52842cfed32ad89503553d0bf7443c7da74623ddbe2",
-      "review": "Read NAMES, Widget, ShowSegments, Apply, Refresh, UpdateBands, SizeTimer, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Refresh puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. ShowSegments now shows each segment's text only while the Show segment names option (rangeStripNames, default on) is active; that hides text, it changes no font. SizeTimer reads a hidden timer's GetWidth and GetEffectiveScale to size the undocked strip; it sets no text. Too far is displayed only in label, never a segment. Apply hides the label for ambiguous ranges and leaves every segment unlit when all are possible. Layout reads fill visibility to dim icons. Neither path changes fonts. Client spell names/icons and settings phrases are excluded.",
+      "sha256": "6c2d1a3bda445b0bb89815a7de8fbe2306b8e260f36a427ef05674372876b83e",
+      "review": "Read NAMES, Widget, ShowSegments, Apply, Refresh, UpdateBands, SizeTimer, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Refresh puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. ShowSegments now shows each segment's text only while the Show segment names option (rangeStripNames, default on) is active; that hides text, it changes no font. SizeTimer reads a hidden timer's GetWidth and GetEffectiveScale to size the undocked strip; it sets no text. Too far is displayed only in label, never a segment. Apply hides the label for ambiguous ranges and leaves every segment unlit when all are possible. Layout reads fill visibility to dim icons. Neither path changes fonts. Client spell names/icons and settings phrases are excluded. FallbackOffset and Clear (#702) only read the registered Edit Mode cooldown viewer rects and set the strip's anchor offset; no font object or text changes. Updating the fallback width separately from its anchor only reruns Layout through OnSizeChanged.",
       "bindings": [
         {
           "font": "GameFontNormal",
@@ -613,8 +613,8 @@
     },
     {
       "source": "Core/Core.lua",
-      "sha256": "dc021f7c67d21063cc1675b0b8d7f6bdfd21f24925e39c229639d19883e4ddc9",
-      "review": "Reviewed FitButton and its QuestLog, PetTrainer, TrainAll and DungeonMaps callers: FitButton changes only width from GetTextWidth, never fonts. Empty bindings pin this shared helper dependency. ReportTitle delegates to ForeverCore report UI; Print is chat output. Neither establishes font coverage here.",
+      "sha256": "daf7d11c46da8e55e1e281b93b5522c2a628ba5ba7b925e3d7f9b1d813ecdc11",
+      "review": "Reviewed FitButton and its QuestLog, PetTrainer, TrainAll and DungeonMaps callers: FitButton changes only width from GetTextWidth, never fonts. Empty bindings pin this shared helper dependency. ReportTitle delegates to ForeverCore report UI; Print is chat output. Neither establishes font coverage here. The login formerDefault revision (#701) only rewrites saved setting values; no font or widget code.",
       "bindings": []
     },
     {
