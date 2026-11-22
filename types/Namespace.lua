@@ -211,6 +211,7 @@
 
 ---@class TFDatabase
 ---@field junk TFMarks
+---@field revisedDefaults? table<string, boolean> feature keys whose former defaults were handled at login
 ---@field errors ForeverCaughtError[] ForeverCore's shared error journal: earlier sessions' errors, for the report
 ---@field log ForeverDebugLogStore ForeverCore's shared log ring: recent lines, for the report
 ---@field gearMark? 'strip'|'border'|'dots'|'none'
@@ -258,6 +259,7 @@ TweaksForeverCharDB = nil
 ---@field name string
 ---@field tooltip? string
 ---@field default boolean|string|number
+---@field formerDefault? boolean|string|number an earlier default every profile saved; once, a profile still holding it gets `default`
 ---@field conflicts? TFConflict[]
 ---@field options? [string, string][]
 ---@field slider? { min: number, max: number, step?: number }

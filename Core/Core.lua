@@ -435,7 +435,17 @@ login:SetScript("OnEvent", function()
 	db.familyDismissed = nil
 	db.dungeonEntrances = nil
 	db.questPlates = nil
+	-- Every profile saves each feature's default here, so a later change of default reaches only new profiles. A
+	-- feature whose default changed names the old one as `formerDefault`: once per profile, a value still equal to it
+	-- gives way to the new default, and from then on the saved value is the player's.
+	db.revisedDefaults = db.revisedDefaults or {}
 	for _, feature in ipairs(ns.features) do
+		if feature.formerDefault ~= nil and not db.revisedDefaults[feature.key] then
+			if db[feature.key] == feature.formerDefault then
+				db[feature.key] = nil
+			end
+			db.revisedDefaults[feature.key] = true
+		end
 		if db[feature.key] == nil then
 			db[feature.key] = feature.default
 		end

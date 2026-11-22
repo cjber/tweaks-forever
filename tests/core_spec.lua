@@ -72,6 +72,7 @@ local function Load(saved, beforeLogin)
 	ns.Feature({ key = "enabled", default = true })
 	ns.Feature({ key = "disabled", default = false })
 	ns.Feature({ key = "gearMark", default = "strip" })
+	ns.Feature({ key = "revised", default = false, formerDefault = true })
 	local present = function()
 		return true
 	end
@@ -148,6 +149,15 @@ local saved = { enabled = false, junk = { [42] = true }, gearMark = "dots" }
 assert(Load(saved) == saved, "existing settings keep their identity and player choices")
 assert(not saved.enabled and saved.junk[42] and saved.gearMark == "dots")
 assert(Load({}).junk, "older settings receive the junk table before initializers")
+
+-- A default an earlier release saved into every profile gives way to the new one once (#701); a value set after that
+-- is the player's own and stays.
+assert(fresh.revised == false, "a new profile takes the current default")
+local revised = Load({ revised = true })
+assert(revised.revised == false, "a profile still holding the old default gets the new one")
+assert(Load(revised).revised == false and revised.revisedDefaults.revised)
+revised.revised = true
+assert(Load(revised).revised == true, "turned on after the revision, the setting stays on")
 
 -- Settings retired with what they belonged to: the entrance pins' switch, the old hint setting and the Forever
 -- addons page's setting and dismissed hints are forgotten.
