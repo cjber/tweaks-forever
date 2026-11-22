@@ -728,6 +728,41 @@ for a = 1, #SHAPES do
 	end
 end
 
+local function Kept(mask, flag, value)
+	if math.floor(mask / flag) % 2 == 0 then
+		return value
+	end
+end
+
+-- Each answer is one base-3 digit, including an explicit digit for nil.
+local function AnswerDigit(answer)
+	return answer == nil and 0 or (answer and 1 or 2)
+end
+
+local nearAnswer, farAnswer
+local function CaseInteract()
+	return nearAnswer
+end
+local function CaseFollow()
+	return farAnswer
+end
+
+local function Failure(set, case, bands, reason)
+	local answers = { tostring(case.melee), tostring(case.near), tostring(case.far) }
+	for i = 1, #set do
+		answers[#answers + 1] = tostring(case.checks[i])
+	end
+	return string.format(
+		"reaches %s near %.1f yd (%s): got %s, %s",
+		table.concat(set, ","),
+		case.at,
+		table.concat(answers, ","),
+		table.concat(bands, ","),
+		reason
+	)
+end
+
+local result, possible, reported = {}, {}, {}
 for _, set in ipairs(reachSets) do
 	local reaches = {}
 	for i, shape in ipairs(set) do
@@ -750,37 +785,46 @@ for _, set in ipairs(reachSets) do
 		samples[#samples + 1] = edges[i + 1] and (edge + edges[i + 1]) / 2 or edge + 1
 	end
 	-- Each distinct set of answers once, with every band a target giving those answers can stand in.
-	local cases, order = {}, {}
-	for _, distance in ipairs(samples) do
+	local cases, order, checks = {}, {}, {}
+	local maskCount = 2 ^ (n + 3)
+	local sampleAnswers = {}
+	for sample, distance in ipairs(samples) do
+		local answers = {
+			melee = distance <= 5,
+			insideInteract = distance < 10,
+			far = distance <= 28,
+			band = TrueBand(distance, reaches),
+		}
+		for i, r in ipairs(reaches) do
+			answers[i] = Within(distance, r)
+		end
+		sampleAnswers[sample] = answers
 		-- What the interact check can answer at this edge distance. Its radius lies from 8 to 9.9 yards and it measures
 		-- between centres, 0 to 10 yards beyond the edge distance: true is possible only inside 9.9 yards (radius 9.9,
 		-- no reach), and false always is (the largest reach pushes any distance past 9.9).
 		local nears = distance < 9.9 and { true, false } or { false }
 		for _, nearValue in ipairs(nears) do
 			-- Bit 0 drops melee, bit 1 the interact check, bit 2 the follow check, bit i + 2 reach i.
-			for mask = 0, 2 ^ (n + 3) - 1 do
-				local function Kept(bit, value)
-					if math.floor(mask / 2 ^ bit) % 2 == 1 then
-						return nil
-					end
-					return value
-				end
-				local melee, near, checks = Kept(0, distance <= 5), Kept(1, nearValue), {}
+			for mask = 0, maskCount - 1 do
+				local melee, near = Kept(mask, 1, answers.melee), Kept(mask, 2, nearValue)
 				-- The follow check is modelled as measuring the edge distance, which the strip assumes for it: measured
 				-- between centres, a large target would answer false inside 28 yards of edge distance.
-				local far = Kept(2, distance <= 28)
-				local key = tostring(melee) .. tostring(near) .. tostring(far)
-				for i, r in ipairs(reaches) do
-					checks[i] = Kept(i + 2, Within(distance, r))
-					key = key .. tostring(checks[i])
+				local far = Kept(mask, 4, answers.far)
+				local key = (AnswerDigit(melee) * 3 + AnswerDigit(near)) * 3 + AnswerDigit(far)
+				local flag = 8
+				for i = 1, n do
+					checks[i] = Kept(mask, flag, answers[i])
+					key = key * 3 + AnswerDigit(checks[i])
+					flag = flag * 2
 				end
 				local case = cases[key]
 				if not case then
 					case = { melee = melee, near = near, far = far, checks = checks, bands = {}, at = distance }
 					cases[key] = case
 					order[#order + 1] = key
+					checks = {}
 				end
-				case.bands[TrueBand(distance, reaches)] = true
+				case.bands[answers.band] = true
 			end
 		end
 	end
@@ -791,42 +835,46 @@ for _, set in ipairs(reachSets) do
 		end
 		-- A true interact answer puts the target inside 10 yards. A false one gives no bound on edge distance.
 		local only, count = nil, 0
-		local possible = {}
-		for _, distance in ipairs(samples) do
-			local agrees = (case.melee == nil or case.melee == (distance <= 5))
-				and (case.near ~= true or distance < 10)
-				and (case.far == nil or case.far == (distance <= 28))
-			for i, r in ipairs(reaches) do
-				agrees = agrees and (case.checks[i] == nil or case.checks[i] == Within(distance, r))
+		for band in pairs(possible) do
+			possible[band] = nil
+		end
+		for _, answers in ipairs(sampleAnswers) do
+			local agrees = (case.melee == nil or case.melee == answers.melee)
+				and (case.near ~= true or answers.insideInteract)
+				and (case.far == nil or case.far == answers.far)
+			for i = 1, n do
+				agrees = agrees and (case.checks[i] == nil or case.checks[i] == answers[i])
 			end
 			if agrees then
-				local band = TrueBand(distance, reaches)
+				local band = answers.band
 				if not possible[band] then
 					possible[band], count, only = true, count + 1, band
 				end
 			end
 		end
-		local near, far = interact(case.near), follow(case.far)
-		local bands = M.Bands(case.melee, reaches, near, far)
-		local got = Band(case.melee, reaches, near, far)
-		local failure = string.format(
-			"reaches %s near %.1f yd (%s): got %s",
-			table.concat(set, ","),
-			case.at,
-			key,
-			table.concat(bands, ",")
-		)
-		local reported = {}
+		nearAnswer, farAnswer = case.near, case.far
+		local bands = M.Bands(case.melee, reaches, CaseInteract, CaseFollow, result)
+		for band in pairs(reported) do
+			reported[band] = nil
+		end
 		for _, band in ipairs(bands) do
-			assert(possible[band], failure .. ", impossible band " .. band)
-			assert(not reported[band], failure .. ", duplicate band " .. band)
+			if not possible[band] then
+				error(Failure(set, case, bands, "impossible band " .. band))
+			end
+			if reported[band] then
+				error(Failure(set, case, bands, "duplicate band " .. band))
+			end
 			reported[band] = true
 		end
-		assert(#bands == count, failure .. ", expected " .. count .. " possible bands")
-		for band in pairs(case.bands) do
-			assert(reported[band], failure .. ", missing real band " .. band)
+		if #bands ~= count then
+			error(Failure(set, case, bands, "expected " .. count .. " possible bands"))
 		end
-		assert(got == (count == 1 and only or nil), failure .. ", only a confirmed band is named")
+		for band in pairs(case.bands) do
+			if not reported[band] then
+				error(Failure(set, case, bands, "missing real band " .. band))
+			end
+		end
+		assert((#bands == 1 and bands[1] == only) == (count == 1), "only a confirmed band is named")
 	end
 end
 
