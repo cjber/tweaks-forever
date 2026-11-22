@@ -63,8 +63,7 @@ GameTooltip.StatusBar = Stub()
 -- The health bar's hooks, art and height, and the tooltip's minimum width and padding, to check the bar keeps its
 -- room and its art's own height.
 local barShown, barHooks, minWidth = true, {}, nil
-local barHeight, padding
-local nativeFill = 137014
+local barHeight, fill, padding
 local track = {}
 local bar = GameTooltip.StatusBar
 function bar.IsShown()
@@ -76,21 +75,14 @@ end
 function bar.SetHeight(_, height)
 	barHeight = height
 end
-function bar.GetStatusBarTexture()
-	return {
-		GetTexture = function()
-			return nativeFill
-		end,
-	}
-end
-function bar.SetStatusBarTexture()
-	error("the native tooltip should keep its fill")
+function bar.SetStatusBarTexture(_, texture)
+	fill = texture
 end
 function bar.CreateTexture()
 	return track
 end
-function track.SetTexture(_, texture)
-	track.texture = texture
+function track.SetAtlas(_, atlas)
+	track.atlas = atlas
 end
 function track.SetAllPoints() end
 function track.SetShown(_, shown)
@@ -227,20 +219,22 @@ for _, fn in ipairs(initializers) do
 end
 assert(#pre == 1 and #linePre == 1 and #post == 1, "the player lines hook the tooltip data processor")
 
--- The health bar keeps its native fill and uses the same art for the shaded track.
+-- The health bar is the game's cooldown bar at its own 10 units tall: the fill in the bar's colour, the track the
+-- same art at TRACK_SHADE, and room under the tooltip's last line for both.
 assert(barHeight == 10, "the health bar is 10 tall: " .. tostring(barHeight))
-assert(track.texture == nativeFill, "the track uses the native tooltip bar texture")
+assert(fill == "UI-HUD-CoolDownManager-Bar", "the health bar is filled with the cooldown bar: " .. tostring(fill))
+assert(track.atlas == "UI-HUD-CoolDownManager-Bar", "the track is the cooldown bar: " .. tostring(track.atlas))
 assert(
 	track.color[1] == 0 and track.color[2] == 0.6 * 0.3 and track.color[3] == 0.1 * 0.3,
 	"the track is the bar's colour at TRACK_SHADE"
 )
 assert(padding and padding[2] == 21, "the tooltip makes room for the bar: " .. tostring(padding and padding[2]))
-print("tooltips: the health bar uses native tooltip art: ok")
+print("tooltips: the health bar is the cooldown bar at its own height: ok")
 
--- Forever's style puts the same 10-unit bar back under the tooltip.
+-- Forever's style keeps Blizzard's placement under the tooltip, the same art and the same 10 units tall.
 active = false
 handlers.retailTooltips()
-assert(barHeight == 10 and not track.shown, "the game's own style only shows the native fill")
+assert(barHeight == 10 and fill == "UI-HUD-CoolDownManager-Bar", "the game's own style keeps the height and art")
 active = true
 handlers.retailTooltips()
 
