@@ -455,8 +455,8 @@
     },
     {
       "source": "UI/RangeStrip.lua",
-      "sha256": "2ab64f865a28757ec21030e12b4becc67017360d27add40038aae8f28c1d7b81",
-      "review": "Read NAMES, Widget, ShowSegments, Apply, Refresh, UpdateBands, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Refresh puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. Too far is displayed only in label, never a segment. Apply hides the label for ambiguous ranges and leaves every segment unlit when all are possible. Layout reads fill visibility to dim icons. Neither path changes fonts. Client spell names/icons and settings phrases are excluded.",
+      "sha256": "97fe89e848f4365a75e2e52842cfed32ad89503553d0bf7443c7da74623ddbe2",
+      "review": "Read NAMES, Widget, ShowSegments, Apply, Refresh, UpdateBands, SizeTimer, Layout and update/event callers. The band label explicitly SetFontObject(GameFontNormal); segment widget.text explicitly SetFontObject(GameFontHighlightSmall). Refresh puts Melee and optionally Dead zone in segments; ShowSegments displays their names and Apply repeats the selected name in label. ShowSegments now shows each segment's text only while the Show segment names option (rangeStripNames, default on) is active; that hides text, it changes no font. SizeTimer reads a hidden timer's GetWidth and GetEffectiveScale to size the undocked strip; it sets no text. Too far is displayed only in label, never a segment. Apply hides the label for ambiguous ranges and leaves every segment unlit when all are possible. Layout reads fill visibility to dim icons. Neither path changes fonts. Client spell names/icons and settings phrases are excluded.",
       "bindings": [
         {
           "font": "GameFontNormal",

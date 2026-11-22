@@ -7,7 +7,7 @@ end
 local L = ns.L
 
 local KEY = "rangeStrip"
-local ICONS_KEY, LABEL_KEY = "rangeStripIcons", "rangeStripLabel"
+local ICONS_KEY, LABEL_KEY, NAMES_KEY = "rangeStripIcons", "rangeStripLabel", "rangeStripNames"
 
 ns.Feature({
 	key = KEY,
@@ -37,6 +37,16 @@ ns.Feature({
 	section = "Bars and alerts",
 	name = "Show band label",
 	tooltip = "The band's name in its colour under the strip.",
+	default = true,
+	parent = KEY,
+})
+
+ns.Feature({
+	key = NAMES_KEY,
+	category = "Interface",
+	section = "Bars and alerts",
+	name = "Show segment names",
+	tooltip = "Each segment names its attack. Off, with icons and the band label off too, the strip is bars only.",
 	default = true,
 	parent = KEY,
 })
@@ -655,7 +665,7 @@ ns.Init(function()
 			widget.iconFile = segment.icon
 			widget.background:Show()
 			widget.border:Show()
-			widget.text:Show()
+			widget.text:SetShown(ns.Active(NAMES_KEY))
 			shown[#shown + 1] = widget
 		end
 		for key, widget in pairs(widgets) do
@@ -732,6 +742,16 @@ ns.Init(function()
 		return lowest
 	end
 
+	-- The swing timer the strip matches in size when none is shown to dock under: hidden, a timer keeps the width
+	-- and scale Edit Mode gave it (#698).
+	local function SizeTimer()
+		for _, timer in ipairs(timers) do
+			if (timer:GetWidth() or 0) > 0 then
+				return timer
+			end
+		end
+	end
+
 	-- Whether the strip enabled the main-hand swing range check, so it gives back only its own: the game's timer
 	-- enables the same check for itself, and a check it holds is left alone.
 	local ownSwingCheck = false
@@ -795,7 +815,7 @@ ns.Init(function()
 	-- The segments and shape options last laid out, so a tick with none of them changed only re-lights the band.
 	---@type TFRangeSegment[]?
 	local shownSegments
-	local shownIcons, shownLabel
+	local shownIcons, shownLabel, shownNames
 	local SPELL_COLOUR = { SPELL_R, SPELL_G, SPELL_B }
 	-- The client can answer a known spell's name late, before its data has loaded: a build that missed one is read
 	-- again on the next update, so the reach joins the strip without waiting for the next spell event. An icon may
@@ -898,14 +918,16 @@ ns.Init(function()
 				strip:SetPoint("TOPLEFT", timer, "BOTTOMLEFT", 0, -DOCK_GAP)
 				strip:SetPoint("TOPRIGHT", timer, "BOTTOMRIGHT", 0, -DOCK_GAP)
 			else
-				strip:SetWidth(FALLBACK_WIDTH)
+				local size = SizeTimer()
+				strip:SetWidth(size and size:GetWidth() or FALLBACK_WIDTH)
 				strip:SetPoint("TOP", UIParent, "CENTER", 0, FALLBACK_OFFSET)
 			end
 		end
-		-- Match the timer's scale when docked, or inherit UIParent's at the fallback spot.
+		-- Match the docked timer's scale, or at the fallback spot a hidden timer's, else inherit UIParent's.
 		local parentScale = UIParent:GetEffectiveScale()
-		if timer and parentScale and parentScale > 0 then
-			strip:SetScale(timer:GetEffectiveScale() / parentScale)
+		local scaleFrom = timer or SizeTimer()
+		if scaleFrom and parentScale and parentScale > 0 then
+			strip:SetScale(scaleFrom:GetEffectiveScale() / parentScale)
 		else
 			strip:SetScale(1)
 		end
@@ -914,10 +936,13 @@ ns.Init(function()
 			return
 		end
 		SwingCheck(true)
-		local icons, labelOn = ns.Active(ICONS_KEY), ns.Active(LABEL_KEY)
-		local changed = shownSegments ~= cachedSegments or shownIcons ~= icons or shownLabel ~= labelOn
+		local icons, labelOn, namesOn = ns.Active(ICONS_KEY), ns.Active(LABEL_KEY), ns.Active(NAMES_KEY)
+		local changed = shownSegments ~= cachedSegments
+			or shownIcons ~= icons
+			or shownLabel ~= labelOn
+			or shownNames ~= namesOn
 		if changed then
-			shownSegments, shownIcons, shownLabel = cachedSegments, icons, labelOn
+			shownSegments, shownIcons, shownLabel, shownNames = cachedSegments, icons, labelOn, namesOn
 			ShowSegments(cachedSegments)
 		end
 		UpdateBands()
@@ -944,6 +969,7 @@ ns.Init(function()
 	ns.OnSettingChanged(KEY, Update)
 	ns.OnSettingChanged(ICONS_KEY, Update)
 	ns.OnSettingChanged(LABEL_KEY, Update)
+	ns.OnSettingChanged(NAMES_KEY, Update)
 	ns.On("PLAYER_TARGET_CHANGED", Update)
 	-- A learned spell, a talent point, a level or the ranged slot moves a range or adds a reach. The segments are
 	-- rebuilt from the client's current ranges, and only a changed list lays the strip out again.
