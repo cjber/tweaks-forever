@@ -10,6 +10,16 @@ Each version's entry is also its release notes on GitHub, CurseForge and Wago. O
 verbatim rather than rewritten as the addon moves. API changes other addons' authors need go under an
 optional `### For addon authors` subsection after a version's player bullets.
 
+## [2.9.13] - 2026-11-22
+
+### Added
+
+- **Bars-only range strip.** A *Show segment names* option under Range strip hides each segment's name; with icons and the band label off too, only the coloured bars show.
+
+### Fixed
+
+- **The range strip is the same size away from the swing timers.** With no swing timer showing, it takes the width and scale the game gives its timers instead of a smaller size of its own.
+
 ## [2.9.12] - 2026-11-22
 
 ### Changed
