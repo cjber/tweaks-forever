@@ -145,6 +145,9 @@ end
 function Timer.GetEffectiveScale(self)
 	return self.scale
 end
+function Timer.GetWidth(self)
+	return self.width
+end
 function Timer.HookScript(self, script, fn)
 	self.scripts[script] = fn
 end
@@ -154,7 +157,8 @@ function Timer.IsRangeCheckEnabled(self)
 end
 
 local function Load(class, knownSpells)
-	local features, initializers, handlers, db = {}, {}, {}, {}
+	-- Segment names default on, as the saved settings do; older cases predate the option.
+	local features, initializers, handlers, db = {}, {}, {}, { rangeStripNames = true }
 	local settingChanged = {}
 
 	local tickers = {}
@@ -460,8 +464,11 @@ local feature = hunter.features.rangeStrip
 assert(feature.default == false and feature.category == "Interface", "off by default on the Interface page")
 assert(feature.name == "Range strip", "named for every class")
 
--- Two options under it, both on by default: each segment's own icon, and the band's name under the strip.
+-- Three options under it, all on by default: each segment's own icon, the band's name under the strip, and each
+-- segment's name.
 local icons, label = hunter.features.rangeStripIcons, hunter.features.rangeStripLabel
+local names = hunter.features.rangeStripNames
+assert(names and names.parent == "rangeStrip" and names.default == true, "segment names on by default, under the strip")
 assert(icons and icons.parent == "rangeStrip" and icons.default == true, "icons on by default, under the strip")
 assert(
 	label and label.parent == "rangeStrip" and label.default == true,
@@ -909,7 +916,7 @@ assert(hunter.mainHand.scripts.OnShow and hunter.mainHand.scripts.OnHide and hun
 assert(hunter.ranged.scripts.OnShow and hunter.ranged.scripts.OnHide and hunter.ranged.scripts.OnSizeChanged)
 
 hunter.db.rangeStrip = true
-hunter.db.rangeStripIcons, hunter.db.rangeStripLabel = true, true
+hunter.db.rangeStripIcons, hunter.db.rangeStripLabel, hunter.db.rangeStripNames = true, true, true
 hunter.setSwing(true)
 hunter.changed()
 assert(hunter.strip.shown, "on, the strip shows")
@@ -1020,7 +1027,7 @@ hunter.changed()
 assert(hunter.strip.shown, "the strip shows with hidden swing timers")
 assert(hunter.strip.points[1][2] == hunter.uiParent, "hidden, unplaced timers use the screen fallback")
 assert(hunter.strip.points[1][3] == "CENTER" and #hunter.strip.points == 1, "a single screen-relative anchor")
-assert(hunter.strip:GetWidth() == 213, "the fallback has its own width")
+assert(hunter.strip:GetWidth() == 240, "the fallback takes a hidden timer's width (#698)")
 
 -- A shown timer without a resolved position cannot displace the fallback.
 hunter.mainHand.shown = true
@@ -1051,7 +1058,10 @@ assert(hunter.strip.shown and math.abs(hunter.strip.scale - 1.4) < 1e-9, "the st
 assert(#hunter.tickers == 2 and not hunter.tickers[2].cancelled, "shown again, a new ticker starts")
 hunter.ranged.shown = false
 hunter.ranged.scripts.OnHide()
-assert(hunter.strip.points[1][2] == hunter.uiParent and hunter.strip.scale == 1, "fallback restores UI scale")
+assert(
+	hunter.strip.points[1][2] == hunter.uiParent and math.abs(hunter.strip.scale - hunter.mainHand.scale / 0.5) < 1e-9,
+	"the fallback keeps a hidden timer's scale (#698)"
+)
 hunter.ranged.shown = true
 hunter.ranged.scripts.OnShow()
 assert(hunter.strip:GetWidth() == 240, "docking restores the timer width")
@@ -1082,6 +1092,24 @@ assert(
 hunter.db.rangeStripIcons = true
 hunter.changed("rangeStripIcons")
 assert(art(hunter, 1).icon.shown and art(hunter, 1).background.points[1][4] == TILE + ICON_GAP, "the tiles come back")
+
+-- Bars only (#699): icons, band label and segment names all off leave no text and no tiles, at once.
+local function anyText()
+	for _, text in ipairs(hunter.fontStrings) do
+		if text.shown then
+			return true
+		end
+	end
+	return false
+end
+assert(anyText(), "names and label show by default")
+hunter.db.rangeStripIcons, hunter.db.rangeStripLabel, hunter.db.rangeStripNames = false, false, false
+hunter.changed("rangeStripNames")
+assert(not anyText(), "bars only: no segment names and no band label")
+assert(not art(hunter, 1).icon.shown and art(hunter, 1).background.shown, "bars only: segments without tiles")
+hunter.db.rangeStripIcons, hunter.db.rangeStripLabel, hunter.db.rangeStripNames = true, true, true
+hunter.changed("rangeStripNames")
+assert(anyText() and art(hunter, 1).icon.shown, "names, label and tiles come back")
 
 -- A new main-hand weapon: PLAYER_EQUIPMENT_CHANGED re-reads the slot and lays the strip out again, so Melee's tile
 -- carries the new weapon at once. An empty slot leaves Melee without a tile, taking its whole width as any segment
