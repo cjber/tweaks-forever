@@ -343,7 +343,7 @@ L["%s: %s are out of date. Update them to fix this."] = "%s：%s 已過時。請
 L["%s could not start. Reinstall %s to fix this."] = "%s 無法啟動。請重新安裝 %s 以解決此問題。" -- mt
 
 L["Range strip"] = "距離條"
-L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden. When the game cannot tell bands apart, the strip lights each one faintly and names none."] = "在遊戲揮擊計時器下方顯示一條距離條，標明你的哪些攻擊能觸及目標，從近戰一路到最遠的射程；最小射程留下的空檔會顯示為死區。只要有可攻擊的目標就會顯示，無論是否在戰鬥中，位置在揮擊計時器處，即使計時器已隱藏。 遊戲無法區分多個距離區間時，所有可能的區間都會微亮，且不顯示區間名稱。"
+L["A strip under the game's swing timers naming which of your attacks reach your target, from melee out to your longest reach, with a dead zone where a minimum range leaves a gap. It shows with any attackable target, in combat or not, where the swing timers sit, even while they are hidden. When the game cannot tell bands apart, the strip lights each one faintly and names none."] = "在遊戲揮擊計時器下方顯示一條距離條，標明你的哪些攻擊能觸及目標，從近戰一路到最遠的射程；最小射程留下的空檔會顯示為死區。只要有可攻擊的目標就會顯示，無論是否在戰鬥中，位置在揮擊計時器處，即使計時器已隱藏。遊戲無法區分多個距離區間時，所有可能的區間都會微亮，且不顯示區間名稱。"
 L["Melee"] = "近戰" -- mt
 L["Dead zone"] = "死區" -- mt
 L["Too far"] = "過遠" -- mt

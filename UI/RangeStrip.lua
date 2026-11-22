@@ -482,16 +482,6 @@ function Model.Bands(melee, reaches, interact, follow, bands)
 	return bands
 end
 
----@param melee boolean?
----@param reaches TFRangeReach[]
----@param interact fun(): boolean?
----@param follow? fun(): boolean?
----@return string?
-function Model.Band(melee, reaches, interact, follow)
-	local bands = Model.Bands(melee, reaches, interact, follow)
-	return #bands == 1 and bands[1] or nil
-end
-
 ns.Init(function()
 	local class = UnitClassBase("player")
 	if not class or not REACHES[class] then
@@ -531,7 +521,6 @@ ns.Init(function()
 	label:Hide()
 
 	---@class TFRangeSegmentWidget
-	---@field key string
 	---@field text FontString
 	---@field fill Texture
 	---@field background Texture
@@ -579,7 +568,6 @@ ns.Init(function()
 		text:SetTextColor(UNLIT_R, UNLIT_G, UNLIT_B)
 		text:SetWordWrap(false)
 		widget = {
-			key = key,
 			background = background,
 			fill = fill,
 			border = border,
@@ -596,7 +584,7 @@ ns.Init(function()
 	---@type TFRangeSegmentWidget[]
 	local shown = {}
 
-	-- Reused on each update and read by Layout to dim icons outside the possible bands.
+	-- Reused on each update to collect the possible bands.
 	local bands = {}
 
 	-- The strip's two rows: segments 17 high with icons and 15 without, and a 20-high band label under them only
@@ -647,7 +635,7 @@ ns.Init(function()
 				widget.iconFrame:SetSize(tile, tile)
 				widget.icon:Show()
 				widget.iconFrame:Show()
-				widget.dim:SetShown(not HasBand(bands, widget.key))
+				widget.dim:SetShown(not widget.fill:IsShown())
 			else
 				widget.icon:Hide()
 				widget.dim:Hide()
@@ -705,11 +693,21 @@ ns.Init(function()
 		else
 			label:Hide()
 		end
+		-- Too far has no segment. Suppress highlights only if every visible segment is possible.
+		local allPossible = #bands >= #segments
+		if allPossible then
+			for _, segment in ipairs(segments) do
+				if not HasBand(bands, segment.key) then
+					allPossible = false
+					break
+				end
+			end
+		end
 		local icons = ns.Active(ICONS_KEY)
 		for _, segment in ipairs(segments) do
 			local widget = Widget(segment.key)
-			local possible = HasBand(bands, segment.key)
-			if possible then
+			local lit = not allPossible and HasBand(bands, segment.key)
+			if lit then
 				local colour = segment.colour
 				widget.fill:SetVertexColor(colour[1], colour[2], colour[3], band and 1 or POSSIBLE_ALPHA)
 				widget.fill:Show()
@@ -719,7 +717,7 @@ ns.Init(function()
 				widget.text:SetTextColor(UNLIT_R, UNLIT_G, UNLIT_B)
 			end
 			-- An unlit segment's icon is darkened, as the mock draws it: black over the tile at 0.6.
-			widget.dim:SetShown(widget.iconFile ~= nil and icons and not possible)
+			widget.dim:SetShown(widget.iconFile ~= nil and icons and not lit)
 		end
 	end
 
