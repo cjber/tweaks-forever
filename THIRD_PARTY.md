@@ -51,6 +51,10 @@ Credit for the reports and requests behind the addon.
 | [Mouchoir](https://github.com/Mouchoir) | Questie icon sizes follow its sliders (code) | GitHub; #217, PR #216 |
 | [Mouchoir](https://github.com/Mouchoir) | Fixed the chat options' login errors (code) | GitHub; #551, PR #552 |
 | [Mouchoir](https://github.com/Mouchoir) | Fixed the battleground tooltip errors (code) | GitHub; #568, PR #569 |
+| Tinter | Option to hide the Professions crafting bar | CurseForge; #617; thread 8735245 |
+| jixxor | Range strip no longer sticks top left | Discord; #695 |
+| KiraAkashiya | Range strip no longer sticks top left | CurseForge; #695; thread 8771583 |
+| [Danescalis](https://github.com/Danescalis) | Addon managers update Tweaks beside SkillUp again | GitHub; #527 |
 
 ## Inspired by
 
