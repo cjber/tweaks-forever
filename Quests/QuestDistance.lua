@@ -171,28 +171,24 @@ local function CreateDecorations(inside, Each)
 		return d
 	end
 
-	-- Ends the title at `right`, as Blizzard does beside an item button, and passes a change in its wrapped height to
-	-- the block and its module, so the rows below move with it. Engine calls only, after Blizzard's own layout, which
-	-- sets all three again each time.
+	-- Ends the title at `right`, as Blizzard does beside an item button. The title keeps the height Blizzard laid the
+	-- block out for, so one that no longer fits is cut short with "..." and nothing on the tracker moves: its room for
+	-- more blocks is worked out from those heights. Engine calls only; Blizzard resets both on its next layout.
 	---@param block TFQuestBlock
 	---@param right number
 	local function Fit(block, right)
 		local title = block.HeaderText
-		local before = title:GetHeight()
+		local height = title:GetHeight()
 		title:SetPoint("RIGHT", right, 0)
-		title:SetHeight(0)
-		local grown = title:GetHeight() - before
-		if grown ~= 0 then
-			block:SetHeight(block:GetHeight() + grown)
-			block.parentModule:SetHeight(block.parentModule:GetHeight() + grown)
-		end
+		title:SetHeight(height)
 	end
 
 	---@param block TFQuestBlock
 	local function Hide(block)
 		local d = decor[block]
 		if d then
-			Fit(block, block.rightEdgeOffset or 0)
+			block.HeaderText:SetPoint("RIGHT", block.rightEdgeOffset or 0, 0)
+			block.HeaderText:SetHeight(0)
 			d.label:Hide()
 			d.glow:Hide()
 		end
@@ -225,9 +221,13 @@ local function CreateDecorations(inside, Each)
 		d.glow:SetShown(here)
 	end
 
+	-- A cached block (a quest on its way out) is not reset by the layout, so its offset can still allow for an item
+	-- button the tracker has since released.
 	---@param block TFQuestBlock
 	local function Widen(block)
-		column = math.min(column, block.rightEdgeOffset or 0)
+		if not block.cached then
+			column = math.min(column, block.rightEdgeOffset or 0)
+		end
 	end
 
 	local function Layout()
