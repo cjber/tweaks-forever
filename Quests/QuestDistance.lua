@@ -27,7 +27,7 @@ ns.Feature({
 
 -- Yards you move before your position is checked against quest areas again, and before the list is re-sorted.
 local RECHECK, RESORT = 5, 25
--- Space between the distance column and the item buttons.
+-- Space left of the distance column, and between it and the item buttons.
 local GAP = 4
 
 ---@param yards number
@@ -171,10 +171,28 @@ local function CreateDecorations(inside, Each)
 		return d
 	end
 
+	-- Ends the title at `right`, as Blizzard does beside an item button, and passes a change in its wrapped height to
+	-- the block and its module, so the rows below move with it. Engine calls only, after Blizzard's own layout, which
+	-- sets all three again each time.
+	---@param block TFQuestBlock
+	---@param right number
+	local function Fit(block, right)
+		local title = block.HeaderText
+		local before = title:GetHeight()
+		title:SetPoint("RIGHT", right, 0)
+		title:SetHeight(0)
+		local grown = title:GetHeight() - before
+		if grown ~= 0 then
+			block:SetHeight(block:GetHeight() + grown)
+			block.parentModule:SetHeight(block.parentModule:GetHeight() + grown)
+		end
+	end
+
 	---@param block TFQuestBlock
 	local function Hide(block)
 		local d = decor[block]
 		if d then
+			Fit(block, block.rightEdgeOffset or 0)
 			d.label:Hide()
 			d.glow:Hide()
 		end
@@ -197,6 +215,7 @@ local function CreateDecorations(inside, Each)
 		d.label:SetPoint("TOP", block.HeaderText, "TOP")
 		d.label:SetPoint("RIGHT", block, "RIGHT", column, 0)
 		d.label:SetText(here and L["here"] or Format(math.sqrt(distanceSq)))
+		Fit(block, column - d.label:GetStringWidth() - GAP)
 		if here then
 			d.label:SetTextColor(GREEN_FONT_COLOR:GetRGB()) -- multi-value: r, g, b
 		else

@@ -3,6 +3,7 @@
 -- feature's own work.
 local ns = {
 	Feature = function() end,
+	L = { ["%d yd"] = "%d yd", here = "here" },
 }
 
 local function Frame()
@@ -28,6 +29,52 @@ local function Frame()
 	return frame
 end
 
+-- A region of our own on a block: every call is accepted, and a font string measures 6 px a character.
+local function Region()
+	local region = { text = "" }
+	function region:SetText(text)
+		self.text = text
+	end
+	function region:GetStringWidth()
+		return #self.text * 6
+	end
+	return setmetatable(region, {
+		__index = function()
+			return function() end
+		end,
+	})
+end
+
+-- A 200 px tracker block as Blizzard lays it out: the title runs from the left edge to its RIGHT offset, 6 px a
+-- character in lines of 12 px, two at most, and the block and its module are as tall as the title.
+local function Block(id, title, rightEdgeOffset)
+	local function Sized(height)
+		return {
+			height = height,
+			GetHeight = function(self)
+				return self.height
+			end,
+			SetHeight = function(self, value)
+				self.height = value
+			end,
+		}
+	end
+	local header = { right = rightEdgeOffset }
+	function header:SetPoint(point, x)
+		assert(point == "RIGHT")
+		self.right = x
+	end
+	function header.SetHeight() end
+	function header:GetHeight()
+		return 12 * math.min(2, math.ceil(#title * 6 / (200 + self.right)))
+	end
+	local block = Sized(header:GetHeight())
+	block.id, block.rightEdgeOffset, block.HeaderText = id, rightEdgeOffset, header
+	block.parentModule = Sized(100)
+	block.CreateFontString, block.CreateTexture = Region, Region
+	return block
+end
+
 -- A stand-in client as Forever was measured to behave (#80): every watch is manual, AddQuestWatch takes a quest and
 -- puts it first, and un-watching the super-tracked quest drops the super-tracking. Quests sit along a line at the
 -- yards given in `at`; one missing from `at` is on another continent. `world.x`/`world.y` is the player.
@@ -45,9 +92,16 @@ local function Load(watched, at)
 		tracker = Frame(),
 		moves = 0, -- watches re-added
 		areaChecks = 0,
+		blocks = {}, -- tracker blocks, for the layout checks
 	}
 	local frames = {}
-	local module = { EnumerateActiveBlocks = function() end }
+	local module = {
+		EnumerateActiveBlocks = function(_, fn)
+			for _, block in ipairs(world.blocks) do
+				fn(block)
+			end
+		end,
+	}
 	local function IndexOf(id)
 		for index, watch in ipairs(world.watches) do
 			if watch == id then
@@ -71,6 +125,10 @@ local function Load(watched, at)
 		assert(loadfile("Quests/QuestDistance.lua")),
 		setmetatable({
 			UIParent = {},
+			CreateColor = function() end,
+			GREEN_FONT_COLOR = {
+				GetRGB = function() end,
+			},
 			CreateFrame = function()
 				frames[#frames + 1] = Frame()
 				return frames[#frames]
@@ -281,4 +339,22 @@ assert(watcher.shown, "tracker back")
 world.active = false
 world.tick()
 assert(not watcher.shown, "a conflict stops the polling within a second")
+
+-- A long title ends before its distance (and the item button beside it), and the block and the module below it grow
+-- by the line it now takes; switched off, all of it is Blizzard's again.
+world = Load({ 1, 2 }, { 500, 900 })
+local long = Block(1, "[18] Collecting Memories", 0)
+local button = Block(2, "Short", -30)
+world.blocks = { long, button }
+world.tick()
+-- "500 yd" is 36 px, the item button's column -34 and the gap 4.
+assert(long.HeaderText.right == -74, "the title stops left of the distance column: " .. long.HeaderText.right)
+assert(long.height == 24 and long.parentModule.height == 112, "the wrapped line moves the rows below down")
+assert(button.height == 12 and button.parentModule.height == 100, "a title that still fits moves nothing")
+world.tick()
+assert(long.height == 24 and long.parentModule.height == 112, "the next tick grows nothing again")
+world.active = false
+world.changed()
+assert(long.HeaderText.right == 0 and button.HeaderText.right == -30, "the native right edges are back")
+assert(long.height == 12 and long.parentModule.height == 100, "and the native heights")
 print("questdistance: ok")
