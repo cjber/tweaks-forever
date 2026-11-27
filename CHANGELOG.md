@@ -16,6 +16,14 @@ optional `### For addon authors` subsection after a version's player bullets.
 
 - Ships with the same shared code as your other Forever addons, so they keep working together.
 
+### Changed
+
+- The Thanks page lists more players. More of the people whose reports and ideas shipped are now thanked by name in game.
+
+### Fixed
+
+- Long quest titles no longer cover their distance. In the objective tracker, a title too long for the space beside the distance is now cut short with "...".
+
 ## [2.9.18] - 2026-11-26
 
 <!-- forever-core-sync -->
