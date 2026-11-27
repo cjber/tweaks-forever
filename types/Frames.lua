@@ -33,6 +33,7 @@
 ---@class TFQuestBlock : ObjectiveTrackerBlockTemplate
 ---@field id integer
 ---@field rightEdgeOffset? number
+---@field cached? boolean
 
 ---@class TFQuestDecor
 ---@field label FontString
