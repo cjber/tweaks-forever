@@ -12,6 +12,10 @@ ns.Credits = {
 		{ name = "Mouchoir", what = "Questie icon sizes follow its sliders (code)" },
 		{ name = "Mouchoir", what = "Fixed the chat options' login errors (code)" },
 		{ name = "Mouchoir", what = "Fixed the battleground tooltip errors (code)" },
+		{ name = "Tinter", what = "Option to hide the Professions crafting bar" },
+		{ name = "jixxor", what = "Range strip no longer sticks top left" },
+		{ name = "KiraAkashiya", what = "Range strip no longer sticks top left" },
+		{ name = "Danescalis", what = "Addon managers update Tweaks beside SkillUp again" },
 	},
 	inspired = {
 		{ name = "Polestar by Fitz", what = "Ideas for many features" },

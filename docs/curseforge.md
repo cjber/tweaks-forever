@@ -85,7 +85,7 @@ Adventure Guide Forever uses Tweaks' class trainer locations for its spell remin
 
 <!-- forever-credits:start -->
 
-Thanks to Mouchoir, Sojiro84, SirGooie, NightIsolation and everyone who reported a bug or asked for a feature.
+Thanks to Mouchoir, Sojiro84, SirGooie, NightIsolation, Tinter, jixxor, KiraAkashiya, Danescalis and everyone who reported a bug or asked for a feature.
 
 <!-- forever-credits:end -->
 
