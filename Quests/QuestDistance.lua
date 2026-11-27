@@ -171,16 +171,18 @@ local function CreateDecorations(inside, Each)
 		return d
 	end
 
-	-- Ends the title at `right`, as Blizzard does beside an item button. The title keeps the height Blizzard laid the
-	-- block out for, so one that no longer fits is cut short with "..." and nothing on the tracker moves: its room for
-	-- more blocks is worked out from those heights. Engine calls only; Blizzard resets both on its next layout.
+	-- Ends the title at `right`, as Blizzard does beside an item button. The title keeps the height and line count
+	-- Blizzard laid the block out for, so one that no longer fits is cut short with "..." and nothing on the tracker
+	-- moves: its room for more blocks is worked out from those heights. A set height alone does not clip: the client
+	-- draws a wrapped line over the objective below it. Engine calls only; Blizzard resets all three on its next layout.
 	---@param block TFQuestBlock
 	---@param right number
 	local function Fit(block, right)
 		local title = block.HeaderText
-		local height = title:GetHeight()
+		local height, lines = title:GetHeight(), title:GetNumLines()
 		title:SetPoint("RIGHT", right, 0)
 		title:SetHeight(height)
+		title:SetMaxLines(lines)
 	end
 
 	---@param block TFQuestBlock
@@ -189,6 +191,7 @@ local function CreateDecorations(inside, Each)
 		if d then
 			block.HeaderText:SetPoint("RIGHT", block.rightEdgeOffset or 0, 0)
 			block.HeaderText:SetHeight(0)
+			block.HeaderText:SetMaxLines(2) -- the header's limit in ObjectiveTrackerBlockMixin:SetStringText
 			d.label:Hide()
 			d.glow:Hide()
 		end

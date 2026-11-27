@@ -160,7 +160,7 @@
     },
     {
       "source": "Quests/QuestDistance.lua",
-      "sha256": "470d43a8061b98113552b56b7927eab3818540a8bfcd825fa866697824d4a01d",
+      "sha256": "cccae69ae7f433a89acf80ee3007c01cb39927233311bd00195334946a589797",
       "review": "Read Format, CreateDecorations Decor/Update/Layout and all refresh, tracker iteration and ticker callers. Decor creates our own label with ObjectiveTrackerLineFont; Update assigns here or the two Format phrases. No later font override or label export occurs. Only the addon-owned distance label is covered, not Blizzard quest titles, settings labels or dynamic game data.",
       "bindings": [
         {

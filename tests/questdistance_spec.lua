@@ -46,9 +46,10 @@ local function Region()
 end
 
 -- A 200 px tracker block as Blizzard lays it out: the title runs from the left edge to its RIGHT offset, 6 px a
--- character in lines of 12 px, two at most, as tall as its lines unless its height is set.
+-- character in lines of 12 px, up to its line limit (two from Blizzard), as tall as its lines unless its height is
+-- set. As in the client, a set height does not limit the lines drawn.
 local function Block(id, title, rightEdgeOffset)
-	local header = { right = rightEdgeOffset, height = 0 }
+	local header = { right = rightEdgeOffset, height = 0, maxLines = 2 }
 	function header:SetPoint(point, x)
 		assert(point == "RIGHT")
 		self.right = x
@@ -56,11 +57,17 @@ local function Block(id, title, rightEdgeOffset)
 	function header:SetHeight(height)
 		self.height = height
 	end
+	function header:SetMaxLines(lines)
+		self.maxLines = lines
+	end
+	function header:GetNumLines()
+		return math.min(self.maxLines, math.ceil(#title * 6 / (200 + self.right)))
+	end
 	function header:GetHeight()
 		if self.height > 0 then
 			return self.height
 		end
-		return 12 * math.min(2, math.ceil(#title * 6 / (200 + self.right)))
+		return 12 * self:GetNumLines()
 	end
 	return {
 		id = id,
@@ -338,20 +345,23 @@ assert(not watcher.shown, "a conflict stops the polling within a second")
 
 -- A long title ends before its distance (and the item button beside it) at the height Blizzard gave it; switched
 -- off, it is Blizzard's again.
-world = Load({ 1, 2 }, { 500, 900 })
+world = Load({ 1, 2, 3 }, { 500, 900, 700 })
 local long = Block(1, "[18] Collecting Memories", 0)
 local button = Block(2, "Short", -30)
-world.blocks = { long, button }
+local tall = Block(3, "[18] Collecting Memories of the Miners' Union", 0)
+world.blocks = { long, button, tall }
 world.tick()
 -- "500 yd" is 36 px, the item button's column -34 and the gap 4.
 assert(long.HeaderText.right == -74, "the title stops left of the distance column: " .. long.HeaderText.right)
-assert(long.HeaderText:GetHeight() == 12, "a title that no longer fits takes no new line")
+assert(long.HeaderText:GetHeight() == 12 and long.HeaderText:GetNumLines() == 1, "a title takes no new line")
+assert(tall.HeaderText:GetHeight() == 24 and tall.HeaderText:GetNumLines() == 2, "a two-line title keeps both")
 world.tick()
-assert(long.HeaderText:GetHeight() == 12, "nor on the next tick")
+assert(long.HeaderText:GetHeight() == 12 and long.HeaderText:GetNumLines() == 1, "nor on the next tick")
 world.active = false
 world.changed()
 assert(long.HeaderText.right == 0 and button.HeaderText.right == -30, "the native right edges are back")
 assert(long.HeaderText.height == 0 and button.HeaderText.height == 0, "and the titles size themselves again")
+assert(long.HeaderText.maxLines == 2, "with the header's two lines")
 
 -- A cached block keeps the offset of an item button the tracker has released: the column does not make room for it.
 world = Load({ 1, 2 }, { 500, 900 })
